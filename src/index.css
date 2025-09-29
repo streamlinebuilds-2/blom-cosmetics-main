@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-pink: #FF8BB3;
+  --primary-blue: #CEE5FF;
+  --accent-gold: #FFD700;
+  --accent-coral: #FF6B6B;
+  --neutral-white: #FFFFFF;
+  --neutral-light: #F8F9FA;
+  --neutral-medium: #6C757D;
+  --neutral-dark: #343A40;
+  --neutral-black: #212529;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --spacing-2xl: 4rem;
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: var(--neutral-dark);
+    background-color: var(--neutral-white);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--neutral-black);
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+  }
+
+  h3 {
+    font-size: 1.875rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
+  }
+
+  h5 {
+    font-size: 1.25rem;
+  }
+
+  h6 {
+    font-size: 1.125rem;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2.25rem;
+    }
+
+    h2 {
+      font-size: 1.875rem;
+    }
+
+    h3 {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer border-0 outline-none focus:ring-2 focus:ring-offset-2;
+    min-height: 44px;
+  }
+
+  .btn-primary {
+    @apply bg-pink-400 text-white hover:bg-pink-500 focus:ring-pink-300;
+    background-color: var(--primary-pink);
+  }
+
+  .btn-primary:hover {
+    background-color: #FF6B9D;
+  }
+
+  .btn-secondary {
+    @apply text-gray-700 border border-gray-300 hover:bg-gray-50 focus:ring-gray-200;
+    background-color: var(--neutral-white);
+  }
+
+  .btn-outline {
+    @apply border-2 border-pink-400 text-pink-400 hover:bg-pink-400 hover:text-white focus:ring-pink-300;
+    border-color: var(--primary-pink);
+    color: var(--primary-pink);
+  }
+
+  .btn-ghost {
+    @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-200;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-base;
+    min-height: 48px;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-xs;
+    min-height: 40px;
+  }
+
+  .container-custom {
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
+    max-width: 1200px;
+  }
+
+  .grid-responsive {
+    @apply grid gap-6;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-gray-200 overflow-hidden;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all;
+    min-height: 44px;
+  }
+
+  .section-padding {
+    @apply py-12 md:py-20;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-pink-400 to-blue-300 bg-clip-text text-transparent;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.6s ease-out;
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.8s ease-out;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-slide-up {
+      animation: none;
+    }
+  }
+}

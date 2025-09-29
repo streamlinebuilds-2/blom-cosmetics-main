@@ -1,0 +1,180 @@
+import React from 'react';
+import { Container } from './Container';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+
+export const Footer: React.FC = () => {
+  const footerLinks = {
+    shop: [
+      { name: 'All Products', href: '/shop' },
+      { name: 'New In', href: '/shop/new' },
+      { name: 'Best Sellers', href: '/shop/bestsellers' },
+      { name: 'Acrylic System', href: '/shop/acrylic' },
+      { name: 'Gel System', href: '/shop/gel' },
+      { name: 'Tools & Essentials', href: '/shop/tools' }
+    ],
+    courses: [
+      { name: 'Online Courses', href: '/courses/online' },
+      { name: 'In-Person Training', href: '/courses/in-person' },
+      { name: 'Watercolour Workshop', href: '/courses/watercolour' },
+      { name: 'Acrylic Basics', href: '/courses/acrylic-basics' },
+      { name: 'Professional Training', href: '/courses/professional' },
+      { name: 'Master Classes', href: '/courses/masterclass' }
+    ],
+    company: [
+      { name: 'About Us', href: '/about' },
+      { name: 'Our Story', href: '/about#story' },
+      { name: 'Our Team', href: '/about#team' },
+      { name: 'Our Mission', href: '/about#mission' },
+      { name: 'Careers', href: '/careers' },
+      { name: 'Press', href: '/press' }
+    ],
+    support: [
+      { name: 'Contact Us', href: '/contact' },
+      { name: 'Customer Support', href: '/support' },
+      { name: 'Shipping Info', href: '/shipping' },
+      { name: 'Returns & Exchanges', href: '/returns' },
+      { name: 'Size Guide', href: '/size-guide' },
+      { name: 'FAQ', href: '/faq' }
+    ]
+  };
+
+  return (
+    <footer className="bg-gray-900 text-gray-300">
+      {/* Newsletter Section */}
+      <div className="bg-gradient-to-r from-pink-400 to-blue-300 text-white">
+        <Container>
+          <div className="py-12 text-center">
+            <h3 className="text-2xl font-bold mb-4">Join the BLOM Beauty Club</h3>
+            <p className="mb-6 text-blue-100">Get exclusive offers, tutorials, and nail art inspiration delivered to your inbox</p>
+            <div className="max-w-md mx-auto flex gap-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                className="input-field flex-1 text-gray-900"
+              />
+              <button className="btn btn-secondary px-8">
+                Subscribe
+              </button>
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      {/* Main Footer Content */}
+      <Container>
+        <div className="py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="lg:col-span-1">
+              <h3 className="text-2xl font-bold text-gradient mb-4">BLOM</h3>
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                Empowering nail professionals with premium products and expert training.
+                Bloom, Blossom, Believe with BLOM Cosmetics.
+              </p>
+
+              {/* Contact Info */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-pink-400" />
+                  <span className="text-sm">shopblomcosmetics@gmail.com</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-pink-400" />
+                  <span className="text-sm">+27 79 548 3317</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-pink-400" />
+                  <span className="text-sm">South Africa</span>
+                </div>
+              </div>
+
+              {/* Social Media */}
+              <div className="flex gap-4 mt-6">
+                <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                  <Facebook className="h-4 w-4" />
+                </a>
+                <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                  <Instagram className="h-4 w-4" />
+                </a>
+                <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                  <Twitter className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Shop Links */}
+            <div>
+              <h4 className="font-semibold text-white mb-4">Shop</h4>
+              <ul className="space-y-2">
+                {footerLinks.shop.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Courses Links */}
+            <div>
+              <h4 className="font-semibold text-white mb-4">Education</h4>
+              <ul className="space-y-2">
+                {footerLinks.courses.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <h4 className="font-semibold text-white mb-4">Support</h4>
+              <ul className="space-y-2">
+                {footerLinks.support.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-800 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-gray-500 text-sm">
+              © 2024 BLOM Cosmetics. All rights reserved.
+            </p>
+            <div className="flex gap-6">
+              <a href="/privacy" className="text-gray-500 hover:text-pink-400 text-sm transition-colors">
+                Privacy Policy
+              </a>
+              <a href="/terms" className="text-gray-500 hover:text-pink-400 text-sm transition-colors">
+                Terms of Service
+              </a>
+              <a href="/returns" className="text-gray-500 hover:text-pink-400 text-sm transition-colors">
+                Returns Policy
+              </a>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </footer>
+  );
+};
