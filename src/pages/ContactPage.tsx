@@ -235,25 +235,7 @@ export const ContactPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-16 text-center">
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">24hrs</div>
-                <div className="text-gray-600">Response Time</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">10,000+</div>
-                <div className="text-gray-600">Happy Customers</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">99%</div>
-                <div className="text-gray-600">Satisfaction Rate</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">24/7</div>
-                <div className="text-gray-600">Support Available</div>
-              </div>
-            </div>
+            {/* Quick Stats removed as requested */}
           </Container>
         </section>
 
