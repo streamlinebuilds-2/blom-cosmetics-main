@@ -381,7 +381,7 @@ export const ShopPage: React.FC = () => {
             <div className="py-4">
               {/* Desktop Filter Bar */}
               <div className="hidden lg:block">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-4" id="category-filter-bar">
                     {/* Category Pills */}
                     <div className="flex gap-2 overflow-x-auto">
@@ -402,26 +402,6 @@ export const ShopPage: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    {/* Search */}
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search products..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="input-field pl-10 pr-10 w-64"
-                      />
-                      {searchTerm && (
-                        <button
-                          onClick={clearSearch}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                        >
-                          <X className="h-4 w-4 text-gray-400" />
-                        </button>
-                      )}
-                    </div>
-
                     {/* Sort */}
                     <select
                       value={sortBy}
@@ -459,6 +439,28 @@ export const ShopPage: React.FC = () => {
                         <List className="h-4 w-4" />
                       </button>
                     </div>
+                  </div>
+                </div>
+
+                {/* Search placed under category pills for better spacing */}
+                <div className="mt-3">
+                  <div className="relative max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="input-field pl-10 pr-10 w-full"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={clearSearch}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                      >
+                        <X className="h-4 w-4 text-gray-400" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
