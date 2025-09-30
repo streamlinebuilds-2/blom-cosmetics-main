@@ -266,7 +266,7 @@
     font-style: italic;
     line-height: 1.2;
     margin: 0 0 40px 0;
-    transform: skew(-8deg, -2deg);
+    transform: skew(-3deg, -1deg);
   }
   @media (max-width: 1024px) {
     .hero-slogan { font-size: 64px; letter-spacing: 8px; }

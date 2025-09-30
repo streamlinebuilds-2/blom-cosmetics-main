@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/Button';
 
@@ -49,6 +49,7 @@ const slides: Slide[] = [
 export const HeroSlider: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const intervalRef = useRef<number | null>(null);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -63,13 +64,20 @@ export const HeroSlider: React.FC = () => {
   };
 
   useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
     if (!isAutoPlaying) return;
-
-    const interval = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       nextSlide();
     }, 5000);
-
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isAutoPlaying]);
 
   const handleMouseEnter = () => setIsAutoPlaying(false);
@@ -106,7 +114,7 @@ export const HeroSlider: React.FC = () => {
               alt={slideItem.title}
               className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'scale-110' : 'scale-100'}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-100/80 to-blue-100/80"></div>
+            {/* Overlay removed for a cleaner image presentation */}
           </div>
         ))}
       </div>
