@@ -429,53 +429,37 @@ export const ContactPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* FAQ Section */}
-        <section className="section-padding bg-gray-50">
+        {/* FAQ Section - Original Design */}
+        <section className="section-padding bg-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Find quick answers to the most common questions about our products, 
-                courses, and services
-              </p>
+              <h2 className="text-4xl font-bold mb-4 text-gray-900 uppercase tracking-wide">FREQUENTLY ASKED QUESTIONS</h2>
             </div>
 
             <div className="max-w-4xl mx-auto">
               <div className="space-y-4">
                 {faqs.map((faq, index) => (
-                  <Card key={index} className="overflow-hidden">
+                  <Card key={index} className="bg-white shadow-sm border-0 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleFaq(index)}
                       className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
-                          <HelpCircle className="h-4 w-4 text-pink-400" />
-                        </div>
-                        <h3 className="font-semibold text-lg">{faq.question}</h3>
+                      <h3 className="font-semibold text-lg text-gray-900">{faq.question}</h3>
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        {expandedFaq === index ? (
+                          <ChevronUp className="h-4 w-4 text-blue-600" />
+                        ) : (
+                          <span className="text-blue-600 font-bold text-lg">+</span>
+                        )}
                       </div>
-                      {expandedFaq === index ? (
-                        <ChevronUp className="h-5 w-5 text-gray-400" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-gray-400" />
-                      )}
                     </button>
                     {expandedFaq === index && (
                       <div className="px-6 pb-6">
-                        <div className="pl-12">
-                          <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                        </div>
+                        <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
                       </div>
                     )}
                   </Card>
                 ))}
-              </div>
-
-              <div className="text-center mt-12">
-                <p className="text-gray-600 mb-4">Can't find what you're looking for?</p>
-                <Button size="lg" variant="outline">
-                  Contact Our Support Team
-                </Button>
               </div>
             </div>
           </Container>
