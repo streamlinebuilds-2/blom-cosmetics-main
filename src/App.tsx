@@ -69,6 +69,12 @@ function App() {
     return <OrderConfirmationPage />;
   }
   
+  if (path === '/privacy') { return <PrivacyPage />; }
+  if (path === '/terms') { return <TermsPage />; }
+  if (path === '/returns') { return <ReturnsPage />; }
+  if (path === '/cookies') { return <CookiesPage />; }
+  if (path === '/account') { return <AccountPage />; }
+  
   if (path === '/product-template-example') {
     return <ProductTemplateExample />;
   }
@@ -87,6 +93,7 @@ function App() {
     <>
       <HomePage />
       <CartWidget />
+      
     </>
   );
 }
