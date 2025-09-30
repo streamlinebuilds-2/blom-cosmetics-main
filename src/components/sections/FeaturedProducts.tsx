@@ -13,6 +13,21 @@ export const FeaturedProducts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const handleViewAllClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const overlay = document.createElement('div');
+      overlay.className = 'page-transition-overlay';
+      document.body.appendChild(overlay);
+      window.setTimeout(() => {
+        window.location.assign('/shop');
+      }, 500);
+    } catch {
+      window.location.assign('/shop');
+    }
+  };
+
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
@@ -118,7 +133,7 @@ export const FeaturedProducts: React.FC = () => {
           </div>
 
           <div className="text-center mt-12">
-            <a href="/shop" className="inline-block">
+            <a href="/shop" className="inline-block" onClick={handleViewAllClick}>
               <Button size="lg" variant="outline">
                 View All Products
               </Button>
@@ -178,7 +193,7 @@ export const FeaturedProducts: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <a href="/shop" className="inline-block">
+          <a href="/shop" className="inline-block" onClick={handleViewAllClick}>
             <Button size="lg" variant="outline">
               View All Products
             </Button>
