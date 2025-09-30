@@ -50,33 +50,17 @@ export const Footer: React.FC = () => {
       {/* Main Footer Content */}
       <Container>
         <div className="py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Company Info */}
             <div className="lg:col-span-1">
               <h3 className="text-2xl font-bold text-gradient mb-4">BLOM</h3>
-              <p className="text-gray-400 mb-6 leading-relaxed">
+              <p className="text-gray-400 mb-8 leading-relaxed">
                 Empowering nail professionals with premium products and expert training.
                 Bloom, Blossom, Believe with BLOM Cosmetics.
               </p>
 
-              {/* Contact Info */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-pink-400" />
-                  <span className="text-sm">shopblomcosmetics@gmail.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-pink-400" />
-                  <span className="text-sm">+27 79 548 3317</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-pink-400" />
-                  <span className="text-sm">South Africa</span>
-                </div>
-              </div>
-
               {/* Social Media */}
-              <div className="flex gap-4 mt-6">
+              <div className="flex gap-4">
                 <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
                   <Facebook className="h-4 w-4" />
                 </a>
@@ -146,6 +130,25 @@ export const Footer: React.FC = () => {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Contact Information */}
+            <div className="lg:col-span-1">
+              <h4 className="font-semibold text-white mb-6">Contact Info</h4>
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Mail className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                  <span className="text-sm text-gray-300">shopblomcosmetics@gmail.com</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Phone className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                  <span className="text-sm text-gray-300">+27 79 548 3317</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                  <span className="text-sm text-gray-300">South Africa</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
