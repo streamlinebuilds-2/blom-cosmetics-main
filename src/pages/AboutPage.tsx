@@ -185,54 +185,50 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Story Section */}
+        {/* The Dream Behind BLOM Section */}
         <section className="section-padding">
           <Container>
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-6">Our Story</h2>
+                <h2 className="text-4xl font-bold mb-6 text-gray-900 relative inline-block">
+                  THE DREAM BEHIND BLOM
+                  <span className="absolute left-0 bottom-0 h-1 bg-blue-200 rounded-full w-full"></span>
+                </h2>
                 <div className="space-y-6 text-gray-600 leading-relaxed">
                   <p>
-                    BLOM Cosmetics was born from a simple yet powerful vision: to create a world where 
-                    every nail professional has access to premium products and world-class education. 
-                    Founded in 2018 by master nail technician Sarah Mitchell, our journey began with 
-                    a passion for excellence and a commitment to elevating the nail artistry industry.
+                    BLOM began as a dream. One night, the word "BLOM" appeared, with the O transformed into a lily—the flower of our founder's birth month. Paired with the calming blue of water, it became a constant reminder that passion and dedication are what help beauty bloom.
                   </p>
                   <p>
-                    What started as a small collection of carefully formulated acrylic products has 
-                    grown into a comprehensive ecosystem of premium nail systems, innovative training 
-                    programs, and a thriving global community of professionals who share our dedication 
-                    to quality and creativity.
-                  </p>
-                  <p>
-                    Today, BLOM stands for more than just beautiful products – we represent a movement 
-                    of empowerment, education, and excellence. Our motto "Bloom, Blossom, Believe" 
-                    reflects our commitment to helping every nail professional flourish in their craft 
-                    and achieve their dreams.
+                    What started as a personal vision over 10 years ago has now grown into a brand dedicated to empowering nail professionals across South Africa and beyond.
                   </p>
                 </div>
               </div>
               <div className="relative">
-                <img
-                  src="https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-                  alt="BLOM Cosmetics story"
-                  className="rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-6 shadow-lg max-w-xs">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-lg">Our Mission</div>
-                      <div className="text-gray-600 text-sm">Empowering Excellence</div>
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img
+                    src="https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
+                    alt="Dreamy beach scene with BLOM logo"
+                    className="w-full h-96 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-200/20 via-blue-200/20 to-purple-200/20"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-6xl font-bold text-black mb-2 font-serif">
+                        BL<span className="relative">
+                          <svg className="inline w-12 h-12 text-black" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2c-2 0-4 1-5 3-1 2-1 4 0 6 1 2 3 3 5 3s4-1 5-3c1-2 1-4 0-6-1-2-3-3-5-3zm0 2c1 0 2 1 3 2 1 1 1 3 0 4-1 1-2 2-3 2s-2-1-3-2c-1-1-1-3 0-4 1-1 2-2 3-2z"/>
+                            <path d="M12 8c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/>
+                            <path d="M12 12c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/>
+                            <path d="M12 16c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/>
+                          </svg>
+                        </span>M
+                      </div>
+                      <div className="text-lg font-semibold text-black">COSMETICS</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Company Timeline removed as requested */}
           </Container>
         </section>
 
