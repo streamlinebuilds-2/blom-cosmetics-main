@@ -151,6 +151,31 @@
     box-shadow: var(--shadow-md);
   }
 
+  /* Our Promise cards */
+  .promise-card {
+    @apply relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-200;
+    box-shadow: var(--shadow-sm);
+  }
+  .promise-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .promise-icon {
+    @apply w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5;
+    background: linear-gradient(180deg, rgba(236,72,153,0.08), rgba(59,130,246,0.08));
+    border: 1px solid rgba(203,213,225,0.8);
+  }
+  .promise-card--gradient {}
+  .promise-card--gradient:hover {
+    background-image: linear-gradient(135deg, #f472b6 0%, #60a5fa 100%);
+    border-color: transparent;
+    color: white;
+  }
+  .promise-card--gradient:hover .promise-icon {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.4);
+  }
+
   .input-field {
     @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all;
     min-height: 44px;
