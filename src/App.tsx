@@ -10,6 +10,7 @@ import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage';
 import { CartWidget } from './components/cart/CartWidget';
+import { ProductTemplateExample } from './pages/ProductTemplateExample';
 
 function App() {
   // Simple routing based on URL path
@@ -41,6 +42,10 @@ function App() {
   
   if (path === '/order-confirmation') {
     return <OrderConfirmationPage />;
+  }
+  
+  if (path === '/product-template-example') {
+    return <ProductTemplateExample />;
   }
   
   if (path.startsWith('/courses/')) {
