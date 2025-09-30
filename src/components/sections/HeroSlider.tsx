@@ -30,7 +30,7 @@ const slides: Slide[] = [
     subtitle: 'Professional Grade Products',
     description: 'From powders to liquids, sculpting forms to brushes - everything you need for perfect acrylic nails.',
     ctaText: 'Explore Acrylic',
-    ctaHref: '/shop/acrylic',
+    ctaHref: '/shop#acrylic-system',
     backgroundImage: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
     textPosition: 'right'
   },

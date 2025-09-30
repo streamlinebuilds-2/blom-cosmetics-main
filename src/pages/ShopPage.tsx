@@ -255,6 +255,14 @@ export const ShopPage: React.FC = () => {
     setTimeout(() => {
       setLoading(false);
     }, 1000);
+
+    // If navigated with hash to a category (e.g., #acrylic-system), preselect it
+    const hash = window.location.hash.replace('#', '');
+    if (hash) {
+      setSelectedCategory(hash);
+      // Scroll to filter bar smoothly
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
+    }
   }, []);
 
   const filteredProducts = allProducts.filter(product => {
@@ -362,7 +370,7 @@ export const ShopPage: React.FC = () => {
               {/* Desktop Filter Bar */}
               <div className="hidden lg:block">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4" id="category-filter-bar">
                     {/* Category Pills */}
                     <div className="flex gap-2 overflow-x-auto">
                       {productCategories.map((category) => (
