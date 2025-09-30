@@ -7,7 +7,7 @@ import { MasterYourCraft } from '../components/sections/MasterYourCraft';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Star, Award, Users, Sparkles, Shield, Truck, RefreshCw } from 'lucide-react';
+import { Star, Award, Users, Sparkles, Shield, Truck, RefreshCw, CheckCircle, Zap, Heart } from 'lucide-react';
 import { Testimonials } from '../components/sections/Testimonials';
 
 export const HomePage: React.FC = () => {
@@ -92,7 +92,7 @@ export const HomePage: React.FC = () => {
               {/* 1 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Shield className="h-6 w-6 text-gray-700" />
+                  <Heart className="h-7 w-7 text-gray-700" />
                 </div>
                 <h3 className="font-bold text-lg mb-3">HEMA-Free Formulas</h3>
                 <p className="text-gray-600 text-sm">Safe for sensitive clients with our carefully formulated, hypoallergenic products</p>
@@ -101,25 +101,25 @@ export const HomePage: React.FC = () => {
               {/* 2 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Award className="h-6 w-6 text-gray-700" />
+                  <Star className="h-7 w-7 text-gray-700" />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Professional Grade</h3>
                 <p className="text-gray-600 text-sm">Used by leading salons and nail technicians across South Africa</p>
               </div>
 
-              {/* 3 with gradient hover */}
-              <div className="promise-card promise-card--gradient text-center p-6">
+              {/* 3 */}
+              <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Truck className="h-6 w-6" />
+                  <Zap className="h-7 w-7 text-gray-700" />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Fast & Reliable</h3>
-                <p className="text-gray-600 group-hover:text-white/90 text-sm">Free shipping on orders over R1500 with 2–3 day delivery nationwide</p>
+                <p className="text-gray-600 text-sm">Free shipping on orders over R1500 with 2–3 day delivery nationwide</p>
               </div>
 
               {/* 4 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <RefreshCw className="h-6 w-6 text-gray-700" />
+                  <CheckCircle className="h-7 w-7 text-gray-700" />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Hassle-Free Returns</h3>
                 <p className="text-gray-600 text-sm">7-day return policy for unopened items. Damaged or incorrect orders replaced free.</p>

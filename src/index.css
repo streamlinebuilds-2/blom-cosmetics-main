@@ -371,34 +371,55 @@
 
   /* Our Promise cards */
   .promise-card {
-    @apply relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-200;
-    box-shadow: var(--shadow-sm);
+    @apply relative overflow-hidden rounded-2xl border border-gray-200 bg-white transition-all duration-300;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   }
   .promise-card:hover {
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-    background-image: linear-gradient(135deg, #f472b6 0%, #60a5fa 100%);
-    border-color: transparent;
-    color: white;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-4px);
   }
-  .promise-card:hover h3,
-  .promise-card:hover p { color: white; }
+  .promise-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 116, 164, 0.1), transparent);
+    transition: left 0.6s ease;
+  }
+  .promise-card:hover::before {
+    left: 100%;
+  }
   .promise-icon {
-    @apply w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5;
-    background: linear-gradient(180deg, rgba(236,72,153,0.08), rgba(59,130,246,0.08));
-    border: 1px solid rgba(203,213,225,0.8);
+    @apply w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
-  .promise-card:hover .promise-icon { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.4); }
-  .promise-card:hover .promise-icon svg { color: white; }
-  .promise-card--gradient {}
-  .promise-card--gradient:hover {
-    background-image: linear-gradient(135deg, #f472b6 0%, #60a5fa 100%);
-    border-color: transparent;
-    color: white;
+  .promise-card:hover .promise-icon { 
+    background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
+    border-color: #f472b6;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 15px -3px rgba(244, 114, 182, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
-  .promise-card--gradient:hover .promise-icon {
-    background: rgba(255,255,255,0.18);
-    border-color: rgba(255,255,255,0.4);
+  .promise-card:hover .promise-icon svg { 
+    color: #f472b6;
+    transform: scale(1.1);
+  }
+  .promise-card h3 {
+    @apply font-bold text-lg mb-3 text-gray-900;
+    transition: color 0.3s ease;
+  }
+  .promise-card:hover h3 {
+    color: #1e293b;
+  }
+  .promise-card p {
+    @apply text-gray-600 text-sm;
+    transition: color 0.3s ease;
+  }
+  .promise-card:hover p {
+    color: #475569;
   }
 
   .input-field {
