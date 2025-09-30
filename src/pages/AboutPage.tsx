@@ -168,25 +168,7 @@ export const AboutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Brand Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-16 text-center">
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">6+</div>
-                <div className="text-gray-600">Years of Excellence</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">10,000+</div>
-                <div className="text-gray-600">Happy Customers</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">500+</div>
-                <div className="text-gray-600">Certified Professionals</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-pink-400 mb-2">50+</div>
-                <div className="text-gray-600">Premium Products</div>
-              </div>
-            </div>
+            {/* Brand Stats removed as requested */}
           </Container>
         </section>
 
