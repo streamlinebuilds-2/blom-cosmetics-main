@@ -461,17 +461,14 @@ export const ShopPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Product Count */}
-                <div className="text-sm text-gray-600">
-                  {sortedProducts.length} products
-                </div>
+                {/* Product count removed as requested */}
               </div>
 
               {/* Mobile Filter Summary */}
               <div className="lg:hidden">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-gray-600">
-                    {sortedProducts.length} products
+                    {/* Product count removed as requested */}
                   </div>
                   <button
                     onClick={() => setShowMobileFilters(true)}
