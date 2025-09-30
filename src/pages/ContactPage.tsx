@@ -14,11 +14,9 @@ import {
   HelpCircle,
   ChevronDown,
   ChevronUp,
-  User,
   Building,
   ShoppingCart,
   BookOpen,
-  Award,
   Heart,
   CheckCircle
 } from 'lucide-react';
@@ -45,48 +43,6 @@ export const ContactPage: React.FC = () => {
     { value: 'media', label: 'Media & Press' }
   ];
 
-  const helpLinks = [
-    {
-      icon: ShoppingCart,
-      title: 'Order Support',
-      description: 'Track orders, returns, and shipping',
-      links: [
-        { name: 'Track Your Order', href: '/order-tracking' },
-        { name: 'Returns & Exchanges', href: '/returns' },
-        { name: 'Shipping Information', href: '/shipping' }
-      ]
-    },
-    {
-      icon: BookOpen,
-      title: 'Course Support',
-      description: 'Enrollment, access, and certification',
-      links: [
-        { name: 'Course Enrollment', href: '/courses' },
-        { name: 'Access Your Courses', href: '/student-portal' },
-        { name: 'Certification Help', href: '/certification' }
-      ]
-    },
-    {
-      icon: User,
-      title: 'Account Help',
-      description: 'Login, profile, and account settings',
-      links: [
-        { name: 'Account Login', href: '/login' },
-        { name: 'Reset Password', href: '/reset-password' },
-        { name: 'Update Profile', href: '/profile' }
-      ]
-    },
-    {
-      icon: Award,
-      title: 'Professional Services',
-      description: 'Certification, training, and partnerships',
-      links: [
-        { name: 'Become an Instructor', href: '/instructor-application' },
-        { name: 'Wholesale Inquiries', href: '/wholesale' },
-        { name: 'Partnership Opportunities', href: '/partnerships' }
-      ]
-    }
-  ];
 
   const faqs = [
     {
@@ -410,43 +366,65 @@ export const ContactPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Help Links Section */}
-        <section className="section-padding">
+        {/* Quick Help Section - Original Design */}
+        <section className="section-padding bg-gradient-to-r from-pink-50 to-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Quick Help Links</h2>
+              <h2 className="text-4xl font-bold mb-4">Quick Help</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Find answers to common questions and access helpful resources quickly
+                Find answers to common questions and access helpful resources quickly.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {helpLinks.map((category, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4">
-                      <category.icon className="h-6 w-6 text-pink-400" />
-                    </div>
-                    <h3 className="font-bold text-lg">{category.title}</h3>
-                    <p className="text-gray-600 text-sm">{category.description}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {category.links.map((link, linkIndex) => (
-                        <li key={linkIndex}>
-                          <a
-                            href={link.href}
-                            className="text-sm text-gray-600 hover:text-pink-400 transition-colors flex items-center gap-2"
-                          >
-                            <CheckCircle className="h-3 w-3 text-green-500" />
-                            {link.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Shipping & Delivery Card */}
+              <Card className="text-center p-8 hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Shipping & Delivery</h3>
+                <p className="text-gray-600 mb-6">Track your order and delivery options</p>
+                <a 
+                  href="/shipping" 
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Learn More
+                </a>
+              </Card>
+
+              {/* Returns & Refunds Card */}
+              <Card className="text-center p-8 hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <svg className="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Returns & Refunds</h3>
+                <p className="text-gray-600 mb-6">Easy returns within 30 days</p>
+                <a 
+                  href="/returns" 
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Learn More
+                </a>
+              </Card>
+
+              {/* FAQs Card */}
+              <Card className="text-center p-8 hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <HelpCircle className="w-8 h-8 text-pink-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">FAQs</h3>
+                <p className="text-gray-600 mb-6">Find answers to common questions</p>
+                <a 
+                  href="#faq" 
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Learn More
+                </a>
+              </Card>
             </div>
           </Container>
         </section>
