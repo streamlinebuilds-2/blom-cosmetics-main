@@ -90,45 +90,41 @@ export const HomePage: React.FC = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <Card className="text-center hover:shadow-lg transition-shadow h-full">
-                <CardContent className="p-6 flex flex-col items-center">
-                  <div className="mt-2 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Shield className="h-6 w-6 text-pink-400" />
-                  </div>
-                  <h3 className="font-bold text-lg mb-3">HEMA-Free Formulas</h3>
-                  <p className="text-gray-600 text-sm">Safe for sensitive clients with our carefully formulated, hypoallergenic products</p>
-                </CardContent>
-              </Card>
+              {/* 1 */}
+              <div className="promise-card text-center p-6">
+                <div className="promise-icon">
+                  <Shield className="h-6 w-6 text-gray-700" />
+                </div>
+                <h3 className="font-bold text-lg mb-3">HEMA-Free Formulas</h3>
+                <p className="text-gray-600 text-sm">Safe for sensitive clients with our carefully formulated, hypoallergenic products</p>
+              </div>
 
-              <Card className="text-center hover:shadow-lg transition-shadow h-full">
-                <CardContent className="p-6 flex flex-col items-center">
-                  <div className="mt-2 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Award className="h-6 w-6 text-blue-400" />
-                  </div>
-                  <h3 className="font-bold text-lg mb-3">Professional Grade</h3>
-                  <p className="text-gray-600 text-sm">Used by leading salons and nail technicians across South Africa</p>
-                </CardContent>
-              </Card>
+              {/* 2 */}
+              <div className="promise-card text-center p-6">
+                <div className="promise-icon">
+                  <Award className="h-6 w-6 text-gray-700" />
+                </div>
+                <h3 className="font-bold text-lg mb-3">Professional Grade</h3>
+                <p className="text-gray-600 text-sm">Used by leading salons and nail technicians across South Africa</p>
+              </div>
 
-              <Card className="text-center hover:shadow-lg transition-shadow h-full">
-                <CardContent className="p-6 flex flex-col items-center">
-                  <div className="mt-2 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <Truck className="h-6 w-6 text-green-400" />
-                  </div>
-                  <h3 className="font-bold text-lg mb-3">Fast & Reliable</h3>
-                  <p className="text-gray-600 text-sm">Free shipping on orders over R1500 with 2–3 day delivery nationwide</p>
-                </CardContent>
-              </Card>
+              {/* 3 with gradient hover */}
+              <div className="promise-card promise-card--gradient text-center p-6">
+                <div className="promise-icon">
+                  <Truck className="h-6 w-6" />
+                </div>
+                <h3 className="font-bold text-lg mb-3">Fast & Reliable</h3>
+                <p className="text-gray-600 group-hover:text-white/90 text-sm">Free shipping on orders over R1500 with 2–3 day delivery nationwide</p>
+              </div>
 
-              <Card className="text-center hover:shadow-lg transition-shadow h-full">
-                <CardContent className="p-6 flex flex-col items-center">
-                  <div className="mt-2 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <RefreshCw className="h-6 w-6 text-purple-400" />
-                  </div>
-                  <h3 className="font-bold text-lg mb-3">Hassle-Free Returns</h3>
-                  <p className="text-gray-600 text-sm">7-day return policy for unopened items. Damaged or incorrect orders replaced free.</p>
-                </CardContent>
-              </Card>
+              {/* 4 */}
+              <div className="promise-card text-center p-6">
+                <div className="promise-icon">
+                  <RefreshCw className="h-6 w-6 text-gray-700" />
+                </div>
+                <h3 className="font-bold text-lg mb-3">Hassle-Free Returns</h3>
+                <p className="text-gray-600 text-sm">7-day return policy for unopened items. Damaged or incorrect orders replaced free.</p>
+              </div>
             </div>
           </Container>
         </section>

@@ -21,12 +21,23 @@ const getSessionState = () => {
 export const AnnouncementSignup: React.FC = () => {
   const session = getSessionState();
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(!session.bannerClosed);
+  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(() => {
+    try { return sessionStorage.getItem('signup_banner_closed') === '1' ? false : true; } catch { return !session.bannerClosed; }
+  });
   const timerRef = useRef<number | null>(null);
 
   // Auto show popup once after 7s on first page load in this tab
   useEffect(() => {
-    if (session.hasShown || session.popupClosed) return;
+    // If this is a reload, allow popup again by clearing the session flag
+    try {
+      const nav = (performance.getEntriesByType('navigation')[0] as any);
+      if (nav && nav.type === 'reload') {
+        sessionStorage.removeItem('signup_popup_closed');
+      }
+    } catch {}
+
+    const closedInThisTab = (() => { try { return sessionStorage.getItem('signup_popup_closed') === '1'; } catch { return false; } })();
+    if (closedInThisTab || session.hasShown || session.popupClosed) return;
     timerRef.current = window.setTimeout(() => {
       setIsPopupOpen(true);
       session.hasShown = true;
@@ -57,17 +68,20 @@ export const AnnouncementSignup: React.FC = () => {
     session.popupClosed = true;
     session.hasShown = true;
     if (!session.bannerClosed) setIsBannerVisible(true);
+    try { sessionStorage.setItem('signup_popup_closed', '1'); } catch {}
   };
 
   const closeBanner = () => {
     setIsBannerVisible(false);
     session.bannerClosed = true;
+    try { sessionStorage.setItem('signup_banner_closed', '1'); } catch {}
   };
 
   const openPopup = () => {
     // Mark as shown so auto-timer never retriggers after manual interaction
     session.hasShown = true;
     setIsPopupOpen(true);
+    // User intent overrides previous close. Do not set closed flag here.
   };
 
   return (
