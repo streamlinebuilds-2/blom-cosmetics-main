@@ -14,13 +14,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const navigationItems = [
     {
       name: 'HOME',
-      href: '/',
-      dropdown: [
-        { name: 'Homepage', href: '/' },
-        { name: 'Our Vision', href: '#our-vision' },
-        { name: 'Master Your Craft', href: '#master-craft' },
-        { name: 'Testimonials', href: '#testimonials' }
-      ]
+      href: '/'
     },
     {
       name: 'SHOP',
