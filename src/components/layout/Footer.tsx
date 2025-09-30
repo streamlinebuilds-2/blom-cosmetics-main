@@ -100,8 +100,45 @@ export const Footer: React.FC = () => {
             {/* Shop, Education & Support */}
             <div className="lg:col-span-2">
               <div className="space-y-8 ml-8">
-                {/* Shop Links */}
-                <div>
+                {/* Mobile: Shop and Education side by side */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:hidden">
+                  {/* Shop Links */}
+                  <div>
+                    <h4 className="font-semibold text-white mb-4">Shop</h4>
+                    <ul className="space-y-2">
+                      {footerLinks.shop.map((link) => (
+                        <li key={link.name}>
+                          <a
+                            href={link.href}
+                            className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                          >
+                            {link.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Education */}
+                  <div>
+                    <h4 className="font-semibold text-white mb-4">Education</h4>
+                    <ul className="space-y-2">
+                      {footerLinks.courses.map((link) => (
+                        <li key={link.name}>
+                          <a
+                            href={link.href}
+                            className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                          >
+                            {link.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Desktop: Shop */}
+                <div className="hidden lg:block">
                   <h4 className="font-semibold text-white mb-4">Shop</h4>
                   <ul className="space-y-2">
                     {footerLinks.shop.map((link) => (
@@ -117,8 +154,8 @@ export const Footer: React.FC = () => {
                   </ul>
                 </div>
 
-                {/* Education */}
-                <div>
+                {/* Desktop: Education */}
+                <div className="hidden lg:block">
                   <h4 className="font-semibold text-white mb-4">Education</h4>
                   <ul className="space-y-2">
                     {footerLinks.courses.map((link) => (
