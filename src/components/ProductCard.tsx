@@ -61,14 +61,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <article 
-      className={`group relative flex flex-col rounded-2xl bg-white shadow-sm transition-all duration-300 will-change-transform hover:shadow-lg hover:-translate-y-0.5 hover:rotate-[1deg] cursor-pointer overflow-hidden ${className}`}
+      className={`group relative flex flex-col rounded-2xl bg-white shadow-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform hover:shadow-lg hover:-translate-y-0.5 hover:rotate-[0.5deg] cursor-pointer overflow-hidden ${className}`}
       role="article"
       onClick={handleCardClick}
       style={{ perspective: '1000px' }}
     >
-      {/* Shimmer Effect */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none hidden md:block">
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent transform -translate-x-full -translate-y-full group-hover:translate-x-full group-hover:translate-y-full transition-transform duration-900 ease-out" />
+      {/* Premium Shimmer Effect */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none hidden md:block">
+        <div className="shimmer" />
       </div>
 
       {/* Image Container */}
@@ -146,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Content */}
       <div className="flex flex-col flex-1 p-4 pt-3">
         {/* Title */}
-        <h3 className="font-semibold text-lg leading-tight mb-2 line-clamp-2 hover:text-pink-400 transition-colors">
+        <h3 className="product-title font-semibold text-lg leading-tight mb-2 line-clamp-2 transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-pink-400 group-hover:tracking-wide">
           {name}
         </h3>
 
@@ -196,13 +196,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           -webkit-box-orient: vertical;
           overflow: hidden;
         }
+        /* Bright, slower diagonal shimmer */
+        .shimmer {
+          position: absolute;
+          inset: -40%;
+          background: linear-gradient(135deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0) 65%);
+          filter: blur(2px);
+          transform: translate(-150%, -150%) rotate(15deg);
+          border-radius: 24px;
+        }
+        .group:hover .shimmer {
+          animation: shimmer-sweep 2600ms cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
+        }
+        @keyframes shimmer-sweep {
+          to { transform: translate(150%, 150%) rotate(15deg); }
+        }
         @media (hover: none) {
           .group:hover {
             transform: none !important;
           }
-          .group:hover .shimmer {
-            opacity: 0 !important;
-          }
+          .group:hover .shimmer { opacity: 0 !important; animation: none !important; }
         }
         @media (prefers-reduced-motion: reduce) {
           * {
