@@ -169,20 +169,8 @@ export const AboutPage: React.FC = () => {
         <section className="bg-gradient-to-br from-pink-50 to-blue-50 section-padding">
           <Container>
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-5xl font-bold mb-6">About BLOM Cosmetics</h1>
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                Empowering nail professionals worldwide with premium products, expert education, 
-                and a supportive community. We believe every nail technician deserves access to 
-                the finest tools and knowledge to create stunning artistry.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/about#team" className="inline-block">
-                  <Button size="lg" variant="outline">Meet Our Team</Button>
-                </a>
-              </div>
+              {/* Content removed as requested */}
             </div>
-
-            {/* Brand Stats removed as requested */}
           </Container>
         </section>
 
