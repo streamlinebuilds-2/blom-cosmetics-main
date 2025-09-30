@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
-import { User, Menu, X } from 'lucide-react';
+import { User, Menu, X, Search, ShoppingBag } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
 
@@ -75,6 +75,16 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     }
   ];
 
+  // Get current page for active highlighting
+  const getCurrentPath = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.replace(/\/$/, '') || '/';
+    }
+    return '/';
+  };
+
+  const currentPath = getCurrentPath();
+
   return (
     <>
       <AnnouncementSignup />
@@ -85,22 +95,28 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <a href="/" className="text-2xl font-bold text-gradient" onClick={(e) => handleNavClick(e, '/')}>
-                BLOM
+              <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
+                BLOM COSMETICS
               </a>
             </div>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center space-x-8">
-              {navigationItems.map((item) => (
-                <div key={item.name} className="relative group">
-                  <a
-                    href={item.href}
-                    className="text-gray-700 hover:text-pink-400 px-3 py-2 text-sm font-medium transition-colors"
-                    onClick={(e) => handleNavClick(e, item.href)}
-                  >
-                    {item.name}
-                  </a>
+              {navigationItems.map((item) => {
+                const isActive = currentPath === item.href;
+                return (
+                  <div key={item.name} className="relative group">
+                    <a
+                      href={item.href}
+                      className={`px-3 py-2 text-sm font-medium header-nav transition-colors ${
+                        isActive 
+                          ? 'bg-blue-100 text-gray-900 rounded-md' 
+                          : 'text-gray-700 hover:text-gray-900'
+                      }`}
+                      onClick={(e) => handleNavClick(e, item.href)}
+                    >
+                      {item.name}
+                    </a>
 
                   {/* Dropdown/Mega Menu */}
                   {(item.dropdown || item.megaMenu) && (
@@ -153,8 +169,16 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             {/* Action Icons */}
             <div className="flex items-center space-x-4">
               <a
+                href="/search"
+                className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
+                onClick={(e) => handleNavClick(e, '/search')}
+                aria-label="Search"
+              >
+                <Search className="h-5 w-5" />
+              </a>
+              <a
                 href="/account"
-                className="p-2 text-gray-400 hover:text-gray-500"
+                className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
                 onClick={(e) => handleNavClick(e, '/account')}
                 aria-label="Account"
               >

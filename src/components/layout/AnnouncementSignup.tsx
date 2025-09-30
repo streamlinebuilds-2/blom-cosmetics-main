@@ -87,23 +87,23 @@ export const AnnouncementSignup: React.FC = () => {
   return (
     <>
       {isBannerVisible && (
-        <div className="bg-gradient-to-r from-pink-400 to-blue-300 text-white">
+        <div className="bg-blue-100 text-gray-900">
           <Container className="py-2 px-4">
             <div className="relative flex items-center justify-center gap-3">
-              <p className="text-sm font-medium text-center">
-                ✨ Join the BLOM Beauty Club & get 15% off your first order ✨
+              <p className="text-sm font-medium text-center announcement-text">
+                ✨ Join the BLOM Beauty Club & Get 15% Off Your First Order ✨
               </p>
               <Button
                 variant="secondary"
                 size="sm"
-                className="!py-1 !px-3 uppercase"
+                className="!py-1 !px-3 uppercase font-sans bg-white text-gray-900 border border-gray-900 hover:bg-gray-100"
                 onClick={openPopup}
               >
-                Join Now
+                JOIN NOW
               </Button>
               <button
                 aria-label="Close announcement"
-                className="absolute right-0 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/10"
+                className="absolute right-0 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200"
                 onClick={closeBanner}
               >
                 <X className="h-5 w-5" />
