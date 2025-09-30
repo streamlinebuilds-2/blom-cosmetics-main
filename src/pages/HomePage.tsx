@@ -61,11 +61,11 @@ export const HomePage: React.FC = () => {
         <section id="our-vision" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="max-w-3xl">
-              <p className="text-slate-900 text-4xl md:text-5xl font-extrabold mb-2 animate-fade-in">
+              <p className="text-slate-900 text-3xl md:text-4xl font-extrabold mb-2 animate-fade-in">
                 OUR VISION
               </p>
               <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
-              <h2 className="text-3xl md:text-4xl font-extrabold mb-6 text-slate-900">
+              <h2 className="text-2xl md:text-3xl font-extrabold mb-6 text-slate-900">
                 To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.
               </h2>
               <div className="animate-slide-up">
