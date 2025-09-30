@@ -69,9 +69,9 @@ const CoursesPage: React.FC = () => {
         {/* In-Person Training (Featured) */}
         <div className="py-16">
           <div className="text-center mb-12">
-            <h2 className="uppercase text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">Our Training Programs</h2>
+            <h2 className="uppercase text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-3">Our Training Programs</h2>
             <div className="h-1 w-24 bg-blue-200 rounded-full mx-auto mb-6"></div>
-            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">In-Person Training</h3>
+            <h3 className="text-xl md:text-2xl font-semibold text-slate-900 mb-2">In-Person Training</h3>
             <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
           </div>
 
@@ -148,7 +148,7 @@ const CoursesPage: React.FC = () => {
         {/* Online Workshops */}
         <div className="py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2">Online Workshops</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">Online Workshops</h2>
             <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
           </div>
 
