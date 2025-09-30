@@ -4,6 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { ReviewSection } from '../components/review/ReviewSection';
 import { cartStore, showNotification } from '../lib/cart';
 import { 
   Star, 
@@ -1218,78 +1219,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         </section>
 
         {/* Reviews Section */}
-        <section className="section-padding">
-          <Container>
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-bold">Customer Reviews</h2>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-5 w-5 ${
-                          i < Math.floor(product.rating)
-                            ? 'text-yellow-400 fill-current'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="font-medium">{product.rating} out of 5</span>
-                  <span className="text-gray-500">({product.reviewCount} reviews)</span>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {reviews.map((review) => (
-                  <Card key={review.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="flex items-center gap-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? 'text-yellow-400 fill-current'
-                                      : 'text-gray-300'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span className="font-medium">{review.name}</span>
-                            {review.verified && (
-                              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                                Verified Purchase
-                              </span>
-                            )}
-                          </div>
-                          <h4 className="font-medium mb-2">{review.title}</h4>
-                        </div>
-                        <span className="text-gray-500 text-sm">
-                          {new Date(review.date).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 mb-4">{review.comment}</p>
-                      <div className="flex items-center gap-4">
-                        <button className="text-sm text-gray-500 hover:text-pink-400 transition-colors">
-                          Helpful ({review.helpful})
-                        </button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-
-              <div className="text-center mt-8">
-                <Button variant="outline">Load More Reviews</Button>
-              </div>
-            </div>
-          </Container>
-        </section>
+        <ReviewSection
+          productName={product.name}
+          productImage={product.images[0]}
+          productSlug={product.slug}
+          averageRating={product.rating}
+          reviewCount={product.reviewCount}
+          reviews={reviews}
+          onReviewSubmit={(reviewData) => {
+            // In a real app, this would submit to your backend
+            console.log('New review submitted:', reviewData);
+            showNotification('Thank you for your review! It will be published after moderation.');
+          }}
+        />
 
         {/* Related Products */}
         <section className="section-padding bg-gray-50">

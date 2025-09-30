@@ -1,0 +1,307 @@
+import React, { useState } from 'react';
+import { Star, X, Check, User, MessageSquare } from 'lucide-react';
+import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/Card';
+
+interface ReviewFormProps {
+  productName: string;
+  productImage: string;
+  productSlug: string;
+  onClose: () => void;
+  onSubmit: (review: ReviewData) => void;
+}
+
+interface ReviewData {
+  rating: number;
+  title: string;
+  comment: string;
+  name: string;
+  email: string;
+  verified: boolean;
+}
+
+export const ReviewForm: React.FC<ReviewFormProps> = ({
+  productName,
+  productImage,
+  productSlug,
+  onClose,
+  onSubmit
+}) => {
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [title, setTitle] = useState('');
+  const [comment, setComment] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const ratingLabels = [
+    'Select a rating',
+    'Poor',
+    'Fair', 
+    'Good',
+    'Very Good',
+    'Excellent'
+  ];
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (rating === 0) {
+      newErrors.rating = 'Please select a rating';
+    }
+    if (!title.trim()) {
+      newErrors.title = 'Please enter a review title';
+    }
+    if (!comment.trim()) {
+      newErrors.comment = 'Please write your review';
+    }
+    if (!name.trim()) {
+      newErrors.name = 'Please enter your name';
+    }
+    if (!email.trim()) {
+      newErrors.email = 'Please enter your email';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const reviewData: ReviewData = {
+        rating,
+        title: title.trim(),
+        comment: comment.trim(),
+        name: name.trim(),
+        email: email.trim(),
+        verified: false // In a real app, this would be determined by purchase verification
+      };
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      onSubmit(reviewData);
+      
+      // Reset form
+      setRating(0);
+      setTitle('');
+      setComment('');
+      setName('');
+      setEmail('');
+      setErrors({});
+      
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+              <MessageSquare className="h-5 w-5 text-pink-500" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Write a Review</h2>
+              <p className="text-sm text-gray-600">Share your experience with others</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Close review form"
+          >
+            <X className="h-5 w-5 text-gray-500" />
+          </button>
+        </div>
+
+        {/* Product Info */}
+        <div className="p-6 border-b border-gray-200 bg-gray-50">
+          <div className="flex items-center gap-4">
+            <img
+              src={productImage}
+              alt={productName}
+              className="w-16 h-16 object-cover rounded-lg"
+            />
+            <div>
+              <h3 className="font-semibold text-gray-900">{productName}</h3>
+              <p className="text-sm text-gray-600">Reviewing: {productSlug}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Star Rating */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-800 mb-3">
+              Overall Rating *
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                    className="p-1 transition-colors"
+                  >
+                    <Star
+                      className={`h-8 w-8 ${
+                        star <= (hoveredRating || rating)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+              <span className="ml-3 text-sm font-medium text-gray-700">
+                {ratingLabels[rating]}
+              </span>
+            </div>
+            {errors.rating && (
+              <p className="text-red-500 text-sm mt-1">{errors.rating}</p>
+            )}
+          </div>
+
+          {/* Review Title */}
+          <div>
+            <label htmlFor="review-title" className="block text-sm font-semibold text-gray-800 mb-3">
+              Review Title *
+            </label>
+            <input
+              id="review-title"
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Summarize your experience in a few words"
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all"
+            />
+            {errors.title && (
+              <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+            )}
+          </div>
+
+          {/* Review Comment */}
+          <div>
+            <label htmlFor="review-comment" className="block text-sm font-semibold text-gray-800 mb-3">
+              Your Review *
+            </label>
+            <textarea
+              id="review-comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Tell others about your experience with this product..."
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all resize-none"
+            />
+            <div className="flex justify-between items-center mt-1">
+              <span className="text-xs text-gray-500">
+                {comment.length}/500 characters
+              </span>
+              {errors.comment && (
+                <p className="text-red-500 text-sm">{errors.comment}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Personal Info */}
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="reviewer-name" className="block text-sm font-semibold text-gray-800 mb-3">
+                Your Name *
+              </label>
+              <input
+                id="reviewer-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all"
+              />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="reviewer-email" className="block text-sm font-semibold text-gray-800 mb-3">
+                Email Address *
+              </label>
+              <input
+                id="reviewer-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Privacy Notice */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
+                <Check className="h-3 w-3 text-blue-600" />
+              </div>
+              <div className="text-sm text-blue-800">
+                <p className="font-medium mb-1">Privacy Notice</p>
+                <p>Your email will not be published. We may use it to verify your purchase and contact you about your review.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="bg-pink-400 hover:bg-pink-500 text-white font-semibold px-8 py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Submitting...
+                </div>
+              ) : (
+                'Submit Review'
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};

@@ -4,6 +4,7 @@ import { Footer } from '../layout/Footer';
 import { Container } from '../layout/Container';
 import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { ReviewSection } from '../review/ReviewSection';
 import { cartStore, showNotification } from '../../lib/cart';
 import { 
   Star, 
@@ -25,6 +26,17 @@ import {
   MessageCircle,
   Phone
 } from 'lucide-react';
+
+interface Review {
+  id: string;
+  name: string;
+  rating: number;
+  title: string;
+  comment: string;
+  date: string;
+  verified: boolean;
+  helpful: number;
+}
 
 interface ProductData {
   name: string;
@@ -49,6 +61,9 @@ interface ProductData {
   };
   variants: string[];
   related: string[];
+  rating: number;
+  reviewCount: number;
+  reviews: Review[];
   seo: {
     title: string;
     description: string;
@@ -622,6 +637,21 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
             </div>
           </div>
         </div>
+
+        {/* Reviews Section */}
+        <ReviewSection
+          productName={product.name}
+          productImage={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+          productSlug={product.slug}
+          averageRating={product.rating || 0}
+          reviewCount={product.reviewCount || 0}
+          reviews={product.reviews || []}
+          onReviewSubmit={(reviewData) => {
+            // In a real app, this would submit to your backend
+            console.log('New review submitted:', reviewData);
+            showNotification('Thank you for your review! It will be published after moderation.');
+          }}
+        />
       </main>
 
       <Footer />
