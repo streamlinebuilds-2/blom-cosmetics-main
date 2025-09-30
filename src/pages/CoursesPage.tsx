@@ -1,8 +1,8 @@
 import React from 'react';
 import { Calendar, Clock, MapPin, Monitor } from 'lucide-react';
-import Container from '../components/layout/Container';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import { Container } from '../components/layout/Container';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 
 const CoursesPage: React.FC = () => {
   const courses = [
