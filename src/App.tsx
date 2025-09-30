@@ -61,12 +61,12 @@ function App() {
   
   if (path.startsWith('/courses/')) {
     const courseSlug = path.split('/courses/')[1];
-    return <CourseDetailPage courseSlug={courseSlug} />;
+    return <><CourseDetailPage courseSlug={courseSlug} /><CartWidget /></>;
   }
   
   if (path.startsWith('/products/')) {
     const productSlug = path.split('/products/')[1];
-    return <ProductDetailPage productSlug={productSlug} />;
+    return <><ProductDetailPage productSlug={productSlug} /><CartWidget /></>;
   }
 
   return (
