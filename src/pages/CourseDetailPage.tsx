@@ -30,7 +30,10 @@ import {
   User,
   CreditCard,
   AlertCircle,
-  X
+  X,
+  Monitor,
+  Globe,
+  Smartphone
 } from 'lucide-react';
 
 interface CourseDetailPageProps {
@@ -195,6 +198,12 @@ Our expert instructor will guide you through each step of the process, from sele
         'Nail Forms',
         'Clean workspace'
       ],
+      modelRequirements: [
+        'No models required for online courses',
+        'Practice on yourself or willing friends',
+        'Use practice tips for skill development',
+        'Submit photos for feedback'
+      ],
       faqs: [
         {
           question: 'How long do I have access to the course?',
@@ -351,11 +360,18 @@ Our expert instructors will guide you through each step of the acrylic process, 
         }
       ],
       requirements: [
-        'Models required for Day 4 & 5',
         'Comfortable clothing',
         'Notepad and pen',
         'Lunch (or purchase on-site)',
-        'Positive attitude and willingness to learn'
+        'Positive attitude and willingness to learn',
+        'Basic nail care knowledge helpful'
+      ],
+      modelRequirements: [
+        'Models required for Day 4 & 5',
+        'Bring 2 different models if possible',
+        'Models should have healthy natural nails',
+        'No recent nail treatments (48 hours prior)',
+        'Models must stay for full session duration'
       ],
       availableDates: [
         'March 15-19, 2025',
@@ -709,6 +725,52 @@ Our expert instructors will guide you through each step of the acrylic process, 
           </Container>
         </section>
 
+        {/* Models & What to Bring */}
+        <section className="section-padding">
+          <Container>
+            <div className="max-w-4xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-8">
+                <Card>
+                  <CardHeader>
+                    <h3 className="text-xl font-bold flex items-center gap-2">
+                      <Users className="h-5 w-5 text-pink-400" />
+                      Model Requirements
+                    </h3>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {course.modelRequirements.map((requirement, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span>{requirement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <h3 className="text-xl font-bold flex items-center gap-2">
+                      <Package className="h-5 w-5 text-pink-400" />
+                      What to Bring
+                    </h3>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2">
+                      {course.requirements.map((item, index) => (
+                        <li key={index} className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </Container>
+        </section>
         {/* Choose Your Package */}
         <section className="section-padding">
           <Container>
@@ -756,76 +818,6 @@ Our expert instructors will guide you through each step of the acrylic process, 
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        {/* Required Materials / What to Bring */}
-        {course.requirements && (
-          <section className="section-padding bg-gray-50">
-            <Container>
-              <div className="max-w-4xl mx-auto">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <Card>
-                    <CardHeader>
-                      <h3 className="text-xl font-bold flex items-center gap-2">
-                        <Package className="h-5 w-5 text-pink-400" />
-                        {course.course_type === 'online' ? 'Required Materials' : 'What to Bring'}
-                      </h3>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2">
-                        {course.requirements.map((item, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <h3 className="text-xl font-bold flex items-center gap-2">
-                        <Users className="h-5 w-5 text-pink-400" />
-                        {course.course_type === 'in-person' ? 'Model Requirements' : 'Support Available'}
-                      </h3>
-                    </CardHeader>
-                    <CardContent>
-                      {course.course_type === 'in-person' ? (
-                        <div className="space-y-3">
-                          <p className="text-gray-600">You'll need to bring models for practical sessions:</p>
-                          <ul className="space-y-2">
-                            <li className="flex items-center gap-2">
-                              <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                              <span>Day 4: 1 model required</span>
-                            </li>
-                            <li className="flex items-center gap-2">
-                              <AlertCircle className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                              <span>Day 5: 1 model required (assessment)</span>
-                            </li>
-                          </ul>
-                        </div>
-                      ) : (
-                        <ul className="space-y-2">
-                          <li className="flex items-center gap-2">
-                            <MessageCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>WhatsApp support group</span>
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>Email support</span>
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <Video className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>Video feedback sessions</span>
-                          </li>
-                        </ul>
-                      )}
-                    </CardContent>
-                  </Card>
                 </div>
               </div>
             </Container>
