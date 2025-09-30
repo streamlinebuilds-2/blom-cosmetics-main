@@ -97,26 +97,26 @@ export const Footer: React.FC = () => {
               </div>
             </div>
 
-            {/* Shop Links */}
-            <div>
-              <h4 className="font-semibold text-white mb-4">Shop</h4>
-              <ul className="space-y-2">
-                {footerLinks.shop.map((link) => (
-                  <li key={link.name}>
-                    <a
-                      href={link.href}
-                      className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {/* Shop, Education & Support */}
+            <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Shop Links */}
+                <div>
+                  <h4 className="font-semibold text-white mb-4">Shop</h4>
+                  <ul className="space-y-2">
+                    {footerLinks.shop.map((link) => (
+                      <li key={link.name}>
+                        <a
+                          href={link.href}
+                          className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                        >
+                          {link.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-            {/* Education & Support */}
-            <div>
-              <div className="space-y-6">
                 {/* Education */}
                 <div>
                   <h4 className="font-semibold text-white mb-4">Education</h4>
