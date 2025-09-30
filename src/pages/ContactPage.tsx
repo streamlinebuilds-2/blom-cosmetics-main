@@ -233,7 +233,7 @@ export const ContactPage: React.FC = () => {
         {/* Contact Form Section */}
         <section className="section-padding bg-gray-50">
           <Container>
-            <div className="grid lg:grid-cols-2 gap-12">
+            <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
               <div>
                 <h2 className="text-4xl font-bold mb-6">Send Us a Message</h2>
@@ -360,14 +360,23 @@ export const ContactPage: React.FC = () => {
                 </Card>
               </div>
 
-              {/* Map & Location Info */}
-              <div>
+            </div>
+          </Container>
+        </section>
+
+        {/* Visit Our Location Section */}
+        <section className="section-padding">
+          <Container>
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold mb-6">Visit Our Location</h2>
                 <p className="text-lg text-gray-600 mb-8">
                   Located in the heart of South Africa, we welcome visitors by appointment. 
                   Contact us to schedule a visit to our facilities.
                 </p>
+              </div>
 
+              <div className="grid lg:grid-cols-2 gap-12">
                 {/* Location Card */}
                 <Card className="mb-8">
                   <CardContent className="pt-10 pb-6 px-6">
