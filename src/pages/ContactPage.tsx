@@ -272,9 +272,20 @@ export const ContactPage: React.FC = () => {
                     <p className="text-gray-600 mb-4">{method.description}</p>
                     <a 
                       href={method.action}
-                      className="text-pink-400 font-semibold hover:text-pink-500 transition-colors block mb-2 text-xs md:text-sm break-all whitespace-normal leading-5"
+                      className="text-pink-400 font-semibold hover:text-pink-500 transition-colors block mb-2 text-xs md:text-sm whitespace-normal leading-5"
                     >
-                      {method.contact}
+                      {method.title === 'Email Us' && typeof method.contact === 'string'
+                        ? (() => {
+                            const [local, domain] = method.contact.split('@');
+                            return (
+                              <>
+                                <span className="break-words">{local}</span>
+                                <wbr />
+                                <span>@{domain}</span>
+                              </>
+                            );
+                          })()
+                        : method.contact}
                     </a>
                     <p className="text-sm text-gray-500">{method.available}</p>
                   </CardContent>
