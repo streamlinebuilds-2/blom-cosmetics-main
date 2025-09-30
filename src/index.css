@@ -196,6 +196,17 @@
     animation-delay: 400ms;
   }
 
+  /* Overlay used during page transitions */
+  .page-transition-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: saturate(150%) blur(2px);
+    z-index: 9999;
+    pointer-events: none;
+    animation: fade-in 0.25s ease-out;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-in,
     .animate-slide-up {

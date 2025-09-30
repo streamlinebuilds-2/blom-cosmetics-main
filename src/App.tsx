@@ -11,6 +11,11 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderConfirmationPage } from './pages/OrderConfirmationPage';
 import { CartWidget } from './components/cart/CartWidget';
 import { ProductTemplateExample } from './pages/ProductTemplateExample';
+import PrivacyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
+import ReturnsPage from './pages/ReturnsPage';
+import CookiesPage from './pages/CookiesPage';
+import AccountPage from './pages/AccountPage';
 
 function App() {
   // Simple routing based on URL path
@@ -38,6 +43,26 @@ function App() {
   
   if (path === '/checkout') {
     return <CheckoutPage />;
+  }
+
+  if (path === '/privacy') {
+    return <PrivacyPage />;
+  }
+
+  if (path === '/terms') {
+    return <TermsPage />;
+  }
+
+  if (path === '/returns') {
+    return <ReturnsPage />;
+  }
+
+  if (path === '/cookies') {
+    return <CookiesPage />;
+  }
+
+  if (path === '/account') {
+    return <AccountPage />;
   }
   
   if (path === '/order-confirmation') {
