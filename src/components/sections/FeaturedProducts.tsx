@@ -118,9 +118,11 @@ export const FeaturedProducts: React.FC = () => {
           </div>
 
           <div className="text-center mt-12">
-            <Button size="lg" variant="outline">
-              View All Products
-            </Button>
+            <a href="/shop" className="inline-block">
+              <Button size="lg" variant="outline">
+                View All Products
+              </Button>
+            </a>
           </div>
         </Container>
       </section>
@@ -176,9 +178,11 @@ export const FeaturedProducts: React.FC = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button size="lg" variant="outline">
-            View All Products
-          </Button>
+          <a href="/shop" className="inline-block">
+            <Button size="lg" variant="outline">
+              View All Products
+            </Button>
+          </a>
         </div>
       </Container>
     </section>
