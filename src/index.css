@@ -207,6 +207,15 @@
     animation: fade-in 0.25s ease-out;
   }
 
+  /* Scroll lock when drawers/overlays are open */
+  html.no-scroll,
+  body.no-scroll {
+    overflow: hidden !important;
+    height: 100%;
+    overscroll-behavior: contain;
+    touch-action: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .animate-fade-in,
     .animate-slide-up {

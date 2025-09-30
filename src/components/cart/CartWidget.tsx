@@ -14,14 +14,17 @@ export const CartWidget: React.FC = () => {
 
   // Lock page scroll when cart is open
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
+    const html = document.documentElement;
     if (isOpen) {
-      document.body.style.overflow = 'hidden';
+      html.classList.add('no-scroll');
+      document.body.classList.add('no-scroll');
     } else {
-      document.body.style.overflow = previousOverflow || '';
+      html.classList.remove('no-scroll');
+      document.body.classList.remove('no-scroll');
     }
     return () => {
-      document.body.style.overflow = previousOverflow || '';
+      html.classList.remove('no-scroll');
+      document.body.classList.remove('no-scroll');
     };
   }, [isOpen]);
 
