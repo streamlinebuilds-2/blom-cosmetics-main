@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -23,6 +23,18 @@ import {
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
+  // Scroll to hash targets (e.g., #team, #story) and align section to top below sticky header
+  useEffect(() => {
+    const { hash } = window.location;
+    if (!hash) return;
+    const id = hash.replace('#', '');
+    const el = document.getElementById(id);
+    if (el) {
+      const headerOffset = 80; // accommodates sticky header
+      const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  }, []);
   const teamMembers = [
     {
       id: 1,
