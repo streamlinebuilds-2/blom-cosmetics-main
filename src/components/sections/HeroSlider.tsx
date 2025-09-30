@@ -114,7 +114,7 @@ export const HeroSlider: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 h-full flex items-center">
         <div className="container-custom w-full">
-          <div className={`flex flex-col justify-center h-full max-w-3xl ${textPositionClasses[slide.textPosition]} ${slide.textPosition === 'right' ? 'ml-auto' : slide.textPosition === 'center' ? 'mx-auto' : ''}`}>
+          <div className={`flex flex-col justify-center items-center text-center h-full max-w-3xl mx-auto`}>
             <div className="text-white space-y-6">
               <div>
                 {slide.subtitle && (
@@ -122,21 +122,21 @@ export const HeroSlider: React.FC = () => {
                     {slide.subtitle}
                   </p>
                 )}
-                <h1 className="whitespace-pre-line italic tracking-wider drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] text-5xl md:text-7xl leading-[1.1] font-extrabold animate-slide-up">
+                <h1 className="whitespace-pre-line italic tracking-widest drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] text-5xl md:text-7xl leading-[1.15] font-extrabold text-white animate-slide-up">
                   {slide.title}
                 </h1>
               </div>
 
               {slide.description && (
-                <p className="text-xl text-gray-100/90 leading-relaxed animate-slide-up animation-delay-200">
+                <p className="text-xl text-white/95 leading-[1.6] tracking-wide animate-slide-up animation-delay-200">
                   {slide.description}
                 </p>
               )}
 
-              <div className="animate-slide-up animation-delay-400 mt-4">
+              <div className="animate-slide-up animation-delay-400 mt-4 flex justify-center">
                 <Button
                   size="lg"
-                  className="bg-pink-400 hover:bg-pink-500 text-white px-10 py-5 text-lg rounded-full shadow-lg"
+                  className="bg-white text-gray-900 hover:bg-white/90 px-10 py-5 text-lg rounded-full shadow-lg"
                   onClick={() => window.location.href = slide.ctaHref}
                 >
                   {slide.ctaText}
