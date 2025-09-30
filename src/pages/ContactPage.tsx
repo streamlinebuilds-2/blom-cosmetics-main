@@ -265,7 +265,7 @@ export const ContactPage: React.FC = () => {
               {contactMethods.map((method, index) => (
                 <Card key={index} className="text-center hover:shadow-lg transition-shadow group">
                   <CardContent className="p-6">
-                    <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <div className="mt-1 w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                       <method.icon className="h-8 w-8 text-white" />
                     </div>
                     <h3 className="font-bold text-xl mb-2">{method.title}</h3>
@@ -446,7 +446,7 @@ export const ContactPage: React.FC = () => {
                 <Card className="mb-8">
                   <CardContent className="p-6">
                     <div className="flex items-start gap-4 mb-6">
-                      <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <div className="mt-1 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <MapPin className="h-6 w-6 text-pink-400" />
                       </div>
                       <div>
