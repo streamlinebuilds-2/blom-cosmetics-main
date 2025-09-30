@@ -818,8 +818,7 @@ Our expert instructors will guide you through each step of the acrylic process, 
                     </Button>
                   </CardContent>
                 </Card>
-                </div>
-              </div>
+              ))}
             </Container>
           </section>
         )}
