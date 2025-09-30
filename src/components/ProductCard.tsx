@@ -146,7 +146,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Content */}
       <div className="flex flex-col flex-1 p-4 pt-3">
         {/* Title */}
-        <h3 className="product-title font-semibold text-lg leading-tight mb-2 line-clamp-2 transition-all duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:text-pink-400 group-hover:tracking-wide">
+        <h3 className="product-title font-semibold text-lg leading-tight mb-2 line-clamp-2 transition-all duration-[1500ms] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:text-pink-400 group-hover:tracking-wide">
           {name}
         </h3>
 
@@ -199,17 +199,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         /* Bright, slower diagonal shimmer */
         .shimmer {
           position: absolute;
-          inset: -40%;
-          background: linear-gradient(135deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.35) 50%, rgba(255,255,255,0) 65%);
-          filter: blur(2px);
-          transform: translate(-150%, -150%) rotate(15deg);
+          inset: -55%;
+          background: linear-gradient(135deg, rgba(255,255,255,0) 32%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 68%);
+          filter: blur(4px);
+          transform: translate(-180%, -180%) rotate(20deg);
           border-radius: 24px;
         }
         .group:hover .shimmer {
-          animation: shimmer-sweep 2600ms cubic-bezier(0.22, 1, 0.36, 1) 1 forwards;
+          animation: shimmer-sweep 5200ms cubic-bezier(0.19, 1, 0.22, 1) 1 forwards;
         }
         @keyframes shimmer-sweep {
-          to { transform: translate(150%, 150%) rotate(15deg); }
+          0% { opacity: 0; transform: translate(-180%, -180%) rotate(20deg); }
+          8% { opacity: 1; }
+          92% { opacity: 1; }
+          100% { opacity: 0; transform: translate(180%, 180%) rotate(20deg); }
         }
         @media (hover: none) {
           .group:hover {
