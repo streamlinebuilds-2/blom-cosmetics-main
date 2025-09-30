@@ -113,9 +113,9 @@ export const CartWidget: React.FC = () => {
       >
         {/* Backdrop */}
         <div
-          className={`absolute inset-0 bg-black transition-opacity duration-300 ${
-            isOpen ? 'bg-opacity-50' : 'bg-opacity-0'
-          }`}
+          className={`absolute inset-0 transition-opacity duration-300 ${
+            isOpen ? 'bg-black/40' : 'bg-black/0'
+          } backdrop-blur-[2px]`}
           onClick={() => setIsOpen(false)}
         />
 
