@@ -378,47 +378,6 @@ export const PrivacyPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Contact Information */}
-        <section className="section-padding bg-gradient-to-r from-pink-400 to-blue-300 text-white">
-          <Container>
-            <div className="text-center max-w-4xl mx-auto">
-              <h2 className="text-4xl font-bold mb-6">Questions About Privacy?</h2>
-              <p className="text-xl text-pink-100 mb-8">
-                If you have any questions about this privacy policy or how we handle your data, 
-                please don't hesitate to contact us.
-              </p>
-
-              <div className="grid md:grid-cols-3 gap-8 mb-12">
-                <div className="text-center">
-                  <Mail className="h-8 w-8 mx-auto mb-3 text-pink-200" />
-                  <h4 className="font-semibold mb-2">Email</h4>
-                  <p className="text-pink-100">shopblomcosmetics@gmail.com</p>
-                </div>
-                <div className="text-center">
-                  <Phone className="h-8 w-8 mx-auto mb-3 text-pink-200" />
-                  <h4 className="font-semibold mb-2">Phone</h4>
-                  <p className="text-pink-100">+27 79 548 3317</p>
-                </div>
-                <div className="text-center">
-                  <Globe className="h-8 w-8 mx-auto mb-3 text-pink-200" />
-                  <h4 className="font-semibold mb-2">Address</h4>
-                  <p className="text-pink-100">34 Horingbek St, Randfontein 1759</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Contact Privacy Team
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
-                  <Eye className="h-4 w-4 mr-2" />
-                  Request My Data
-                </Button>
-              </div>
-            </div>
-          </Container>
-        </section>
       </main>
 
       <Footer />

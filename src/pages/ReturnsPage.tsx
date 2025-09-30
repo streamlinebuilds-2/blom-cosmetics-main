@@ -369,28 +369,6 @@ export const ReturnsPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Emergency Contact */}
-        <section className="section-padding bg-gradient-to-r from-pink-400 to-blue-300 text-white">
-          <Container>
-            <div className="text-center max-w-4xl mx-auto">
-              <AlertCircle className="h-12 w-12 mx-auto mb-6 text-pink-200" />
-              <h2 className="text-3xl font-bold mb-4">Need Immediate Help?</h2>
-              <p className="text-xl text-pink-100 mb-8">
-                For urgent return requests or damaged items, contact us immediately
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" variant="secondary">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Email Support
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Call Us
-                </Button>
-              </div>
-            </div>
-          </Container>
-        </section>
       </main>
 
       <Footer />
