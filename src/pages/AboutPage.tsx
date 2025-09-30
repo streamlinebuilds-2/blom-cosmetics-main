@@ -273,6 +273,45 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
+        {/* Founders & Movement Section */}
+        <section className="section-padding">
+          <Container>
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <Card className="p-8">
+                <div className="flex items-start gap-5">
+                  <div className="w-14 h-14 rounded-full bg-pink-100 text-pink-600 font-bold grid place-items-center text-xl flex-shrink-0">AC</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Avané Crous</h3>
+                    <p className="text-pink-500 font-medium mb-3">Founder & Lead Educator</p>
+                    <p className="text-slate-600 leading-7">
+                      With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM’s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+
+              <Card className="p-8">
+                <div className="flex items-start gap-5">
+                  <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 font-bold grid place-items-center text-xl flex-shrink-0">AE</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Anna-marie Ernst</h3>
+                    <p className="text-pink-500 font-medium mb-3">Administration & Client Care</p>
+                    <p className="text-slate-600 leading-7">
+                      Anna-marie is the heart and backbone of our team. As BLOM’s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            <div className="bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-8 text-center">
+              <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3">More Than Products — A Movement</h3>
+              <p className="text-slate-700 max-w-4xl mx-auto leading-8">
+                BLOM isn't just about selling nail products. We're creating opportunities for salons to grow, for nail artists to thrive, and for beauty to be celebrated responsibly. With plans to expand into training centers and sub-distributors across South Africa, this is only the beginning.
+              </p>
+            </div>
+          </Container>
+        </section>
 
         {/* Closing CTA Section */}
         <section className="section-padding bg-gradient-to-r from-pink-400 to-blue-300 text-white">
