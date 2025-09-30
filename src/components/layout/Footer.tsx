@@ -50,26 +50,50 @@ export const Footer: React.FC = () => {
       {/* Main Footer Content */}
       <Container>
         <div className="py-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-            {/* Company Info */}
-            <div className="lg:col-span-1">
-              <h3 className="text-2xl font-bold text-gradient mb-4">BLOM</h3>
-              <p className="text-gray-400 mb-8 leading-relaxed">
-                Empowering nail professionals with premium products and expert training.
-                Bloom, Blossom, Believe with BLOM Cosmetics.
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Company Info & Contact */}
+            <div className="lg:col-span-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Company Info */}
+                <div>
+                  <h3 className="text-2xl font-bold text-gradient mb-4">BLOM</h3>
+                  <p className="text-gray-400 mb-6 leading-relaxed">
+                    Empowering nail professionals with premium products and expert training.
+                    Bloom, Blossom, Believe with BLOM Cosmetics.
+                  </p>
 
-              {/* Social Media */}
-              <div className="flex gap-4">
-                <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
-                  <Facebook className="h-4 w-4" />
-                </a>
-                <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
-                  <Instagram className="h-4 w-4" />
-                </a>
-                <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
-                  <Twitter className="h-4 w-4" />
-                </a>
+                  {/* Social Media */}
+                  <div className="flex gap-4">
+                    <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                      <Facebook className="h-4 w-4" />
+                    </a>
+                    <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                      <Instagram className="h-4 w-4" />
+                    </a>
+                    <a href="#" className="p-2 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                      <Twitter className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div>
+                  <h4 className="font-semibold text-white mb-4">Contact Info</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Mail className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                      <span className="text-sm text-gray-300">shopblomcosmetics@gmail.com</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                      <span className="text-sm text-gray-300">+27 79 548 3317</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <MapPin className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                      <span className="text-sm text-gray-300">South Africa</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -90,63 +114,49 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Courses Links */}
+            {/* Education & Support */}
             <div>
-              <h4 className="font-semibold text-white mb-4">Education</h4>
-              <ul className="space-y-2">
-                {footerLinks.courses.map((link) => (
-                  <li key={link.name}>
-                    <a
-                      href={link.href}
-                      className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
-                    >
-                      {link.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
+              <div className="space-y-6">
+                {/* Education */}
+                <div>
+                  <h4 className="font-semibold text-white mb-4">Education</h4>
+                  <ul className="space-y-2">
+                    {footerLinks.courses.map((link) => (
+                      <li key={link.name}>
+                        <a
+                          href={link.href}
+                          className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                        >
+                          {link.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
 
-            {/* Support Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setIsSupportDropdownOpen(!isSupportDropdownOpen)}
-                className="flex items-center gap-2 font-semibold text-white mb-4 hover:text-pink-400 transition-colors"
-              >
-                Support
-                <ChevronDown className={`h-4 w-4 transition-transform ${isSupportDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {isSupportDropdownOpen && (
-                <div className="absolute top-8 left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
-                  {footerLinks.support.map((link) => (
-                    <a
-                      key={link.name}
-                      href={link.href}
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-pink-400 transition-colors"
-                    >
-                      {link.name}
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Contact Information */}
-            <div className="lg:col-span-1">
-              <h4 className="font-semibold text-white mb-6">Contact Info</h4>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Mail className="h-4 w-4 text-pink-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-300">shopblomcosmetics@gmail.com</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-4 w-4 text-pink-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-300">+27 79 548 3317</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <MapPin className="h-4 w-4 text-pink-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-300">South Africa</span>
+                {/* Support Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setIsSupportDropdownOpen(!isSupportDropdownOpen)}
+                    className="flex items-center gap-2 font-semibold text-white mb-4 hover:text-pink-400 transition-colors"
+                  >
+                    Support
+                    <ChevronDown className={`h-4 w-4 transition-transform ${isSupportDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {isSupportDropdownOpen && (
+                    <div className="absolute top-8 left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
+                      {footerLinks.support.map((link) => (
+                        <a
+                          key={link.name}
+                          href={link.href}
+                          className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-pink-400 transition-colors"
+                        >
+                          {link.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
