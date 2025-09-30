@@ -4,7 +4,6 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { products } from '../data/products';
 import { cartStore, showNotification } from '../lib/cart';
 import { Filter, Grid2x2 as Grid, List, Search, ShoppingCart, Star, Eye, Heart, X, SlidersHorizontal } from 'lucide-react';
 
@@ -26,7 +25,7 @@ export const ShopPage: React.FC = () => {
       compare_at_price: 179,
       short_description: 'Nourishing cuticle oil with Vitamin E, Jojoba & Soybean Oil.',
       description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      images: ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'prep-finishing',
       rating: 4.9,
       reviews: 156,
@@ -47,7 +46,7 @@ export const ShopPage: React.FC = () => {
       compare_at_price: 350,
       short_description: 'Vitamin-infused, acid-free primer for strong adhesion.',
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      images: ['https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'prep-finishing',
       rating: 4.8,
       reviews: 124,
@@ -63,7 +62,7 @@ export const ShopPage: React.FC = () => {
       compare_at_price: null,
       short_description: 'Removes oils & moisture for better adhesion.',
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      image: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      images: ['https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'prep-finishing',
       rating: 4.7,
       reviews: 89,
@@ -79,7 +78,7 @@ export const ShopPage: React.FC = () => {
       compare_at_price: 299,
       short_description: 'Strong, protective top coat with mirror shine.',
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      images: ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'gel-system',
       rating: 4.9,
       reviews: 201,
@@ -95,7 +94,7 @@ export const ShopPage: React.FC = () => {
       compare_at_price: null,
       short_description: 'Glitter-infused top coat with smooth shine.',
       description: 'Adds a sparkling finish to any gel or acrylic set.',
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      images: ['https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'gel-system',
       rating: 4.6,
       reviews: 73,
@@ -111,7 +110,7 @@ export const ShopPage: React.FC = () => {
       compare_at_price: null,
       short_description: 'Durable file with eco-friendly sponge core.',
       description: 'Double-sided professional nail file for shaping and refinements.',
-      image: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      images: ['https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'tools-essentials',
       rating: 4.5,
       reviews: 45,
@@ -122,10 +121,10 @@ export const ShopPage: React.FC = () => {
   ];
 
   const productCategories = [
-    { name: 'All Products', slug: 'all', count: products.length },
-    { name: 'Prep & Finish', slug: 'prep-finish', count: products.filter(p => p.category === 'Prep & Finish').length },
-    { name: 'Acrylic System', slug: 'acrylic-system', count: products.filter(p => p.category === 'Acrylic System').length },
-    { name: 'Accessories', slug: 'accessories', count: products.filter(p => p.category === 'Accessories').length }
+    { name: 'All Products', slug: 'all', count: allProducts.length },
+    { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
+    { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
+    { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length }
   ];
 
   const sortOptions = [
@@ -145,17 +144,17 @@ export const ShopPage: React.FC = () => {
     }, 1000);
   }, []);
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = allProducts.filter(product => {
     const matchesCategory = selectedCategory === 'all' || 
       product.category.toLowerCase().replace(' & ', '-').replace(' ', '-') === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
+                         product.short_description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = parseFloat(a.price.replace('R', '') || '0');
-    const priceB = parseFloat(b.price.replace('R', '') || '0');
+    const priceA = a.price;
+    const priceB = b.price;
     
     switch (sortBy) {
       case 'price-low':
@@ -165,7 +164,7 @@ export const ShopPage: React.FC = () => {
       case 'name':
         return a.name.localeCompare(b.name);
       case 'newest':
-        return products.indexOf(b) - products.indexOf(a);
+        return allProducts.indexOf(b) - allProducts.indexOf(a);
       case 'featured':
       default:
         return 0;
