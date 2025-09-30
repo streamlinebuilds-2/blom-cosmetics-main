@@ -62,21 +62,21 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
     'online-watercolour-workshop': {
       id: '1',
       title: 'Online Watercolour Workshop',
-      subtitle: 'Learn to create soft, dreamy watercolour nail designs from home',
-      description: 'Master the beautiful art of watercolor nail design in this comprehensive online workshop. Perfect for beginners and intermediate artists looking to add this stunning technique to their repertoire.',
-      fullDescription: `This comprehensive online watercolor workshop will take you from basic color theory to advanced blending techniques. You'll learn how to create stunning watercolor effects that will set your nail art apart from the competition.
+      subtitle: 'Learn dreamy watercolour nail designs from home',
+      description: 'Step-by-step online training with lifetime access and optional kit. Master the beautiful art of watercolor nail design from the comfort of your home.',
+      fullDescription: `This comprehensive step-by-step online watercolour workshop provides lifetime access to professional training materials. You'll learn how to create stunning watercolor effects that will set your nail art apart from the competition.
 
-Our expert instructor will guide you through each step of the process, from selecting the right products to mastering the delicate brush techniques required for perfect watercolor nails. By the end of this course, you'll have the confidence and skills to offer this premium service to your clients.`,
+Our expert instructor Avané Crous will guide you through each step of the process, from selecting the right products to mastering the delicate brush techniques required for perfect watercolor nails. With lifetime access, you can learn at your own pace and revisit content anytime.`,
       price: 480,
       originalPrice: null,
-      duration_hours: 8,
+      duration_hours: 0,
       max_students: 50,
       enrolled_students: 34,
       instructor: {
         name: 'Avané Crous',
-        bio: 'Professional nail artist with 10+ years experience specializing in watercolor techniques and artistic nail design',
+        bio: 'Watercolour Specialist with 10+ years experience in creating dreamy watercolor nail designs and training professionals worldwide',
         image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
-        credentials: ['Certified Master Nail Technician', 'International Nail Art Champion', 'BLOM Lead Instructor']
+        credentials: ['Watercolour Specialist', 'International Nail Art Champion', 'BLOM Lead Instructor']
       },
       featured_image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
       course_type: 'online',
@@ -93,10 +93,8 @@ Our expert instructor will guide you through each step of the process, from sele
           kitValue: 0,
           popular: false,
           includes: [
-            'Video tutorials',
-            'App access',
-            'Materials list',
             'Lifetime access',
+            'Materials list',
             'Certificate',
             'WhatsApp support'
           ]
@@ -105,22 +103,22 @@ Our expert instructor will guide you through each step of the process, from sele
           id: 'premium',
           name: 'Premium Package',
           price: 680,
-          kitValue: 200,
+          kitValue: 0,
           popular: true,
           includes: [
             'Everything in Standard',
-            'Complete watercolor starter kit',
+            'Starter kit included',
             'Priority support',
-            'Bonus advanced techniques',
-            'One-on-one feedback session'
+            'Priority WhatsApp support',
+            'Bonus techniques'
           ]
         }
       ],
       curriculum: [
         {
           module: 1,
-          title: 'Watercolour Fundamentals',
-          duration: '45 min',
+          title: 'Fundamentals',
+          duration: 'Self-paced',
           lessons: [
             'Understanding watercolor techniques',
             'Essential tools and products',
@@ -131,7 +129,7 @@ Our expert instructor will guide you through each step of the process, from sele
         {
           module: 2,
           title: 'Basic Techniques',
-          duration: '90 min',
+          duration: 'Self-paced',
           lessons: [
             'Wet-on-wet blending',
             'Gradient creation',
@@ -142,7 +140,7 @@ Our expert instructor will guide you through each step of the process, from sele
         {
           module: 3,
           title: 'Advanced Designs',
-          duration: '120 min',
+          duration: 'Self-paced',
           lessons: [
             'Floral watercolor designs',
             'Abstract patterns',
@@ -153,7 +151,7 @@ Our expert instructor will guide you through each step of the process, from sele
         {
           module: 4,
           title: 'Professional Application',
-          duration: '90 min',
+          duration: 'Self-paced',
           lessons: [
             'Client consultation',
             'Pricing strategies',
@@ -165,28 +163,28 @@ Our expert instructor will guide you through each step of the process, from sele
       howItWorks: [
         {
           step: 1,
-          title: 'Purchase & Sign Up',
-          description: 'Complete your enrollment and receive instant access'
+          title: 'Purchase',
+          description: 'Complete your enrollment and payment'
         },
         {
           step: 2,
-          title: 'Access the Academy',
-          description: 'Log into the BLOM Academy app or web platform'
+          title: 'Access',
+          description: 'Get instant access to BLOM Academy'
         },
         {
           step: 3,
-          title: 'Get Your Materials',
+          title: 'Get Materials',
           description: 'Download the materials list and gather supplies'
         },
         {
           step: 4,
-          title: 'Learn & Create',
-          description: 'Follow along with video tutorials at your own pace'
+          title: 'Learn',
+          description: 'Follow step-by-step tutorials at your own pace'
         },
         {
           step: 5,
-          title: 'Submit & Certify',
-          description: 'Submit your work and receive your certificate'
+          title: 'Certify',
+          description: 'Complete the course and receive your certificate'
         }
       ],
       requirements: [
@@ -898,29 +896,27 @@ Our expert instructors will guide you through each step of the acrylic process, 
               <Card className="text-center">
                 <CardContent className="p-6">
                   <CreditCard className="h-8 w-8 text-pink-400 mx-auto mb-4" />
-                  <h3 className="font-bold mb-2">Investment</h3>
-                  <p className="text-gray-600 text-sm">From {formatPrice(course.price)}</p>
-                  {course.course_type === 'in-person' && (
-                    <p className="text-gray-600 text-sm">R2,000 deposit required</p>
-                  )}
+                  <h3 className="font-bold mb-2">Support</h3>
+                  <p className="text-gray-600 text-sm">WhatsApp Support</p>
+                  <p className="text-gray-600 text-sm">Email Support</p>
                 </CardContent>
               </Card>
 
               <Card className="text-center">
                 <CardContent className="p-6">
                   <MessageCircle className="h-8 w-8 text-pink-400 mx-auto mb-4" />
-                  <h3 className="font-bold mb-2">Support</h3>
-                  <p className="text-gray-600 text-sm">WhatsApp: +27 79 548 3317</p>
-                  <p className="text-gray-600 text-sm">Email: shopblomcosmetics@gmail.com</p>
+                  <h3 className="font-bold mb-2">Access</h3>
+                  <p className="text-gray-600 text-sm">Web Platform</p>
+                  <p className="text-gray-600 text-sm">Mobile BLOM Academy</p>
                 </CardContent>
               </Card>
 
               <Card className="text-center">
                 <CardContent className="p-6">
                   <Shield className="h-8 w-8 text-pink-400 mx-auto mb-4" />
-                  <h3 className="font-bold mb-2">Guarantee</h3>
-                  <p className="text-gray-600 text-sm">7-day satisfaction guarantee</p>
-                  <p className="text-gray-600 text-sm">Full refund available</p>
+                  <h3 className="font-bold mb-2">Investment</h3>
+                  <p className="text-gray-600 text-sm">From {formatPrice(course.price)}</p>
+                  <p className="text-gray-600 text-sm">Lifetime access included</p>
                 </CardContent>
               </Card>
             </div>
@@ -1098,8 +1094,6 @@ Our expert instructors will guide you through each step of the acrylic process, 
                         disabled={!selectedPackage || !formData.terms}
                       >
                         {isSubmitting ? 'Processing...' : 
-                         course.course_type === 'in-person' ? 
-                         'Pay Deposit & Secure Spot (R2,000)' : 
                          `Complete Enrollment & Payment - ${formatPrice(course.packages.find(p => p.id === selectedPackage)?.price || course.price)}`
                         }
                       </Button>
