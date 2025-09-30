@@ -176,13 +176,18 @@ export const Footer: React.FC = () => {
                   <button
                     onClick={() => setIsSupportDropdownOpen(!isSupportDropdownOpen)}
                     className="flex items-center gap-2 font-semibold text-white mb-4 hover:text-pink-400 transition-colors"
+                    aria-expanded={isSupportDropdownOpen}
                   >
                     Support
                     <ChevronDown className={`h-4 w-4 transition-transform ${isSupportDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   
-                  {isSupportDropdownOpen && (
-                    <div className="absolute bottom-8 left-0 lg:bottom-8 lg:left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
+                  <div
+                    className={`absolute left-0 right-auto bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10 transition-all duration-200 ease-out origin-bottom ${
+                      isSupportDropdownOpen ? 'opacity-100 translate-y-0' : 'pointer-events-none opacity-0 translate-y-2'
+                    } ${'bottom-8'}`}
+                    style={{ transformOrigin: 'bottom left' }}
+                  >
                       {footerLinks.support.map((link) => (
                         <a
                           key={link.name}
@@ -192,8 +197,7 @@ export const Footer: React.FC = () => {
                           {link.name}
                         </a>
                       ))}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -169,6 +169,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="lg:hidden p-2 text-gray-400 hover:text-gray-500"
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="mobile-menu"
                 >
                   {isMobileMenuOpen ? (
                     <X className="h-6 w-6" />
@@ -182,8 +184,14 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
         </Container>
 
         {/* Mobile Navigation */}
-        {showMobileMenu && isMobileMenuOpen && (
-          <div className="lg:hidden border-t bg-white shadow-lg">
+        {showMobileMenu && (
+          <div
+            id="mobile-menu"
+            className={`lg:hidden border-t bg-white shadow-lg overflow-hidden transition-all duration-300 ease-out ${
+              isMobileMenuOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+            }`}
+            aria-hidden={!isMobileMenuOpen}
+          >
             <Container>
               <div className="py-6 space-y-1">
                 {navigationItems.map((item) => (
