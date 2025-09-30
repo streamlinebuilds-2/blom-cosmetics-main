@@ -295,7 +295,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         certifications: ['Vegan', 'Cruelty-Free', 'HEMA-Free']
       }
     },
-    // Add more products as needed...
     'nail-file-80-80': {
       id: '6',
       name: 'Nail File (80/80 Grit)',
