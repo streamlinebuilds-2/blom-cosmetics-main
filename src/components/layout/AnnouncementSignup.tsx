@@ -123,27 +123,70 @@ export const AnnouncementSignup: React.FC = () => {
             if (e.target === e.currentTarget) closePopup();
           }}
         >
-          <div className="bg-white rounded-xl shadow-2xl w-[min(880px,95vw)] max-h-[90vh] overflow-hidden grid grid-cols-1 md:grid-cols-2">
-            <div className="hidden md:block bg-pink-400" aria-hidden="true" />
-            <div className="relative p-6 md:p-8 overflow-auto">
+          <div className="bg-white rounded-2xl shadow-2xl w-[min(900px,95vw)] max-h-[90vh] overflow-hidden grid grid-cols-1 md:grid-cols-2">
+            {/* Visual Panel - Desktop Only */}
+            <div className="hidden md:block bg-gradient-to-br from-pink-400 via-pink-500 to-pink-600 relative overflow-hidden" aria-hidden="true">
+              <div className="absolute inset-0 bg-black/10"></div>
+              <div className="relative h-full flex flex-col justify-center items-center p-8 text-white">
+                <div className="text-center">
+                  <h2 className="text-4xl font-bold mb-4 tracking-wide">BLOM</h2>
+                  <h3 className="text-2xl font-light mb-6">COSMETICS</h3>
+                  <div className="w-16 h-1 bg-white/30 mx-auto mb-8"></div>
+                  <p className="text-lg font-medium opacity-90">Professional Beauty Solutions</p>
+                </div>
+                {/* Decorative elements */}
+                <div className="absolute top-8 right-8 w-20 h-20 bg-white/10 rounded-full"></div>
+                <div className="absolute bottom-8 left-8 w-12 h-12 bg-white/10 rounded-full"></div>
+                <div className="absolute top-1/2 right-4 w-8 h-8 bg-white/10 rounded-full"></div>
+              </div>
+            </div>
+
+            {/* Form Panel */}
+            <div className="relative p-6 md:p-10 overflow-auto">
               <button
                 aria-label="Close"
-                className="absolute top-4 right-4 p-1 rounded hover:bg-gray-100"
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
                 onClick={closePopup}
               >
                 <X className="h-5 w-5 text-gray-500" />
               </button>
 
               <div className="max-w-md mx-auto">
-                <div className="mb-4">
-                  <h3 className="text-2xl font-bold text-gray-900">Join the Beauty Club</h3>
-                  <p className="text-pink-400 font-semibold">Get 15% off + exclusive drops</p>
+                {/* Logo */}
+                <div className="text-center mb-8">
+                  <div className="inline-flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">B</span>
+                    </div>
+                    <span className="text-2xl font-bold text-gray-900">BLOM COSMETICS</span>
+                  </div>
+                  <div className="w-12 h-0.5 bg-pink-400 mx-auto"></div>
                 </div>
 
-                <ul className="mb-5 space-y-2 text-sm text-gray-600">
-                  <li className="flex gap-2"><span className="text-pink-400 font-bold">✓</span> Instant 15% welcome code</li>
-                  <li className="flex gap-2"><span className="text-pink-400 font-bold">✓</span> Early access to launches</li>
-                  <li className="flex gap-2"><span className="text-pink-400 font-bold">✓</span> Member-only promos</li>
+                <div className="mb-8">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2 text-center">Join Our VIP Club</h3>
+                  <p className="text-pink-500 font-semibold text-center text-lg">Get 15% off + exclusive drops</p>
+                </div>
+
+                <ul className="mb-8 space-y-3 text-sm text-gray-600">
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
+                      <span className="text-pink-500 font-bold text-xs">✓</span>
+                    </div>
+                    <span>Instant 15% welcome code</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
+                      <span className="text-pink-500 font-bold text-xs">✓</span>
+                    </div>
+                    <span>Early access to launches</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
+                      <span className="text-pink-500 font-bold text-xs">✓</span>
+                    </div>
+                    <span>Member-only promos</span>
+                  </li>
                 </ul>
 
                 <SignupForm onSuccess={closePopup} />
@@ -190,16 +233,16 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-4">
+    <form onSubmit={submit} className="space-y-6">
       <div>
-        <label htmlFor="beautyclub-email" className="block text-sm font-semibold text-gray-800 mb-2">
+        <label htmlFor="beautyclub-email" className="block text-sm font-semibold text-gray-800 mb-3">
           Email address
         </label>
         <input
           id="beautyclub-email"
           type="email"
-          className="input-field"
-          placeholder="you@example.com"
+          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
+          placeholder="Enter your email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
@@ -207,27 +250,35 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
         />
       </div>
 
-      <label className="flex items-start gap-3 text-sm text-gray-600">
+      <label className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed">
         <input
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          className="mt-1 rounded border-gray-300 text-pink-400 focus:ring-pink-300"
+          className="mt-1 rounded border-gray-300 text-pink-400 focus:ring-pink-300 w-4 h-4"
           required
         />
-        <span>I agree to receive marketing emails and accept the Privacy Policy.</span>
+        <span>I agree to receive marketing emails and accept the <a href="/privacy" className="text-pink-500 hover:text-pink-600 underline">Privacy Policy</a>.</span>
       </label>
 
-      {error && <div className="text-sm text-red-600">{error}</div>}
+      {error && (
+        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+          {error}
+        </div>
+      )}
       {success && (
         <div className="text-sm font-semibold text-green-600 bg-green-50 border border-green-200 rounded-lg p-3">
           Thanks! Check your inbox for your code.
         </div>
       )}
 
-      <Button type="submit" size="lg" className="w-full" loading={submitting} disabled={submitting}>
-        Join Now & Save 15%
-      </Button>
+      <button
+        type="submit"
+        disabled={submitting}
+        className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+      >
+        {submitting ? 'Joining...' : 'Join Now & Save 15%'}
+      </button>
     </form>
   );
 };
