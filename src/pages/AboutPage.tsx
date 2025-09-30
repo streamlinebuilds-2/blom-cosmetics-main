@@ -236,13 +236,6 @@ export const AboutPage: React.FC = () => {
         {/* Vision & Mission Section - original card design */}
         <section className="section-padding bg-[#F7FAFF]">
           <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Vision & Mission</h2>
-              <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
-                Our vision guides everything we do, from product development to education, ensuring we always stay true to our core purpose.
-              </p>
-            </div>
-
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
                 <div className="mb-6">
