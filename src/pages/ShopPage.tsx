@@ -365,8 +365,7 @@ export const ShopPage: React.FC = () => {
             <div className="relative text-center max-w-4xl mx-auto">
               <h1 className="text-5xl font-bold mb-6">Discover Professional Nail Essentials</h1>
               <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                Premium nail products designed for professionals who demand excellence. 
-                From prep to finish, we have everything you need to create stunning nail art.
+                High-quality products trusted by nail artists and beauty professionals.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg">Shop All Products</Button>
