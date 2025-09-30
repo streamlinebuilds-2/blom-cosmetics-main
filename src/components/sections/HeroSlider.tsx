@@ -67,7 +67,7 @@ export const HeroSlider: React.FC = () => {
 
     const interval = setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
@@ -95,6 +95,8 @@ export const HeroSlider: React.FC = () => {
         {slides.map((slideItem, index) => (
           <div
             key={slideItem.id}
+            id={`slide-${slideItem.id}`}
+            aria-hidden={index === currentSlide ? false : true}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
@@ -102,9 +104,9 @@ export const HeroSlider: React.FC = () => {
             <img
               src={slideItem.backgroundImage}
               alt={slideItem.title}
-              className="w-full h-full object-cover"
+              className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'scale-110' : 'scale-100'}`}
             />
-            <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-100/80 to-blue-100/80"></div>
           </div>
         ))}
       </div>
@@ -159,8 +161,8 @@ export const HeroSlider: React.FC = () => {
       </button>
 
       {/* Dot Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-3">
-        {slides.map((_, index) => (
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-3" role="tablist" aria-label="Hero slides">
+        {slides.map((s, index) => (
           <button
             key={index}
             onClick={() => goToSlide(index)}
@@ -169,6 +171,9 @@ export const HeroSlider: React.FC = () => {
                 ? 'bg-pink-400 scale-110'
                 : 'bg-white bg-opacity-50 hover:bg-opacity-75'
             }`}
+            role="tab"
+            aria-selected={index === currentSlide}
+            aria-controls={`slide-${s.id}`}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
