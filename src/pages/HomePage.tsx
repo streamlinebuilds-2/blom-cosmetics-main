@@ -125,7 +125,20 @@ export const HomePage: React.FC = () => {
                 </div>
 
                 <div className="mt-8">
-                  <Button size="lg">Explore Courses</Button>
+                  <a href="/courses" onClick={(e) => {
+                    e.preventDefault();
+                    try {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      const overlay = document.createElement('div');
+                      overlay.className = 'page-transition-overlay';
+                      document.body.appendChild(overlay);
+                      window.setTimeout(() => { window.location.assign('/courses'); }, 500);
+                    } catch {
+                      window.location.assign('/courses');
+                    }
+                  }}>
+                    <Button size="lg">Explore Courses</Button>
+                  </a>
                 </div>
               </div>
 
