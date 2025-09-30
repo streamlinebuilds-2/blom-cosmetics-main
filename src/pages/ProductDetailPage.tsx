@@ -296,6 +296,158 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       }
     }
     // Add more products as needed...
+    'nail-file-80-80': {
+      id: '6',
+      name: 'Nail File (80/80 Grit)',
+      subtitle: 'Durable file with eco-friendly sponge core',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.5,
+      reviewCount: 45,
+      inStock: true,
+      stockCount: 50,
+      description: 'Double-sided professional nail file for shaping and refinements.',
+      images: [
+        '/public/nail-file-80-80.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: 'single', name: 'Single', inStock: true }
+      ],
+      overview: [
+        '80/80 grit for heavy shaping and refinements',
+        'Floral design that won\'t fade or transfer',
+        'Long-lasting performance with eco-friendly sponge core',
+        'Double-sided for versatile use',
+        'Professional quality for salon and home use'
+      ],
+      features: [
+        { title: '80/80 Grit', description: 'Perfect grit level for heavy shaping and refinements' },
+        { title: 'Fade-Resistant Design', description: 'Floral pattern won\'t fade or transfer during use' },
+        { title: 'Eco-Friendly Core', description: 'Sustainable sponge core for environmental responsibility' },
+        { title: 'Long-Lasting', description: 'Durable construction for extended professional use' }
+      ],
+      howToUse: [
+        'Use gently on acrylic or gel nails to refine shape',
+        'File in one direction for best results',
+        'Clean file regularly during use',
+        'Store in dry place to maintain quality'
+      ],
+      ingredients: [
+        'Abrasive Coating',
+        'Eco-Friendly Sponge Core',
+        'Protective Surface Layer'
+      ],
+      specifications: {
+        size: 'Standard nail file size',
+        shelfLife: 'Long-lasting with proper care',
+        origin: 'Professional Grade',
+        certifications: ['Cruelty-Free']
+      }
+    },
+    'nail-forms': {
+      id: '7',
+      name: 'Nail Forms',
+      subtitle: 'Sculpting forms with holographic guide for precision',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.5,
+      reviewCount: 32,
+      inStock: true,
+      stockCount: 25,
+      description: 'Luxury nail forms designed for short to extreme lengths.',
+      images: [
+        '/public/nail-forms.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: 'roll-300', name: 'Roll of 300', inStock: true }
+      ],
+      overview: [
+        '300 forms per roll for professional use',
+        'Strong adhesive that stays in place during application',
+        'Holographic grid for perfect structure and alignment',
+        'Detachable section for extreme length extensions',
+        'Luxury design for professional nail technicians'
+      ],
+      features: [
+        { title: '300 Forms Per Roll', description: 'Generous quantity for professional salon use' },
+        { title: 'Strong Adhesive', description: 'Stays securely in place during sculpting process' },
+        { title: 'Holographic Grid', description: 'Precision guide lines for perfect structure and symmetry' },
+        { title: 'Detachable Section', description: 'Special feature for creating extreme length extensions' }
+      ],
+      howToUse: [
+        'Apply form under free edge of natural nail',
+        'Ensure secure adhesion and proper alignment',
+        'Sculpt with acrylic or gel over the form',
+        'Remove form after curing and refine shape'
+      ],
+      ingredients: [
+        'High-Quality Adhesive',
+        'Durable Form Material',
+        'Holographic Guide Elements'
+      ],
+      specifications: {
+        size: '300 forms per roll',
+        shelfLife: 'Long-lasting with proper storage',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'nail-liquid-monomer': {
+      id: '8',
+      name: 'Nail Liquid (Monomer)',
+      subtitle: 'Low-odor EMA monomer. MMA-free, HEMA-free',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.8,
+      reviewCount: 87,
+      inStock: true,
+      stockCount: 15,
+      description: 'Professional-grade acrylic monomer for strength, clarity, and long-lasting wear.',
+      images: [
+        '/public/nail-liquid-monomer.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '250ml', name: '250ml', inStock: true },
+        { id: '550ml', name: '550ml', inStock: true }
+      ],
+      overview: [
+        'Low odor formula for comfortable application',
+        'Self-leveling for smooth, professional results',
+        'Non-yellowing formula maintains clarity over time',
+        'Bubble-free application for flawless finish',
+        'MMA-free and HEMA-free for safety'
+      ],
+      features: [
+        { title: 'Low Odor Formula', description: 'Comfortable to work with, reduced chemical smell' },
+        { title: 'Self-Leveling', description: 'Flows smoothly for even application and professional results' },
+        { title: 'Non-Yellowing', description: 'Maintains crystal clarity and doesn\'t discolor over time' },
+        { title: 'Bubble-Free', description: 'Advanced formula prevents air bubbles for flawless finish' }
+      ],
+      howToUse: [
+        'Dampen brush in monomer liquid',
+        'Pick up appropriate acrylic bead size',
+        'Sculpt nail extension or overlay',
+        'Allow to set completely, then file and finish'
+      ],
+      ingredients: [
+        'Ethyl Methacrylate (EMA)',
+        'Hydroquinone',
+        'UV Stabilizers',
+        'Performance Enhancers'
+      ],
+      specifications: {
+        size: 'Available in 250ml and 550ml',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free', 'HEMA-Free', 'MMA-Free']
+      }
+    }
   };
 
   const product = allProductsData[productSlug as keyof typeof allProductsData] || allProductsData['cuticle-oil'];
