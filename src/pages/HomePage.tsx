@@ -61,7 +61,7 @@ export const HomePage: React.FC = () => {
         <section id="our-vision" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="max-w-3xl">
-              <p className="text-slate-900 text-lg font-semibold mb-2 animate-fade-in">
+              <p className="text-slate-900 text-4xl md:text-5xl font-extrabold mb-2 animate-fade-in">
                 OUR VISION
               </p>
               <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
