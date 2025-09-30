@@ -232,30 +232,7 @@ export const AboutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Company Timeline */}
-            <div className="mt-20">
-              <h3 className="text-3xl font-bold text-center mb-12">Our Journey</h3>
-              <div className="relative">
-                <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-pink-400 to-blue-300 rounded-full"></div>
-                <div className="space-y-12">
-                  {milestones.map((milestone, index) => (
-                    <div key={milestone.year} className={`flex items-center ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'}`}>
-                      <div className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8 text-left'}`}>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                          <div className="text-2xl font-bold text-pink-400 mb-2">{milestone.year}</div>
-                          <h4 className="font-bold text-lg mb-2">{milestone.event}</h4>
-                          <p className="text-gray-600">{milestone.description}</p>
-                        </div>
-                      </div>
-                      <div className="relative z-10">
-                        <div className="w-4 h-4 bg-pink-400 rounded-full border-4 border-white shadow-md"></div>
-                      </div>
-                      <div className="w-1/2"></div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {/* Company Timeline removed as requested */}
           </Container>
         </section>
 
