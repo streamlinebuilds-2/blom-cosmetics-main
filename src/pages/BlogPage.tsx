@@ -181,7 +181,7 @@ export const BlogPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showMobileMenu={false} />
+      <Header showMobileMenu={true} />
 
       <main>
         {/* Blog Hero Section */}

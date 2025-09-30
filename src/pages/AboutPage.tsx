@@ -149,7 +149,7 @@ export const AboutPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showMobileMenu={false} />
+      <Header showMobileMenu={true} />
 
       <main>
         {/* About Hero Section */}

@@ -216,7 +216,7 @@ export const ContactPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showMobileMenu={false} />
+      <Header showMobileMenu={true} />
 
       <main>
         {/* Contact Hero Section */}

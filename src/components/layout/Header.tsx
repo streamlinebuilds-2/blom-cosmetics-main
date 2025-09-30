@@ -142,24 +142,26 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
         {/* Mobile Navigation */}
         {showMobileMenu && isMobileMenuOpen && (
-          <div className="lg:hidden border-t bg-white">
+          <div className="lg:hidden border-t bg-white shadow-lg">
             <Container>
-              <div className="py-4 space-y-2">
+              <div className="py-6 space-y-1">
                 {navigationItems.map((item) => (
                   <div key={item.name}>
                     <a
                       href={item.href}
-                      className="block py-2 text-gray-700 hover:text-pink-400 font-medium"
+                      className="block py-3 px-4 text-gray-700 hover:text-pink-400 hover:bg-pink-50 font-medium rounded-lg transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
                     </a>
                     {item.dropdown && (
-                      <div className="pl-4 space-y-1">
+                      <div className="pl-6 space-y-1">
                         {item.dropdown.map((subItem) => (
                           <a
                             key={subItem.name}
                             href={subItem.href}
-                            className="block py-1 text-sm text-gray-600 hover:text-pink-400"
+                            className="block py-2 text-sm text-gray-600 hover:text-pink-400 hover:bg-pink-50 rounded-lg transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
                           >
                             {subItem.name}
                           </a>
@@ -170,9 +172,18 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 ))}
 
                 {/* Mobile Contact Info */}
-                <div className="pt-4 border-t mt-4">
-                  <p className="text-sm text-gray-600">shopblomcosmetics@gmail.com</p>
-                  <p className="text-sm text-gray-600">+27 79 548 3317</p>
+                <div className="pt-6 border-t mt-6 bg-gray-50 -mx-4 px-4 py-4 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 mb-3">Contact Info</h4>
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
+                      shopblomcosmetics@gmail.com
+                    </p>
+                    <p className="text-sm text-gray-600 flex items-center">
+                      <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
+                      +27 79 548 3317
+                    </p>
+                  </div>
                 </div>
               </div>
             </Container>

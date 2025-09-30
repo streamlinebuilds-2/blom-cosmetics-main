@@ -121,7 +121,7 @@ export const OrderConfirmationPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header showMobileMenu={false} />
+      <Header showMobileMenu={true} />
 
       <main className="section-padding">
         <Container>

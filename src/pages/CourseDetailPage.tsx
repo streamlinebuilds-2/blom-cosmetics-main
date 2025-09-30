@@ -734,7 +734,7 @@ Our expert instructors will guide you through each step of the acrylic process, 
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showMobileMenu={false} />
+      <Header showMobileMenu={true} />
 
       <main>
         {/* Course Hero Section */}
