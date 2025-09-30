@@ -28,7 +28,19 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
       // If navigating to a different page, perform navigation after brief delay
       if (!isSamePage) {
-        const delayMs = 450; // gives time for the scroll animation to start/feel consistent
+        const delayMs = 500; // allow scroll animation to be perceived
+
+        // Show page transition overlay to avoid white flash and keep continuity
+        const overlay = document.createElement('div');
+        overlay.className = 'page-transition-overlay';
+        document.body.appendChild(overlay);
+
+        // Ensure overlay remains during unload
+        const beforeUnload = () => {
+          try { document.body.appendChild(overlay); } catch {}
+        };
+        window.addEventListener('beforeunload', beforeUnload, { once: true });
+
         window.setTimeout(() => {
           window.location.assign(href);
         }, delayMs);
