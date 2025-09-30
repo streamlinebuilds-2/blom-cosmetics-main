@@ -13,6 +13,7 @@ import { CartWidget } from './components/cart/CartWidget';
 import { ProductTemplateExample } from './pages/ProductTemplateExample';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
+import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { AccountPage } from './pages/AccountPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
@@ -55,6 +56,10 @@ function App() {
   
   if (path === '/terms') {
     return <TermsPage />;
+  }
+  
+  if (path === '/cookie-policy') {
+    return <CookiePolicyPage />;
   }
   
   if (path === '/account') {
