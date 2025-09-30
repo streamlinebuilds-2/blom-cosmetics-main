@@ -264,7 +264,7 @@ export const ContactPage: React.FC = () => {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {contactMethods.map((method, index) => (
                 <Card key={index} className="text-center hover:shadow-lg transition-shadow group">
-                  <CardContent className="p-6">
+                  <CardContent className="pt-8 pb-6 px-6">
                     <div className="mt-3 w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                       <method.icon className="h-8 w-8 text-white" />
                     </div>
@@ -328,7 +328,7 @@ export const ContactPage: React.FC = () => {
                 </p>
 
                 <Card>
-                  <CardContent className="p-8">
+                  <CardContent className="pt-10 pb-8 px-8">
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
@@ -455,7 +455,7 @@ export const ContactPage: React.FC = () => {
 
                 {/* Location Card */}
                 <Card className="mb-8">
-                  <CardContent className="p-6">
+                  <CardContent className="pt-10 pb-6 px-6">
                     <div className="flex items-start gap-4 mb-6">
                       <div className="mt-3 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
                         <MapPin className="h-6 w-6 text-pink-400" />
