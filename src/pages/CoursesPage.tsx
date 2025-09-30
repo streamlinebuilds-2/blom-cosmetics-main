@@ -63,14 +63,35 @@ export const CoursesPage: React.FC = () => {
   const fallbackCourses = [
     {
       id: '1',
+      title: 'Professional Acrylic Training',
+      slug: 'professional-acrylic-training',
+      short_description: '5-day hands-on training in Randfontein',
+      description: 'Comprehensive 5-day hands-on acrylic nail training course covering everything from basic application to advanced sculpting techniques.',
+      price: 7200,
+      duration_hours: 40,
+      max_students: 50,
+      instructor_name: 'Avané Crous',
+      instructor_bio: 'Master nail technician with 15+ years experience',
+      featured_image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
+      course_type: 'in-person' as const,
+      difficulty_level: 'intermediate' as const,
+      is_active: true,
+      is_featured: true,
+      start_date: '2024-03-01T09:00:00Z',
+      end_date: '2024-03-05T17:00:00Z',
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z'
+    },
+    {
+      id: '2',
       title: 'Online Watercolour Workshop',
       slug: 'online-watercolour-workshop',
-      short_description: 'Master the art of watercolor nail techniques from the comfort of your home',
+      short_description: 'Soft, dreamy watercolour nail art from home',
       description: 'Learn the beautiful art of watercolor nail design in this comprehensive online workshop. Perfect for beginners and intermediate artists looking to add this stunning technique to their repertoire.',
-      price: 899,
+      price: 480,
       duration_hours: 8,
       max_students: 50,
-      instructor_name: 'Sarah Mitchell',
+      instructor_name: 'Avané Crous',
       instructor_bio: 'Professional nail artist with 10+ years experience',
       featured_image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
       course_type: 'online' as const,
@@ -83,33 +104,13 @@ export const CoursesPage: React.FC = () => {
       updated_at: '2024-01-01T00:00:00Z'
     },
     {
-      id: '2',
-      title: 'Professional Acrylic Training',
-      slug: 'professional-acrylic-training',
-      short_description: 'Comprehensive in-person acrylic nail system training for professionals',
-      description: 'Master the complete acrylic nail system with hands-on training from industry experts. This intensive course covers everything from basic application to advanced sculpting techniques.',
-      price: 2499,
-      duration_hours: 24,
-      max_students: 12,
-      instructor_name: 'Michelle Adams',
-      instructor_bio: 'Master nail technician and BLOM certified trainer',
-      featured_image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
-      course_type: 'in-person' as const,
-      difficulty_level: 'intermediate' as const,
-      is_active: true,
-      is_featured: true,
-      start_date: '2024-03-01T09:00:00Z',
-      end_date: '2024-03-03T17:00:00Z',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z'
-    },
-    {
       id: '3',
       title: 'Christmas Watercolor Workshop',
       slug: 'christmas-watercolor-workshop',
-      short_description: 'Festive watercolor nail art perfect for the holiday season',
+      short_description: 'Festive holiday nail art, step-by-step',
       description: 'Create stunning Christmas-themed watercolor nail designs. Learn seasonal color palettes, festive patterns, and holiday-inspired techniques.',
-      price: 599,
+      price: 450,
+      compare_at_price: 650,
       duration_hours: 4,
       max_students: 30,
       instructor_name: 'Jessica Chen',
@@ -118,30 +119,9 @@ export const CoursesPage: React.FC = () => {
       course_type: 'online' as const,
       difficulty_level: 'beginner' as const,
       is_active: true,
-      is_featured: false,
+      is_featured: true,
       start_date: '2024-12-10T14:00:00Z',
       end_date: '2024-12-10T18:00:00Z',
-      created_at: '2024-01-01T00:00:00Z',
-      updated_at: '2024-01-01T00:00:00Z'
-    },
-    {
-      id: '4',
-      title: 'Advanced Gel System Mastery',
-      slug: 'advanced-gel-system-mastery',
-      short_description: 'Master advanced gel techniques and troubleshooting',
-      description: 'Take your gel nail skills to the next level with advanced techniques, problem-solving, and professional tips for perfect results every time.',
-      price: 1299,
-      duration_hours: 12,
-      max_students: 20,
-      instructor_name: 'Sarah Mitchell',
-      instructor_bio: 'Professional nail artist with 10+ years experience',
-      featured_image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop',
-      course_type: 'hybrid' as const,
-      difficulty_level: 'advanced' as const,
-      is_active: true,
-      is_featured: true,
-      start_date: '2024-04-15T10:00:00Z',
-      end_date: '2024-04-16T16:00:00Z',
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z'
     }
@@ -291,21 +271,62 @@ export const CoursesPage: React.FC = () => {
                       <div className="space-y-2 mb-4 text-sm text-gray-500">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4" />
-                          <span>{course.duration_hours} hours</span>
+                          <span>
+                            {course.course_type === 'in-person' 
+                              ? `${Math.ceil(course.duration_hours / 8)} Days`
+                              : course.course_type === 'online'
+                              ? 'Self-Paced Online'
+                              : `${course.duration_hours}h`
+                            }
+                          </span>
+                            {course.course_type === 'in-person' 
+                              ? `${Math.ceil(course.duration_hours / 8)} Days`
+                              : course.course_type === 'online'
+                              ? 'Self-Paced Online'
+                              : `${course.duration_hours} hours`
+                            }
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="h-4 w-4" />
                           <span>Max {course.max_students} students</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          <span>{formatDate(course.start_date!)}</span>
-                        </div>
+                        {course.course_type === 'in-person' && (
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            <span>{formatDate(course.start_date!)}</span>
+                          </div>
+                        )}
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-pink-400">R{course.price}</span>
-                        <Button size="sm">Enroll Now</Button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl font-bold text-pink-400">
+                            {course.course_type === 'in-person' ? 'From ' : ''}R{course.price}
+                          </span>
+                          {course.compare_at_price && (
+                            <span className="text-sm text-gray-400 line-through">
+                              R{course.compare_at_price}
+                            </span>
+                          )}
+                        </div>
+                          <span className="text-2xl font-bold text-pink-400">
+                            {course.course_type === 'in-person' ? 'From ' : ''}R{course.price}
+                          </span>
+                          {course.compare_at_price && (
+                            <span className="text-sm text-gray-400 line-through">
+                              R{course.compare_at_price}
+                            </span>
+                          )}
+                        </div>
+                        <Button 
+                          size="sm"
+                          onClick={() => window.location.href = `/courses/${course.slug}`}
+                        >
+                          View Course
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -505,8 +526,12 @@ export const CoursesPage: React.FC = () => {
                           <span className="text-2xl font-bold text-pink-400">R{course.price}</span>
                           <div className="flex gap-2">
                             <Button variant="outline" size="sm">Learn More</Button>
-                            <Button size="sm">Enroll Now</Button>
-                          </div>
+                          <Button 
+                            size="sm"
+                            onClick={() => window.location.href = `/courses/${course.slug}`}
+                          >
+                            View Course
+                          </Button>
                         </div>
                       </div>
                     </div>
