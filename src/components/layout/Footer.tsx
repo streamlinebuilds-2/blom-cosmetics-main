@@ -224,6 +224,9 @@ export const Footer: React.FC = () => {
               <a href="/returns" className="text-gray-500 hover:text-pink-400 text-sm transition-colors">
                 Returns Policy
               </a>
+              <a href="/cookie-policy" className="text-gray-500 hover:text-pink-400 text-sm transition-colors">
+                Cookie Policy
+              </a>
             </div>
           </div>
         </div>
