@@ -4,17 +4,11 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { queries, Product, ProductImage, Category } from '../lib/supabase';
+import { products } from '../data/products';
 import { cartStore, showNotification } from '../lib/cart';
 import { Filter, Grid2x2 as Grid, List, Search, ShoppingCart, Star, Eye, Heart, X, SlidersHorizontal } from 'lucide-react';
 
-interface ProductWithImages extends Product {
-  product_images: ProductImage[];
-}
-
 export const ShopPage: React.FC = () => {
-  const [products, setProducts] = useState<ProductWithImages[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>('grid-3');
@@ -128,134 +122,10 @@ export const ShopPage: React.FC = () => {
   ];
 
   const productCategories = [
-    {
-      id: '7',
-      name: 'Nail Forms',
-      slug: 'nail-forms',
-      price: 89,
-      compare_at_price: 109,
-      short_description: 'Sculpting forms with holographic guide for precision.',
-      description: 'Luxury nail forms designed for short to extreme lengths.',
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'tools-essentials',
-      rating: 4.8,
-      reviews: 92,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '8',
-      name: 'Nail Liquid (Monomer)',
-      slug: 'nail-liquid-monomer',
-      price: 380,
-      compare_at_price: 450,
-      short_description: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
-      description: 'Professional-grade acrylic monomer for strength, clarity, and long-lasting wear.',
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'acrylic-system',
-      rating: 4.9,
-      reviews: 167,
-      badges: ['Bestseller'],
-      inStock: true,
-      variants: [
-        { name: '250ml', inStock: true },
-        { name: '550ml', inStock: true }
-      ]
-    },
-    {
-      id: '9',
-      name: 'Crystal Clear Acrylic (56g)',
-      slug: 'crystal-clear-acrylic',
-      price: 450,
-      compare_at_price: null,
-      short_description: 'Glass-clear powder for encapsulation & overlays.',
-      description: 'Ultra-clear, non-yellowing acrylic powder for professional results.',
-      image: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'acrylic-system',
-      rating: 4.8,
-      reviews: 134,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '10',
-      name: 'Snow White Acrylic (56g)',
-      slug: 'snow-white-acrylic',
-      price: 450,
-      compare_at_price: null,
-      short_description: 'Opaque white acrylic for French & design work.',
-      description: 'Buttery application, strong coverage for smile lines and full sets.',
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'acrylic-system',
-      rating: 4.7,
-      reviews: 98,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '11',
-      name: 'Colour Acrylic (15g)',
-      slug: 'colour-acrylic',
-      price: 189,
-      compare_at_price: 229,
-      short_description: 'High-pigment acrylic powders for bold designs.',
-      description: 'Buttery, smooth powders for ombré, fades, and 3D work.',
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'acrylic-system',
-      rating: 4.6,
-      reviews: 76,
-      badges: [],
-      inStock: true,
-      variants: [
-        { name: 'Red', inStock: true },
-        { name: 'Blue', inStock: true },
-        { name: 'Pink', inStock: false },
-        { name: 'Purple', inStock: true }
-      ]
-    },
-    {
-      id: '12',
-      name: 'Glitter Acrylic (15g)',
-      slug: 'glitter-acrylic',
-      price: 219,
-      compare_at_price: null,
-      short_description: 'Sparkle acrylics for encapsulated effects.',
-      description: 'Glitter particles suspended in clear/colored acrylic.',
-      image: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'acrylic-system',
-      rating: 4.5,
-      reviews: 54,
-      badges: ['New'],
-      inStock: true,
-      variants: [
-        { name: 'Gold', inStock: true },
-        { name: 'Silver', inStock: true },
-        { name: 'Rose Gold', inStock: false }
-      ]
-    },
-    {
-      id: '13',
-      name: 'Core Acrylics (56g)',
-      slug: 'core-acrylics',
-      price: 480,
-      compare_at_price: 550,
-      short_description: 'Strength powders in clear, white, and natural tones.',
-      description: 'Core range designed as structural powders; often don\'t require capping.',
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-      category: 'acrylic-system',
-      rating: 4.9,
-      reviews: 189,
-      badges: ['Bestseller'],
-      inStock: true,
-      variants: [
-        { name: 'Clear', inStock: true },
-        { name: 'Natural', inStock: true },
-        { name: 'Cover Pink', inStock: true }
-      ]
-    }
+    { name: 'All Products', slug: 'all', count: products.length },
+    { name: 'Prep & Finish', slug: 'prep-finish', count: products.filter(p => p.category === 'Prep & Finish').length },
+    { name: 'Acrylic System', slug: 'acrylic-system', count: products.filter(p => p.category === 'Acrylic System').length },
+    { name: 'Accessories', slug: 'accessories', count: products.filter(p => p.category === 'Accessories').length }
   ];
 
   const sortOptions = [
@@ -275,38 +145,41 @@ export const ShopPage: React.FC = () => {
     }, 1000);
   }, []);
 
-  const filteredProducts = allProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+  const filteredProducts = products.filter(product => {
+    const matchesCategory = selectedCategory === 'all' || 
+      product.category.toLowerCase().replace(' & ', '-').replace(' ', '-') === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.short_description.toLowerCase().includes(searchTerm.toLowerCase());
+                         product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const priceA = parseFloat(a.price.replace('R', '') || '0');
+    const priceB = parseFloat(b.price.replace('R', '') || '0');
+    
     switch (sortBy) {
       case 'price-low':
-        return a.price - b.price;
+        return priceA - priceB;
       case 'price-high':
-        return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
+        return priceB - priceA;
       case 'name':
         return a.name.localeCompare(b.name);
       case 'newest':
-        return parseInt(b.id) - parseInt(a.id);
+        return products.indexOf(b) - products.indexOf(a);
       case 'featured':
       default:
-        return a.badges.includes('Bestseller') ? -1 : b.badges.includes('Bestseller') ? 1 : 0;
+        return 0;
     }
   });
 
   const handleAddToCart = (product: any) => {
+    const priceValue = parseFloat(product.price.replace('R', '') || '0');
     cartStore.addItem({
       id: `item_${Date.now()}`,
-      productId: product.id,
+      productId: product.slug,
       name: product.name,
-      price: product.price,
-      image: product.image
+      price: priceValue,
+      image: product.images[0]
     });
     showNotification(`Added ${product.name} to cart!`);
   };
@@ -517,19 +390,14 @@ export const ShopPage: React.FC = () => {
             ) : (
               <div className={`grid ${getGridClasses()} gap-6`}>
                 {sortedProducts.map((product) => (
-                  <Card key={product.id} className="group cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-300">
+                  <Card key={product.slug} className="group cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-300">
                     <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
-                      {/* Product Badges */}
-                      {product.badges.length > 0 && (
-                        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-                          {product.badges.map((badge, index) => (
-                            <span
-                              key={index}
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${getBadgeColor(badge)}`}
-                            >
-                              {badge}
-                            </span>
-                          ))}
+                      {/* Sale Badge */}
+                      {product.compareAtPrice && (
+                        <div className="absolute top-3 left-3 z-10">
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
+                            Sale
+                          </span>
                         </div>
                       )}
 
@@ -540,10 +408,14 @@ export const ShopPage: React.FC = () => {
 
                       {/* Product Image */}
                       <img
-                        src={product.image}
+                        src={product.images[0]}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onClick={() => window.location.href = `/products/${product.slug}`}
+                        onClick={() => window.location.href = `/product/${product.slug}`}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+                        }}
                       />
 
                       {/* Quick View Overlay */}
@@ -555,70 +427,40 @@ export const ShopPage: React.FC = () => {
                     </div>
 
                     <div className="p-4">
-                      {/* Rating */}
-                      <div className="flex items-center gap-1 mb-2">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.floor(product.rating)
-                                ? 'text-yellow-400 fill-current'
-                                : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                        <span className="text-sm text-gray-500 ml-1">({product.reviews})</span>
-                      </div>
-
                       {/* Product Title */}
                       <h3 
                         className="font-semibold text-lg mb-2 line-clamp-2 cursor-pointer hover:text-pink-400 transition-colors"
-                        onClick={() => window.location.href = `/products/${product.slug}`}
+                        onClick={() => window.location.href = `/product/${product.slug}`}
                       >
                         {product.name}
                       </h3>
 
                       {/* Product Description */}
                       <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {product.short_description}
+                        {product.shortDescription}
                       </p>
 
-                      {/* Variants Preview */}
-                      {product.variants.length > 0 && (
+                      {/* Scents Preview */}
+                      {product.scents && product.scents.length > 0 && (
                         <div className="mb-3">
                           <p className="text-xs text-gray-500 mb-1">
-                            {product.variants.length} variants available
+                            {product.scents.length} scents available
                           </p>
-                          <div className="flex gap-1">
-                            {product.variants.slice(0, 4).map((variant, index) => (
-                              <div
-                                key={index}
-                                className={`w-4 h-4 rounded-full border-2 ${
-                                  variant.inStock ? 'border-gray-300' : 'border-gray-200 opacity-50'
-                                }`}
-                                style={{ backgroundColor: variant.name.toLowerCase() }}
-                                title={variant.name}
-                              />
-                            ))}
-                            {product.variants.length > 4 && (
-                              <span className="text-xs text-gray-400">+{product.variants.length - 4}</span>
-                            )}
-                          </div>
                         </div>
                       )}
 
                       {/* Price and Actions */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold text-pink-400">R{product.price}</span>
-                          {product.compare_at_price && (
+                          <span className="text-xl font-bold text-pink-400">{product.price}</span>
+                          {product.compareAtPrice && (
                             <span className="text-sm text-gray-400 line-through">
-                              R{product.compare_at_price}
+                              {product.compareAtPrice}
                             </span>
                           )}
                         </div>
                         
-                        {product.inStock ? (
+                        {product.stock === 'In Stock' ? (
                           <Button
                             size="sm"
                             onClick={() => handleAddToCart(product)}
@@ -629,7 +471,7 @@ export const ShopPage: React.FC = () => {
                           </Button>
                         ) : (
                           <Button size="sm" variant="outline" disabled>
-                            Coming Soon
+                            Out of Stock
                           </Button>
                         )}
                       </div>
