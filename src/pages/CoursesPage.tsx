@@ -1,4 +1,6 @@
 import React from 'react';
+import { Header } from '../components/layout/Header';
+import { Footer } from '../components/layout/Footer';
 import { Calendar, Clock, MapPin, Monitor } from 'lucide-react';
 import { Container } from '../components/layout/Container';
 import { Card } from '../components/ui/Card';
@@ -47,7 +49,10 @@ const CoursesPage: React.FC = () => {
   const featuredCourses = courses.filter(course => course.featured);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
+      <Header showMobileMenu={false} />
+
+      <main className="bg-gray-50">
       <Container>
         {/* Hero Section */}
         <div className="py-16 text-center">
@@ -178,6 +183,9 @@ const CoursesPage: React.FC = () => {
           </div>
         </div>
       </Container>
+      </main>
+
+      <Footer />
     </div>
   );
 };
