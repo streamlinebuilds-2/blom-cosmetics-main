@@ -59,6 +59,191 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
 
   // Course data based on slug
   const courseData = {
+    'christmas-watercolor-workshop': {
+      id: '3',
+      title: 'Christmas Watercolor Workshop',
+      subtitle: 'Paint festive nail art for the holidays',
+      description: 'Create magical holiday nail designs with our beginner-friendly Christmas watercolor workshop. Perfect for the festive season!',
+      fullDescription: `Get into the holiday spirit with our special Christmas Watercolor Workshop! This beginner-friendly course teaches you how to create stunning festive nail designs using watercolor techniques.
+
+Learn to paint beautiful Christmas trees, delicate snowflakes, and elegant ornaments on nails. This self-paced workshop is perfect for anyone wanting to add some holiday magic to their nail art skills. No prior experience needed - we'll guide you through every brushstroke!`,
+      price: 450,
+      originalPrice: 650,
+      duration_hours: 0,
+      max_students: 100,
+      enrolled_students: 67,
+      instructor: {
+        name: 'Avané Crous',
+        bio: 'Festive Nail Art specialist with expertise in seasonal watercolor designs and holiday-themed nail artistry',
+        image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+        credentials: ['Festive Nail Art Specialist', 'Watercolor Expert', 'Holiday Design Creator']
+      },
+      featured_image: 'https://images.pexels.com/photos/3997969/pexels-photo-3997969.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop',
+      course_type: 'online',
+      difficulty_level: 'beginner',
+      format: 'Self-Paced',
+      location: 'Online',
+      rating: 4.8,
+      total_reviews: 89,
+      saleEndDate: 'October 31, 2024',
+      packages: [
+        {
+          id: 'workshop',
+          name: 'Christmas Workshop Package',
+          price: 450,
+          originalPrice: 650,
+          kitValue: 0,
+          popular: true,
+          includes: [
+            'Step-by-step video tutorials',
+            'BLOM Academy app access',
+            'Complete materials list',
+            'Certificate with festive design',
+            'WhatsApp support group',
+            'Lifetime access to content'
+          ]
+        }
+      ],
+      curriculum: [
+        {
+          module: 1,
+          title: 'Welcome & Materials',
+          duration: 'Self-paced',
+          lessons: [
+            'Welcome to Christmas nail art',
+            'Materials overview and setup',
+            'Workspace preparation',
+            'Color palette introduction'
+          ]
+        },
+        {
+          module: 2,
+          title: 'Festive Watercolour Basics',
+          duration: 'Self-paced',
+          lessons: [
+            'Holiday color theory',
+            'Festive brush techniques',
+            'Blending for winter effects',
+            'Creating depth and dimension'
+          ]
+        },
+        {
+          module: 3,
+          title: 'Tutorials (Tree, Snowflakes, Ornaments)',
+          duration: 'Self-paced',
+          lessons: [
+            'Christmas tree watercolor technique',
+            'Delicate snowflake patterns',
+            'Elegant ornament designs',
+            'Combining elements for full sets'
+          ]
+        },
+        {
+          module: 4,
+          title: 'Sealing & Certification',
+          duration: 'Self-paced',
+          lessons: [
+            'Proper sealing techniques',
+            'Photo submission guidelines',
+            'Portfolio presentation tips',
+            'Certificate completion process'
+          ]
+        }
+      ],
+      howItWorks: [
+        {
+          step: 1,
+          title: 'Purchase',
+          description: 'Complete your enrollment and payment for the Christmas workshop'
+        },
+        {
+          step: 2,
+          title: 'Access',
+          description: 'Get instant access to BLOM Academy and festive content'
+        },
+        {
+          step: 3,
+          title: 'Get Materials',
+          description: 'Download the holiday materials list and gather supplies'
+        },
+        {
+          step: 4,
+          title: 'Learn',
+          description: 'Follow festive tutorials at your own pace'
+        },
+        {
+          step: 5,
+          title: 'Certify',
+          description: 'Submit photos and receive your festive certificate'
+        }
+      ],
+      requirements: [
+        'Fine Line Brush',
+        'Practice Tips',
+        'Watercolor Palette',
+        'Base Coat',
+        'Top Coat',
+        'Nail Forms',
+        'Clean workspace',
+        'Holiday spirit!'
+      ],
+      modelRequirements: [
+        'No models required for online workshop',
+        'Practice on yourself or willing friends',
+        'Use practice tips for skill development',
+        'Submit festive photos for certification'
+      ],
+      faqs: [
+        {
+          question: 'Is this suitable for beginners?',
+          answer: 'Absolutely! This workshop is designed for beginners. No prior watercolor experience needed - we\'ll guide you through every festive technique.'
+        },
+        {
+          question: 'How long do I have access?',
+          answer: 'You have lifetime access to all Christmas workshop materials, so you can create festive nails every holiday season!'
+        },
+        {
+          question: 'When does the sale end?',
+          answer: 'The special Christmas pricing ends on October 31st, so enroll now to save R200 on this festive workshop!'
+        },
+        {
+          question: 'How do I get my certificate?',
+          answer: 'Complete the tutorials and submit photos of your festive nail art. You\'ll receive a beautiful certificate with a special holiday design!'
+        }
+      ],
+      reviews: [
+        {
+          id: 1,
+          name: 'Sarah M.',
+          rating: 5,
+          date: '2023-12-20',
+          title: 'Perfect for the holidays!',
+          comment: 'This workshop got me so excited for Christmas! The snowflake tutorial is absolutely magical and my clients loved their festive nails.',
+          verified: true,
+          helpful: 15
+        },
+        {
+          id: 2,
+          name: 'Jessica L.',
+          rating: 5,
+          date: '2023-12-15',
+          title: 'Beginner-friendly and festive!',
+          comment: 'I\'ve never done watercolor nails before but Avané made it so easy. The Christmas tree design is now my signature holiday look!',
+          verified: true,
+          helpful: 12
+        },
+        {
+          id: 3,
+          name: 'Michelle R.',
+          rating: 4,
+          date: '2023-12-10',
+          title: 'Great value with the sale!',
+          comment: 'Amazing workshop at an incredible price. The ornament designs are so elegant and the certificate is beautiful!',
+          verified: true,
+          helpful: 8
+        }
+      ]
+    },
     'online-watercolour-workshop': {
       id: '1',
       title: 'Online Watercolour Workshop',
@@ -790,12 +975,17 @@ Our expert instructors will guide you through each step of the acrylic process, 
                   )}
                   <CardContent className="p-8">
                     <div className="text-center mb-6">
-                      <h3 className="text-2xl font-bold mb-2">{pkg.name}</h3>
+                      <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
                       <div className="text-3xl font-bold text-pink-400 mb-2">
                         {formatPrice(pkg.price)}
                       </div>
-                      {pkg.kitValue > 0 && (
-                        <p className="text-gray-600">Kit Value: {formatPrice(pkg.kitValue)}</p>
+                      {course.originalPrice && (
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="text-xl text-gray-400 line-through">R{course.originalPrice}</span>
+                          <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-medium">
+                            Save R{course.originalPrice - course.price}
+                          </span>
+                        </div>
                       )}
                     </div>
 
@@ -1139,6 +1329,78 @@ Our expert instructors will guide you through each step of the acrylic process, 
             </div>
           </Container>
         </section>
+
+        {/* Reviews Section */}
+        {'reviews' in course && course.reviews && (
+          <section className="section-padding">
+            <Container>
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-bold">Student Reviews</h2>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(course.rating)
+                              ? 'text-yellow-400 fill-current'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="font-medium">{course.rating} out of 5</span>
+                    <span className="text-gray-500">({course.total_reviews} reviews)</span>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  {course.reviews.map((review) => (
+                    <Card key={review.id}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-4 w-4 ${
+                                      i < review.rating
+                                        ? 'text-yellow-400 fill-current'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="font-medium">{review.name}</span>
+                              {review.verified && (
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                  Verified Purchase
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="font-medium mb-2">{review.title}</h4>
+                          </div>
+                          <span className="text-gray-500 text-sm">
+                            {new Date(review.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-4">{review.comment}</p>
+                        <div className="flex items-center gap-4">
+                          <button className="text-sm text-gray-500 hover:text-pink-400 transition-colors">
+                            Helpful ({review.helpful})
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </Container>
+          </section>
+        )}
 
         {/* Mobile Sticky Bar */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
