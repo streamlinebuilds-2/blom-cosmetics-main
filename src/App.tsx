@@ -1,7 +1,7 @@
 import React from 'react';
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
-import { CoursesPage } from './pages/CoursesPage';
+import CoursesPage from './pages/CoursesPage';
 import { BlogPage } from './pages/BlogPage';
 import { CourseDetailPage } from './pages/CourseDetailPage';
 import { AboutPage } from './pages/AboutPage';
