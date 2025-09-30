@@ -771,6 +771,7 @@ Our expert instructors will guide you through each step of the acrylic process, 
             </div>
           </Container>
         </section>
+
         {/* Choose Your Package */}
         <section className="section-padding">
           <Container>
@@ -819,9 +820,9 @@ Our expert instructors will guide you through each step of the acrylic process, 
                   </CardContent>
                 </Card>
               ))}
-            </Container>
-          </section>
-        )}
+            </div>
+          </Container>
+        </section>
 
         {/* How It Works */}
         <section className="section-padding">
