@@ -18,47 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     },
     {
       name: 'SHOP',
-      href: '/shop',
-      megaMenu: {
-        columns: [
-          {
-            title: 'Acrylic System',
-            items: [
-              { name: 'Acrylic Powders', href: '/shop/acrylic-powders' },
-              { name: 'Liquid Monomers', href: '/shop/liquid-monomers' },
-              { name: 'Acrylic Brushes', href: '/shop/acrylic-brushes' },
-              { name: 'Sculpting Forms', href: '/shop/sculpting-forms' }
-            ]
-          },
-          {
-            title: 'Gel System',
-            items: [
-              { name: 'Gel Polish', href: '/shop/gel-polish' },
-              { name: 'Base Coats', href: '/shop/base-coats' },
-              { name: 'Top Coats', href: '/shop/top-coats' },
-              { name: 'LED Lamps', href: '/shop/led-lamps' }
-            ]
-          },
-          {
-            title: 'Prep & Finishing',
-            items: [
-              { name: 'Primers', href: '/shop/primers' },
-              { name: 'Cleansers', href: '/shop/cleansers' },
-              { name: 'Cuticle Care', href: '/shop/cuticle-care' },
-              { name: 'Nail Art', href: '/shop/nail-art' }
-            ]
-          },
-          {
-            title: 'Tools & Essentials',
-            items: [
-              { name: 'Files & Buffers', href: '/shop/files-buffers' },
-              { name: 'Electric Files', href: '/shop/electric-files' },
-              { name: 'Professional Kits', href: '/shop/professional-kits' },
-              { name: 'Accessories', href: '/shop/accessories' }
-            ]
-          }
-        ]
-      }
+      href: '/shop'
     },
     {
       name: 'COURSES & BLOG',
