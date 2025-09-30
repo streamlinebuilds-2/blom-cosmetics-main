@@ -222,4 +222,49 @@
       animation: none;
     }
   }
+
+  /* Testimonials carousel */
+  .testi__carousel{ position: relative; }
+  .testi__viewport{
+    overflow: hidden;
+    position: relative;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    padding-block: 8px;
+  }
+  .testi__viewport::-webkit-scrollbar{ display: none; }
+
+  .testi__track{
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+    will-change: transform;
+    width: max-content;
+    animation: testi-scroll var(--testi-duration, 40s) linear infinite;
+    margin: 0;
+    list-style: none;
+  }
+  .testi__slide{ flex: 0 0 auto; }
+
+  .t-card{ background: #fff; border-radius: 20px; box-shadow: 0 14px 40px rgba(0,0,0,.08); overflow: hidden; height: 100%; display: flex; }
+
+  /* Aspect helpers */
+  .aspect-9-16{ aspect-ratio: 9 / 16; width: 280px; }
+  @media (min-width: 768px){ .aspect-9-16{ width: 320px; } }
+  @media (min-width: 1024px){ .aspect-9-16{ width: 360px; } }
+  .aspect-4-5{ aspect-ratio: 4 / 5; }
+
+  /* Pause on hover/focus (for accessibility) */
+  .testi__carousel:hover .testi__track,
+  .testi__viewport:focus-within .testi__track{ animation-play-state: paused; }
+
+  /* Motion preferences */
+  @media (prefers-reduced-motion: reduce){ .testi__track{ animation: none; } }
+
+  @keyframes testi-scroll{
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
 }
