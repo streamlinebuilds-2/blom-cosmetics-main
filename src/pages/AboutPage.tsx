@@ -232,6 +232,44 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
+        {/* Vision & Mission Section */}
+        <section className="section-padding bg-gray-50">
+          <Container>
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold mb-4">Vision & Mission</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Our vision guides everything we do, from product development to education, 
+                ensuring we always stay true to our core purpose.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12">
+              <Card className="text-center p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Target className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  To be the world's leading provider of premium nail products and education, 
+                  creating a global community where every nail professional can achieve 
+                  excellence and build successful, fulfilling careers in the beauty industry.
+                </p>
+              </Card>
+
+              <Card className="text-center p-8">
+                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Heart className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
+                <p className="text-gray-600 leading-relaxed">
+                  To empower nail professionals with premium products, comprehensive education, 
+                  and ongoing support, enabling them to create beautiful artistry, build 
+                  successful businesses, and inspire confidence in every client they serve.
+                </p>
+              </Card>
+            </div>
+          </Container>
+        </section>
 
         {/* Values Section */}
         <section className="section-padding">
