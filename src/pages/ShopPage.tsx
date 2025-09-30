@@ -153,8 +153,8 @@ export const ShopPage: React.FC = () => {
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = parseFloat(a.price.replace('R', '') || '0');
-    const priceB = parseFloat(b.price.replace('R', '') || '0');
+    const priceA = a.price;
+    const priceB = b.price;
     
     switch (sortBy) {
       case 'price-low':
