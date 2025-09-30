@@ -67,10 +67,10 @@ const CoursesPage: React.FC = () => {
         {/* Featured Courses */}
         <div className="py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Courses</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Choose from our most popular training programs designed to elevate your nail art skills
-            </p>
+            <h2 className="uppercase text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-3">Our Training Programs</h2>
+            <div className="h-1 w-24 bg-blue-200 rounded-full mx-auto mb-6"></div>
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">In-Person Training</h3>
+            <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
