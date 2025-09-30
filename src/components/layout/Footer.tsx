@@ -100,8 +100,8 @@ export const Footer: React.FC = () => {
             {/* Shop, Education & Support */}
             <div className="lg:col-span-2">
               <div className="space-y-8 ml-8">
-                {/* Mobile: Shop and Education side by side */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:hidden">
+                {/* Mobile: Shop and Education side by side horizontally */}
+                <div className="grid grid-cols-2 gap-6 lg:hidden">
                   {/* Shop Links */}
                   <div>
                     <h4 className="font-semibold text-white mb-4">Shop</h4>
