@@ -975,8 +975,9 @@ Our expert instructors will guide you through each step of the acrylic process, 
                   )}
                   <CardContent className="p-8">
                     <div className="text-center mb-6">
+                      <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
                       {course.originalPrice && (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center justify-center gap-2">
                           <span className="text-xl text-gray-400 line-through">R{course.originalPrice}</span>
                           <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-medium">
                             Save R{course.originalPrice - course.price}
@@ -1334,7 +1335,16 @@ Our expert instructors will guide you through each step of the acrylic process, 
           <div className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-bold text-lg text-pink-400">From {formatPrice(course.price)}</p>
+                <p className="font-bold text-lg text-pink-400">
+                  {course.originalPrice ? (
+                    <>
+                      <span className="line-through text-gray-400 text-sm mr-2">R{course.originalPrice}</span>
+                      R{course.price}
+                    </>
+                  ) : (
+                    `From ${formatPrice(course.price)}`
+                  )}
+                </p>
                 <p className="text-sm text-gray-600">{course.format} • {course.location}</p>
               </div>
               <Button 
