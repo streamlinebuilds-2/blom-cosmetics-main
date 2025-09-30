@@ -13,6 +13,9 @@ import { CartWidget } from './components/cart/CartWidget';
 import { ProductTemplateExample } from './pages/ProductTemplateExample';
 import { PrivacyPage } from './pages/PrivacyPage';
 import { TermsPage } from './pages/TermsPage';
+import { AccountPage } from './pages/AccountPage';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
 
 function App() {
   // Simple routing based on URL path
@@ -52,6 +55,18 @@ function App() {
   
   if (path === '/terms') {
     return <TermsPage />;
+  }
+  
+  if (path === '/account') {
+    return <AccountPage />;
+  }
+  
+  if (path === '/login') {
+    return <LoginPage />;
+  }
+  
+  if (path === '/signup') {
+    return <SignupPage />;
   }
   
   if (path === '/product-template-example') {

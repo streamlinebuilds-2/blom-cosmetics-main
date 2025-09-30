@@ -159,7 +159,10 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
               <button className="p-2 text-gray-400 hover:text-gray-500">
                 <Search className="h-5 w-5" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-gray-500">
+              <button 
+                className="p-2 text-gray-400 hover:text-gray-500"
+                onClick={() => window.location.href = '/account'}
+              >
                 <User className="h-5 w-5" />
               </button>
               <CartButton />
