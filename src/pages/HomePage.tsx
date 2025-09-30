@@ -60,17 +60,17 @@ export const HomePage: React.FC = () => {
         {/* Our Vision Section */}
         <section id="our-vision" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
-            <div className="text-center max-w-4xl mx-auto">
-              <p className="text-pink-400 text-lg font-medium mb-2 animate-fade-in">
+            <div className="max-w-3xl">
+              <p className="text-pink-400 text-lg font-semibold mb-2 animate-fade-in">
                 OUR VISION
               </p>
-              <h2 className="text-4xl font-bold mb-6">To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.</h2>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
+              <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
+              <h2 className="text-3xl md:text-4xl font-extrabold mb-6 text-slate-900">
+                To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.
+              </h2>
+              <div className="animate-slide-up">
                 <Button size="lg" onClick={() => window.location.href = '/about'}>
                   Learn More About Us
-                </Button>
-                <Button size="lg" variant="outline" onClick={() => window.location.href = '/shop'}>
-                  Explore the Collection
                 </Button>
               </div>
             </div>
