@@ -401,8 +401,31 @@ export const ShopPage: React.FC = () => {
                     </div>
                   </div>
 
+                  <div className="hidden"></div>
+                </div>
+
+                {/* Controls row under category pills: search + sort + view */}
+                <div className="mt-3 flex items-center justify-between gap-4 flex-wrap">
+                  <div className="relative flex-1 min-w-[260px] max-w-xl">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="input-field pl-10 pr-10 w-full"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={clearSearch}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                      >
+                        <X className="h-4 w-4 text-gray-400" />
+                      </button>
+                    )}
+                  </div>
+
                   <div className="flex items-center gap-4">
-                    {/* Sort */}
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
@@ -415,7 +438,6 @@ export const ShopPage: React.FC = () => {
                       ))}
                     </select>
 
-                    {/* View Toggle */}
                     <div className="flex border rounded-lg overflow-hidden">
                       <button
                         onClick={() => setViewMode('grid-3')}
@@ -439,28 +461,6 @@ export const ShopPage: React.FC = () => {
                         <List className="h-4 w-4" />
                       </button>
                     </div>
-                  </div>
-                </div>
-
-                {/* Search placed under category pills for better spacing */}
-                <div className="mt-3">
-                  <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="input-field pl-10 pr-10 w-full"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={clearSearch}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                      >
-                        <X className="h-4 w-4 text-gray-400" />
-                      </button>
-                    )}
                   </div>
                 </div>
 
