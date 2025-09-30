@@ -9,11 +9,7 @@ import {
   Phone, 
   MapPin, 
   Clock, 
-  MessageCircle, 
   Send,
-  Facebook,
-  Instagram,
-  Twitter,
   HelpCircle,
   ChevronDown,
   ChevronUp,
@@ -38,61 +34,6 @@ export const ContactPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
-  const contactMethods = [
-    {
-      icon: Mail,
-      title: 'Email Us',
-      description: 'Send us a message anytime',
-      contact: 'shopblomcosmetics@gmail.com',
-      action: 'mailto:shopblomcosmetics@gmail.com',
-      available: '24/7 - We respond within 24 hours'
-    },
-    {
-      icon: Phone,
-      title: 'Call Us',
-      description: 'Speak directly with our team',
-      contact: '+27 79 548 3317',
-      action: 'tel:+27795483317',
-      available: 'Mon-Fri: 9:00 AM - 6:00 PM (SAST)'
-    },
-    {
-      icon: MessageCircle,
-      title: 'Live Chat',
-      description: 'Get instant support',
-      contact: 'Chat with us now',
-      action: '#',
-      available: 'Mon-Fri: 9:00 AM - 5:00 PM (SAST)'
-    },
-    {
-      icon: MapPin,
-      title: 'Visit Us',
-      description: 'Come see us in person',
-      contact: 'South Africa',
-      action: '#',
-      available: 'By appointment only'
-    }
-  ];
-
-  const socialLinks = [
-    {
-      icon: Facebook,
-      name: 'Facebook',
-      href: '#',
-      followers: '12.5K'
-    },
-    {
-      icon: Instagram,
-      name: 'Instagram',
-      href: '#',
-      followers: '25.8K'
-    },
-    {
-      icon: Twitter,
-      name: 'Twitter',
-      href: '#',
-      followers: '8.2K'
-    }
-  ];
 
   const inquiryTypes = [
     { value: 'general', label: 'General Inquiry' },
@@ -231,70 +172,6 @@ export const ContactPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Contact Options Section */}
-        <section className="section-padding">
-          <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Multiple Ways to Connect</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Choose the contact method that works best for you. Our team is available 
-                through multiple channels to provide the support you need.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {contactMethods.map((method, index) => (
-                <Card key={index} className="text-center hover:shadow-lg transition-shadow group">
-                  <CardContent className="pt-8 pb-6 px-6">
-                    <div className="mt-3 w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                      <method.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <h3 className="font-bold text-xl mb-2">{method.title}</h3>
-                    <p className="text-gray-600 mb-4">{method.description}</p>
-                    <a 
-                      href={method.action}
-                      className="text-pink-400 font-semibold hover:text-pink-500 transition-colors block mb-2 text-xs md:text-sm whitespace-normal leading-5"
-                    >
-                      {method.title === 'Email Us' && typeof method.contact === 'string'
-                        ? (() => {
-                            const [local, domain] = method.contact.split('@');
-                            return (
-                              <>
-                                <span className="break-words">{local}</span>
-                                <wbr />
-                                <span>@{domain}</span>
-                              </>
-                            );
-                          })()
-                        : method.contact}
-                    </a>
-                    <p className="text-sm text-gray-500">{method.available}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Social Media */}
-            <div className="mt-16 text-center">
-              <h3 className="text-2xl font-bold mb-8">Follow Us on Social Media</h3>
-              <div className="flex justify-center gap-6">
-                {socialLinks.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.href}
-                    className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-pink-50 transition-colors group"
-                  >
-                    <div className="w-12 h-12 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                      <social.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="font-medium">{social.name}</span>
-                    <span className="text-sm text-gray-500">{social.followers} followers</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </Container>
-        </section>
 
         {/* Contact Form Section */}
         <section className="section-padding bg-gray-50">
