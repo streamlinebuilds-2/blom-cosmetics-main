@@ -48,7 +48,6 @@ const slides: Slide[] = [
 
 export const HeroSlider: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const intervalRef = useRef<number | null>(null);
 
   const nextSlide = () => {
@@ -68,20 +67,16 @@ export const HeroSlider: React.FC = () => {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    if (!isAutoPlaying) return;
     intervalRef.current = window.setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 6000);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [isAutoPlaying]);
-
-  const handleMouseEnter = () => setIsAutoPlaying(false);
-  const handleMouseLeave = () => setIsAutoPlaying(true);
+  }, []);
 
   const slide = slides[currentSlide];
 
@@ -95,8 +90,6 @@ export const HeroSlider: React.FC = () => {
     <section
       id="heroSlider"
       className="relative h-screen min-h-[600px] overflow-hidden"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       {/* Background Images */}
       <div className="absolute inset-0">
@@ -175,32 +168,14 @@ export const HeroSlider: React.FC = () => {
         <ChevronRight className="h-6 w-6" />
       </button>
 
-      {/* Dot Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-3" role="tablist" aria-label="Hero slides">
-        {slides.map((s, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentSlide
-                ? 'bg-pink-400 scale-110'
-                : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-            }`}
-            role="tab"
-            aria-selected={index === currentSlide}
-            aria-controls={`slide-${s.id}`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
 
       {/* Slide Progress Bar */}
       <div className="absolute bottom-0 left-0 w-full h-1 bg-black bg-opacity-20">
         <div
-          className="h-full bg-pink-400 transition-all duration-5000 ease-linear"
+          className="h-full bg-pink-400 transition-all duration-6000 ease-linear"
           style={{
-            width: isAutoPlaying ? '100%' : `${((currentSlide + 1) / slides.length) * 100}%`,
-            transitionDuration: isAutoPlaying ? '5000ms' : '300ms'
+            width: '100%',
+            transitionDuration: '6000ms'
           }}
         />
       </div>
