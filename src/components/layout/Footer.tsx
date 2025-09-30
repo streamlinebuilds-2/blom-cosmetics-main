@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container } from './Container';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, ChevronDown } from 'lucide-react';
 
 export const Footer: React.FC = () => {
+  const [isSupportDropdownOpen, setIsSupportDropdownOpen] = useState(false);
   const footerLinks = {
     shop: [],
     courses: [],
@@ -122,21 +123,29 @@ export const Footer: React.FC = () => {
               </ul>
             </div>
 
-            {/* Support Links */}
-            <div>
-              <h4 className="font-semibold text-white mb-4">Support</h4>
-              <ul className="space-y-2">
-                {footerLinks.support.map((link) => (
-                  <li key={link.name}>
+            {/* Support Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsSupportDropdownOpen(!isSupportDropdownOpen)}
+                className="flex items-center gap-2 font-semibold text-white mb-4 hover:text-pink-400 transition-colors"
+              >
+                Support
+                <ChevronDown className={`h-4 w-4 transition-transform ${isSupportDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {isSupportDropdownOpen && (
+                <div className="absolute top-8 left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
+                  {footerLinks.support.map((link) => (
                     <a
+                      key={link.name}
                       href={link.href}
-                      className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-pink-400 transition-colors"
                     >
                       {link.name}
                     </a>
-                  </li>
-                ))}
-              </ul>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
