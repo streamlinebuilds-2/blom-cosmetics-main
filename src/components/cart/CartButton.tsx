@@ -25,11 +25,11 @@ export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' 
         const trigger = document.getElementById('cart-drawer-trigger');
         if (trigger) (trigger as HTMLDivElement).click();
       }}
-      className={`p-2 text-gray-400 hover:text-gray-500 relative ${className}`}
+      className={`p-2 bg-pink-400 text-white hover:bg-pink-500 rounded-full transition-colors duration-200 relative ${className}`}
     >
       <ShoppingCart className="h-5 w-5" />
       {itemCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-pink-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
           {itemCount}
         </span>
       )}

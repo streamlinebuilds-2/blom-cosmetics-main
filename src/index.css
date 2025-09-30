@@ -653,4 +653,70 @@
   .master__chips {
     display: none !important;
   }
+
+  /* Cart Animations */
+  @keyframes bounce-in {
+    0% {
+      transform: scale(0) rotate(180deg);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.2) rotate(0deg);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1) rotate(0deg);
+      opacity: 1;
+    }
+  }
+
+  .animate-bounce-in {
+    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes fade-out {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-out;
+  }
+
+  /* Enhanced notification styles */
+  .cart-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: linear-gradient(135deg, #FF74A4 0%, #ff5f97 100%);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(255, 116, 164, 0.3);
+    font-weight: 600;
+    font-size: 14px;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .cart-notification.show {
+    transform: translateX(0);
+  }
+
+  .cart-notification::before {
+    content: '✓';
+    display: inline-block;
+    margin-right: 8px;
+    font-weight: bold;
+    font-size: 16px;
+  }
 }

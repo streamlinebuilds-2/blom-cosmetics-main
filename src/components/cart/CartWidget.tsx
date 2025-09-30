@@ -6,12 +6,26 @@ import { cartStore, CartState, formatPrice } from '../../lib/cart';
 export const CartWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
+  const [showCart, setShowCart] = useState(false);
   const scrollYRef = React.useRef<number>(0);
 
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
     return unsubscribe;
   }, []);
+
+  // Handle cart visibility animation
+  useEffect(() => {
+    if (cartState.items.length > 0) {
+      setShowCart(true);
+    } else {
+      // Delay hiding to allow for smooth animation
+      const timer = setTimeout(() => {
+        setShowCart(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [cartState.items.length]);
 
   // Lock page scroll when cart is open
   useEffect(() => {
@@ -72,18 +86,20 @@ export const CartWidget: React.FC = () => {
 
   return (
     <>
-      {/* Cart FAB */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center group hover:scale-110"
-      >
-        <ShoppingCart className="h-6 w-6 text-white" />
-        {cartState.items.length > 0 && (
+      {/* Cart FAB - Only show when cart has items */}
+      {showCart && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className={`fixed bottom-6 right-6 z-40 w-14 h-14 bg-pink-400 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110 ${
+            cartState.items.length > 0 ? 'animate-bounce-in' : 'animate-fade-out'
+          }`}
+        >
+          <ShoppingCart className="h-6 w-6 text-white" />
           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
             {cartStore.getItemCount()}
           </span>
-        )}
-      </button>
+        </button>
+      )}
       {/* Triggerable from header cart button */}
       <div id="cart-drawer-trigger" hidden onClick={() => setIsOpen(true)} />
 
