@@ -121,10 +121,10 @@ export const ShopPage: React.FC = () => {
   ];
 
   const productCategories = [
-    { name: 'All Products', slug: 'all', count: products.length },
-    { name: 'Prep & Finish', slug: 'prep-finish', count: products.filter(p => p.category === 'Prep & Finish').length },
-    { name: 'Acrylic System', slug: 'acrylic-system', count: products.filter(p => p.category === 'Acrylic System').length },
-    { name: 'Accessories', slug: 'accessories', count: products.filter(p => p.category === 'Accessories').length }
+    { name: 'All Products', slug: 'all', count: allProducts.length },
+    { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
+    { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
+    { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length }
   ];
 
   const sortOptions = [
@@ -144,11 +144,11 @@ export const ShopPage: React.FC = () => {
     }, 1000);
   }, []);
 
-  const filteredProducts = products.filter(product => {
+  const filteredProducts = allProducts.filter(product => {
     const matchesCategory = selectedCategory === 'all' || 
       product.category.toLowerCase().replace(' & ', '-').replace(' ', '-') === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
+                         product.short_description.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -164,7 +164,7 @@ export const ShopPage: React.FC = () => {
       case 'name':
         return a.name.localeCompare(b.name);
       case 'newest':
-        return products.indexOf(b) - products.indexOf(a);
+        return allProducts.indexOf(b) - allProducts.indexOf(a);
       case 'featured':
       default:
         return 0;
