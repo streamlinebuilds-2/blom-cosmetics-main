@@ -163,8 +163,12 @@ export const AboutPage: React.FC = () => {
                 the finest tools and knowledge to create stunning artistry.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg">Our Story</Button>
-                <Button size="lg" variant="outline">Meet Our Team</Button>
+                <a href="/about#story" className="inline-block">
+                  <Button size="lg">Our Story</Button>
+                </a>
+                <a href="/about#team" className="inline-block">
+                  <Button size="lg" variant="outline">Meet Our Team</Button>
+                </a>
               </div>
             </div>
 
