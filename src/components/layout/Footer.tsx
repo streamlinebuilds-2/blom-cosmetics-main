@@ -100,25 +100,8 @@ export const Footer: React.FC = () => {
             {/* Shop, Education & Support */}
             <div className="lg:col-span-2">
               <div className="space-y-8 ml-8">
-                {/* Mobile: Shop and Education side by side horizontally */}
+                {/* Mobile: Education and Shop side by side horizontally */}
                 <div className="grid grid-cols-2 gap-6 lg:hidden">
-                  {/* Shop Links */}
-                  <div>
-                    <h4 className="font-semibold text-white mb-4">Shop</h4>
-                    <ul className="space-y-2">
-                      {footerLinks.shop.map((link) => (
-                        <li key={link.name}>
-                          <a
-                            href={link.href}
-                            className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
-                          >
-                            {link.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
                   {/* Education */}
                   <div>
                     <h4 className="font-semibold text-white mb-4">Education</h4>
@@ -135,13 +118,30 @@ export const Footer: React.FC = () => {
                       ))}
                     </ul>
                   </div>
+
+                  {/* Shop Links */}
+                  <div>
+                    <h4 className="font-semibold text-white mb-4">Shop</h4>
+                    <ul className="space-y-2">
+                      {footerLinks.shop.map((link) => (
+                        <li key={link.name}>
+                          <a
+                            href={link.href}
+                            className="text-gray-400 hover:text-pink-400 transition-colors text-sm"
+                          >
+                            {link.name}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
 
-                {/* Desktop: Shop */}
+                {/* Desktop: Education */}
                 <div className="hidden lg:block">
-                  <h4 className="font-semibold text-white mb-4">Shop</h4>
+                  <h4 className="font-semibold text-white mb-4">Education</h4>
                   <ul className="space-y-2">
-                    {footerLinks.shop.map((link) => (
+                    {footerLinks.courses.map((link) => (
                       <li key={link.name}>
                         <a
                           href={link.href}
@@ -154,11 +154,11 @@ export const Footer: React.FC = () => {
                   </ul>
                 </div>
 
-                {/* Desktop: Education */}
+                {/* Desktop: Shop */}
                 <div className="hidden lg:block">
-                  <h4 className="font-semibold text-white mb-4">Education</h4>
+                  <h4 className="font-semibold text-white mb-4">Shop</h4>
                   <ul className="space-y-2">
-                    {footerLinks.courses.map((link) => (
+                    {footerLinks.shop.map((link) => (
                       <li key={link.name}>
                         <a
                           href={link.href}
@@ -182,7 +182,7 @@ export const Footer: React.FC = () => {
                   </button>
                   
                   {isSupportDropdownOpen && (
-                    <div className="absolute top-8 left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
+                    <div className="absolute bottom-8 left-0 lg:top-8 lg:left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
                       {footerLinks.support.map((link) => (
                         <a
                           key={link.name}
