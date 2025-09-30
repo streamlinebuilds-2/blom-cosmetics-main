@@ -76,9 +76,6 @@ export const MasterYourCraft: React.FC = () => {
               >
                 <source src="/videos/myc-demo.mp4" type="video/mp4" />
               </video>
-
-              <span className="m-badge m-badge--pink">Pro Tips</span>
-              <span className="m-badge m-badge--blue">New</span>
             </figure>
           </div>
         </div>
