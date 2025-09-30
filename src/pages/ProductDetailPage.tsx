@@ -544,6 +544,106 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         certifications: ['Vegan', 'Cruelty-Free']
       }
     },
+    'glitter-acrylic': {
+      id: '12',
+      name: 'Glitter Acrylic (15 g)',
+      subtitle: 'Sparkle acrylics for encapsulated effects',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.6,
+      reviewCount: 73,
+      inStock: true,
+      stockCount: 20,
+      description: 'Glitter particles suspended in clear/colored acrylic for high-impact shine.',
+      images: [
+        '/public/glitter-acrylic.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '15g', name: '15 g', inStock: true }
+      ],
+      overview: [
+        'Vibrant glitter distribution',
+        'Encapsulate for long wear',
+        'Smooth application for fades',
+        'High-impact shine effects',
+        'Professional quality sparkle'
+      ],
+      features: [
+        { title: 'Vibrant Glitter', description: 'Even distribution of sparkle particles for consistent shine' },
+        { title: 'Long Wear', description: 'Designed to be encapsulated for extended durability' },
+        { title: 'Smooth Application', description: 'Perfect for creating gradient and fade effects' },
+        { title: 'High Impact', description: 'Maximum sparkle for dramatic nail art designs' }
+      ],
+      howToUse: [
+        'Apply thin glitter coat',
+        'Encapsulate with clear core',
+        'File & top coat',
+        'Layer for more intense sparkle'
+      ],
+      ingredients: [
+        'PMMA (Polymethyl Methacrylate)',
+        'Benzoyl Peroxide',
+        'Cosmetic-grade PET glitter'
+      ],
+      specifications: {
+        size: '15 g',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'core-acrylics': {
+      id: '13',
+      name: 'Core Acrylics (56 g)',
+      subtitle: 'Strength powders in clear, white, and natural tones',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.8,
+      reviewCount: 94,
+      inStock: true,
+      stockCount: 30,
+      description: 'Core range designed as structural powders; often don\'t require capping.',
+      images: [
+        '/public/core-acrylics.webp',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '56g', name: '56 g', inStock: true }
+      ],
+      overview: [
+        'Strength formula for reliable wear',
+        'Non-yellowing',
+        'Smooth, self-leveling application',
+        'No clear cap required',
+        'Professional structural powders'
+      ],
+      features: [
+        { title: 'Strength Formula', description: 'Reliable wear without requiring clear capping' },
+        { title: 'Non-Yellowing', description: 'Maintains color integrity over time' },
+        { title: 'Self-Leveling', description: 'Smooth application for professional results' },
+        { title: 'Structural Design', description: 'Perfect for building strong nail extensions' }
+      ],
+      howToUse: [
+        'Build extension/base and apex directly',
+        'Refine shape',
+        'Finish file & top coat',
+        'No clear cap needed'
+      ],
+      ingredients: [
+        'PMMA (Polymethyl Methacrylate)',
+        'Benzoyl Peroxide',
+        'Cosmetic pigments'
+      ],
+      specifications: {
+        size: '56 g',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
     'nail-liquid-monomer': {
       id: '8',
       name: 'Nail Liquid (Monomer)',
