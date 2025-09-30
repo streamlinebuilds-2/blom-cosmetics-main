@@ -502,93 +502,156 @@ export const ShopPage: React.FC = () => {
             ) : (
               <div className={`grid ${getGridClasses()} gap-6`}>
                 {sortedProducts.map((product) => (
-                  <Card key={product.slug} className="group cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-300">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
-                      {/* Sale Badge */}
-                      {product.compareAtPrice && (
-                        <div className="absolute top-3 left-3 z-10">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
-                            Sale
-                          </span>
-                        </div>
-                      )}
+                <article 
+                  key={product.slug} 
+                  className="group relative flex flex-col bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 will-change-transform perspective-1000 hover:-translate-y-1 hover:rotate-1 overflow-hidden"
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  {/* Shimmer Effect */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent transform -translate-x-full -translate-y-full group-hover:translate-x-full group-hover:translate-y-full transition-transform duration-900 ease-out"></div>
+                  </div>
 
-                      {/* Wishlist Heart */}
-                      <button className="absolute top-3 right-3 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-pink-50 transition-colors">
-                        <Heart className="h-4 w-4 text-gray-400 hover:text-pink-400" />
-                      </button>
+                  {/* Sale Badge */}
+                  {product.compare_at_price && (
+                    <div className="absolute top-3 left-3 z-20">
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white shadow-sm">
+                        Sale
+                      </span>
+                    </div>
+                  )}
 
-                      {/* Product Image */}
+                  {/* Out of Stock Badge */}
+                  {!product.inStock && (
+                    <div className="absolute top-3 left-3 z-20">
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-500 text-white shadow-sm">
+                        Out of Stock
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Wishlist Heart */}
+                  <button 
+                    className="absolute top-3 right-3 z-20 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white hover:scale-110 transition-all duration-200"
+                    aria-label={`Add ${product.name} to wishlist`}
+                    aria-pressed="false"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      // Wishlist functionality would go here
+                    }}
+                  >
+                    <Heart className="h-4 w-4 text-gray-400 hover:text-pink-400 transition-colors" />
+                  </button>
+
+                  {/* Clickable Product Link Area */}
+                  <div 
+                    className="cursor-pointer"
+                    onClick={() => window.location.href = `/products/${product.slug}`}
+                  >
+                    {/* Product Image Container */}
+                    <div className="relative aspect-square overflow-hidden rounded-t-2xl bg-gray-50">
+                      {/* Main Product Image */}
                       <img
-                        src={product.images[0]}
+                        src={product.images?.[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
                         alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onClick={() => window.location.href = `/product/${product.slug}`}
+                        className="absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105"
+                        loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
                         }}
                       />
 
+                      {/* Hover Image (if available) */}
+                      {product.images?.[1] && (
+                        <img
+                          src={product.images[1]}
+                          alt={`${product.name} alternate view`}
+                          className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                          loading="lazy"
+                        />
+                      )}
+
                       {/* Quick View Overlay */}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                        <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50">
-                          <Eye className="h-5 w-5 text-gray-600" />
-                        </button>
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+                          <Eye className="h-5 w-5 text-gray-700" />
+                        </div>
                       </div>
                     </div>
 
-                    <div className="p-4">
+                    {/* Product Info */}
+                    <div className="p-4 pb-2">
                       {/* Product Title */}
-                      <h3 
-                        className="font-semibold text-lg mb-2 line-clamp-2 cursor-pointer hover:text-pink-400 transition-colors"
-                        onClick={() => window.location.href = `/product/${product.slug}`}
-                      >
+                      <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2 group-hover:text-pink-400 transition-colors">
                         {product.name}
                       </h3>
 
                       {/* Product Description */}
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {product.shortDescription}
-                      </p>
-
-                      {/* Scents Preview */}
-                      {product.scents && product.scents.length > 0 && (
-                        <div className="mb-3">
-                          <p className="text-xs text-gray-500 mb-1">
-                            {product.scents.length} scents available
-                          </p>
-                        </div>
+                      {product.short_description && (
+                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                          {product.short_description}
+                        </p>
                       )}
 
-                      {/* Price and Actions */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold text-pink-400">{product.price}</span>
-                          {product.compareAtPrice && (
-                            <span className="text-sm text-gray-400 line-through">
-                              {product.compareAtPrice}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {product.stock === 'In Stock' ? (
-                          <Button
-                            size="sm"
-                            onClick={() => handleAddToCart(product)}
-                            className="hover:scale-105 transition-transform"
-                          >
-                            <ShoppingCart className="h-4 w-4 mr-1" />
-                            Add to Cart
-                          </Button>
-                        ) : (
-                          <Button size="sm" variant="outline" disabled>
-                            Out of Stock
-                          </Button>
+                      {/* Price Row */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xl font-bold text-pink-400">
+                          R{typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                        </span>
+                        {product.compare_at_price && (
+                          <span className="text-sm text-gray-400 line-through">
+                            R{typeof product.compare_at_price === 'number' ? product.compare_at_price.toFixed(2) : product.compare_at_price}
+                          </span>
                         )}
                       </div>
+
+                      {/* Rating Stars (if available) */}
+                      {product.rating && (
+                        <div className="flex items-center gap-1 mb-3">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < Math.floor(product.rating)
+                                  ? 'text-yellow-400 fill-current'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                          {product.reviews && (
+                            <span className="text-xs text-gray-500 ml-1">({product.reviews})</span>
+                          )}
+                        </div>
+                      )}
                     </div>
-                  </Card>
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  <div className="p-4 pt-0 mt-auto">
+                    <Button
+                      className={`w-full transition-all duration-200 ${
+                        product.inStock !== false
+                          ? 'bg-gray-100 text-gray-700 hover:bg-pink-400 hover:text-white hover:scale-105'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      }`}
+                      disabled={product.inStock === false}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (product.inStock !== false) {
+                          handleAddToCart(product);
+                        }
+                      }}
+                      aria-label={`Add ${product.name} to cart`}
+                      aria-disabled={product.inStock === false}
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      {product.inStock === false ? 'Out of Stock' : 'ADD TO CART'}
+                    </Button>
+                  </div>
+                </article>
                 ))}
               </div>
             )}
