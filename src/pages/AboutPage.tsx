@@ -23,42 +23,24 @@ import {
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
-  const teamMembers = [
+  const teamMembers = [ // Updated team members
     {
       id: 1,
-      name: 'Sarah Mitchell',
-      role: 'Founder & Lead Instructor',
-      bio: 'With over 15 years in the nail industry, Sarah founded BLOM to share her passion for professional nail artistry and empower others to achieve excellence.',
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['Master Nail Technician', 'International Nail Art Champion', 'Certified Educator'],
-      specialties: ['Watercolor Techniques', 'Advanced Acrylics', 'Business Development']
+      name: 'Avané Crous',
+      role: 'Founder & Lead Educator',
+      bio: 'With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM’s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.',
+      image: 'https://images.pexels.com/photos/3762804/pexels-photo-3762804.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop', // Placeholder Pexels image
+      credentials: ['8+ Years Experience', 'Skilled Educator', 'Founder of BLOM'],
+      specialties: ['Acrylic Nail Application', 'Safe Techniques', 'Community Building']
     },
     {
       id: 2,
-      name: 'Michelle Adams',
-      role: 'Senior Instructor & Product Developer',
-      bio: 'Michelle brings technical expertise and innovation to BLOM, developing our premium product lines and advanced training curricula.',
-      image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['Chemical Engineering Background', 'Product Development Specialist', 'BLOM Certified Trainer'],
-      specialties: ['Product Formulation', 'Technical Training', 'Quality Assurance']
-    },
-    {
-      id: 3,
-      name: 'Jessica Chen',
-      role: 'Creative Director & Nail Artist',
-      bio: 'Jessica leads our creative vision, developing trend-forward techniques and inspiring nail artists worldwide with innovative designs.',
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['International Nail Art Judge', 'Creative Arts Degree', 'Social Media Influencer'],
-      specialties: ['Trend Forecasting', 'Creative Design', 'Social Media Strategy']
-    },
-    {
-      id: 4,
-      name: 'Amanda Foster',
-      role: 'Education Coordinator',
-      bio: 'Amanda ensures our training programs meet the highest standards, coordinating with instructors and supporting student success.',
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['Education Management', 'Student Success Specialist', 'Training Coordinator'],
-      specialties: ['Curriculum Development', 'Student Support', 'Program Management']
+      name: 'Anna-marie Ernst',
+      role: 'Administration & Client Care',
+      bio: 'Anna-marie is the heart and backbone of our team. As BLOM’s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
+      image: 'https://images.pexels.com/photos/3762807/pexels-photo-3762807.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop', // Placeholder Pexels image
+      credentials: ['Admin & Logistics Expert', 'Client Care Specialist'],
+      specialties: ['Bookings Management', 'Logistics Coordination', 'Client Relations']
     }
   ];
 
