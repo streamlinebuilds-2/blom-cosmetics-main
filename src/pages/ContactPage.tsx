@@ -231,7 +231,18 @@ export const ContactPage: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg">Send us a Message</Button>
-                <Button size="lg" variant="outline">Browse FAQ</Button>
+                <a href="/about#team" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/about#team'); }, 400);
+                  } catch { window.location.assign('/about#team'); }
+                }}>
+                  <Button size="lg" variant="outline">Meet Our Team</Button>
+                </a>
               </div>
             </div>
 
