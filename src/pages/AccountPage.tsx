@@ -4,10 +4,13 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle, LogOut, AlertCircle } from 'lucide-react';
+import { authService, AuthState } from '../lib/auth';
 
 export const AccountPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
+  const [authState, setAuthState] = useState<AuthState>({ user: null, loading: true, error: null });
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     document.title = 'My Account - BLOM Cosmetics';
@@ -16,15 +19,82 @@ export const AccountPage: React.FC = () => {
       metaDescription.setAttribute('content', 'Manage your BLOM Cosmetics account, view orders, update profile, and track your nail artistry journey.');
     }
     window.scrollTo({ top: 0 });
+
+    // Subscribe to auth state changes
+    const unsubscribe = authService.subscribe(setAuthState);
+    
+    // Check if user is authenticated
+    if (!authService.requireAuth()) {
+      return; // Will redirect to login
+    }
+
+    return unsubscribe;
   }, []);
 
-  // Mock user data
+  // Handle sign out
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      const result = await authService.signOut();
+      if (result.success) {
+        window.location.href = '/';
+      } else {
+        console.error('Sign out failed:', result.error);
+        setIsSigningOut(false);
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      setIsSigningOut(false);
+    }
+  };
+
+  // Show loading state
+  if (authState.loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header showMobileMenu={true} />
+        <main className="section-padding">
+          <Container>
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading your account...</p>
+            </div>
+          </Container>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Show error state
+  if (authState.error) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header showMobileMenu={true} />
+        <main className="section-padding">
+          <Container>
+            <div className="text-center py-16">
+              <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Authentication Error</h2>
+              <p className="text-gray-600 mb-6">{authState.error}</p>
+              <Button onClick={() => window.location.href = '/login'}>
+                Go to Login
+              </Button>
+            </div>
+          </Container>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // User data from auth state
   const userData = {
-    name: 'Sarah Mitchell',
-    email: 'sarah@example.com',
+    name: authState.user?.user_metadata?.full_name || authState.user?.email?.split('@')[0] || 'User',
+    email: authState.user?.email || '',
     phone: '+27 79 123 4567',
     address: '123 Beauty Street, Cape Town, 8001',
-    memberSince: 'March 2023',
+    memberSince: authService.formatMemberSince(authState.user?.created_at || ''),
     totalOrders: 12,
     totalSpent: 3450,
     loyaltyPoints: 345
@@ -100,7 +170,8 @@ export const AccountPage: React.FC = () => {
     { id: 'profile', label: 'Profile', icon: User },
     { id: 'orders', label: 'Orders', icon: Package },
     { id: 'wishlist', label: 'Wishlist', icon: Heart },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'signout', label: 'Sign Out', icon: LogOut, action: handleSignOut }
   ];
 
   return (
@@ -146,7 +217,18 @@ export const AccountPage: React.FC = () => {
                 <CardContent className="p-0">
                   <nav className="space-y-1">
                     {tabItems.map((item) => (
-                      <button
+                      item.action ? (
+                        <button
+                          key={item.id}
+                          onClick={item.action}
+                          disabled={isSigningOut}
+                          className="w-full flex items-center gap-3 px-6 py-4 text-left transition-colors text-red-600 hover:bg-red-50 disabled:opacity-50"
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {isSigningOut ? 'Signing Out...' : item.label}
+                        </button>
+                      ) : (
+                        <button
                         key={item.id}
                         onClick={() => setActiveTab(item.id as any)}
                         className={`w-full flex items-center gap-3 px-6 py-4 text-left transition-colors ${
@@ -158,6 +240,7 @@ export const AccountPage: React.FC = () => {
                         <item.icon className="h-5 w-5" />
                         {item.label}
                       </button>
+                      )
                     ))}
                   </nav>
                 </CardContent>
@@ -206,7 +289,7 @@ export const AccountPage: React.FC = () => {
                           <div className="flex items-center gap-3">
                             <User className="h-5 w-5 text-gray-400" />
                             <div>
-                              <div className="font-medium">{userData.name}</div>
+                              <div className="font-medium" id="accountEmail">{userData.name}</div>
                               <div className="text-sm text-gray-500">Full Name</div>
                             </div>
                           </div>
@@ -240,7 +323,7 @@ export const AccountPage: React.FC = () => {
                           <div className="flex items-center gap-3">
                             <Calendar className="h-5 w-5 text-gray-400" />
                             <div>
-                              <div className="font-medium">{userData.memberSince}</div>
+                              <div className="font-medium" id="memberSince">{userData.memberSince}</div>
                               <div className="text-sm text-gray-500">Member Since</div>
                             </div>
                           </div>

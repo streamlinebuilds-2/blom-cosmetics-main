@@ -16,6 +16,8 @@ import { TermsPage } from './pages/TermsPage';
 import { ReturnsPage } from './pages/ReturnsPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { AccountPage } from './pages/AccountPage';
+import { LoginPage } from './pages/LoginPage';
+import { SignupPage } from './pages/SignupPage';
 
 function App() {
   // Simple routing based on URL path
@@ -54,6 +56,10 @@ function App() {
   if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
   if (path === '/account') { return <><AccountPage /><CartWidget /></>; }
+  
+  if (path === '/login') { return <><LoginPage /><CartWidget /></>; }
+  
+  if (path === '/signup') { return <><SignupPage /><CartWidget /></>; }
   
   if (path === '/order-confirmation') { return <><OrderConfirmationPage /><CartWidget /></>; }
   

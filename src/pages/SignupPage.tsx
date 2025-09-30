@@ -1,0 +1,402 @@
+import React, { useState, useEffect } from 'react';
+import { Header } from '../components/layout/Header';
+import { Footer } from '../components/layout/Footer';
+import { Container } from '../components/layout/Container';
+import { Card, CardContent, CardHeader } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { authService } from '../lib/auth';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, UserPlus } from 'lucide-react';
+
+export const SignupPage: React.FC = () => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    passwordConfirm: '',
+    agreeToTerms: false
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string }>({
+    type: null,
+    message: ''
+  });
+  const [isFormValid, setIsFormValid] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    document.title = 'Sign Up – BLOM Cosmetics';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Create a BLOM Cosmetics account to shop faster, track orders, and manage your profile.');
+    }
+    window.scrollTo({ top: 0 });
+
+    // Check if user is already logged in
+    const authState = authService.getState();
+    if (authState.user && !authState.loading) {
+      window.location.href = '/account';
+    }
+  }, []);
+
+  useEffect(() => {
+    // Validate form
+    const errors: string[] = [];
+    
+    // Email validation
+    if (formData.email && (!formData.email.includes('@') || !formData.email.includes('.'))) {
+      errors.push('Please enter a valid email address');
+    }
+    
+    // Password validation
+    if (formData.password && formData.password.length < 8) {
+      errors.push('Password must be at least 8 characters long');
+    }
+    
+    // Password confirmation
+    if (formData.password && formData.passwordConfirm && formData.password !== formData.passwordConfirm) {
+      errors.push('Passwords do not match');
+    }
+    
+    // Terms agreement
+    if (!formData.agreeToTerms) {
+      errors.push('You must agree to the Terms and Privacy Policy');
+    }
+
+    setValidationErrors(errors);
+    
+    const isValid = formData.email.includes('@') && 
+                   formData.email.includes('.') && 
+                   formData.password.length >= 8 &&
+                   formData.password === formData.passwordConfirm &&
+                   formData.agreeToTerms;
+    
+    setIsFormValid(isValid);
+  }, [formData]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    
+    // Clear status when user starts typing
+    if (status.type) {
+      setStatus({ type: null, message: '' });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isFormValid || isSubmitting) return;
+
+    setIsSubmitting(true);
+    setStatus({ type: null, message: '' });
+
+    try {
+      const result = await authService.signUpWithEmail(formData.email, formData.password);
+
+      if (result.success) {
+        if (result.needsVerification) {
+          setStatus({ 
+            type: 'success', 
+            message: 'Account created! Please check your email to confirm your account before signing in.' 
+          });
+        } else {
+          setStatus({ type: 'success', message: 'Account created successfully! Redirecting...' });
+          setTimeout(() => {
+            window.location.href = '/account';
+          }, 1000);
+        }
+      } else {
+        setStatus({ 
+          type: 'error', 
+          message: result.error || 'Failed to create account. Please try again.' 
+        });
+      }
+    } catch (error) {
+      setStatus({ 
+        type: 'error', 
+        message: 'An unexpected error occurred. Please try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getPasswordStrength = (password: string): { strength: number; label: string; color: string } => {
+    if (password.length === 0) return { strength: 0, label: '', color: '' };
+    if (password.length < 6) return { strength: 1, label: 'Weak', color: 'text-red-500' };
+    if (password.length < 8) return { strength: 2, label: 'Fair', color: 'text-yellow-500' };
+    if (password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+      return { strength: 4, label: 'Strong', color: 'text-green-500' };
+    }
+    return { strength: 3, label: 'Good', color: 'text-blue-500' };
+  };
+
+  const passwordStrength = getPasswordStrength(formData.password);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header showMobileMenu={true} />
+
+      <main className="section-padding">
+        <Container>
+          <div className="max-w-md mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-bold mb-4">Create Your Account</h1>
+              <p className="text-xl text-gray-600">
+                Join BLOM to shop faster and track your orders
+              </p>
+            </div>
+
+            {/* Signup Form */}
+            <Card>
+              <CardHeader>
+                <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Email Field */}
+                  <div>
+                    <label htmlFor="signupEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <input
+                        type="email"
+                        id="signupEmail"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="input-field pl-12"
+                        placeholder="your@email.com"
+                        autoComplete="email"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Password Field */}
+                  <div>
+                    <label htmlFor="signupPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                      Password *
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        id="signupPassword"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        minLength={8}
+                        className="input-field pl-12 pr-12"
+                        placeholder="Create a strong password"
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                        aria-pressed={showPassword}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                    {/* Password Strength Indicator */}
+                    {formData.password && (
+                      <div className="mt-2">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                passwordStrength.strength === 1 ? 'bg-red-500 w-1/4' :
+                                passwordStrength.strength === 2 ? 'bg-yellow-500 w-2/4' :
+                                passwordStrength.strength === 3 ? 'bg-blue-500 w-3/4' :
+                                passwordStrength.strength === 4 ? 'bg-green-500 w-full' : 'w-0'
+                              }`}
+                            />
+                          </div>
+                          <span className={`text-xs font-medium ${passwordStrength.color}`}>
+                            {passwordStrength.label}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Use 8+ characters with a mix of letters, numbers & symbols
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Confirm Password Field */}
+                  <div>
+                    <label htmlFor="signupPasswordConfirm" className="block text-sm font-medium text-gray-700 mb-2">
+                      Confirm Password *
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <input
+                        type={showPasswordConfirm ? 'text' : 'password'}
+                        id="signupPasswordConfirm"
+                        name="passwordConfirm"
+                        value={formData.passwordConfirm}
+                        onChange={handleInputChange}
+                        required
+                        className="input-field pl-12 pr-12"
+                        placeholder="Confirm your password"
+                        autoComplete="new-password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                        aria-pressed={showPasswordConfirm}
+                        aria-label={showPasswordConfirm ? 'Hide password confirmation' : 'Show password confirmation'}
+                      >
+                        {showPasswordConfirm ? (
+                          <EyeOff className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <Eye className="h-5 w-5 text-gray-400" />
+                        )}
+                      </button>
+                    </div>
+                    {/* Password Match Indicator */}
+                    {formData.passwordConfirm && (
+                      <div className="mt-2">
+                        {formData.password === formData.passwordConfirm ? (
+                          <p className="text-xs text-green-600 flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            Passwords match
+                          </p>
+                        ) : (
+                          <p className="text-xs text-red-600 flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            Passwords do not match
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Terms Agreement */}
+                  <div>
+                    <label className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="signupTerms"
+                        name="agreeToTerms"
+                        checked={formData.agreeToTerms}
+                        onChange={handleInputChange}
+                        required
+                        className="mt-1 rounded border-gray-300 text-pink-400 focus:ring-pink-300"
+                      />
+                      <span className="text-sm text-gray-600">
+                        I agree to the{' '}
+                        <a href="/terms" className="text-pink-400 hover:text-pink-500 transition-colors">
+                          Terms of Service
+                        </a>{' '}
+                        and{' '}
+                        <a href="/privacy" className="text-pink-400 hover:text-pink-500 transition-colors">
+                          Privacy Policy
+                        </a>
+                        *
+                      </span>
+                    </label>
+                  </div>
+
+                  {/* Validation Errors */}
+                  {validationErrors.length > 0 && !isFormValid && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-red-800 mb-1">Please fix the following:</h4>
+                          <ul className="text-sm text-red-700 space-y-1">
+                            {validationErrors.map((error, index) => (
+                              <li key={index}>• {error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Status Message */}
+                  {status.type && (
+                    <div 
+                      id="signupStatus" 
+                      className={`form-status p-4 rounded-lg flex items-center gap-2 ${
+                        status.type === 'error' 
+                          ? 'bg-red-50 text-red-700 border border-red-200' 
+                          : 'bg-green-50 text-green-700 border border-green-200'
+                      }`}
+                      aria-live="polite"
+                    >
+                      {status.type === 'error' ? (
+                        <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                      ) : (
+                        <CheckCircle className="h-5 w-5 flex-shrink-0" />
+                      )}
+                      <span>{status.message}</span>
+                    </div>
+                  )}
+
+                  {/* Submit Button */}
+                  <Button
+                    type="submit"
+                    id="signupSubmit"
+                    className="w-full"
+                    size="lg"
+                    disabled={!isFormValid || isSubmitting}
+                    loading={isSubmitting}
+                  >
+                    <UserPlus className="h-5 w-5 mr-2" />
+                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                  </Button>
+                </form>
+
+                {/* Login Link */}
+                <div className="mt-6 text-center">
+                  <p className="text-gray-600">
+                    Already have an account?{' '}
+                    <a 
+                      href="/login" 
+                      className="text-pink-400 hover:text-pink-500 font-medium transition-colors"
+                    >
+                      Log in
+                    </a>
+                  </p>
+                </div>
+
+                {/* Email Verification Notice */}
+                {status.type === 'success' && status.message.includes('email') && (
+                  <div className="mt-6 text-center">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => window.location.href = '/login'}
+                    >
+                      Go to Login
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </Container>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
