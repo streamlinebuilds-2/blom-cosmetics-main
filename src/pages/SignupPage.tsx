@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { authService } from '../lib/auth';
+// import { authService } from '../lib/auth';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, UserPlus } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
@@ -15,7 +15,7 @@ export const SignupPage: React.FC = () => {
     agreeToTerms: false
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  // const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string }>({
     type: null,
@@ -33,10 +33,11 @@ export const SignupPage: React.FC = () => {
     window.scrollTo({ top: 0 });
 
     // Check if user is already logged in
-    const authState = authService.getState();
-    if (authState.user && !authState.loading) {
-      window.location.href = '/account';
-    }
+    // Temporarily disable auth redirect while testing
+    // const authState = authService.getState();
+    // if (authState.user && !authState.loading) {
+    //   window.location.href = '/account';
+    // }
   }, []);
 
   useEffect(() => {
@@ -95,35 +96,12 @@ export const SignupPage: React.FC = () => {
     setIsSubmitting(true);
     setStatus({ type: null, message: '' });
 
-    try {
-      const result = await authService.signUpWithEmail(formData.email, formData.password);
-
-      if (result.success) {
-        if (result.needsVerification) {
-          setStatus({ 
-            type: 'success', 
-            message: 'Account created! Please check your email to confirm your account before signing in.' 
-          });
-        } else {
-          setStatus({ type: 'success', message: 'Account created successfully! Redirecting...' });
-          setTimeout(() => {
-            window.location.href = '/account';
-          }, 1000);
-        }
-      } else {
-        setStatus({ 
-          type: 'error', 
-          message: result.error || 'Failed to create account. Please try again.' 
-        });
-      }
-    } catch (error) {
-      setStatus({ 
-        type: 'error', 
-        message: 'An unexpected error occurred. Please try again.' 
-      });
-    } finally {
+    // Simulate account creation while testing (no backend)
+    setTimeout(() => {
+      setStatus({ type: 'success', message: 'Account created successfully! Redirecting...' });
       setIsSubmitting(false);
-    }
+      setTimeout(() => { window.location.href = '/account'; }, 600);
+    }, 400);
   };
 
   const getPasswordStrength = (password: string): { strength: number; label: string; color: string } => {
@@ -247,7 +225,7 @@ export const SignupPage: React.FC = () => {
                     <div className="relative">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                       <input
-                        type={showPasswordConfirm ? 'text' : 'password'}
+                        type={'password'}
                         id="signupPasswordConfirm"
                         name="passwordConfirm"
                         value={formData.passwordConfirm}
@@ -257,19 +235,7 @@ export const SignupPage: React.FC = () => {
                         placeholder="Confirm your password"
                         autoComplete="new-password"
                       />
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                        aria-pressed={showPasswordConfirm}
-                        aria-label={showPasswordConfirm ? 'Hide password confirmation' : 'Show password confirmation'}
-                      >
-                        {showPasswordConfirm ? (
-                          <EyeOff className="h-5 w-5 text-gray-400" />
-                        ) : (
-                          <Eye className="h-5 w-5 text-gray-400" />
-                        )}
-                      </button>
+                      {/* Hide/show toggle removed for confirm field during testing */}
                     </div>
                     {/* Password Match Indicator */}
                     {formData.passwordConfirm && (

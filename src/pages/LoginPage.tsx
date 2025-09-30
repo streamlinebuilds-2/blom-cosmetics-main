@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { authService } from '../lib/auth';
+// import { authService } from '../lib/auth';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
@@ -30,10 +30,11 @@ export const LoginPage: React.FC = () => {
     window.scrollTo({ top: 0 });
 
     // Check if user is already logged in
-    const authState = authService.getState();
-    if (authState.user && !authState.loading) {
-      window.location.href = '/account';
-    }
+    // Temporarily disable auth redirect while testing
+    // const authState = authService.getState();
+    // if (authState.user && !authState.loading) {
+    //   window.location.href = '/account';
+    // }
   }, []);
 
   useEffect(() => {
@@ -65,32 +66,12 @@ export const LoginPage: React.FC = () => {
     setIsSubmitting(true);
     setStatus({ type: null, message: '' });
 
-    try {
-      const result = await authService.signInWithEmail(
-        formData.email, 
-        formData.password, 
-        { remember: formData.remember }
-      );
-
-      if (result.success) {
-        setStatus({ type: 'success', message: 'Login successful! Redirecting...' });
-        setTimeout(() => {
-          window.location.href = '/account';
-        }, 1000);
-      } else {
-        setStatus({ 
-          type: 'error', 
-          message: result.error || 'Login failed. Please check your credentials.' 
-        });
-      }
-    } catch (error) {
-      setStatus({ 
-        type: 'error', 
-        message: 'An unexpected error occurred. Please try again.' 
-      });
-    } finally {
+    // Simulate successful login without backend while testing
+    setTimeout(() => {
+      setStatus({ type: 'success', message: 'Login successful! Redirecting...' });
       setIsSubmitting(false);
-    }
+      setTimeout(() => { window.location.href = '/account'; }, 600);
+    }, 400);
   };
 
   const handleForgotPassword = async () => {
