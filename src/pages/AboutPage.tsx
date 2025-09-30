@@ -28,8 +28,8 @@ export const AboutPage: React.FC = () => {
       id: 1,
       name: 'Avané Crous',
       role: 'Founder & Lead Educator',
-      bio: 'With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM’s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.',
-      image: 'https://images.pexels.com/photos/3762804/pexels-photo-3762804.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop', // Placeholder Pexels image
+      bio: 'With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM\'s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.',
+      image: 'https://images.pexels.com/photos/3762804/pexels-photo-3762804.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
       credentials: ['8+ Years Experience', 'Skilled Educator', 'Founder of BLOM'],
       specialties: ['Acrylic Nail Application', 'Safe Techniques', 'Community Building']
     },
@@ -37,8 +37,8 @@ export const AboutPage: React.FC = () => {
       id: 2,
       name: 'Anna-marie Ernst',
       role: 'Administration & Client Care',
-      bio: 'Anna-marie is the heart and backbone of our team. As BLOM’s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
-      image: 'https://images.pexels.com/photos/3762807/pexels-photo-3762807.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop', // Placeholder Pexels image
+      bio: 'Anna-marie is the heart and backbone of our team. As BLOM\'s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
+      image: 'https://images.pexels.com/photos/3762807/pexels-photo-3762807.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
       credentials: ['Admin & Logistics Expert', 'Client Care Specialist'],
       specialties: ['Bookings Management', 'Logistics Coordination', 'Client Relations']
     }
