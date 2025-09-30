@@ -14,7 +14,8 @@ import {
   BookOpen,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  Layers
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
@@ -165,6 +166,32 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
+        {/* Vision & Mission Section - original card design */}
+        <section className="section-padding bg-[#F7FAFF]">
+          <Container>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                <div className="mb-6">
+                  <Layers className="w-10 h-10 text-pink-500" />
+                </div>
+                <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-4 uppercase">Our Vision</h3>
+                <p className="text-slate-600 text-lg leading-8">
+                  To be one of South Africa's most trusted and loved nail care brands, empowering beauty with eco-friendly, cruelty-free, and innovative products that make self-expression affordable, fun, and accessible to everyone.
+                </p>
+              </div>
+
+              <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                <div className="mb-6">
+                  <Heart className="w-10 h-10 text-pink-500" />
+                </div>
+                <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-4 uppercase">Our Mission</h3>
+                <p className="text-slate-600 text-lg leading-8">
+                  Our mission is to create high-quality nail products that combine sustainability with style. We are committed to eco-friendly practices, never testing on animals, and keeping our products affordable without compromise.
+                </p>
+              </div>
+            </div>
+          </Container>
+        </section>
 
 
         {/* Why Choose Us Section */}
