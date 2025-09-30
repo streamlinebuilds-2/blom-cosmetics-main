@@ -142,6 +142,158 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         origin: 'Professional Grade',
         certifications: ['Vegan', 'Cruelty-Free', 'HEMA-Free']
       }
+    },
+    'prep-solution': {
+      id: '3',
+      name: 'Prep Solution (Nail Dehydrator)',
+      subtitle: 'Removes oils & moisture for better adhesion',
+      price: 189,
+      comparePrice: null,
+      rating: 4.7,
+      reviewCount: 89,
+      inStock: true,
+      stockCount: 20,
+      description: 'Prepares natural nails by dehydrating the plate, preventing lifting under acrylic and gel.',
+      images: [
+        '/public/prep-solution.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '15ml', name: '15ml', inStock: true }
+      ],
+      overview: [
+        'Fast-evaporating formula with no residue',
+        'Improves adhesion under acrylic & gel systems',
+        'Prevents lifting and extends wear time',
+        'Professional salon quality',
+        'Easy application with precision brush'
+      ],
+      features: [
+        { title: 'Fast-Evaporating', description: 'Quick-drying formula that leaves no residue' },
+        { title: 'Improved Adhesion', description: 'Creates optimal surface for gel and acrylic application' },
+        { title: 'Prevents Lifting', description: 'Removes oils and moisture that cause product failure' },
+        { title: 'Professional Grade', description: 'Salon-quality results for long-lasting manicures' }
+      ],
+      howToUse: [
+        'Push back cuticles and shape nails',
+        'Apply thin coat to natural nail surface',
+        'Allow to air dry for approximately 30 seconds',
+        'Continue with primer and nail enhancement application'
+      ],
+      ingredients: [
+        'Ethyl Acetate',
+        'Isopropyl Alcohol',
+        'Dehydrating Agents'
+      ],
+      specifications: {
+        size: '15ml',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'top-coat': {
+      id: '4',
+      name: 'Top Coat',
+      subtitle: 'Strong, protective top coat with mirror shine',
+      price: 249,
+      comparePrice: 299,
+      rating: 4.9,
+      reviewCount: 201,
+      inStock: true,
+      stockCount: 35,
+      description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
+      images: [
+        '/public/top-coat.webp',
+        'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '15ml', name: '15ml', inStock: true }
+      ],
+      overview: [
+        'Seals and protects color underneath',
+        'Scratch and chip resistant formula',
+        'Glossy, professional mirror finish',
+        'Compatible with gel and acrylic systems',
+        'Long-lasting durability'
+      ],
+      features: [
+        { title: 'Protective Seal', description: 'Creates a barrier that protects underlying color and design' },
+        { title: 'Chip Resistant', description: 'Advanced formula resists chipping and scratching' },
+        { title: 'Mirror Shine', description: 'Delivers a high-gloss, professional finish' },
+        { title: 'Universal Compatibility', description: 'Works with both gel and acrylic nail systems' }
+      ],
+      howToUse: [
+        'Ensure base color is completely cured/dry',
+        'Apply thin, even coat over entire nail',
+        'Cure under LED/UV lamp if using with gel system',
+        'Apply second coat if extra durability is desired'
+      ],
+      ingredients: [
+        'Acrylate Polymers',
+        'UV Stabilizers',
+        'Gloss Enhancers',
+        'Protective Resins'
+      ],
+      specifications: {
+        size: '15ml',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free', 'HEMA-Free']
+      }
+    },
+    'fairy-dust-top-coat': {
+      id: '5',
+      name: 'Fairy Dust Top Coat',
+      subtitle: 'Glitter-infused top coat with smooth shine',
+      price: 279,
+      comparePrice: null,
+      rating: 4.6,
+      reviewCount: 73,
+      inStock: true,
+      stockCount: 18,
+      description: 'Adds a sparkling finish to any gel or acrylic set.',
+      images: [
+        '/public/fairy-dust-top-coat.webp',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '15ml', name: '15ml', inStock: true }
+      ],
+      overview: [
+        'Subtle glitter shimmer for elegant sparkle',
+        'Long-lasting shine that won\'t fade',
+        'Smooth finish that\'s non-gritty to touch',
+        'Perfect for special occasions or everyday glamour',
+        'Easy application with built-in precision brush'
+      ],
+      features: [
+        { title: 'Subtle Shimmer', description: 'Fine glitter particles create elegant sparkle without being overwhelming' },
+        { title: 'Smooth Finish', description: 'Non-gritty texture feels smooth to the touch' },
+        { title: 'Long-Lasting', description: 'Maintains sparkle and shine for extended wear' },
+        { title: 'Versatile Use', description: 'Perfect as final coat or mixed with other colors' }
+      ],
+      howToUse: [
+        'Apply over cured base color or design',
+        'Use as final coat for subtle sparkle effect',
+        'Cure under LED/UV lamp if using with gel system',
+        'Can be layered for more intense shimmer'
+      ],
+      ingredients: [
+        'Acrylate Polymers',
+        'Cosmetic Grade Glitter',
+        'UV Stabilizers',
+        'Shine Enhancers'
+      ],
+      specifications: {
+        size: '15ml',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free', 'HEMA-Free']
+      }
     }
     // Add more products as needed...
   };
