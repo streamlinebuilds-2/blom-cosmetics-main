@@ -7,13 +7,8 @@ import { Button } from '../components/ui/Button';
 import { 
   Award, 
   Heart, 
-  Users, 
-  Target, 
   Star, 
   CheckCircle,
-  Sparkles,
-  TrendingUp,
-  Shield,
   Zap,
   Globe,
   BookOpen,
@@ -75,38 +70,6 @@ export const AboutPage: React.FC = () => {
     }
   ];
 
-  const coreValues = [
-    {
-      icon: Heart,
-      title: 'Passion for Excellence',
-      description: 'We are driven by an unwavering commitment to quality and excellence in everything we do, from our products to our education.'
-    },
-    {
-      icon: Users,
-      title: 'Community First',
-      description: 'We believe in building a supportive community where nail professionals can learn, grow, and succeed together.'
-    },
-    {
-      icon: Target,
-      title: 'Innovation & Growth',
-      description: 'We continuously innovate and evolve, staying ahead of industry trends to provide cutting-edge solutions.'
-    },
-    {
-      icon: Shield,
-      title: 'Trust & Integrity',
-      description: 'We build lasting relationships through honest communication, reliable products, and consistent quality.'
-    },
-    {
-      icon: Sparkles,
-      title: 'Creativity & Artistry',
-      description: 'We celebrate creativity and support artists in expressing their unique vision through beautiful nail art.'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Professional Development',
-      description: 'We are committed to helping nail professionals advance their careers and achieve their business goals.'
-    }
-  ];
 
   const whyChooseUs = [
     {
@@ -248,30 +211,6 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Values Section */}
-        <section className="section-padding">
-          <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Our Core Values</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                These fundamental principles guide our decisions, shape our culture, 
-                and define how we serve our community of professionals.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {coreValues.map((value, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <value.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{value.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{value.description}</p>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
 
         {/* Why Choose Us Section */}
         <section className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
