@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
-import { Search, User, Menu, X } from 'lucide-react';
+import { User, Menu, X } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 
 interface HeaderProps {
@@ -156,9 +156,6 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
             {/* Action Icons */}
             <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-gray-500">
-                <Search className="h-5 w-5" />
-              </button>
               <button className="p-2 text-gray-400 hover:text-gray-500">
                 <User className="h-5 w-5" />
               </button>
