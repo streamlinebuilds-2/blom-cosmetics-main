@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Instagram, Facebook, Twitter } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Whatsapp, Tiktok } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   useEffect(() => {
@@ -55,10 +55,10 @@ export const Footer: React.FC = () => {
         <div className="footer-col">
           <h4>Connect</h4>
           <div className="footer-socials">
-            <a aria-label="Instagram" href="https://instagram.com/yourhandle" target="_blank" rel="noopener" className="social-link"><Instagram className="h-4 w-4" /></a>
-            <a aria-label="Facebook" href="https://facebook.com/yourhandle" target="_blank" rel="noopener" className="social-link"><Facebook className="h-4 w-4" /></a>
-            <a aria-label="WhatsApp" href="https://wa.me/yourwhatsapp" target="_blank" rel="noopener" className="social-link">WA</a>
-            <a aria-label="TikTok" href="https://tiktok.com/@yourhandle" target="_blank" rel="noopener" className="social-link">TT</a>
+            <a aria-label="Instagram" href="https://instagram.com/yourhandle" target="_blank" rel="noopener" className="social-link"><Instagram className="h-5 w-5 icon" /></a>
+            <a aria-label="Facebook" href="https://facebook.com/yourhandle" target="_blank" rel="noopener" className="social-link"><Facebook className="h-5 w-5 icon" /></a>
+            <a aria-label="WhatsApp" href="https://wa.me/yourwhatsapp" target="_blank" rel="noopener" className="social-link"><Whatsapp className="h-5 w-5 icon" /></a>
+            <a aria-label="TikTok" href="https://tiktok.com/@yourhandle" target="_blank" rel="noopener" className="social-link"><Tiktok className="h-5 w-5 icon" /></a>
           </div>
 
           <h5 className="newsletter-title">Newsletter Signup</h5>
