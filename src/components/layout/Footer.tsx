@@ -99,7 +99,7 @@ export const Footer: React.FC = () => {
 
             {/* Shop, Education & Support */}
             <div className="lg:col-span-2">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="space-y-8">
                 {/* Shop Links */}
                 <div>
                   <h4 className="font-semibold text-white mb-4">Shop</h4>
