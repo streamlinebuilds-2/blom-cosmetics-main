@@ -112,11 +112,18 @@
     background-color: var(--neutral-white);
   }
 
-  .btn-outline {
-    @apply border-2 border-pink-400 text-pink-400 hover:bg-pink-400 hover:text-white focus:ring-pink-300;
-    border-color: var(--primary-pink);
-    color: var(--primary-pink);
-  }
+  /* Pink primary (rounded, white text) */
+  .btn-primary { background: linear-gradient(135deg, #FF74A4 0%, #FF5A96 100%); color: #fff; box-shadow: 0 8px 25px rgba(255,116,164,.40); border-radius: 9999px; }
+  .btn-primary:hover { background: transparent; color: #000; border: 2px solid #000; transform: translateY(-1px); box-shadow: 0 12px 35px rgba(255,116,164,.20); }
+  .btn-primary:active { transform: translateY(0); filter: brightness(.98); }
+
+  /* Pink solid convenience */
+  .btn-pink { background: #FF74A4; color: #fff; box-shadow: 0 4px 15px rgba(255,116,164,.30); border-radius: 9999px; }
+  .btn-pink:hover { background: transparent; color: #000; border: 2px solid #000; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,116,164,.20); }
+
+  /* Secondary outline (black) */
+  .btn-outline, .btn-secondary { background: #fff; color: #000; border: 2px solid #000; border-radius: 9999px; }
+  .btn-outline:hover, .btn-secondary:hover { background: #CEE5FF; transform: translateY(-1px); }
 
   .btn-ghost {
     @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-200;
