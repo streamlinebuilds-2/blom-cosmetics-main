@@ -57,11 +57,10 @@ const CoursesPage: React.FC = () => {
         {/* Hero Section */}
         <div className="py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Professional Nail Art Courses
+            Elevate Your Artistry. Grow Your Business.
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Master the art of nail design with our comprehensive training programs. 
-            From beginner-friendly online workshops to advanced in-person certification courses.
+            Explore our expert-led workshops and courses, designed to give professional nail technicians the skills and confidence to succeed.
           </p>
         </div>
 
