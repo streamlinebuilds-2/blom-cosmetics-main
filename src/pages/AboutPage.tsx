@@ -94,24 +94,6 @@ export const AboutPage: React.FC = () => {
     }
   ];
 
-  const certifications = [
-    {
-      name: 'ISO 9001:2015 Quality Management',
-      description: 'International standard for quality management systems'
-    },
-    {
-      name: 'Professional Beauty Association Member',
-      description: 'Active member of leading beauty industry organizations'
-    },
-    {
-      name: 'Certified Training Provider',
-      description: 'Accredited by international beauty education bodies'
-    },
-    {
-      name: 'Product Safety Compliance',
-      description: 'All products meet international safety and quality standards'
-    }
-  ];
 
   const milestones = [
     { year: '2018', event: 'BLOM Cosmetics Founded', description: 'Started with a vision to elevate nail artistry' },
@@ -291,49 +273,6 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Education Section */}
-        <section className="section-padding bg-gray-50">
-          <Container>
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-bold mb-6">Education & Certifications</h2>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                  Our commitment to excellence is backed by industry-leading certifications, 
-                  continuous education, and adherence to the highest professional standards. 
-                  We maintain rigorous quality controls and stay current with industry developments.
-                </p>
-
-                <div className="space-y-6">
-                  {certifications.map((cert, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Award className="h-6 w-6 text-blue-400" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-lg mb-2">{cert.name}</h4>
-                        <p className="text-gray-600">{cert.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="relative">
-                <img
-                  src="https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-                  alt="Education and certifications"
-                  className="rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -top-6 -right-6 bg-white rounded-xl p-6 shadow-lg">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-1">ISO</div>
-                    <div className="text-sm text-gray-600">Certified Quality</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </section>
 
         {/* Closing CTA Section */}
         <section className="section-padding bg-gradient-to-r from-pink-400 to-blue-300 text-white">
