@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Instagram, Facebook, Twitter } from 'lucide-react';
 
+export const Footer: React.FC = () => {
   useEffect(() => {
     const y = document.getElementById('year');
     if (y) y.textContent = String(new Date().getFullYear());
