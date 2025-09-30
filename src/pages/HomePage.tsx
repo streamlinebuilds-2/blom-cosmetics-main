@@ -89,9 +89,9 @@ export const HomePage: React.FC = () => {
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              <Card className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Card className="text-center hover:shadow-lg transition-shadow h-full">
+                <CardContent className="p-6 flex flex-col items-center">
+                  <div className="mt-2 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <Shield className="h-6 w-6 text-pink-400" />
                   </div>
                   <h3 className="font-bold text-lg mb-3">HEMA-Free Formulas</h3>
@@ -99,9 +99,9 @@ export const HomePage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Card className="text-center hover:shadow-lg transition-shadow h-full">
+                <CardContent className="p-6 flex flex-col items-center">
+                  <div className="mt-2 w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <Award className="h-6 w-6 text-blue-400" />
                   </div>
                   <h3 className="font-bold text-lg mb-3">Professional Grade</h3>
@@ -109,9 +109,9 @@ export const HomePage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Card className="text-center hover:shadow-lg transition-shadow h-full">
+                <CardContent className="p-6 flex flex-col items-center">
+                  <div className="mt-2 w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <Truck className="h-6 w-6 text-green-400" />
                   </div>
                   <h3 className="font-bold text-lg mb-3">Fast & Reliable</h3>
@@ -119,9 +119,9 @@ export const HomePage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Card className="text-center hover:shadow-lg transition-shadow h-full">
+                <CardContent className="p-6 flex flex-col items-center">
+                  <div className="mt-2 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <RefreshCw className="h-6 w-6 text-purple-400" />
                   </div>
                   <h3 className="font-bold text-lg mb-3">Hassle-Free Returns</h3>
