@@ -361,26 +361,26 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 <div className="space-y-4 mb-8">
                   <button
                     onClick={handleAddToCart}
-                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg"
+                    className="w-full btn btn-primary btn-lg flex items-center justify-center gap-3"
                   >
-                    <ShoppingCart className="h-6 w-6" />
+                    <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl text-lg"
+                    className="w-full btn btn-pink btn-lg"
                   >
                     BUY NOW
                   </button>
                   <div className="flex gap-3">
                     <button 
                       onClick={() => setIsWishlisted(!isWishlisted)}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 font-semibold text-gray-700"
+                      className="flex-1 btn btn-outline flex items-center justify-center gap-2"
                     >
                       <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : ''}`} />
                       {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 font-semibold text-gray-700">
+                    <button className="flex-1 btn btn-outline flex items-center justify-center gap-2">
                       <Share2 className="h-5 w-5" />
                       Share
                     </button>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Plus, Minus } from 'lucide-react';
 
 interface StickyCartProps {
@@ -20,10 +20,24 @@ export const StickyCart: React.FC<StickyCartProps> = ({
   onAddToCart,
   isVisible
 }) => {
+  const [shouldShake, setShouldShake] = useState(false);
+
+  // Shake animation every 10 seconds
+  useEffect(() => {
+    if (!isVisible) return;
+
+    const interval = setInterval(() => {
+      setShouldShake(true);
+      setTimeout(() => setShouldShake(false), 600); // Animation duration
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [isVisible]);
+
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50 transform transition-transform duration-300">
+    <div className={`fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50 transform transition-all duration-300 ${shouldShake ? 'animate-subtle-shake' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
           {/* Product Info */}
@@ -41,10 +55,10 @@ export const StickyCart: React.FC<StickyCartProps> = ({
 
           {/* Quantity Selector */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white">
+            <div className="flex items-center border-2 border-gray-200 rounded-full bg-white">
               <button
                 onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-                className="p-2 hover:bg-gray-50 transition-colors rounded-l-xl"
+                className="p-2 hover:bg-gray-50 transition-colors rounded-l-full"
                 aria-label="Decrease quantity"
               >
                 <Minus className="h-4 w-4 text-gray-600" />
@@ -54,7 +68,7 @@ export const StickyCart: React.FC<StickyCartProps> = ({
               </span>
               <button
                 onClick={() => onQuantityChange(quantity + 1)}
-                className="p-2 hover:bg-gray-50 transition-colors rounded-r-xl"
+                className="p-2 hover:bg-gray-50 transition-colors rounded-r-full"
                 aria-label="Increase quantity"
               >
                 <Plus className="h-4 w-4 text-gray-600" />
@@ -65,9 +79,9 @@ export const StickyCart: React.FC<StickyCartProps> = ({
           {/* Add to Cart Button */}
           <button
             onClick={onAddToCart}
-            className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] shadow-lg hover:shadow-xl flex items-center gap-3 text-lg whitespace-nowrap"
+            className="btn btn-primary btn-lg flex items-center gap-3 whitespace-nowrap"
           >
-            <ShoppingCart className="h-6 w-6" />
+            <ShoppingCart className="h-5 w-5" />
             ADD TO CART
           </button>
 
