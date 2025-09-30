@@ -117,11 +117,124 @@ export const ShopPage: React.FC = () => {
       badges: [],
       inStock: true,
       variants: []
+    },
+    {
+      id: '7',
+      name: 'Nail Forms',
+      slug: 'nail-forms',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'Sculpting forms with holographic guide for precision.',
+      description: 'Professional sculpting forms with holographic guide lines for precise nail extensions.',
+      images: ['/public/nail-forms.webp'],
+      category: 'tools-essentials',
+      rating: 4.5,
+      reviews: 32,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '8',
+      name: 'Nail Liquid Monomer',
+      slug: 'nail-liquid-monomer',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
+      description: 'Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application.',
+      images: ['/public/nail-liquid-monomer.webp'],
+      category: 'acrylic-system',
+      rating: 4.8,
+      reviews: 87,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '9',
+      name: 'Crystal Clear Acrylic',
+      slug: 'crystal-clear-acrylic',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'Glass-clear powder for encapsulation & overlays.',
+      description: 'Ultra-clear acrylic powder perfect for encapsulation work and crystal-clear overlays.',
+      images: ['/public/crystal-clear-acrylic.webp'],
+      category: 'acrylic-system',
+      rating: 4.9,
+      reviews: 156,
+      badges: ['Bestseller'],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '10',
+      name: 'Snow White Acrylic',
+      slug: 'snow-white-acrylic',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'Opaque white acrylic for French & design work.',
+      description: 'Pure opaque white acrylic powder ideal for French manicures and design work.',
+      images: ['/public/snow-white-acrylic.webp'],
+      category: 'acrylic-system',
+      rating: 4.7,
+      reviews: 94,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '11',
+      name: 'Colour Acrylic',
+      slug: 'colour-acrylic',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'High-pigment acrylic powders for bold designs.',
+      description: 'Vibrant, high-pigment acrylic powders available in multiple colors for bold nail designs.',
+      images: ['/public/colour-acrylic.webp'],
+      category: 'acrylic-system',
+      rating: 4.6,
+      reviews: 73,
+      badges: ['New'],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '12',
+      name: 'Glitter Acrylic',
+      slug: 'glitter-acrylic',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'Sparkle acrylics for encapsulated effects.',
+      description: 'Glitter-infused acrylic powders perfect for creating stunning encapsulated sparkle effects.',
+      images: ['/public/glitter-acrylic.webp'],
+      category: 'acrylic-system',
+      rating: 4.5,
+      reviews: 61,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '13',
+      name: 'Core Acrylics',
+      slug: 'core-acrylics',
+      price: 0, // Price to be updated
+      compare_at_price: null,
+      short_description: 'Strength powders in clear, white, and natural tones.',
+      description: 'Essential strength acrylic powders available in clear, white, and natural tones for all nail applications.',
+      images: ['/public/core-acrylics.webp'],
+      category: 'acrylic-system',
+      rating: 4.8,
+      reviews: 128,
+      badges: [],
+      inStock: true,
+      variants: []
     }
   ];
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
+    { name: 'Acrylic System', slug: 'acrylic-system', count: allProducts.filter(p => p.category === 'acrylic-system').length },
     { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
     { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
     { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length }
