@@ -17,6 +17,7 @@ import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { AccountPage } from './pages/AccountPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
+import { CookieConsentBanner } from './components/ui/CookieConsentBanner';
 
 function App() {
   // Simple routing based on URL path
@@ -92,6 +93,7 @@ function App() {
     <>
       <HomePage />
       <CartWidget />
+      <CookieConsentBanner />
     </>
   );
 }

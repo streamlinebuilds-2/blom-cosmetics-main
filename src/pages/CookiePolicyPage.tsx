@@ -90,7 +90,7 @@ export const CookiePolicyPage: React.FC = () => {
                   <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-3">Marketing Cookies:</h3>
                   <p>
                     These cookies are used to track advertising effectiveness and to deliver more relevant advertising 
-                    to you. They are usually placed by advertising networks with the website operator’s permission.
+                    to you. They are usually placed by advertising networks with the website operator's permission.
                   </p>
                   <h3 className="text-xl font-semibold text-gray-800 mt-6 mb-3">Preference Cookies:</h3>
                   <p>
