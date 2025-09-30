@@ -37,12 +37,7 @@ export const HomePage: React.FC = () => {
     }
   ];
 
-  const stats = [
-    { icon: Users, value: '10,000+', label: 'Happy Customers' },
-    { icon: Award, value: '500+', label: 'Certified Professionals' },
-    { icon: Sparkles, value: '50+', label: 'Premium Products' },
-    { icon: Star, value: '4.9/5', label: 'Customer Rating' }
-  ];
+  const stats: any[] = [];
 
   return (
     <div className="min-h-screen bg-white">
@@ -62,17 +57,7 @@ export const HomePage: React.FC = () => {
                 and world-class education. Our mission is to empower beauty professionals with the tools
                 and knowledge needed to create stunning nail art that inspires confidence.
               </p>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mt-12">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full mb-4">
-                      <stat.icon className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
-                    <div className="text-gray-600">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
+              {/* Stats removed as requested */}
             </div>
           </Container>
         </section>
@@ -148,17 +133,6 @@ export const HomePage: React.FC = () => {
                   alt="Nail art training"
                   className="rounded-2xl shadow-2xl"
                 />
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-6 shadow-lg max-w-xs">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center">
-                      <Star className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-lg">4.9/5 Rating</div>
-                      <div className="text-gray-600 text-sm">From 500+ students</div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </Container>
