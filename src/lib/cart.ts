@@ -34,6 +34,7 @@ class CartStore {
 
   private constructor() {
     this.state = this.loadFromStorage();
+    this.normalizeState();
     this.updateTotals();
   }
 
@@ -73,6 +74,32 @@ class CartStore {
       localStorage.setItem(this.storageKey, JSON.stringify(this.state));
     } catch (error) {
       console.error('Error saving cart to storage:', error);
+    }
+  }
+
+  // Ensure legacy/invalid items are fixed so actions like delete work reliably
+  private normalizeState(): void {
+    let didChange = false;
+    if (!Array.isArray(this.state.items)) {
+      this.state.items = [];
+      didChange = true;
+    }
+
+    this.state.items = this.state.items.map((item, index) => {
+      const normalized = { ...item } as CartItem;
+      if (!normalized.id || typeof normalized.id !== 'string') {
+        normalized.id = `item_${Date.now()}_${index}`;
+        didChange = true;
+      }
+      if (!normalized.quantity || normalized.quantity < 1) {
+        normalized.quantity = 1;
+        didChange = true;
+      }
+      return normalized;
+    });
+
+    if (didChange) {
+      this.saveToStorage();
     }
   }
 
@@ -137,9 +164,17 @@ class CartStore {
     }
   }
 
-  removeItem(itemId: string): void {
-    this.state.items = this.state.items.filter(item => item.id !== itemId);
-    this.updateTotals();
+  removeItem(itemIdOrProductId: string): void {
+    const beforeLength = this.state.items.length;
+    this.state.items = this.state.items.filter(
+      item => item.id !== itemIdOrProductId && item.productId !== itemIdOrProductId
+    );
+    if (this.state.items.length !== beforeLength) {
+      this.updateTotals();
+    } else {
+      // No change detected; still notify to refresh UI if needed
+      this.notifyListeners();
+    }
   }
 
   clearCart(): void {
