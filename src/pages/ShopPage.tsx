@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
-import { Card, CardContent } from '../components/ui/Card';
+import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/Button';
 import { cartStore, showNotification } from '../lib/cart';
 import { Filter, Grid2x2 as Grid, List, Search, ShoppingCart, Star, Eye, Heart, X, SlidersHorizontal } from 'lucide-react';
@@ -22,8 +22,9 @@ export const ShopPage: React.FC = () => {
       name: 'Cuticle Oil',
       slug: 'cuticle-oil',
       price: 149,
-      compare_at_price: 179,
+      compareAtPrice: 179,
       short_description: 'Nourishing cuticle oil with Vitamin E, Jojoba & Soybean Oil.',
+      shortDescription: 'Nourishing cuticle oil with Vitamin E, Jojoba & Soybean Oil.',
       description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
       images: ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'prep-finishing',
@@ -43,8 +44,9 @@ export const ShopPage: React.FC = () => {
       name: 'Vitamin Primer',
       slug: 'vitamin-primer',
       price: 299,
-      compare_at_price: 350,
+      compareAtPrice: 350,
       short_description: 'Vitamin-infused, acid-free primer for strong adhesion.',
+      shortDescription: 'Vitamin-infused, acid-free primer for strong adhesion.',
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
       images: ['https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'prep-finishing',
@@ -59,8 +61,9 @@ export const ShopPage: React.FC = () => {
       name: 'Prep Solution (Nail Dehydrator)',
       slug: 'prep-solution',
       price: 189,
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Removes oils & moisture for better adhesion.',
+      shortDescription: 'Removes oils & moisture for better adhesion.',
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
       images: ['https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'prep-finishing',
@@ -75,8 +78,9 @@ export const ShopPage: React.FC = () => {
       name: 'Top Coat',
       slug: 'top-coat',
       price: 249,
-      compare_at_price: 299,
+      compareAtPrice: 299,
       short_description: 'Strong, protective top coat with mirror shine.',
+      shortDescription: 'Strong, protective top coat with mirror shine.',
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
       images: ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'gel-system',
@@ -91,8 +95,9 @@ export const ShopPage: React.FC = () => {
       name: 'Fairy Dust Top Coat',
       slug: 'fairy-dust-top-coat',
       price: 279,
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Glitter-infused top coat with smooth shine.',
+      shortDescription: 'Glitter-infused top coat with smooth shine.',
       description: 'Adds a sparkling finish to any gel or acrylic set.',
       images: ['https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'gel-system',
@@ -107,8 +112,9 @@ export const ShopPage: React.FC = () => {
       name: 'Nail File (80/80 Grit)',
       slug: 'nail-file-80-80',
       price: 45,
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Durable file with eco-friendly sponge core.',
+      shortDescription: 'Durable file with eco-friendly sponge core.',
       description: 'Double-sided professional nail file for shaping and refinements.',
       images: ['https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'],
       category: 'tools-essentials',
@@ -123,8 +129,9 @@ export const ShopPage: React.FC = () => {
       name: 'Nail Forms',
       slug: 'nail-forms',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Sculpting forms with holographic guide for precision.',
+      shortDescription: 'Sculpting forms with holographic guide for precision.',
       description: 'Professional sculpting forms with holographic guide lines for precise nail extensions.',
       images: ['/public/nail-forms.webp'],
       category: 'tools-essentials',
@@ -139,8 +146,9 @@ export const ShopPage: React.FC = () => {
       name: 'Nail Liquid Monomer',
       slug: 'nail-liquid-monomer',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
+      shortDescription: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
       description: 'Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application.',
       images: ['/public/nail-liquid-monomer.webp'],
       category: 'acrylic-system',
@@ -155,8 +163,9 @@ export const ShopPage: React.FC = () => {
       name: 'Crystal Clear Acrylic',
       slug: 'crystal-clear-acrylic',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Glass-clear powder for encapsulation & overlays.',
+      shortDescription: 'Glass-clear powder for encapsulation & overlays.',
       description: 'Ultra-clear acrylic powder perfect for encapsulation work and crystal-clear overlays.',
       images: ['/public/crystal-clear-acrylic.webp'],
       category: 'acrylic-system',
@@ -171,8 +180,9 @@ export const ShopPage: React.FC = () => {
       name: 'Snow White Acrylic',
       slug: 'snow-white-acrylic',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Opaque white acrylic for French & design work.',
+      shortDescription: 'Opaque white acrylic for French & design work.',
       description: 'Pure opaque white acrylic powder ideal for French manicures and design work.',
       images: ['/public/snow-white-acrylic.webp'],
       category: 'acrylic-system',
@@ -187,8 +197,9 @@ export const ShopPage: React.FC = () => {
       name: 'Colour Acrylic',
       slug: 'colour-acrylic',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'High-pigment acrylic powders for bold designs.',
+      shortDescription: 'High-pigment acrylic powders for bold designs.',
       description: 'Vibrant, high-pigment acrylic powders available in multiple colors for bold nail designs.',
       images: ['/public/colour-acrylic.webp'],
       category: 'acrylic-system',
@@ -203,8 +214,9 @@ export const ShopPage: React.FC = () => {
       name: 'Glitter Acrylic',
       slug: 'glitter-acrylic',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Sparkle acrylics for encapsulated effects.',
+      shortDescription: 'Sparkle acrylics for encapsulated effects.',
       description: 'Glitter-infused acrylic powders perfect for creating stunning encapsulated sparkle effects.',
       images: ['/public/glitter-acrylic.webp'],
       category: 'acrylic-system',
@@ -219,8 +231,9 @@ export const ShopPage: React.FC = () => {
       name: 'Core Acrylics',
       slug: 'core-acrylics',
       price: 0, // Price to be updated
-      compare_at_price: null,
+      compareAtPrice: undefined,
       short_description: 'Strength powders in clear, white, and natural tones.',
+      shortDescription: 'Strength powders in clear, white, and natural tones.',
       description: 'Essential strength acrylic powders available in clear, white, and natural tones for all nail applications.',
       images: ['/public/core-acrylics.webp'],
       category: 'acrylic-system',
@@ -293,7 +306,7 @@ export const ShopPage: React.FC = () => {
   });
 
   const handleAddToCart = (product: any) => {
-    const priceValue = parseFloat(product.price.replace('R', '') || '0');
+    const priceValue = product.price || 0;
     cartStore.addItem({
       id: `item_${Date.now()}`,
       productId: product.slug,
@@ -508,95 +521,20 @@ export const ShopPage: React.FC = () => {
                 </Button>
               </div>
             ) : (
-              <div className={`grid ${getGridClasses()} gap-6`}>
+              <div className={`grid ${getGridClasses()} gap-x-6 gap-y-10`}>
                 {sortedProducts.map((product) => (
-                  <Card key={product.slug} className="group cursor-pointer overflow-hidden hover:shadow-lg transition-all duration-300">
-                    <div className="relative aspect-[4/5] overflow-hidden bg-gray-50">
-                      {/* Sale Badge */}
-                      {product.compareAtPrice && (
-                        <div className="absolute top-3 left-3 z-10">
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-500 text-white">
-                            Sale
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Wishlist Heart */}
-                      <button className="absolute top-3 right-3 z-10 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md hover:bg-pink-50 transition-colors">
-                        <Heart className="h-4 w-4 text-gray-400 hover:text-pink-400" />
-                      </button>
-
-                      {/* Product Image */}
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onClick={() => window.location.href = `/product/${product.slug}`}
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-                        }}
-                      />
-
-                      {/* Quick View Overlay */}
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                        <button className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white rounded-full p-2 shadow-lg hover:bg-gray-50">
-                          <Eye className="h-5 w-5 text-gray-600" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      {/* Product Title */}
-                      <h3 
-                        className="font-semibold text-lg mb-2 line-clamp-2 cursor-pointer hover:text-pink-400 transition-colors"
-                        onClick={() => window.location.href = `/product/${product.slug}`}
-                      >
-                        {product.name}
-                      </h3>
-
-                      {/* Product Description */}
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {product.shortDescription}
-                      </p>
-
-                      {/* Scents Preview */}
-                      {product.scents && product.scents.length > 0 && (
-                        <div className="mb-3">
-                          <p className="text-xs text-gray-500 mb-1">
-                            {product.scents.length} scents available
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Price and Actions */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl font-bold text-pink-400">{product.price}</span>
-                          {product.compareAtPrice && (
-                            <span className="text-sm text-gray-400 line-through">
-                              {product.compareAtPrice}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {product.stock === 'In Stock' ? (
-                          <Button
-                            size="sm"
-                            onClick={() => handleAddToCart(product)}
-                            className="hover:scale-105 transition-transform"
-                          >
-                            <ShoppingCart className="h-4 w-4 mr-1" />
-                            Add to Cart
-                          </Button>
-                        ) : (
-                          <Button size="sm" variant="outline" disabled>
-                            Out of Stock
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
+                  <ProductCard
+                    key={product.slug}
+                    id={product.id}
+                    name={product.name}
+                    slug={product.slug}
+                    price={product.price}
+                    compareAtPrice={product.compareAtPrice}
+                    shortDescription={product.shortDescription}
+                    images={product.images}
+                    inStock={product.inStock}
+                    badges={product.badges}
+                  />
                 ))}
               </div>
             )}
