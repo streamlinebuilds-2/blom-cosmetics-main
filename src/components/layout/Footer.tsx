@@ -1,5 +1,18 @@
 import React, { useEffect } from 'react';
-import { Instagram, Facebook, Twitter, Whatsapp, Tiktok } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Whatsapp } from 'lucide-react';
+
+// Local TikTok icon (Lucide does not export Tiktok)
+const TikTokIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden="true"
+  >
+    <path d="M21 8.5c-2.36-.46-4.3-1.88-5.35-3.9V16a6 6 0 1 1-6-6c.23 0 .46.01.68.04V12.5a3.5 3.5 0 1 0 3.5 3.5V2h3.05c.67 2.53 2.72 4.47 5.12 5.01V8.5z" />
+  </svg>
+);
 
 export const Footer: React.FC = () => {
   useEffect(() => {
@@ -58,7 +71,7 @@ export const Footer: React.FC = () => {
             <a aria-label="Instagram" href="https://instagram.com/yourhandle" target="_blank" rel="noopener" className="social-link"><Instagram className="h-5 w-5 icon" /></a>
             <a aria-label="Facebook" href="https://facebook.com/yourhandle" target="_blank" rel="noopener" className="social-link"><Facebook className="h-5 w-5 icon" /></a>
             <a aria-label="WhatsApp" href="https://wa.me/yourwhatsapp" target="_blank" rel="noopener" className="social-link"><Whatsapp className="h-5 w-5 icon" /></a>
-            <a aria-label="TikTok" href="https://tiktok.com/@yourhandle" target="_blank" rel="noopener" className="social-link"><Tiktok className="h-5 w-5 icon" /></a>
+            <a aria-label="TikTok" href="https://tiktok.com/@yourhandle" target="_blank" rel="noopener" className="social-link"><TikTokIcon className="h-5 w-5 icon" /></a>
           </div>
 
           <h5 className="newsletter-title">Newsletter Signup</h5>
