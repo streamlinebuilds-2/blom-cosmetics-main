@@ -16,41 +16,24 @@ export const CartWidget: React.FC = () => {
   // Lock page scroll when cart is open
   useEffect(() => {
     const html = document.documentElement;
+    // compute scrollbar compensation to avoid layout shift
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     if (isOpen) {
-      // Preserve current scroll position and lock layout in place
       scrollYRef.current = window.scrollY || window.pageYOffset;
       html.classList.add('no-scroll');
       document.body.classList.add('no-scroll');
-      // Use fixed positioning to prevent jump-to-top on some browsers
-      const bodyStyle = document.body.style as CSSStyleDeclaration;
-      bodyStyle.position = 'fixed';
-      bodyStyle.top = `-${scrollYRef.current}px`;
-      bodyStyle.left = '0';
-      bodyStyle.right = '0';
-      bodyStyle.width = '100%';
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
     } else {
       html.classList.remove('no-scroll');
       document.body.classList.remove('no-scroll');
-      // Restore scroll position
-      const bodyStyle = document.body.style as CSSStyleDeclaration;
-      const y = Math.abs(parseInt(bodyStyle.top || '0', 10)) || scrollYRef.current;
-      bodyStyle.position = '';
-      bodyStyle.top = '';
-      bodyStyle.left = '';
-      bodyStyle.right = '';
-      bodyStyle.width = '';
-      window.scrollTo(0, y);
+      document.body.style.paddingRight = '';
+      // Ensure we remain at the same position
+      window.scrollTo(0, scrollYRef.current);
     }
     return () => {
-      // Cleanup on unmount or route changes
-      const bodyStyle = document.body.style as CSSStyleDeclaration;
       html.classList.remove('no-scroll');
       document.body.classList.remove('no-scroll');
-      bodyStyle.position = '';
-      bodyStyle.top = '';
-      bodyStyle.left = '';
-      bodyStyle.right = '';
-      bodyStyle.width = '';
+      document.body.style.paddingRight = '';
     };
   }, [isOpen]);
 
