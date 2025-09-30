@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { ReviewSection } from '../components/review/ReviewSection';
+import { PaymentMethods } from '../components/payment/PaymentMethods';
 import { cartStore, showNotification } from '../lib/cart';
 import { 
   Star, 
@@ -879,13 +880,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
               </div>
 
               {/* Product Buy Box */}
-              <div>
-                <div className="mb-6">
-                  <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-                  <p className="text-lg text-gray-600 mb-4">{product.subtitle}</p>
+              <div className="bg-white rounded-2xl p-8 shadow-lg">
+                <div className="mb-8">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-3">{product.name}</h1>
+                  <p className="text-lg text-gray-600 mb-6 leading-relaxed">{product.subtitle}</p>
                   
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-2 mb-6">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -898,19 +899,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600">
-                      {product.rating} ({product.reviewCount} reviews)
+                    <span className="text-lg font-semibold text-gray-900">
+                      {product.rating} out of 5
                     </span>
+                    <span className="text-gray-500">({product.reviewCount} reviews)</span>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="text-3xl font-bold text-pink-400">R{product.price}</span>
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className="text-4xl font-bold text-pink-500">R{product.price}</span>
                     {product.comparePrice && (
-                      <span className="text-xl text-gray-400 line-through">R{product.comparePrice}</span>
+                      <span className="text-2xl text-gray-400 line-through">R{product.comparePrice}</span>
                     )}
                     {product.comparePrice && (
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-medium">
+                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
                         {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
                       </span>
                     )}
@@ -921,45 +923,47 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     {product.inStock ? (
                       <>
                         <Check className="h-5 w-5 text-green-500" />
-                        <span className="text-green-600 font-medium">In Stock</span>
+                        <span className="text-green-600 font-semibold text-lg">In Stock</span>
                         {product.stockCount <= 10 && (
-                          <span className="text-orange-600 text-sm">
+                          <span className="text-orange-600 text-sm font-medium">
                             (Only {product.stockCount} left!)
                           </span>
                         )}
                       </>
                     ) : (
-                      <span className="text-red-600 font-medium">Out of Stock</span>
+                      <span className="text-red-600 font-semibold text-lg">Out of Stock</span>
                     )}
                   </div>
 
-                  {/* Description */}
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    {product.description}
-                  </p>
+                  {/* Product Benefits */}
+                  <div className="bg-gray-50 rounded-xl p-4 mb-6">
+                    <p className="text-gray-700 leading-relaxed">
+                      {product.description}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Variants */}
                 {product.variants.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="font-medium mb-3">Scent:</h3>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Scent:</h3>
+                    <div className="flex flex-wrap gap-3">
                       {product.variants.map((variant) => (
                         <button
                           key={variant.id}
                           onClick={() => setSelectedVariant(variant.id)}
                           disabled={!variant.inStock}
-                          className={`px-4 py-2 border rounded-lg font-medium transition-colors ${
+                          className={`px-6 py-3 border-2 rounded-xl font-semibold text-base transition-all duration-200 ${
                             selectedVariant === variant.id
-                              ? 'border-pink-400 bg-pink-50 text-pink-600'
+                              ? 'border-pink-400 bg-pink-500 text-white shadow-lg'
                               : variant.inStock
-                              ? 'border-gray-300 hover:border-gray-400'
-                              : 'border-gray-200 text-gray-400 cursor-not-allowed'
+                              ? 'border-gray-300 bg-white text-gray-700 hover:border-pink-300 hover:bg-pink-50'
+                              : 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-100'
                           }`}
                         >
                           {variant.name}
                           {!variant.inStock && (
-                            <span className="block text-xs">Out of Stock</span>
+                            <span className="block text-xs mt-1">Out of Stock</span>
                           )}
                         </button>
                       ))}
@@ -968,92 +972,80 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 )}
 
                 {/* Quantity */}
-                <div className="mb-6">
-                  <h3 className="font-medium mb-3">Quantity:</h3>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center border rounded-lg">
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity:</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="p-2 hover:bg-gray-50 transition-colors"
+                        className="p-3 hover:bg-gray-50 transition-colors rounded-l-xl"
                       >
-                        <Minus className="h-4 w-4" />
+                        <Minus className="h-5 w-5 text-gray-600" />
                       </button>
-                      <span className="px-4 py-2 font-medium">{quantity}</span>
+                      <span className="px-6 py-3 font-bold text-lg text-gray-900 min-w-[60px] text-center">{quantity}</span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="p-2 hover:bg-gray-50 transition-colors"
+                        className="p-3 hover:bg-gray-50 transition-colors rounded-r-xl"
                       >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-5 w-5 text-gray-600" />
                       </button>
                     </div>
-                    <span className="text-sm text-gray-600">
-                      Total: R{(product.price * quantity).toFixed(2)}
-                    </span>
+                    <div className="text-lg font-semibold text-gray-900">
+                      Total: <span className="text-pink-500">R{(product.price * quantity).toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-3 mb-8">
-                  <Button
-                    size="lg"
-                    className="w-full"
+                <div className="space-y-4 mb-8">
+                  <button
                     onClick={handleAddToCart}
                     disabled={!product.inStock}
+                    className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:transform-none shadow-lg hover:shadow-xl flex items-center justify-center gap-3 text-lg"
                   >
-                    <ShoppingCart className="h-5 w-5 mr-2" />
-                    Add to Cart
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full"
+                    <ShoppingCart className="h-6 w-6" />
+                    ADD TO CART
+                  </button>
+                  <button
                     onClick={handleBuyNow}
                     disabled={!product.inStock}
+                    className="w-full bg-pink-400 hover:bg-pink-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:transform-none shadow-lg hover:shadow-xl text-lg"
                   >
-                    Buy Now
-                  </Button>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="ghost" 
-                      className="flex-1"
+                    BUY NOW
+                  </button>
+                  <div className="flex gap-3">
+                    <button 
                       onClick={() => setIsWishlisted(!isWishlisted)}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 font-semibold text-gray-700"
                     >
-                      <Heart className={`h-5 w-5 mr-2 ${isWishlisted ? 'fill-current text-pink-400' : ''}`} />
+                      <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : ''}`} />
                       {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
-                    </Button>
-                    <Button variant="ghost" className="flex-1">
-                      <Share2 className="h-5 w-5 mr-2" />
+                    </button>
+                    <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-pink-300 hover:bg-pink-50 transition-all duration-200 font-semibold text-gray-700">
+                      <Share2 className="h-5 w-5" />
                       Share
-                    </Button>
+                    </button>
                   </div>
                 </div>
 
                 {/* Trust Row */}
-                <div className="grid grid-cols-3 gap-4 mb-6 text-center text-sm">
-                  <div className="flex flex-col items-center gap-2">
-                    <Truck className="h-5 w-5 text-green-500" />
-                    <span>Free shipping over R500</span>
+                <div className="grid grid-cols-3 gap-4 mb-8 text-center">
+                  <div className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-xl">
+                    <Truck className="h-6 w-6 text-green-500" />
+                    <span className="font-semibold text-green-700">Free shipping over R500</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <Shield className="h-5 w-5 text-blue-500" />
-                    <span>100% authentic</span>
+                  <div className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl">
+                    <Shield className="h-6 w-6 text-blue-500" />
+                    <span className="font-semibold text-blue-700">100% authentic</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2">
-                    <RotateCcw className="h-5 w-5 text-purple-500" />
-                    <span>30-day returns</span>
+                  <div className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-xl">
+                    <RotateCcw className="h-6 w-6 text-purple-500" />
+                    <span className="font-semibold text-purple-700">30-day returns</span>
                   </div>
                 </div>
 
-                {/* Payment Icons */}
-                <div className="border-t pt-6">
-                  <p className="text-sm text-gray-600 mb-3">Secure payment methods:</p>
-                  <div className="flex gap-2">
-                    <div className="px-3 py-2 border rounded text-xs font-medium">PayFast</div>
-                    <div className="px-3 py-2 border rounded text-xs font-medium">Visa</div>
-                    <div className="px-3 py-2 border rounded text-xs font-medium">Mastercard</div>
-                    <div className="px-3 py-2 border rounded text-xs font-medium">EFT</div>
-                  </div>
-                </div>
+                {/* Payment Methods */}
+                <PaymentMethods />
               </div>
             </div>
           </Container>
