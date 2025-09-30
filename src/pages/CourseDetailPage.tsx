@@ -976,6 +976,9 @@ Our expert instructors will guide you through each step of the acrylic process, 
                   <CardContent className="p-8">
                     <div className="text-center mb-6">
                       <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
+                      <div className="text-3xl font-bold text-pink-400 mb-2">
+                        {formatPrice(pkg.price)}
+                      </div>
                       {course.originalPrice && (
                         <div className="flex items-center justify-center gap-2">
                           <span className="text-xl text-gray-400 line-through">R{course.originalPrice}</span>
@@ -984,9 +987,6 @@ Our expert instructors will guide you through each step of the acrylic process, 
                           </span>
                         </div>
                       )}
-                      <div className="text-3xl font-bold text-pink-400 mb-2">
-                        {formatPrice(pkg.price)}
-                      </div>
                     </div>
 
                     <ul className="space-y-3 mb-8">
@@ -1330,21 +1330,84 @@ Our expert instructors will guide you through each step of the acrylic process, 
           </Container>
         </section>
 
+        {/* Reviews Section */}
+        {'reviews' in course && course.reviews && (
+          <section className="section-padding">
+            <Container>
+              <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <h2 className="text-3xl font-bold">Student Reviews</h2>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(course.rating)
+                              ? 'text-yellow-400 fill-current'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="font-medium">{course.rating} out of 5</span>
+                    <span className="text-gray-500">({course.total_reviews} reviews)</span>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  {course.reviews.map((review) => (
+                    <Card key={review.id}>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between mb-4">
+                          <div>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="flex items-center gap-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-4 w-4 ${
+                                      i < review.rating
+                                        ? 'text-yellow-400 fill-current'
+                                        : 'text-gray-300'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="font-medium">{review.name}</span>
+                              {review.verified && (
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                  Verified Purchase
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="font-medium mb-2">{review.title}</h4>
+                          </div>
+                          <span className="text-gray-500 text-sm">
+                            {new Date(review.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-4">{review.comment}</p>
+                        <div className="flex items-center gap-4">
+                          <button className="text-sm text-gray-500 hover:text-pink-400 transition-colors">
+                            Helpful ({review.helpful})
+                          </button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            </Container>
+          </section>
+        )}
+
         {/* Mobile Sticky Bar */}
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
           <div className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-bold text-lg text-pink-400">
-                  {course.originalPrice ? (
-                    <>
-                      <span className="line-through text-gray-400 text-sm mr-2">R{course.originalPrice}</span>
-                      R{course.price}
-                    </>
-                  ) : (
-                    `From ${formatPrice(course.price)}`
-                  )}
-                </p>
+                <p className="font-bold text-lg text-pink-400">From {formatPrice(course.price)}</p>
                 <p className="text-sm text-gray-600">{course.format} • {course.location}</p>
               </div>
               <Button 
