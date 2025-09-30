@@ -7,19 +7,15 @@ import { Button } from '../components/ui/Button';
 import { 
   Award, 
   Heart, 
-  Users, 
-  Target, 
   Star, 
   CheckCircle,
-  Sparkles,
-  TrendingUp,
-  Shield,
   Zap,
   Globe,
   BookOpen,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  Layers
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
@@ -74,38 +70,6 @@ export const AboutPage: React.FC = () => {
     }
   ];
 
-  const coreValues = [
-    {
-      icon: Heart,
-      title: 'Passion for Excellence',
-      description: 'We are driven by an unwavering commitment to quality and excellence in everything we do, from our products to our education.'
-    },
-    {
-      icon: Users,
-      title: 'Community First',
-      description: 'We believe in building a supportive community where nail professionals can learn, grow, and succeed together.'
-    },
-    {
-      icon: Target,
-      title: 'Innovation & Growth',
-      description: 'We continuously innovate and evolve, staying ahead of industry trends to provide cutting-edge solutions.'
-    },
-    {
-      icon: Shield,
-      title: 'Trust & Integrity',
-      description: 'We build lasting relationships through honest communication, reliable products, and consistent quality.'
-    },
-    {
-      icon: Sparkles,
-      title: 'Creativity & Artistry',
-      description: 'We celebrate creativity and support artists in expressing their unique vision through beautiful nail art.'
-    },
-    {
-      icon: TrendingUp,
-      title: 'Professional Development',
-      description: 'We are committed to helping nail professionals advance their careers and achieve their business goals.'
-    }
-  ];
 
   const whyChooseUs = [
     {
@@ -130,24 +94,6 @@ export const AboutPage: React.FC = () => {
     }
   ];
 
-  const certifications = [
-    {
-      name: 'ISO 9001:2015 Quality Management',
-      description: 'International standard for quality management systems'
-    },
-    {
-      name: 'Professional Beauty Association Member',
-      description: 'Active member of leading beauty industry organizations'
-    },
-    {
-      name: 'Certified Training Provider',
-      description: 'Accredited by international beauty education bodies'
-    },
-    {
-      name: 'Product Safety Compliance',
-      description: 'All products meet international safety and quality standards'
-    }
-  ];
 
   const milestones = [
     { year: '2018', event: 'BLOM Cosmetics Founded', description: 'Started with a vision to elevate nail artistry' },
@@ -168,137 +114,85 @@ export const AboutPage: React.FC = () => {
         <section className="bg-gradient-to-br from-pink-50 to-blue-50 section-padding">
           <Container>
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-5xl font-bold mb-6">About BLOM Cosmetics</h1>
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                Empowering nail professionals worldwide with premium products, expert education, 
-                and a supportive community. We believe every nail technician deserves access to 
-                the finest tools and knowledge to create stunning artistry.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/about#team" className="inline-block">
-                  <Button size="lg" variant="outline">Meet Our Team</Button>
-                </a>
-              </div>
+              {/* Content removed as requested */}
             </div>
-
-            {/* Brand Stats removed as requested */}
           </Container>
         </section>
 
-        {/* Story Section */}
+        {/* The Dream Behind BLOM Section */}
         <section className="section-padding">
           <Container>
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-6">Our Story</h2>
+                <h2 className="text-4xl font-bold mb-6 text-gray-900 relative inline-block">
+                  THE DREAM BEHIND BLOM
+                  <span className="absolute left-0 bottom-0 h-1 bg-blue-200 rounded-full w-full"></span>
+                </h2>
                 <div className="space-y-6 text-gray-600 leading-relaxed">
                   <p>
-                    BLOM Cosmetics was born from a simple yet powerful vision: to create a world where 
-                    every nail professional has access to premium products and world-class education. 
-                    Founded in 2018 by master nail technician Sarah Mitchell, our journey began with 
-                    a passion for excellence and a commitment to elevating the nail artistry industry.
+                    BLOM began as a dream. One night, the word "BLOM" appeared, with the O transformed into a lily—the flower of our founder's birth month. Paired with the calming blue of water, it became a constant reminder that passion and dedication are what help beauty bloom.
                   </p>
                   <p>
-                    What started as a small collection of carefully formulated acrylic products has 
-                    grown into a comprehensive ecosystem of premium nail systems, innovative training 
-                    programs, and a thriving global community of professionals who share our dedication 
-                    to quality and creativity.
-                  </p>
-                  <p>
-                    Today, BLOM stands for more than just beautiful products – we represent a movement 
-                    of empowerment, education, and excellence. Our motto "Bloom, Blossom, Believe" 
-                    reflects our commitment to helping every nail professional flourish in their craft 
-                    and achieve their dreams.
+                    What started as a personal vision over 10 years ago has now grown into a brand dedicated to empowering nail professionals across South Africa and beyond.
                   </p>
                 </div>
               </div>
               <div className="relative">
-                <img
-                  src="https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-                  alt="BLOM Cosmetics story"
-                  className="rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-6 shadow-lg max-w-xs">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center">
-                      <Heart className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-lg">Our Mission</div>
-                      <div className="text-gray-600 text-sm">Empowering Excellence</div>
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img
+                    src="https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
+                    alt="Dreamy beach scene with BLOM logo"
+                    className="w-full h-96 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-200/20 via-blue-200/20 to-purple-200/20"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-6xl font-bold text-black mb-2 font-serif">
+                        BL<span className="relative">
+                          <svg className="inline w-12 h-12 text-black" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2c-2 0-4 1-5 3-1 2-1 4 0 6 1 2 3 3 5 3s4-1 5-3c1-2 1-4 0-6-1-2-3-3-5-3zm0 2c1 0 2 1 3 2 1 1 1 3 0 4-1 1-2 2-3 2s-2-1-3-2c-1-1-1-3 0-4 1-1 2-2 3-2z"/>
+                            <path d="M12 8c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/>
+                            <path d="M12 12c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/>
+                            <path d="M12 16c-1 0-2 1-2 2s1 2 2 2 2-1 2-2-1-2-2-2z"/>
+                          </svg>
+                        </span>M
+                      </div>
+                      <div className="text-lg font-semibold text-black">COSMETICS</div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Company Timeline removed as requested */}
           </Container>
         </section>
 
-        {/* Vision & Mission Section */}
-        <section className="section-padding bg-gray-50">
+        {/* Vision & Mission Section - original card design */}
+        <section className="section-padding bg-[#F7FAFF]">
           <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Vision & Mission</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Our vision guides everything we do, from product development to education, 
-                ensuring we always stay true to our core purpose.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-12">
-              <Card className="text-center p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Target className="h-8 w-8 text-white" />
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                <div className="mb-6">
+                  <Layers className="w-10 h-10 text-pink-500" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  To be the world's leading provider of premium nail products and education, 
-                  creating a global community where every nail professional can achieve 
-                  excellence and build successful, fulfilling careers in the beauty industry.
+                <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-4 uppercase">Our Vision</h3>
+                <p className="text-slate-600 text-lg leading-8">
+                  To be one of South Africa's most trusted and loved nail care brands, empowering beauty with eco-friendly, cruelty-free, and innovative products that make self-expression affordable, fun, and accessible to everyone.
                 </p>
-              </Card>
+              </div>
 
-              <Card className="text-center p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Heart className="h-8 w-8 text-white" />
+              <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                <div className="mb-6">
+                  <Heart className="w-10 h-10 text-pink-500" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  To empower nail professionals with premium products, comprehensive education, 
-                  and ongoing support, enabling them to create beautiful artistry, build 
-                  successful businesses, and inspire confidence in every client they serve.
+                <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-4 uppercase">Our Mission</h3>
+                <p className="text-slate-600 text-lg leading-8">
+                  Our mission is to create high-quality nail products that combine sustainability with style. We are committed to eco-friendly practices, never testing on animals, and keeping our products affordable without compromise.
                 </p>
-              </Card>
+              </div>
             </div>
           </Container>
         </section>
 
-        {/* Values Section */}
-        <section className="section-padding">
-          <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Our Core Values</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                These fundamental principles guide our decisions, shape our culture, 
-                and define how we serve our community of professionals.
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {coreValues.map((value, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <value.icon className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-3">{value.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{value.description}</p>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
 
         {/* Why Choose Us Section */}
         <section className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
@@ -379,49 +273,6 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Education Section */}
-        <section className="section-padding bg-gray-50">
-          <Container>
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-bold mb-6">Education & Certifications</h2>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                  Our commitment to excellence is backed by industry-leading certifications, 
-                  continuous education, and adherence to the highest professional standards. 
-                  We maintain rigorous quality controls and stay current with industry developments.
-                </p>
-
-                <div className="space-y-6">
-                  {certifications.map((cert, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Award className="h-6 w-6 text-blue-400" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-lg mb-2">{cert.name}</h4>
-                        <p className="text-gray-600">{cert.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="relative">
-                <img
-                  src="https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-                  alt="Education and certifications"
-                  className="rounded-2xl shadow-2xl"
-                />
-                <div className="absolute -top-6 -right-6 bg-white rounded-xl p-6 shadow-lg">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-1">ISO</div>
-                    <div className="text-sm text-gray-600">Certified Quality</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </section>
 
         {/* Closing CTA Section */}
         <section className="section-padding bg-gradient-to-r from-pink-400 to-blue-300 text-white">
