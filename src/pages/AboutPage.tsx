@@ -19,7 +19,8 @@ import {
   BookOpen,
   Mail,
   Phone,
-  MapPin
+  MapPin,
+  Layers
 } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
@@ -232,41 +233,36 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Vision & Mission Section */}
-        <section className="section-padding bg-gray-50">
+        {/* Vision & Mission Section - original card design */}
+        <section className="section-padding bg-[#F7FAFF]">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Vision & Mission</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Our vision guides everything we do, from product development to education, 
-                ensuring we always stay true to our core purpose.
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Vision & Mission</h2>
+              <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
+                Our vision guides everything we do, from product development to education, ensuring we always stay true to our core purpose.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-12">
-              <Card className="text-center p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Target className="h-8 w-8 text-white" />
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                <div className="mb-6">
+                  <Layers className="w-10 h-10 text-pink-500" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  To be the world's leading provider of premium nail products and education, 
-                  creating a global community where every nail professional can achieve 
-                  excellence and build successful, fulfilling careers in the beauty industry.
+                <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-4 uppercase">Our Vision</h3>
+                <p className="text-slate-600 text-lg leading-8">
+                  To be one of South Africa's most trusted and loved nail care brands, empowering beauty with eco-friendly, cruelty-free, and innovative products that make self-expression affordable, fun, and accessible to everyone.
                 </p>
-              </Card>
+              </div>
 
-              <Card className="text-center p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-blue-300 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Heart className="h-8 w-8 text-white" />
+              <div className="bg-white rounded-2xl p-8 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
+                <div className="mb-6">
+                  <Heart className="w-10 h-10 text-pink-500" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  To empower nail professionals with premium products, comprehensive education, 
-                  and ongoing support, enabling them to create beautiful artistry, build 
-                  successful businesses, and inspire confidence in every client they serve.
+                <h3 className="text-3xl font-extrabold tracking-tight text-slate-900 mb-4 uppercase">Our Mission</h3>
+                <p className="text-slate-600 text-lg leading-8">
+                  Our mission is to create high-quality nail products that combine sustainability with style. We are committed to eco-friendly practices, never testing on animals, and keeping our products affordable without compromise.
                 </p>
-              </Card>
+              </div>
             </div>
           </Container>
         </section>
