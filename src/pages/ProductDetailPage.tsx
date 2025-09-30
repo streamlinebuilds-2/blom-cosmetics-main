@@ -297,6 +297,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     }
     // Add more products as needed...
     'nail-file-80-80': {
+    'nail-file-80-80': {
       id: '6',
       name: 'Nail File (80/80 Grit)',
       subtitle: 'Durable file with eco-friendly sponge core',
