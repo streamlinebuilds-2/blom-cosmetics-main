@@ -104,7 +104,7 @@ export const CartWidget: React.FC = () => {
 
         {/* Drawer */}
         <div
-          className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 ${
+          className={`absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl transform transition-transform duration-300 flex flex-col ${
             isOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           role="dialog"
@@ -122,8 +122,8 @@ export const CartWidget: React.FC = () => {
               </button>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            {/* Content (scrollable) */}
+            <div className="flex-1 overflow-y-auto p-6 overscroll-contain">
               {cartState.items.length === 0 ? (
                 <div className="text-center py-12">
                   <ShoppingCart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
