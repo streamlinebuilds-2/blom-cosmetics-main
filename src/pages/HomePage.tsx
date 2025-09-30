@@ -84,10 +84,8 @@ export const HomePage: React.FC = () => {
         <section id="our-promise" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Our Promise</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Why Choose BLOM Cosmetics?
-              </p>
+              <h2 className="uppercase text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-2">Our Promise</h2>
+              <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
