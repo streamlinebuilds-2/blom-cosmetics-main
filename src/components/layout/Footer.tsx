@@ -193,7 +193,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Social media row just above bottom bar */}
-          <div className="mt-10 mb-2 flex justify-center md:justify-end">
+          <div className="mt-10 mb-2 flex justify-start">
             <div className="flex gap-4">
               <a href="#" aria-label="Facebook" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
                 <Facebook className="h-5 w-5" />
