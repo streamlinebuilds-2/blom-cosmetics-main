@@ -56,20 +56,7 @@ export const MasterYourCraft: React.FC = () => {
               <li className="chip">Pro tips</li>
             </ul>
 
-            <div className="master__stats">
-              <div className="stat">
-                <div className="stat__num">1,200+</div>
-                <div className="stat__label">Students</div>
-              </div>
-              <div className="stat">
-                <div className="stat__num">4.9/5</div>
-                <div className="stat__label">Average rating</div>
-              </div>
-              <div className="stat">
-                <div className="stat__num">30+ hrs</div>
-                <div className="stat__label">Guided lessons</div>
-              </div>
-            </div>
+            {/* Stats removed as requested */}
 
             <div className="master__actions">
               <a className="btn btn-pink" href="/courses">Start Learning</a>
