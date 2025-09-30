@@ -15,11 +15,25 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     try {
       const currentPath = window.location.pathname.replace(/\/$/, '');
       const targetPath = href.replace(/\/$/, '');
-      if (currentPath === targetPath) {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+      const isSamePage = currentPath === targetPath;
+
+      // Always intercept to apply smooth scroll effect for consistency
+      e.preventDefault();
+
+      // Smooth scroll to top first
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Close mobile menu if open
+      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+
+      // If navigating to a different page, perform navigation after brief delay
+      if (!isSamePage) {
+        const delayMs = 450; // gives time for the scroll animation to start/feel consistent
+        window.setTimeout(() => {
+          window.location.assign(href);
+        }, delayMs);
       }
+      // If same page, the smooth scroll already achieved the effect
     } catch {
       // no-op safeguard
     }

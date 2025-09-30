@@ -182,7 +182,7 @@ export const Footer: React.FC = () => {
                   </button>
                   
                   {isSupportDropdownOpen && (
-                    <div className="absolute bottom-8 left-0 lg:top-8 lg:left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
+                    <div className="absolute bottom-8 left-0 lg:bottom-8 lg:left-0 bg-gray-800 rounded-lg shadow-lg border border-gray-700 py-2 min-w-48 z-10">
                       {footerLinks.support.map((link) => (
                         <a
                           key={link.name}
