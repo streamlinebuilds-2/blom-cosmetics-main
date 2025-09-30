@@ -67,7 +67,7 @@ export const HeroSlider: React.FC = () => {
 
     const interval = setInterval(() => {
       nextSlide();
-    }, 6000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isAutoPlaying]);
@@ -122,7 +122,7 @@ export const HeroSlider: React.FC = () => {
                     {slide.subtitle}
                   </p>
                 )}
-                <h1 className="whitespace-pre-line italic tracking-widest drop-shadow-[0_2px_10px_rgba(0,0,0,0.45)] text-5xl md:text-7xl leading-[1.15] font-extrabold text-white animate-slide-up">
+                <h1 className="hero-slogan whitespace-pre-line animate-slide-up">
                   {slide.title}
                 </h1>
               </div>
