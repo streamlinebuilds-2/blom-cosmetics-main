@@ -3,6 +3,7 @@ import { Container } from './Container';
 import { Button } from '../ui/Button';
 import { User, Menu, X } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
+import { AnnouncementSignup } from './AnnouncementSignup';
 
 interface HeaderProps {
   showMobileMenu?: boolean;
@@ -76,12 +77,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
   return (
     <>
-      {/* Announcement Banner */}
-      <div className="bg-gradient-to-r from-pink-400 to-blue-300 text-white text-center py-2 px-4">
-        <p className="text-sm font-medium">
-          Join the BLOM Beauty Club & Get 15% Off Your First Order
-        </p>
-      </div>
+      <AnnouncementSignup />
 
       {/* Main Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
