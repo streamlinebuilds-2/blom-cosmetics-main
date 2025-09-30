@@ -255,6 +255,17 @@
     }
   }
 
+  /* Global tokens extension + utilities */
+  .section { padding: 100px 0; }
+  .section--tight { padding: 60px 0; }
+  .section--loose { padding: 140px 0; }
+  .section--white { background: #fff; }
+  .section--soft { background: var(--neutral-light); }
+  .section--brand { background: var(--primary-blue); }
+  .section--bloom { background: linear-gradient(135deg,#F8FBFF 0%, #FFF0F6 45%, #EAF5FF 100%); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 min(20px, 4vw); width: 100%; }
+
   /* Hero slogan type */
   .hero-slogan {
     font-size: 96px;
