@@ -62,54 +62,15 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     },
     {
       name: 'COURSES & BLOG',
-      href: '/courses',
-      megaMenu: {
-        columns: [
-          {
-            title: 'Courses',
-            items: [
-              { name: 'Online Watercolour Workshop', href: '/courses/online-watercolour' },
-              { name: 'Online Acrylic Basics', href: '/courses/online-acrylic' },
-              { name: 'Online Nail Art Masterclass', href: '/courses/nail-art-masterclass' },
-              { name: 'Professional Acrylic Training', href: '/courses/professional-acrylic' },
-              { name: 'Advanced Techniques Workshop', href: '/courses/advanced-techniques' },
-              { name: 'Master Class Series', href: '/courses/master-class' },
-              { name: 'All Courses', href: '/courses' }
-            ]
-          },
-          {
-            title: 'Blog',
-            items: [
-              { name: 'Latest Posts', href: '/blog' },
-              { name: 'Nail Art Tutorials', href: '/blog/tutorials' },
-              { name: 'Product Reviews', href: '/blog/reviews' },
-              { name: 'Industry News', href: '/blog/news' },
-              { name: 'Tips & Tricks', href: '/blog/tips' },
-              { name: 'Trends & Inspiration', href: '/blog/trends' }
-            ]
-          }
-        ]
-      }
+      href: '/courses'
     },
     {
       name: 'ABOUT',
-      href: '/about',
-      dropdown: [
-        { name: 'Our Story', href: '/about' },
-        { name: 'Our Team', href: '/about#team' },
-        { name: 'Our Mission', href: '/about#mission' },
-        { name: 'Our Values', href: '/about#values' }
-      ]
+      href: '/about'
     },
     {
       name: 'CONTACT',
-      href: '/contact',
-      dropdown: [
-        { name: 'Contact Us', href: '/contact' },
-        { name: 'Location', href: '/contact#location' },
-        { name: 'Opening Hours', href: '/contact#hours' },
-        { name: 'Customer Support', href: '/contact#support' }
-      ]
+      href: '/contact'
     }
   ];
 
