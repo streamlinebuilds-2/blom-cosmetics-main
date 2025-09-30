@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from '../layout/Container';
-import { Card, CardContent } from '../ui/Card';
+import { ProductCard } from '../ProductCard';
 import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/Card';
 import { queries, Product, ProductImage } from '../../lib/supabase';
 
 interface ProductWithImages extends Product {
