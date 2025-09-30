@@ -4,6 +4,7 @@ import { ProductCard } from '../ProductCard';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { queries, Product, ProductImage } from '../../lib/supabase';
+import { cartStore, showNotification } from '../../lib/cart';
 
 interface ProductWithImages extends Product {
   product_images: ProductImage[];
@@ -126,7 +127,24 @@ export const FeaturedProducts: React.FC = () => {
                   <p className="text-gray-600 text-sm mb-4">{product.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-pink-400">R{product.price}</span>
-                    <Button size="sm">Add to Cart</Button>
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        cartStore.addItem({
+                          id: `item_${Date.now()}`,
+                          productId: product.id,
+                          name: product.name,
+                          price: product.price,
+                          image: product.image
+                        });
+                        showNotification(`Added ${product.name} to cart!`);
+                        const trigger = document.getElementById('cart-drawer-trigger');
+                        if (trigger) (trigger as HTMLDivElement).click();
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -185,7 +203,24 @@ export const FeaturedProducts: React.FC = () => {
                         </span>
                       )}
                     </div>
-                    <Button size="sm">Add to Cart</Button>
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        cartStore.addItem({
+                          id: `item_${Date.now()}`,
+                          productId: product.slug,
+                          name: product.name,
+                          price: product.price,
+                          image: imageUrl
+                        });
+                        showNotification(`Added ${product.name} to cart!`);
+                        const trigger = document.getElementById('cart-drawer-trigger');
+                        if (trigger) (trigger as HTMLDivElement).click();
+                      }}
+                    >
+                      Add to Cart
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
