@@ -272,7 +272,7 @@ export const ContactPage: React.FC = () => {
                     <p className="text-gray-600 mb-4">{method.description}</p>
                     <a 
                       href={method.action}
-                      className="text-pink-400 font-semibold hover:text-pink-500 transition-colors block mb-2"
+                      className="text-pink-400 font-semibold hover:text-pink-500 transition-colors block mb-2 text-sm break-words"
                     >
                       {method.contact}
                     </a>
