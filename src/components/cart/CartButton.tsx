@@ -19,7 +19,12 @@ export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' 
 
   return (
     <button 
-      onClick={onClick}
+      onClick={(e) => {
+        if (onClick) return onClick();
+        // Fallback: open the global cart drawer if present
+        const trigger = document.getElementById('cart-drawer-trigger');
+        if (trigger) (trigger as HTMLDivElement).click();
+      }}
       className={`p-2 text-gray-400 hover:text-gray-500 relative ${className}`}
     >
       <ShoppingCart className="h-5 w-5" />

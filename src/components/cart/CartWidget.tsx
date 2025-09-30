@@ -59,6 +59,8 @@ export const CartWidget: React.FC = () => {
           </span>
         )}
       </button>
+      {/* Triggerable from header cart button */}
+      <div id="cart-drawer-trigger" hidden onClick={() => setIsOpen(true)} />
 
       {/* Cart Drawer */}
       {isOpen && (
