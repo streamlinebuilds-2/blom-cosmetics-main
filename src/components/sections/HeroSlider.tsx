@@ -16,9 +16,9 @@ interface Slide {
 const slides: Slide[] = [
   {
     id: 1,
-    title: 'Bloom, Blossom, Believe',
-    subtitle: 'Professional Nail Artistry Begins Here',
-    description: 'Discover our premium collection of nail products designed for professionals who demand excellence.',
+    title: 'Bloom\nBlossom\nBelieve',
+    subtitle: '',
+    description: '',
     ctaText: 'Shop the Collection',
     ctaHref: '/shop',
     backgroundImage: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
@@ -26,20 +26,20 @@ const slides: Slide[] = [
   },
   {
     id: 2,
-    title: 'Master the Acrylic System',
-    subtitle: 'Professional Grade Products',
-    description: 'From powders to liquids, sculpting forms to brushes - everything you need for perfect acrylic nails.',
-    ctaText: 'Explore Acrylic',
+    title: 'The Professional\nAcrylic System',
+    subtitle: '',
+    description: '',
+    ctaText: 'Explore Acrylics',
     ctaHref: '/shop#acrylic-system',
     backgroundImage: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
     textPosition: 'right'
   },
   {
     id: 3,
-    title: 'Learn from the Best',
-    subtitle: 'Online & In-Person Courses',
-    description: 'Elevate your skills with our comprehensive training programs taught by industry experts.',
-    ctaText: 'View Courses',
+    title: 'Learn\nCreate\nGrow',
+    subtitle: '',
+    description: '',
+    ctaText: 'Explore Courses',
     ctaHref: '/courses',
     backgroundImage: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
     textPosition: 'center'
@@ -114,25 +114,29 @@ export const HeroSlider: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 h-full flex items-center">
         <div className="container-custom w-full">
-          <div className={`flex flex-col justify-center h-full max-w-2xl ${textPositionClasses[slide.textPosition]} ${slide.textPosition === 'right' ? 'ml-auto' : slide.textPosition === 'center' ? 'mx-auto' : ''}`}>
+          <div className={`flex flex-col justify-center h-full max-w-3xl ${textPositionClasses[slide.textPosition]} ${slide.textPosition === 'right' ? 'ml-auto' : slide.textPosition === 'center' ? 'mx-auto' : ''}`}>
             <div className="text-white space-y-6">
               <div>
-                <p className="text-pink-300 text-lg font-medium mb-2 animate-fade-in">
-                  {slide.subtitle}
-                </p>
-                <h1 className="text-4xl md:text-6xl font-bold leading-tight animate-slide-up">
+                {slide.subtitle && (
+                  <p className="text-pink-200/90 text-lg font-medium mb-2 animate-fade-in">
+                    {slide.subtitle}
+                  </p>
+                )}
+                <h1 className="whitespace-pre-line italic tracking-wider drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)] text-5xl md:text-7xl leading-[1.1] font-extrabold animate-slide-up">
                   {slide.title}
                 </h1>
               </div>
 
-              <p className="text-xl text-gray-200 leading-relaxed animate-slide-up animation-delay-200">
-                {slide.description}
-              </p>
+              {slide.description && (
+                <p className="text-xl text-gray-100/90 leading-relaxed animate-slide-up animation-delay-200">
+                  {slide.description}
+                </p>
+              )}
 
-              <div className="animate-slide-up animation-delay-400">
+              <div className="animate-slide-up animation-delay-400 mt-4">
                 <Button
                   size="lg"
-                  className="bg-pink-400 hover:bg-pink-500 text-white px-8 py-4"
+                  className="bg-pink-400 hover:bg-pink-500 text-white px-10 py-5 text-lg rounded-full shadow-lg"
                   onClick={() => window.location.href = slide.ctaHref}
                 >
                   {slide.ctaText}
