@@ -11,6 +11,20 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    try {
+      const currentPath = window.location.pathname.replace(/\/$/, '');
+      const targetPath = href.replace(/\/$/, '');
+      if (currentPath === targetPath) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (isMobileMenuOpen) setIsMobileMenuOpen(false);
+      }
+    } catch {
+      // no-op safeguard
+    }
+  };
+
   const navigationItems = [
     {
       name: 'HOME',
@@ -49,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <div className="flex-shrink-0">
-              <a href="/" className="text-2xl font-bold text-gradient">
+              <a href="/" className="text-2xl font-bold text-gradient" onClick={(e) => handleNavClick(e, '/')}>
                 BLOM
               </a>
             </div>
@@ -61,6 +75,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                   <a
                     href={item.href}
                     className="text-gray-700 hover:text-pink-400 px-3 py-2 text-sm font-medium transition-colors"
+                    onClick={(e) => handleNavClick(e, item.href)}
                   >
                     {item.name}
                   </a>
@@ -150,7 +165,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                     <a
                       href={item.href}
                       className="block py-3 px-4 text-gray-700 hover:text-pink-400 hover:bg-pink-50 font-medium rounded-lg transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
                     </a>
