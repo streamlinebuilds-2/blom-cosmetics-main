@@ -367,55 +367,45 @@ export const ContactPage: React.FC = () => {
         {/* Visit Our Location Section */}
         <section className="section-padding">
           <Container>
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-4xl font-bold mb-6">Visit Our Location</h2>
-                <p className="text-lg text-gray-600 mb-8">
-                  Located in the heart of South Africa, we welcome visitors by appointment. 
-                  Contact us to schedule a visit to our facilities.
-                </p>
-              </div>
-
-              <div className="grid lg:grid-cols-2 gap-12">
-                {/* Location Card */}
-                <Card className="mb-8">
-                  <CardContent className="pt-10 pb-6 px-6">
-                    <div className="flex items-start gap-4 mb-6">
-                      <div className="mt-3 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <MapPin className="h-6 w-6 text-pink-400" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-lg mb-2">BLOM Cosmetics Headquarters</h3>
-                        <p className="text-gray-600 mb-2">South Africa</p>
-                        <p className="text-sm text-gray-500">Visits by appointment only</p>
-                      </div>
+            <div className="max-w-2xl mx-auto">
+              {/* Location Card */}
+              <Card className="mb-8">
+                <CardContent className="pt-10 pb-6 px-6">
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="mt-3 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <MapPin className="h-6 w-6 text-pink-400" />
                     </div>
-
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <Clock className="h-5 w-5 text-gray-400" />
-                        <div>
-                          <p className="font-medium">Business Hours</p>
-                          <p className="text-sm text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM (SAST)</p>
-                          <p className="text-sm text-gray-600">Saturday: 10:00 AM - 4:00 PM (SAST)</p>
-                          <p className="text-sm text-gray-600">Sunday: Closed</p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Map Placeholder */}
-                <Card>
-                  <div className="aspect-video bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin className="h-12 w-12 text-pink-400 mx-auto mb-4" />
-                      <p className="text-gray-600 font-medium">Interactive Map</p>
-                      <p className="text-sm text-gray-500">Location details available upon appointment</p>
+                    <div>
+                      <h3 className="font-bold text-lg mb-2">BLOM Cosmetics Headquarters</h3>
+                      <p className="text-gray-600 mb-2">South Africa</p>
+                      <p className="text-sm text-gray-500">Visits by appointment only</p>
                     </div>
                   </div>
-                </Card>
-              </div>
+
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="font-medium">Business Hours</p>
+                        <p className="text-sm text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM (SAST)</p>
+                        <p className="text-sm text-gray-600">Saturday: 10:00 AM - 4:00 PM (SAST)</p>
+                        <p className="text-sm text-gray-600">Sunday: Closed</p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Map Placeholder */}
+              <Card>
+                <div className="aspect-video bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center">
+                  <div className="text-center">
+                    <MapPin className="h-12 w-12 text-pink-400 mx-auto mb-4" />
+                    <p className="text-gray-600 font-medium">Interactive Map</p>
+                    <p className="text-sm text-gray-500">Location details available upon appointment</p>
+                  </div>
+                </div>
+              </Card>
             </div>
           </Container>
         </section>
