@@ -124,7 +124,7 @@ export const HomePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-8 animate-slide-up">
                   <a href="/courses" onClick={(e) => {
                     e.preventDefault();
                     try {
@@ -137,7 +137,7 @@ export const HomePage: React.FC = () => {
                       window.location.assign('/courses');
                     }
                   }}>
-                    <Button size="lg">Explore Courses</Button>
+                    <Button size="lg" className="transition-transform duration-200 hover:scale-[1.03]">Explore Courses</Button>
                   </a>
                 </div>
               </div>
