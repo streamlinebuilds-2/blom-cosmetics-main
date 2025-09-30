@@ -4,22 +4,8 @@ import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from 'lucide-react'
 
 export const Footer: React.FC = () => {
   const footerLinks = {
-    shop: [
-      { name: 'All Products', href: '/shop' },
-      { name: 'New In', href: '/shop/new' },
-      { name: 'Best Sellers', href: '/shop/bestsellers' },
-      { name: 'Acrylic System', href: '/shop/acrylic' },
-      { name: 'Gel System', href: '/shop/gel' },
-      { name: 'Tools & Essentials', href: '/shop/tools' }
-    ],
-    courses: [
-      { name: 'Online Courses', href: '/courses/online' },
-      { name: 'In-Person Training', href: '/courses/in-person' },
-      { name: 'Watercolour Workshop', href: '/courses/watercolour' },
-      { name: 'Acrylic Basics', href: '/courses/acrylic-basics' },
-      { name: 'Professional Training', href: '/courses/professional' },
-      { name: 'Master Classes', href: '/courses/masterclass' }
-    ],
+    shop: [],
+    courses: [],
     company: [
       { name: 'About Us', href: '/about' },
       { name: 'Our Story', href: '/about#story' },
