@@ -219,34 +219,15 @@ export const ContactPage: React.FC = () => {
       <Header showMobileMenu={true} />
 
       <main>
-        {/* Contact Hero Section */}
-        <section className="bg-gradient-to-br from-pink-50 to-blue-50 section-padding">
+        {/* Contact Hero Section - Original Design */}
+        <section className="bg-gradient-to-r from-pink-50 to-blue-50 section-padding">
           <Container>
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-5xl font-bold mb-6">Get in Touch</h1>
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                We're here to help you succeed in your nail artistry journey. Whether you have 
-                questions about our products, need course guidance, or want to explore partnership 
-                opportunities, our expert team is ready to assist you.
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">We're Here to Help</h1>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                Questions about orders, products, or courses? Message us on WhatsApp for the fastest reply, or use the form below.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg">Send us a Message</Button>
-                <a href="/about#team" className="inline-block" onClick={(e) => {
-                  e.preventDefault();
-                  try {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    const overlay = document.createElement('div');
-                    overlay.className = 'page-transition-overlay';
-                    document.body.appendChild(overlay);
-                    window.setTimeout(() => { window.location.assign('/about#team'); }, 400);
-                  } catch { window.location.assign('/about#team'); }
-                }}>
-                  <Button size="lg" variant="outline">Meet Our Team</Button>
-                </a>
-              </div>
             </div>
-
-            {/* Quick Stats removed as requested */}
           </Container>
         </section>
 
