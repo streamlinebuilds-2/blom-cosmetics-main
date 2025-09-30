@@ -586,6 +586,19 @@
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
+  /* Why Train with BLOM original styles */
+  :root{ --why-brand:#CEE5FF; --why-accent:#FF74A4; --why-ink:#0f172a; --why-ring:rgba(15,23,42,.12); --why-radius:20px; }
+  .why-bloom{ padding-block: clamp(40px,6vw,80px); background: linear-gradient(135deg,#F8FBFF 0%, #FFF0F6 45%, #EAF5FF 100%); }
+  .why-title{ text-align:center; color:var(--why-ink); font-weight:800; letter-spacing:.02em; font-size:clamp(1.6rem,2.6vw,2.2rem); margin:0 0 clamp(22px,3.2vw,32px); position:relative; }
+  .why-title::after{ content:""; display:block; width:72px; height:4px; margin:10px auto 0; border-radius:25px; background: linear-gradient(90deg,var(--why-brand),var(--why-accent)); opacity:.9; }
+  .why-grid{ display:grid; grid-template-columns: repeat(3,1fr); gap: clamp(16px,2.2vw,24px); }
+  @media (max-width: 900px){ .why-grid{ grid-template-columns: 1fr; } }
+  .why-card{ background:#fff; border-radius:var(--why-radius); box-shadow:0 10px 30px var(--why-ring); padding: clamp(18px,3vw,28px); text-align:center; transition: transform .2s ease, box-shadow .2s ease; position: relative; overflow: hidden; }
+  .why-card:hover{ transform: translateY(-4px); box-shadow:0 16px 36px rgba(15,23,42,.16); }
+  .why-icon{ width:76px; height:76px; margin-inline:auto; border-radius:50%; display:grid; place-items:center; color:#243547; background: radial-gradient(ellipse at 30% 30%, #ffffff 0%, #f3f7ff 55%, #eaf3ff 100%); box-shadow: inset 0 0 0 2px #ffffff, 0 10px 22px rgba(15,23,42,.10); transition: transform .22s ease; }
+  .why-card:hover .why-icon{ transform: translateY(-2px) scale(1.03); }
+  .why-heading{ margin: 14px 0 8px; font-weight:800; color:#1f2a44; letter-spacing:.02em; font-size:clamp(1.05rem,1.8vw,1.25rem); }
+  .why-copy{ margin:0; color:#475569; line-height:1.6; font-size:clamp(.95rem,1.4vw,1rem); }
 
   /* Master Your Craft Section Updates */
   .master__title {

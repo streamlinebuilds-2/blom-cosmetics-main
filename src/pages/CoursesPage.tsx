@@ -184,44 +184,47 @@ const CoursesPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Additional Info Section */}
-        <div className="py-16 bg-white rounded-lg">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Choose Our Courses?</h2>
+        {/* Why Train with BLOM (original style) */}
+        <section className="why-bloom" aria-label="Why Train with BLOM">
+          <div className="container">
+            <h2 className="why-title">Why Train with BLOM</h2>
+
+            <div className="why-grid">
+              <div className="why-card">
+                <div className="why-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+                <h3 className="why-heading">Expert-Led Training</h3>
+                <p className="why-copy">Learn from industry professionals with years of experience in nail artistry and salon management.</p>
+              </div>
+
+              <div className="why-card">
+                <div className="why-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                </div>
+                <h3 className="why-heading">Proven Techniques</h3>
+                <p className="why-copy">Master salon-grade methods that deliver consistent, professional results every time.</p>
+              </div>
+
+              <div className="why-card">
+                <div className="why-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </div>
+                <h3 className="why-heading">Community Support</h3>
+                <p className="why-copy">Join a network of passionate nail artists and get ongoing support throughout your journey.</p>
+              </div>
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-pink-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Flexible Learning</h3>
-              <p className="text-gray-600">
-                Choose from in-person intensive courses or self-paced online workshops that fit your schedule.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Monitor className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Expert Instruction</h3>
-              <p className="text-gray-600">
-                Learn from certified nail artists with years of professional experience and industry recognition.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Lifetime Access</h3>
-              <p className="text-gray-600">
-                Get lifetime access to course materials and ongoing support from our community of artists.
-              </p>
-            </div>
-          </div>
-        </div>
+        </section>
       </Container>
       </main>
 
