@@ -350,10 +350,21 @@ export const ReturnsPage: React.FC = () => {
 
             <div className="text-center mt-12">
               <p className="text-gray-600 mb-4">Still have questions about returns?</p>
-              <Button size="lg">
-                <Mail className="h-4 w-4 mr-2" />
-                Contact Support
-              </Button>
+              <a href="/contact" onClick={(e) => {
+                e.preventDefault();
+                try {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  const overlay = document.createElement('div');
+                  overlay.className = 'page-transition-overlay';
+                  document.body.appendChild(overlay);
+                  window.setTimeout(() => { window.location.assign('/contact'); }, 400);
+                } catch { window.location.assign('/contact'); }
+              }}>
+                <Button size="lg">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Contact Support
+                </Button>
+              </a>
             </div>
           </Container>
         </section>
