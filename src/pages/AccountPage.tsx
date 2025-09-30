@@ -4,27 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Package, 
-  Heart, 
-  Settings, 
-  CreditCard,
-  Truck,
-  Star,
-  Edit,
-  Eye,
-  Download,
-  Calendar,
-  ShoppingBag,
-  Award,
-  Bell,
-  Lock,
-  HelpCircle
-} from 'lucide-react';
+import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle } from 'lucide-react';
 
 export const AccountPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
