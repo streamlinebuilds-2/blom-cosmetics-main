@@ -6,6 +6,7 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { ReviewSection } from '../components/review/ReviewSection';
 import { PaymentMethods } from '../components/payment/PaymentMethods';
+import { StickyCart } from '../components/cart/StickyCart';
 import { cartStore, showNotification } from '../lib/cart';
 import { 
   Star, 
@@ -1228,19 +1229,23 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         {/* Related Products */}
         <section className="section-padding bg-gray-50">
           <Container>
-            <h2 className="text-3xl font-bold text-center mb-12">You May Also Like</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <h2 className="text-4xl font-bold text-center mb-16 text-gray-900">You May Also Like</h2>
+            <div className="grid md:grid-cols-4 gap-8">
               {relatedProducts.map((relatedProduct) => (
-                <Card key={relatedProduct.id} className="group cursor-pointer">
-                  <div className="aspect-square overflow-hidden">
+                <Card key={relatedProduct.id} className="group cursor-pointer bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+                  <div className="relative aspect-square overflow-hidden">
                     <img
                       src={relatedProduct.image}
                       alt={relatedProduct.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
+                    {/* Heart Icon */}
+                    <button className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl">
+                      <Heart className="h-5 w-5 text-gray-600 hover:text-pink-500 transition-colors" />
+                    </button>
                   </div>
-                  <CardContent>
-                    <div className="flex items-center gap-1 mb-2">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-1 mb-3">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
@@ -1252,10 +1257,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                         />
                       ))}
                     </div>
-                    <h3 className="font-semibold text-lg mb-2">{relatedProduct.name}</h3>
+                    <h3 className="font-bold text-xl mb-3 text-gray-900 group-hover:text-pink-500 transition-colors">
+                      {relatedProduct.name}
+                    </h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-pink-400">R{relatedProduct.price}</span>
-                      <Button size="sm">Add to Cart</Button>
+                      <span className="text-2xl font-bold text-pink-500">R{relatedProduct.price}</span>
+                      <button className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-2 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        Add to Cart
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
@@ -1264,42 +1273,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
           </Container>
         </section>
 
-        {/* Sticky Cart (Mobile Only) */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
-          <div className="p-4">
-            <div className="flex items-center gap-4">
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-12 h-12 object-cover rounded"
-              />
-              <div className="flex-1">
-                <h4 className="font-medium text-sm">{product.name}</h4>
-                <p className="text-pink-400 font-bold">R{product.price}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center border rounded">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-1"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="px-2 text-sm">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-1"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
-                <Button size="sm" onClick={handleAddToCart}>
-                  Add to Cart
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Sticky Cart */}
+        <StickyCart
+          productName={product.name}
+          productImage={product.images[0]}
+          productPrice={product.price}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+          onAddToCart={handleAddToCart}
+          isVisible={true}
+        />
       </main>
 
       <Footer />

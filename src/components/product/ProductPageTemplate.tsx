@@ -6,6 +6,7 @@ import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { ReviewSection } from '../review/ReviewSection';
 import { PaymentMethods } from '../payment/PaymentMethods';
+import { StickyCart } from '../cart/StickyCart';
 import { cartStore, showNotification } from '../../lib/cart';
 import { 
   Star, 
@@ -683,6 +684,17 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
             console.log('New review submitted:', reviewData);
             showNotification('Thank you for your review! It will be published after moderation.');
           }}
+        />
+
+        {/* Sticky Cart */}
+        <StickyCart
+          productName={product.name}
+          productImage={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+          productPrice={parseFloat(product.price.replace('R', ''))}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+          onAddToCart={handleAddToCart}
+          isVisible={true}
         />
       </main>
 
