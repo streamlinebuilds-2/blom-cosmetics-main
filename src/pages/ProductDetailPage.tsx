@@ -395,6 +395,155 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         certifications: ['Vegan', 'Cruelty-Free']
       }
     },
+    'crystal-clear-acrylic': {
+      id: '9',
+      name: 'Crystal Clear Acrylic (56 g)',
+      subtitle: 'Glass-clear powder for encapsulation & overlays',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.9,
+      reviewCount: 156,
+      inStock: true,
+      stockCount: 25,
+      description: 'Ultra-clear, non-yellowing acrylic powder for professional results.',
+      images: [
+        '/public/crystal-clear-acrylic.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '56g', name: '56 g', inStock: true }
+      ],
+      overview: [
+        'Bubble-free, crystal clarity',
+        'Smooth self-leveling formula',
+        'Ideal for encapsulating designs',
+        'Non-yellowing formula maintains clarity',
+        'Professional salon quality'
+      ],
+      features: [
+        { title: 'Crystal Clarity', description: 'Bubble-free formula provides perfect transparency' },
+        { title: 'Self-Leveling', description: 'Smooth application with professional results' },
+        { title: 'Encapsulation Ready', description: 'Perfect for encapsulating nail art designs' },
+        { title: 'Non-Yellowing', description: 'Maintains clarity over time without discoloration' }
+      ],
+      howToUse: [
+        'Use with EMA monomer for best results',
+        'Sculpt as usual with proper bead consistency',
+        'File and finish to desired shape',
+        'Seal with top coat for lasting shine'
+      ],
+      ingredients: [
+        'PMMA (Polymethyl Methacrylate)',
+        'Benzoyl Peroxide'
+      ],
+      specifications: {
+        size: '56 g',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'snow-white-acrylic': {
+      id: '10',
+      name: 'Snow White Acrylic (56 g)',
+      subtitle: 'Opaque white acrylic for French & design work',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.7,
+      reviewCount: 94,
+      inStock: true,
+      stockCount: 30,
+      description: 'Buttery application, strong coverage for smile lines and full sets.',
+      images: [
+        '/public/snow-white-acrylic.webp',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '56g', name: '56 g', inStock: true }
+      ],
+      overview: [
+        'Bright, clean white coverage',
+        'Strength powder; no clear cap required',
+        'Smooth, buttery application',
+        'Perfect for French manicures',
+        'Professional salon quality'
+      ],
+      features: [
+        { title: 'Bright White', description: 'Clean, opaque white coverage for perfect smile lines' },
+        { title: 'Strength Formula', description: 'No clear cap required - strong on its own' },
+        { title: 'Smooth Application', description: 'Buttery consistency for easy sculpting' },
+        { title: 'Versatile Use', description: 'Perfect for French tips and full coverage sets' }
+      ],
+      howToUse: [
+        'Apply beads for smiles or full coverage',
+        'Sculpt to desired shape and thickness',
+        'File and refine the enhancement',
+        'Seal with top coat for protection'
+      ],
+      ingredients: [
+        'PMMA (Polymethyl Methacrylate)',
+        'Benzoyl Peroxide',
+        'Titanium Dioxide'
+      ],
+      specifications: {
+        size: '56 g',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'colour-acrylic': {
+      id: '11',
+      name: 'Colour Acrylic (15 g)',
+      subtitle: 'High-pigment acrylic powders for bold designs',
+      price: 0, // Price to be updated
+      comparePrice: null,
+      rating: 4.6,
+      reviewCount: 73,
+      inStock: true,
+      stockCount: 20,
+      description: 'Buttery, smooth powders for ombré, fades, and 3D work.',
+      images: [
+        '/public/colour-acrylic.webp',
+        'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
+        'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'
+      ],
+      variants: [
+        { id: '15g', name: '15 g', inStock: true }
+      ],
+      overview: [
+        'Rich, consistent pigments',
+        'Easy blending for gradients',
+        'Requires encapsulation in clear',
+        'Perfect for ombré and fade effects',
+        'Professional quality pigments'
+      ],
+      features: [
+        { title: 'Rich Pigments', description: 'Consistent, vibrant colors for bold nail designs' },
+        { title: 'Easy Blending', description: 'Perfect for creating smooth gradients and ombré effects' },
+        { title: 'Encapsulation Ready', description: 'Designed to be encapsulated with clear acrylic' },
+        { title: '3D Work', description: 'Ideal for dimensional nail art and sculptural designs' }
+      ],
+      howToUse: [
+        'Apply thin color layer over base',
+        'Blend colors for gradient effects',
+        'Encapsulate with clear acrylic',
+        'File and finish to perfection'
+      ],
+      ingredients: [
+        'PMMA (Polymethyl Methacrylate)',
+        'Benzoyl Peroxide',
+        'Cosmetic Grade Pigments'
+      ],
+      specifications: {
+        size: '15 g',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
     'nail-liquid-monomer': {
       id: '8',
       name: 'Nail Liquid (Monomer)',
