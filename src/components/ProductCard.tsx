@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       productId: slug,
       name,
       price,
-      image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
+      image: images || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
     });
     
     showNotification(`Added ${name} to cart!`);
@@ -52,7 +52,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const handleCardClick = () => {
-    window.location.href = `/product/${slug}`;
+    window.location.href = `/products/${slug}`;
   };
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
@@ -75,7 +75,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <div className="relative aspect-square overflow-hidden rounded-xl m-4 mb-0" style={{ transformStyle: 'preserve-3d' }}>
         {/* Front Image */}
         <img
-          src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+          src={images || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
           alt={name}
           className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
             hasSecondImage 
@@ -92,7 +92,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* Back Image (if available) */}
         {hasSecondImage && (
           <img
-            src={images[1]}
+            src={images}
             alt={`${name} - alternate view`}
             className="absolute inset-0 w-full h-full object-cover transition-all duration-500 md:[transform:rotateY(-180deg)] md:group-hover:[transform:rotateY(0deg)] backface-hidden"
             loading="lazy"
