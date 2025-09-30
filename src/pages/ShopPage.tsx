@@ -367,10 +367,7 @@ export const ShopPage: React.FC = () => {
               <p className="text-xl text-gray-600 leading-relaxed mb-8">
                 High-quality products trusted by nail artists and beauty professionals.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg">Shop All Products</Button>
-                <Button size="lg" variant="outline">View Collections</Button>
-              </div>
+              {/* Buttons removed as requested */}
             </div>
           </Container>
         </section>
