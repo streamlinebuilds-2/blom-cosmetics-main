@@ -579,18 +579,51 @@ export const ContactPage: React.FC = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Button size="lg" variant="secondary">
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Shop Products
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
-                  <BookOpen className="h-4 w-4 mr-2" />
-                  Browse Courses
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Join Community
-                </Button>
+                <a href="/shop" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/shop'); }, 400);
+                  } catch { window.location.assign('/shop'); }
+                }}>
+                  <Button size="lg" variant="secondary">
+                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    Shop Products
+                  </Button>
+                </a>
+                <a href="/courses" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/courses'); }, 400);
+                  } catch { window.location.assign('/courses'); }
+                }}>
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    Browse Courses
+                  </Button>
+                </a>
+                <a href="/community" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/community'); }, 400);
+                  } catch { window.location.assign('/community'); }
+                }}>
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
+                    <Heart className="h-4 w-4 mr-2" />
+                    Join Community
+                  </Button>
+                </a>
               </div>
 
               {/* Emergency Contact */}
