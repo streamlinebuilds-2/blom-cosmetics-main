@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
-import { User, Menu, X, Search, ShoppingBag } from 'lucide-react';
+import { User, Menu, X, ShoppingBag } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
 
@@ -169,14 +169,6 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
             {/* Action Icons */}
             <div className="flex items-center space-x-4">
-              <a
-                href="/search"
-                className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
-                onClick={(e) => handleNavClick(e, '/search')}
-                aria-label="Search"
-              >
-                <Search className="h-5 w-5" />
-              </a>
               <a
                 href="/account"
                 className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
