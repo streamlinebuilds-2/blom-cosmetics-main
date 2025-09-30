@@ -123,7 +123,12 @@ class CartStore {
   }
 
   private notifyListeners(): void {
-    this.listeners.forEach(listener => listener(this.state));
+    // Emit a fresh snapshot so React state updates always detect changes
+    const snapshot: CartState = {
+      ...this.state,
+      items: this.state.items.map(item => ({ ...item }))
+    };
+    this.listeners.forEach(listener => listener(snapshot));
   }
 
   subscribe(listener: (state: CartState) => void): () => void {
