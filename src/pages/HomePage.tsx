@@ -3,6 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { HeroSlider } from '../components/sections/HeroSlider';
 import { FeaturedProducts } from '../components/sections/FeaturedProducts';
+import { MasterYourCraft } from '../components/sections/MasterYourCraft';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -129,66 +130,7 @@ export const HomePage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Master Your Craft Section */}
-        <section id="master-craft" className="section-padding bg-gray-50">
-          <Container>
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-4xl font-bold mb-6">MASTER YOUR CRAFT</h2>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                  Professional training to help you build skills, speed, and confidence — in-class or online.
-                </p>
-
-                <div className="space-y-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Award className="h-6 w-6 text-pink-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-lg mb-2">In-Class Professional Courses</h4>
-                      <p className="text-gray-600">Hands-on learning with expert guidance and real-world techniques.</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="h-6 w-6 text-blue-400" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-lg mb-2">Creative Online Workshops</h4>
-                      <p className="text-gray-600">Flexible, self-paced lessons with downloadable resources.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-8 animate-slide-up">
-                  <a href="/courses" onClick={(e) => {
-                    e.preventDefault();
-                    try {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                      const overlay = document.createElement('div');
-                      overlay.className = 'page-transition-overlay';
-                      document.body.appendChild(overlay);
-                      window.setTimeout(() => { window.location.assign('/courses'); }, 500);
-                    } catch {
-                      window.location.assign('/courses');
-                    }
-                  }}>
-                    <Button size="lg" className="transition-transform duration-200 hover:scale-[1.03]">Explore All Courses</Button>
-                  </a>
-                </div>
-              </div>
-
-              <div className="relative">
-                <img
-                  src="https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
-                  alt="Nail art training"
-                  className="rounded-2xl shadow-2xl"
-                />
-              </div>
-            </div>
-          </Container>
-        </section>
+        <MasterYourCraft />
 
         <Testimonials />
       </main>
