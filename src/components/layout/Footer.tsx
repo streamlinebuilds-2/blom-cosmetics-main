@@ -191,6 +191,21 @@ export const Footer: React.FC = () => {
               </div>
             </div>
           </div>
+
+          {/* Social media row just above bottom bar */}
+          <div className="mt-10 mb-2 flex justify-center md:justify-end">
+            <div className="flex gap-4">
+              <a href="#" aria-label="Facebook" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a href="#" aria-label="Instagram" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="#" aria-label="Twitter" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Bottom Bar */}
@@ -209,18 +224,6 @@ export const Footer: React.FC = () => {
               <a href="/returns" className="text-gray-500 hover:text-pink-400 text-sm transition-colors">
                 Returns Policy
               </a>
-              {/* Social Media at bottom, slightly larger for visibility */}
-              <div className="flex gap-3 ml-4">
-                <a href="#" aria-label="Facebook" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
-                  <Facebook className="h-5 w-5" />
-                </a>
-                <a href="#" aria-label="Instagram" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
-                  <Instagram className="h-5 w-5" />
-                </a>
-                <a href="#" aria-label="Twitter" className="p-2.5 bg-gray-800 rounded-lg hover:bg-pink-400 transition-colors">
-                  <Twitter className="h-5 w-5" />
-                </a>
-              </div>
             </div>
           </div>
         </div>
