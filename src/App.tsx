@@ -22,56 +22,42 @@ function App() {
   const path = window.location.pathname;
   
   if (path === '/shop') {
-    return <ShopPage />;
+    return <><ShopPage /><CartWidget /></>;
   }
   
   if (path === '/courses') {
-    return <CoursesPage />;
+    return <><CoursesPage /><CartWidget /></>;
   }
   
   if (path === '/blog') {
-    return <BlogPage />;
+    return <><BlogPage /><CartWidget /></>;
   }
   
   if (path === '/about') {
-    return <AboutPage />;
+    return <><AboutPage /><CartWidget /></>;
   }
   
   if (path === '/contact') {
-    return <ContactPage />;
+    return <><ContactPage /><CartWidget /></>;
   }
   
   if (path === '/checkout') {
-    return <CheckoutPage />;
+    return <><CheckoutPage /><CartWidget /></>;
   }
 
-  if (path === '/privacy') {
-    return <PrivacyPage />;
-  }
+  if (path === '/privacy') { return <><PrivacyPage /><CartWidget /></>; }
 
-  if (path === '/terms') {
-    return <TermsPage />;
-  }
+  if (path === '/terms') { return <><TermsPage /><CartWidget /></>; }
 
-  if (path === '/returns') {
-    return <ReturnsPage />;
-  }
+  if (path === '/returns') { return <><ReturnsPage /><CartWidget /></>; }
 
-  if (path === '/cookie-policy') {
-    return <CookiePolicyPage />;
-  }
+  if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
-  if (path === '/account') {
-    return <AccountPage />;
-  }
+  if (path === '/account') { return <><AccountPage /><CartWidget /></>; }
   
-  if (path === '/order-confirmation') {
-    return <OrderConfirmationPage />;
-  }
+  if (path === '/order-confirmation') { return <><OrderConfirmationPage /><CartWidget /></>; }
   
-  if (path === '/product-template-example') {
-    return <ProductTemplateExample />;
-  }
+  if (path === '/product-template-example') { return <><ProductTemplateExample /><CartWidget /></>; }
   
   if (path.startsWith('/courses/')) {
     const courseSlug = path.split('/courses/')[1];
