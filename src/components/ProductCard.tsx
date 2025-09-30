@@ -66,9 +66,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       onClick={handleCardClick}
       style={{ perspective: '1000px' }}
     >
-      {/* Premium Shimmer Effect */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none hidden md:block">
-        <div className="shimmer" />
+      {/* Premium Shimmer Effect (covers whole card, ultra slow) */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none hidden md:block">
+        <div className="shimmer shimmer--lux" />
       </div>
 
       {/* Image Container */}
@@ -199,20 +199,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         /* Bright, slower diagonal shimmer */
         .shimmer {
           position: absolute;
-          inset: -55%;
-          background: linear-gradient(135deg, rgba(255,255,255,0) 32%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 68%);
-          filter: blur(4px);
-          transform: translate(-180%, -180%) rotate(20deg);
+          inset: -80%;
+          background: linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 70%);
+          filter: blur(5px);
+          transform: translate(-220%, -220%) rotate(22deg);
           border-radius: 24px;
         }
         .group:hover .shimmer {
-          animation: shimmer-sweep 5200ms cubic-bezier(0.19, 1, 0.22, 1) 1 forwards;
+          animation: shimmer-sweep 7000ms cubic-bezier(0.19, 1, 0.22, 1) 1 forwards;
         }
         @keyframes shimmer-sweep {
-          0% { opacity: 0; transform: translate(-180%, -180%) rotate(20deg); }
-          8% { opacity: 1; }
-          92% { opacity: 1; }
-          100% { opacity: 0; transform: translate(180%, 180%) rotate(20deg); }
+          0% { opacity: 0; transform: translate(-220%, -220%) rotate(22deg); }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { opacity: 0; transform: translate(220%, 220%) rotate(22deg); }
         }
         @media (hover: none) {
           .group:hover {

@@ -114,7 +114,11 @@ export const FeaturedProducts: React.FC = () => {
 
           <div className="grid-responsive">
             {fallbackProducts.map((product) => (
-              <Card key={product.id} className="group cursor-pointer">
+              <Card key={product.id} className="group cursor-pointer relative overflow-hidden">
+                {/* Lux shimmer overlay */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none hidden md:block">
+                  <div className="shimmer shimmer--lux" />
+                </div>
                 <div className="aspect-square overflow-hidden">
                   <img
                     src={product.image}
@@ -179,7 +183,11 @@ export const FeaturedProducts: React.FC = () => {
             const imageUrl = primaryImage?.image_url || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
 
             return (
-              <Card key={product.id} className="group cursor-pointer">
+              <Card key={product.id} className="group cursor-pointer relative overflow-hidden">
+                {/* Lux shimmer overlay */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none hidden md:block">
+                  <div className="shimmer shimmer--lux" />
+                </div>
                 <div className="aspect-square overflow-hidden">
                   <img
                     src={imageUrl}
