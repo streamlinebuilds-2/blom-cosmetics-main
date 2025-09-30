@@ -59,14 +59,13 @@ export const MasterYourCraft: React.FC = () => {
             {/* Stats removed as requested */}
 
             <div className="master__actions">
-              <a className="btn btn-pink" href="/courses">Start Learning</a>
-              <a className="btn btn-outline" href="/courses#all">View All Courses</a>
+              <a className="btn btn-pink" href="/courses">EXPLORE ALL COURSES</a>
             </div>
           </div>
 
           {/* Right visual */}
           <div className="master__visual">
-            <figure className="m-visual aspect-9-16">
+            <figure className="m-visual aspect-1-1">
               <video
                 ref={videoRef}
                 className="myc__image"
