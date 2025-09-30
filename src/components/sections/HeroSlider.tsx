@@ -142,13 +142,16 @@ export const HeroSlider: React.FC = () => {
               )}
 
               <div className="animate-slide-up animation-delay-400 mt-4 flex justify-center">
-                <Button
-                  size="lg"
-                  className="bg-white text-gray-900 hover:bg-white/90 px-10 py-5 text-lg rounded-full shadow-lg"
-                  onClick={() => window.location.href = slide.ctaHref}
+                <a
+                  href={slide.ctaHref}
+                  className="btn btn-pink px-10 py-5 text-lg"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = slide.ctaHref;
+                  }}
                 >
                   {slide.ctaText}
-                </Button>
+                </a>
               </div>
             </div>
           </div>

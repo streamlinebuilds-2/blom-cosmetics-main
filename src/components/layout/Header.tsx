@@ -163,7 +163,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                     </div>
                   )}
                 </div>
-              ))}
+              );
+            })}
             </nav>
 
             {/* Action Icons */}
