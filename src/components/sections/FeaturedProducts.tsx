@@ -51,9 +51,11 @@ export const FeaturedProducts: React.FC = () => {
       <section className="section-padding">
         <Container>
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Featured Products</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover our most popular products trusted by professionals worldwide
+            <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-3 text-slate-900">BEST SELLERS</h2>
+            <div className="h-1 w-16 bg-blue-200 rounded-full mx-auto mb-4" />
+            <p className="text-lg md:text-xl text-slate-500 max-w-3xl mx-auto">
+              Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
             </p>
           </div>
           <div className="grid-responsive">
@@ -106,9 +108,11 @@ export const FeaturedProducts: React.FC = () => {
       <section className="section-padding">
         <Container>
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">Featured Products</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover our most popular products trusted by professionals worldwide
+            <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-3 text-slate-900">BEST SELLERS</h2>
+            <div className="h-1 w-16 bg-blue-200 rounded-full mx-auto mb-4" />
+            <p className="text-lg md:text-xl text-slate-500 max-w-3xl mx-auto">
+              Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
             </p>
           </div>
 
@@ -168,14 +172,16 @@ export const FeaturedProducts: React.FC = () => {
   }
 
   return (
-    <section className="section-padding">
-      <Container>
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">Featured Products</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover our most popular products trusted by professionals worldwide
-          </p>
-        </div>
+      <section className="section-padding">
+        <Container>
+          <div className="text-center mb-12">
+            <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-3 text-slate-900">BEST SELLERS</h2>
+            <div className="h-1 w-16 bg-blue-200 rounded-full mx-auto mb-4" />
+            <p className="text-lg md:text-xl text-slate-500 max-w-3xl mx-auto">
+              Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
+            </p>
+          </div>
 
         <div className="grid-responsive">
           {products.map((product) => {
