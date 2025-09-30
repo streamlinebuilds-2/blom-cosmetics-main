@@ -6,6 +6,7 @@ import { cartStore, CartState, formatPrice } from '../../lib/cart';
 export const CartWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
+  const scrollYRef = React.useRef<number>(0);
 
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
@@ -16,15 +17,40 @@ export const CartWidget: React.FC = () => {
   useEffect(() => {
     const html = document.documentElement;
     if (isOpen) {
+      // Preserve current scroll position and lock layout in place
+      scrollYRef.current = window.scrollY || window.pageYOffset;
       html.classList.add('no-scroll');
       document.body.classList.add('no-scroll');
+      // Use fixed positioning to prevent jump-to-top on some browsers
+      const bodyStyle = document.body.style as CSSStyleDeclaration;
+      bodyStyle.position = 'fixed';
+      bodyStyle.top = `-${scrollYRef.current}px`;
+      bodyStyle.left = '0';
+      bodyStyle.right = '0';
+      bodyStyle.width = '100%';
     } else {
       html.classList.remove('no-scroll');
       document.body.classList.remove('no-scroll');
+      // Restore scroll position
+      const bodyStyle = document.body.style as CSSStyleDeclaration;
+      const y = Math.abs(parseInt(bodyStyle.top || '0', 10)) || scrollYRef.current;
+      bodyStyle.position = '';
+      bodyStyle.top = '';
+      bodyStyle.left = '';
+      bodyStyle.right = '';
+      bodyStyle.width = '';
+      window.scrollTo(0, y);
     }
     return () => {
+      // Cleanup on unmount or route changes
+      const bodyStyle = document.body.style as CSSStyleDeclaration;
       html.classList.remove('no-scroll');
       document.body.classList.remove('no-scroll');
+      bodyStyle.position = '';
+      bodyStyle.top = '';
+      bodyStyle.left = '';
+      bodyStyle.right = '';
+      bodyStyle.width = '';
     };
   }, [isOpen]);
 
