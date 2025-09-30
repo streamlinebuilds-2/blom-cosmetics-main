@@ -12,6 +12,19 @@ export const CartWidget: React.FC = () => {
     return unsubscribe;
   }, []);
 
+  // Lock page scroll when cart is open
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = previousOverflow || '';
+    }
+    return () => {
+      document.body.style.overflow = previousOverflow || '';
+    };
+  }, [isOpen]);
+
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     cartStore.updateQuantity(itemId, newQuantity);
   };
