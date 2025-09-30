@@ -449,15 +449,42 @@ export const AboutPage: React.FC = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Button size="lg" variant="secondary">
-                  Shop Products
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
-                  Explore Courses
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">
-                  Contact Us
-                </Button>
+                <a href="/shop" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/shop'); }, 400);
+                  } catch { window.location.assign('/shop'); }
+                }}>
+                  <Button size="lg" variant="secondary">Shop Products</Button>
+                </a>
+                <a href="/courses" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/courses'); }, 400);
+                  } catch { window.location.assign('/courses'); }
+                }}>
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">Explore Courses</Button>
+                </a>
+                <a href="/contact" className="inline-block" onClick={(e) => {
+                  e.preventDefault();
+                  try {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    const overlay = document.createElement('div');
+                    overlay.className = 'page-transition-overlay';
+                    document.body.appendChild(overlay);
+                    window.setTimeout(() => { window.location.assign('/contact'); }, 400);
+                  } catch { window.location.assign('/contact'); }
+                }}>
+                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-pink-400">Contact Us</Button>
+                </a>
               </div>
 
               {/* Contact Information */}
