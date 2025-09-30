@@ -124,7 +124,10 @@ export const ShopPage: React.FC = () => {
       badges: [],
       inStock: true,
       variants: []
-    },
+    }
+  ];
+
+  const productCategories = [
     {
       id: '7',
       name: 'Nail Forms',
@@ -257,7 +260,7 @@ export const ShopPage: React.FC = () => {
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
-    { name: 'Prep & Finishing', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
+    { name: 'Prep & Finish', slug: 'prep-finish', count: allProducts.filter(p => p.category === 'Prep & Finish').length },
     { name: 'Acrylic System', slug: 'acrylic-system', count: allProducts.filter(p => p.category === 'acrylic-system').length },
     { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
     { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length }
