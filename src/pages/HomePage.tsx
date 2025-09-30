@@ -7,6 +7,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Star, Award, Users, Sparkles, Shield, Truck, RefreshCw } from 'lucide-react';
+import { Testimonials } from '../components/sections/Testimonials';
 
 export const HomePage: React.FC = () => {
 
@@ -193,45 +194,7 @@ export const HomePage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Testimonials Section */}
-        <section id="testimonials" className="section-padding">
-          <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">WHAT PEOPLE SAY</h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                Real reviews from pros & students
-              </p>
-            </div>
-
-            <div className="grid-responsive">
-              {testimonials.map((testimonial) => (
-                <Card key={testimonial.id}>
-                  <CardContent className="text-center">
-                    <div className="flex justify-center mb-4">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                    <p className="text-gray-600 mb-6 leading-relaxed italic">
-                      "{testimonial.content}"
-                    </p>
-                    <div className="flex items-center justify-center gap-4">
-                      <img
-                        src={testimonial.image}
-                        alt={testimonial.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                      <div className="text-left">
-                        <div className="font-semibold">{testimonial.name}</div>
-                        <div className="text-gray-500 text-sm">{testimonial.role}</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Container>
-        </section>
+        <Testimonials />
       </main>
 
       <Footer />

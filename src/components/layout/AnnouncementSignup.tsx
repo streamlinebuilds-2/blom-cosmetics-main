@@ -55,6 +55,7 @@ export const AnnouncementSignup: React.FC = () => {
   const closePopup = () => {
     setIsPopupOpen(false);
     session.popupClosed = true;
+    session.hasShown = true;
     if (!session.bannerClosed) setIsBannerVisible(true);
   };
 
@@ -64,6 +65,8 @@ export const AnnouncementSignup: React.FC = () => {
   };
 
   const openPopup = () => {
+    // Mark as shown so auto-timer never retriggers after manual interaction
+    session.hasShown = true;
     setIsPopupOpen(true);
   };
 
