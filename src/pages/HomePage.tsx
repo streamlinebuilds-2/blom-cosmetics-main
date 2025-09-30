@@ -65,7 +65,7 @@ export const HomePage: React.FC = () => {
                 OUR VISION
               </p>
               <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
-              <h2 className="text-2xl md:text-3xl font-medium mb-6 text-slate-700">
+              <h2 className="text-lg md:text-xl font-medium mb-6 text-slate-700">
                 To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.
               </h2>
               <div className="animate-slide-up">
