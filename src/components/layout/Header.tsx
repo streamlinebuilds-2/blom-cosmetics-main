@@ -156,9 +156,14 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
             {/* Action Icons */}
             <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-gray-500">
+              <a
+                href="/account"
+                className="p-2 text-gray-400 hover:text-gray-500"
+                onClick={(e) => handleNavClick(e, '/account')}
+                aria-label="Account"
+              >
                 <User className="h-5 w-5" />
-              </button>
+              </a>
               <CartButton />
 
               {/* Mobile menu button */}
