@@ -3,6 +3,8 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { HeroSlider } from '../components/sections/HeroSlider';
 import { FeaturedProducts } from '../components/sections/FeaturedProducts';
+import { TrustBadges } from '../components/sections/TrustBadges';
+import { ShopByCategory } from '../components/sections/ShopByCategory';
 import { MasterYourCraft } from '../components/sections/MasterYourCraft';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
@@ -55,13 +57,13 @@ export const HomePage: React.FC = () => {
 
       <main>
         {/* Hero Slider */}
-        <HeroSlider />
+        <HeroSlider />`n`n        {/* Trust Badges */}`n        <TrustBadges />
 
         {/* Our Vision Section */}
         <section id="our-vision" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="max-w-3xl">
-              <p className="text-slate-900 text-3xl md:text-4xl font-extrabold mb-2 animate-fade-in">
+              <p className="section-header text-center mb-2 animate-fade-in">
                 OUR VISION
               </p>
               <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
@@ -78,13 +80,13 @@ export const HomePage: React.FC = () => {
         </section>
 
         {/* Featured Products */}
-        <FeaturedProducts />
+        <FeaturedProducts />`n`n        {/* Shop by Category */}`n        <ShopByCategory />
 
         {/* Our Promise Section */}
         <section id="our-promise" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="uppercase text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 mb-2">Our Promise</h2>
+              <h2 className="section-header text-center">Our Promise</h2>
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
@@ -137,3 +139,6 @@ export const HomePage: React.FC = () => {
     </div>
   );
 };
+
+
+

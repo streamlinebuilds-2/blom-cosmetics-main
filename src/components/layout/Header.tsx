@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { User, Menu, X, ShoppingBag } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
+import { AnnouncementBar } from './AnnouncementBar';
 
 interface HeaderProps {
   showMobileMenu?: boolean;
@@ -87,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
   return (
     <>
-      <AnnouncementSignup />
+      <AnnouncementBar />`n      <AnnouncementSignup />
 
       {/* Main Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
@@ -257,3 +258,4 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     </>
   );
 };
+
