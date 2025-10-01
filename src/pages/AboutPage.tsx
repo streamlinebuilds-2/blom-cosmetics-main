@@ -37,14 +37,16 @@ export const AboutPage: React.FC = () => {
       name: 'Avané Crous',
       role: 'Founder & Lead Educator',
       bio: 'With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM’s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.',
-      image: '/avane-crous.webp'
+      image: '/avane-crous.webp',
+      badges: ['Owner', 'Acrylic Education', 'Safety‑Focused']
     },
     {
       id: 2,
       name: 'Anna-marie Ernst',
       role: 'Administration & Client Care',
       bio: 'Anna-marie is the heart and backbone of our team. As BLOM’s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
-      image: '/anna-marie-ernst.webp'
+      image: '/anna-marie-ernst.webp',
+      badges: ['Client Care', 'Admin', 'Logistics']
     }
   ];
 
@@ -210,19 +212,40 @@ export const AboutPage: React.FC = () => {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
               {teamMembers.map((member) => (
-                <Card key={member.id} className="text-center overflow-hidden group">
+                <Card
+                  key={member.id}
+                  className="overflow-hidden rounded-3xl bg-white ring-1 ring-slate-100 shadow-[0_10px_35px_rgba(15,23,42,0.06)] hover:shadow-[0_18px_50px_rgba(15,23,42,0.10)] hover:-translate-y-1 transition-all duration-300"
+                >
                   <div className="relative aspect-1">
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-black/5 to-transparent"></div>
                   </div>
-                  <CardContent className="p-6">
-                    <h3 className="font-bold text-xl mb-2">{member.name}</h3>
-                    <p className="text-pink-400 font-medium mb-3">{member.role}</p>
-                    <p className="text-gray-600 text-sm mb-0 leading-relaxed">{member.bio}</p>
+
+                  <CardContent className="p-7">
+                    <div className="text-center">
+                      <h3 className="font-extrabold text-xl text-slate-900 tracking-tight">{member.name}</h3>
+                      <div className="mx-auto mt-2 h-1 w-12 rounded-full bg-pink-300" />
+                      <p className="mt-2 text-pink-500 font-semibold">{member.role}</p>
+
+                      {member.badges && (
+                        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+                          {member.badges.map((b: string, i: number) => (
+                            <span
+                              key={i}
+                              className="px-3 py-1 rounded-full text-xs font-medium bg-pink-50 text-pink-600 ring-1 ring-pink-100"
+                            >
+                              {b}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="mt-4 text-gray-600 text-sm leading-7">{member.bio}</p>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
