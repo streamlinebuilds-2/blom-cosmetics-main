@@ -34,39 +34,17 @@ export const AboutPage: React.FC = () => {
   const teamMembers = [
     {
       id: 1,
-      name: 'Sarah Mitchell',
-      role: 'Founder & Lead Instructor',
-      bio: 'With over 15 years in the nail industry, Sarah founded BLOM to share her passion for professional nail artistry and empower others to achieve excellence.',
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['Master Nail Technician', 'International Nail Art Champion', 'Certified Educator'],
-      specialties: ['Watercolor Techniques', 'Advanced Acrylics', 'Business Development']
+      name: 'Avané Crous',
+      role: 'Founder & Lead Educator',
+      bio: 'With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM’s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.',
+      image: '/avane-crous.webp'
     },
     {
       id: 2,
-      name: 'Michelle Adams',
-      role: 'Senior Instructor & Product Developer',
-      bio: 'Michelle brings technical expertise and innovation to BLOM, developing our premium product lines and advanced training curricula.',
-      image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['Chemical Engineering Background', 'Product Development Specialist', 'BLOM Certified Trainer'],
-      specialties: ['Product Formulation', 'Technical Training', 'Quality Assurance']
-    },
-    {
-      id: 3,
-      name: 'Jessica Chen',
-      role: 'Creative Director & Nail Artist',
-      bio: 'Jessica leads our creative vision, developing trend-forward techniques and inspiring nail artists worldwide with innovative designs.',
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['International Nail Art Judge', 'Creative Arts Degree', 'Social Media Influencer'],
-      specialties: ['Trend Forecasting', 'Creative Design', 'Social Media Strategy']
-    },
-    {
-      id: 4,
-      name: 'Amanda Foster',
-      role: 'Education Coordinator',
-      bio: 'Amanda ensures our training programs meet the highest standards, coordinating with instructors and supporting student success.',
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=300&h=300&fit=crop',
-      credentials: ['Education Management', 'Student Success Specialist', 'Training Coordinator'],
-      specialties: ['Curriculum Development', 'Student Support', 'Program Management']
+      name: 'Anna-marie Ernst',
+      role: 'Administration & Client Care',
+      bio: 'Anna-marie is the heart and backbone of our team. As BLOM’s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
+      image: '/anna-marie-ernst.webp'
     }
   ];
 
@@ -230,42 +208,21 @@ export const AboutPage: React.FC = () => {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
               {teamMembers.map((member) => (
                 <Card key={member.id} className="text-center overflow-hidden group">
-                  <div className="relative">
+                  <div className="relative aspect-1">
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <CardContent className="p-6">
                     <h3 className="font-bold text-xl mb-2">{member.name}</h3>
                     <p className="text-pink-400 font-medium mb-3">{member.role}</p>
-                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">{member.bio}</p>
-                    
-                    <div className="space-y-2 mb-4">
-                      <h4 className="font-semibold text-sm">Credentials:</h4>
-                      {member.credentials.map((credential, index) => (
-                        <div key={index} className="flex items-center gap-2 text-xs text-gray-600">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          <span>{credential}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-sm">Specialties:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {member.specialties.map((specialty, index) => (
-                          <span key={index} className="px-2 py-1 bg-pink-100 text-pink-600 rounded text-xs">
-                            {specialty}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                    <p className="text-gray-600 text-sm mb-0 leading-relaxed">{member.bio}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -273,45 +230,7 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Founders & Movement Section */}
-        <section className="section-padding">
-          <Container>
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <Card className="p-8">
-                <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-full bg-pink-100 text-pink-600 font-bold grid place-items-center text-xl flex-shrink-0">AC</div>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900">Avané Crous</h3>
-                    <p className="text-pink-500 font-medium mb-3">Founder & Lead Educator</p>
-                    <p className="text-slate-600 leading-7">
-                      With over 8 years of professional nail artistry experience, Avané is the visionary founder of BLOM. As a skilled educator in acrylic nail application, she is dedicated to teaching safe, precise techniques while empowering students to feel confident in their craft. Her leadership drives BLOM’s mission to blend beauty with responsibility, creating a supportive community for both nail professionals and clients.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-8">
-                <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 font-bold grid place-items-center text-xl flex-shrink-0">AE</div>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900">Anna-marie Ernst</h3>
-                    <p className="text-pink-500 font-medium mb-3">Administration & Client Care</p>
-                    <p className="text-slate-600 leading-7">
-                      Anna-marie is the heart and backbone of our team. As BLOM’s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            <div className="bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-8 text-center">
-              <h3 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-3">More Than Products — A Movement</h3>
-              <p className="text-slate-700 max-w-4xl mx-auto leading-8">
-                BLOM isn't just about selling nail products. We're creating opportunities for salons to grow, for nail artists to thrive, and for beauty to be celebrated responsibly. With plans to expand into training centers and sub-distributors across South Africa, this is only the beginning.
-              </p>
-            </div>
-          </Container>
-        </section>
+        {/* Founders & Movement Section removed; bios are included in team cards */}
 
       </main>
 
