@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
 
   return (
     <footer className="site-footer" role="contentinfo">
-      <div className="footer-wrap">`n        <div className="footer-col">`n          <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-16 mb-4" />`n          <p className="text-sm text-gray-600">Premium nail care products and professional education for beauty professionals.</p>`n        </div>`n
+      <div className="footer-wrap">
         <div className="footer-col">
           <h4>Quick Links</h4>
           <ul className="footer-links">
@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
             <li><a href="/contact">Contact</a></li>
             <li><a href="/faq">FAQ</a></li>
             <li><a href="/shipping">Shipping</a></li>
-            <li><a href="/returns">Returns & Refunds</a></li>
+            <li><a href="/returns">Returns</a></li>
           </ul>
         </div>
 
