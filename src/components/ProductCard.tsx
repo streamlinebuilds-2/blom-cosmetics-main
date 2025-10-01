@@ -38,7 +38,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       productId: slug,
       name,
       price,
-      image: images || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
+      image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
     });
     
     showNotification(`Added ${name} to cart!`);
@@ -47,7 +47,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Wishlist functionality placeholder
     showNotification(`Added ${name} to wishlist!`, 'info');
   };
 
@@ -57,31 +56,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
-  const hasSecondImage = images.length > 1;
-
   return (
     <article 
-      className={`group relative flex flex-col rounded-2xl bg-white shadow-sm transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform hover:shadow-lg hover:-translate-y-0.5 hover:rotate-[0.5deg] cursor-pointer overflow-hidden ${className}`}
-      role="article"
+      className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
       onClick={handleCardClick}
-      style={{ perspective: '1000px' }}
     >
-      {/* Premium Shimmer Effect (covers whole card, ultra slow) */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none hidden md:block">
-        <div className="shimmer shimmer--lux" />
-      </div>
-
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden rounded-xl m-4 mb-0" style={{ transformStyle: 'preserve-3d' }}>
-        {/* Front Image */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img
-          src={images || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+          src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
           alt={name}
-          className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 ${
-            hasSecondImage 
-              ? 'md:group-hover:[transform:rotateY(180deg)] backface-hidden' 
-              : 'group-hover:opacity-90'
-          }`}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
@@ -89,83 +74,75 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           }}
         />
 
-        {/* Back Image (if available) */}
-        {hasSecondImage && (
-          <img
-            src={images}
-            alt={`${name} - alternate view`}
-            className="absolute inset-0 w-full h-full object-cover transition-all duration-500 md:[transform:rotateY(-180deg)] md:group-hover:[transform:rotateY(0deg)] backface-hidden"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-            }}
-          />
-        )}
-
-        {/* Badges */}
-        {badges.length > 0 && (
-          <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-            {badges.map((badge, index) => (
-              <span
-                key={index}
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  badge === 'New' ? 'bg-green-500 text-white' :
-                  badge === 'Sale' ? 'bg-red-500 text-white' :
-                  badge === 'Bestseller' ? 'bg-pink-500 text-white' :
-                  'bg-gray-500 text-white'
-                }`}
-              >
-                {badge}
-              </span>
-            ))}
+        {/* Bestseller Badge */}
+        {badges.includes('Bestseller') && (
+          <div className="absolute top-4 left-4 bg-pink-100 text-pink-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase shadow-md">
+            BESTSELLER
           </div>
         )}
 
-        {/* Out of Stock Badge */}
+        {/* New Badge */}
+        {badges.includes('New') && (
+          <div className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase shadow-md">
+            NEW
+          </div>
+        )}
+
+        {/* Sale Badge */}
+        {badges.includes('Sale') && (
+          <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase shadow-md">
+            SALE
+          </div>
+        )}
+
+        {/* Out of Stock Overlay */}
         {!inStock && (
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <span className="bg-gray-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
+            <span className="bg-gray-900 text-white px-6 py-2 rounded-full text-sm font-bold uppercase shadow-xl">
               Out of Stock
             </span>
           </div>
         )}
 
-        {/* Wishlist Button */}
+        {/* Wishlist Heart */}
         <button
           type="button"
           onClick={handleWishlistToggle}
-          className="absolute top-3 right-3 z-10 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors duration-200 group/heart"
+          className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
           aria-label={`Add ${name} to wishlist`}
-          aria-pressed="false"
         >
-          <Heart className="h-4 w-4 text-gray-600 group-hover/heart:text-pink-500 transition-colors" />
+          <Heart className="h-5 w-5 text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current transition-all" />
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4 pt-3">
-        {/* Title */}
-        <h3 className="product-title font-semibold text-lg leading-tight mb-2 line-clamp-2 transition-all duration-[1500ms] ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:text-pink-400 group-hover:tracking-wide">
+      <div className="p-6">
+        {/* Product Name */}
+        <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[3.5rem]">
           {name}
         </h3>
 
         {/* Short Description */}
         {shortDescription && (
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
             {shortDescription}
           </p>
         )}
 
         {/* Price */}
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-xl font-bold text-pink-400">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-2xl font-bold text-pink-500">
             {formatPrice(price)}
           </span>
           {compareAtPrice && (
-            <span className="text-sm text-gray-400 line-through">
-              {formatPrice(compareAtPrice)}
-            </span>
+            <>
+              <span className="text-lg text-gray-400 line-through">
+                {formatPrice(compareAtPrice)}
+              </span>
+              <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+              </span>
+            </>
           )}
         </div>
 
@@ -174,10 +151,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           type="button"
           onClick={handleAddToCart}
           disabled={!inStock}
-          className={`w-full py-3 px-4 rounded-lg font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 mt-auto ${
+          className={`w-full py-3.5 px-6 rounded-2xl font-bold text-sm uppercase transition-all duration-200 flex items-center justify-center gap-2 ${
             inStock
-              ? 'bg-gray-100 text-gray-700 hover:bg-pink-400 hover:text-white hover:shadow-md active:scale-95'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              ? 'bg-pink-500 text-white hover:bg-pink-600 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
           aria-disabled={!inStock}
         >
@@ -187,44 +164,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       <style jsx>{`
-        .backface-hidden {
-          backface-visibility: hidden;
-        }
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-        }
-        /* Bright, slower diagonal shimmer */
-        .shimmer {
-          position: absolute;
-          inset: -80%;
-          background: linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.55) 50%, rgba(255,255,255,0) 70%);
-          filter: blur(5px);
-          transform: translate(-220%, -220%) rotate(22deg);
-          border-radius: 24px;
-        }
-        .group:hover .shimmer {
-          animation: shimmer-sweep 7000ms cubic-bezier(0.19, 1, 0.22, 1) 1 forwards;
-        }
-        @keyframes shimmer-sweep {
-          0% { opacity: 0; transform: translate(-220%, -220%) rotate(22deg); }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { opacity: 0; transform: translate(220%, 220%) rotate(22deg); }
-        }
-        @media (hover: none) {
-          .group:hover {
-            transform: none !important;
-          }
-          .group:hover .shimmer { opacity: 0 !important; animation: none !important; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          * {
-            transition-duration: 0.01ms !important;
-            animation-duration: 0.01ms !important;
-          }
         }
       `}</style>
     </article>
