@@ -96,7 +96,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             {/* Logo */}
             <div className="flex-shrink-0">
               <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
-                BLOM COSMETICS
+                <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10" />
               </a>
             </div>
 
