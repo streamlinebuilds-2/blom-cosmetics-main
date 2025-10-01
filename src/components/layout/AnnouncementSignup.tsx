@@ -124,21 +124,14 @@ export const AnnouncementSignup: React.FC = () => {
           }}
         >
           <div className="bg-white rounded-2xl shadow-2xl w-[min(900px,95vw)] max-h-[90vh] overflow-hidden grid grid-cols-1 md:grid-cols-2">
-            {/* Visual Panel - Desktop Only */}
-            <div className="hidden md:block bg-gradient-to-br from-pink-400 via-pink-500 to-pink-600 relative overflow-hidden" aria-hidden="true">
-              <div className="absolute inset-0 bg-black/10"></div>
-              <div className="relative h-full flex flex-col justify-center items-center p-8 text-white">
-                <div className="text-center">
-                  <h2 className="text-4xl font-bold mb-4 tracking-wide">BLOM</h2>
-                  <h3 className="text-2xl font-light mb-6">COSMETICS</h3>
-                  <div className="w-16 h-1 bg-white/30 mx-auto mb-8"></div>
-                  <p className="text-lg font-medium opacity-90">Professional Beauty Solutions</p>
-                </div>
-                {/* Decorative elements */}
-                <div className="absolute top-8 right-8 w-20 h-20 bg-white/10 rounded-full"></div>
-                <div className="absolute bottom-8 left-8 w-12 h-12 bg-white/10 rounded-full"></div>
-                <div className="absolute top-1/2 right-4 w-8 h-8 bg-white/10 rounded-full"></div>
-              </div>
+            {/* Visual Panel - Desktop Only (Image) */}
+            <div className="hidden md:block relative overflow-hidden" aria-hidden="true">
+              <img
+                src="/sign-up-image (2).webp"
+                alt="BLOM signup visual"
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
 
             {/* Form Panel */}
@@ -154,12 +147,7 @@ export const AnnouncementSignup: React.FC = () => {
               <div className="max-w-md mx-auto">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                  <div className="inline-flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 bg-pink-400 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">B</span>
-                    </div>
-                    <span className="text-2xl font-bold text-gray-900">BLOM COSMETICS</span>
-                  </div>
+                  <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10 mx-auto mb-3" />
                   <div className="w-12 h-0.5 bg-pink-400 mx-auto"></div>
                 </div>
 
