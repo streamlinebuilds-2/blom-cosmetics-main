@@ -60,43 +60,43 @@ const CoursesPage: React.FC = () => {
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-lg mx-auto">
               {inPersonCourses.map((course) => (
-                <Card key={course.id} className="group overflow-hidden rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <Card key={course.id} className="group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
                   {/* Image with Shimmer */}
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={course.image}
                       alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                      <div className="shimmer-effect"></div>
+                      <div className="shimmer shimmer--lux"></div>
                     </div>
                   </div>
 
-                  <CardContent className="p-8">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-4">{course.title}</h3>
-                    <p className="text-slate-600 mb-6 leading-relaxed">{course.description}</p>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">{course.title}</h3>
+                    <p className="text-gray-600 mb-6 text-sm leading-relaxed">{course.description}</p>
 
-                    <div className="space-y-3 mb-8">
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <Clock className="h-5 w-5 text-pink-400" />
-                        <span className="font-medium">{course.duration}</span>
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                        <Clock className="h-4 w-4 text-pink-500" />
+                        <span>{course.duration}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <MapPin className="h-5 w-5 text-pink-400" />
-                        <span className="font-medium">{course.location}</span>
+                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                        <MapPin className="h-4 w-4 text-pink-500" />
+                        <span>{course.location}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <DollarSign className="h-5 w-5 text-pink-400" />
-                        <span className="font-bold text-2xl text-pink-500">{course.priceLabel}</span>
+                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                        <DollarSign className="h-4 w-4 text-pink-500" />
+                        <span className="font-semibold">{course.priceLabel}</span>
                       </div>
                     </div>
 
                     <button
                       onClick={() => window.location.href = `/courses/${course.slug}`}
-                      className="w-full btn btn-primary btn-lg"
+                      className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
                     >
                       SEE MORE DETAILS
                     </button>
@@ -115,46 +115,46 @@ const CoursesPage: React.FC = () => {
 
             <div className="grid md:grid-cols-2 gap-8">
               {onlineCourses.map((course) => (
-                <Card key={course.id} className="group overflow-hidden rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                <Card key={course.id} className="group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
                   {/* Image with Shimmer */}
                   <div className="relative aspect-video overflow-hidden">
                     <img
                       src={course.image}
                       alt={course.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                      <div className="shimmer-effect"></div>
+                      <div className="shimmer shimmer--lux"></div>
                     </div>
                     {/* Sale Badge */}
                     {course.onSale && (
-                      <div className="absolute top-4 right-4 bg-red-500 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase shadow-lg">
+                      <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase shadow-lg">
                         SALE
                       </div>
                     )}
                   </div>
 
-                  <CardContent className="p-8">
-                    <h3 className="text-3xl font-bold text-slate-900 mb-4">{course.title}</h3>
-                    <p className="text-slate-600 text-base mb-8 leading-relaxed">{course.description}</p>
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3">{course.title}</h3>
+                    <p className="text-gray-600 mb-6 text-sm leading-relaxed">{course.description}</p>
 
-                    <div className="space-y-3 mb-8">
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <Clock className="h-5 w-5 text-pink-400" />
-                        <span className="font-medium">{course.duration}</span>
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                        <Clock className="h-4 w-4 text-pink-500" />
+                        <span>{course.duration}</span>
                       </div>
-                      <div className="flex items-center gap-3 text-slate-700">
-                        <MapPin className="h-5 w-5 text-pink-400" />
-                        <span className="font-medium">{course.location}</span>
+                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                        <MapPin className="h-4 w-4 text-pink-500" />
+                        <span>{course.location}</span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <DollarSign className="h-5 w-5 text-pink-400" />
-                        <div className="flex items-center gap-3">
-                          <span className="font-extrabold text-3xl text-pink-500">R{course.price}</span>
+                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                        <DollarSign className="h-4 w-4 text-pink-500" />
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-lg text-pink-500">R{course.price}</span>
                           {course.comparePrice && (
                             <>
-                              <span className="text-lg text-slate-400 line-through">R{course.comparePrice}</span>
-                              <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-bold">
+                              <span className="text-sm text-gray-400 line-through">R{course.comparePrice}</span>
+                              <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold">
                                 {course.discount}% OFF
                               </span>
                             </>
@@ -165,7 +165,7 @@ const CoursesPage: React.FC = () => {
 
                     <button
                       onClick={() => window.location.href = `/courses/${course.slug}`}
-                      className="w-full btn btn-primary btn-lg"
+                      className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
                     >
                       SEE MORE DETAILS
                     </button>
