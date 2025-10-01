@@ -65,18 +65,23 @@ export const HomePage: React.FC = () => {
         {/* Our Vision Section */}
         <section id="our-vision" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
-            <div className="max-w-3xl">
-              <p className="section-header text-center mb-2 animate-fade-in">
-                OUR VISION
-              </p>
-              <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
-              <h2 className="text-lg md:text-xl font-medium mb-6 text-slate-700">
-                To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.
-              </h2>
-              <div className="animate-slide-up">
-                <Button size="lg" onClick={() => window.location.href = '/about'}>
-                  Learn More About Us
-                </Button>
+            <div className="relative">
+              <div className="max-w-3xl">
+                <p className="section-header mb-2 animate-fade-in">
+                  OUR VISION
+                </p>
+                <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
+                <h2 className="text-lg md:text-xl font-medium mb-6 text-slate-700">
+                  To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.
+                </h2>
+                <div className="animate-slide-up">
+                  <Button size="lg" onClick={() => window.location.href = '/about'}>
+                    Learn More About Us
+                  </Button>
+                </div>
+              </div>
+              <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">
+                <Sparkles className="w-28 h-28 text-pink-300/50" />
               </div>
             </div>
           </Container>
