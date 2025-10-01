@@ -19,7 +19,7 @@ export const HomePage: React.FC = () => {
       role: 'Professional Nail Technician',
       content: 'BLOM products have transformed my nail art business. The quality is unmatched and my clients love the results.',
       rating: 5,
-      image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+      image: '/sarah.webp'
     },
     {
       id: 2,
@@ -27,7 +27,7 @@ export const HomePage: React.FC = () => {
       role: 'Salon Owner',
       content: 'The training courses are exceptional. My entire team is now certified and our service quality has improved dramatically.',
       rating: 5,
-      image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+      image: '/testimonial-6.webp'
     },
     {
       id: 3,
@@ -35,7 +35,7 @@ export const HomePage: React.FC = () => {
       role: 'Freelance Artist',
       content: 'From beginner to pro - BLOM\'s educational content and premium products made my journey seamless.',
       rating: 5,
-      image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
+      image: '/michelle.webp'
     },
     {
       id: 4,
@@ -43,7 +43,7 @@ export const HomePage: React.FC = () => {
       role: 'Pro Nail Artist',
       content: 'Blom\'s acrylic system changed my sets — clarity and strength are unreal.',
       rating: 5,
-      image: null
+      image: '/jaundre.webp'
     }
   ];
 
