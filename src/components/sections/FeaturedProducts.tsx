@@ -86,7 +86,7 @@ export const FeaturedProducts: React.FC = () => {
         slug: 'vitamin-primer',
         name: 'Vitamin Primer',
         price: 299,
-        image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        image: '/primer-01.webp',
         description: 'Essential nail preparation for lasting results'
       },
       {
@@ -94,7 +94,7 @@ export const FeaturedProducts: React.FC = () => {
         slug: 'crystal-clear-acrylic-56g',
         name: 'Crystal Clear Acrylic (56 g)',
         price: 450,
-        image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        image: '/acrylic-powder-01.webp',
         description: 'Professional grade acrylic powder for perfect sculpting'
       },
       {
@@ -102,7 +102,7 @@ export const FeaturedProducts: React.FC = () => {
         slug: 'nail-liquid-monomer',
         name: 'Nail Liquid (Monomer)',
         price: 380,
-        image: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        image: '/nail-liquid-01.webp',
         description: 'High-quality monomer for smooth application'
       }
     ];
