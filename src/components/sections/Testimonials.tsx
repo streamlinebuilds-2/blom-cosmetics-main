@@ -8,10 +8,11 @@ interface TestimonialSlide {
 }
 
 const slides: TestimonialSlide[] = [
-  { id: 't1', image: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=480&h=853&fit=crop', alt: 'Sarah Mitchell' },
-  { id: 't2', image: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=480&h=853&fit=crop', alt: 'Jessica Chen' },
-  { id: 't3', image: 'https://images.pexels.com/photos/1181686/pexels-photo-1181686.jpeg?auto=compress&cs=tinysrgb&w=480&h=853&fit=crop', alt: 'Michelle Adams' },
-  { id: 't4', image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=480&h=853&fit=crop', alt: 'Pro Nail Artist' }
+  { id: 't1', image: '/sarah.webp', alt: 'Sarah Mitchell' },
+  { id: 't2', image: '/jaundre.webp', alt: 'Jaundré' },
+  { id: 't3', image: '/michelle.webp', alt: 'Michelle Adams' },
+  { id: 't4', image: '/testimonial-4.webp', alt: 'Pro Nail Artist' },
+  { id: 't5', image: '/testimonial-6.webp', alt: 'Beauty Professional' }
 ];
 
 export const Testimonials: React.FC = () => {
@@ -30,7 +31,7 @@ export const Testimonials: React.FC = () => {
           <div className="testi__viewport" tabIndex={0} aria-label="Testimonials carousel">
             <ul className="testi__track" style={{ ['--testi-duration' as any]: '40s' }}>
               {loopSlides.map((s, idx) => (
-                <li className="testi__slide" key={`${s.id}_${idx}`}>
+                <li className="testi__slide" key={`{s.id}_${idx}`}>
                   <figure className="t-card">
                     <div className="t-card--img aspect-9-16">
                       <img src={s.image} alt={s.alt} className="w-full h-full object-cover" />
