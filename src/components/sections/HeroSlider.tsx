@@ -9,7 +9,8 @@ interface Slide {
   description: string;
   ctaText: string;
   ctaHref: string;
-  backgroundImage: string;
+  backgroundImageDesktop: string;
+  backgroundImageMobile: string;
   textPosition: 'left' | 'center' | 'right';
 }
 
@@ -21,7 +22,8 @@ const slides: Slide[] = [
     description: '',
     ctaText: 'Shop the Collection',
     ctaHref: '/shop',
-    backgroundImage: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    backgroundImageDesktop: '/hero-desktop-1.webp',
+    backgroundImageMobile: '/hero-mobile-1.webp',
     textPosition: 'left'
   },
   {
@@ -31,7 +33,8 @@ const slides: Slide[] = [
     description: '',
     ctaText: 'Explore Acrylics',
     ctaHref: '/shop#acrylic-system',
-    backgroundImage: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    backgroundImageDesktop: '/hero-desktop-2.webp',
+    backgroundImageMobile: '/hero-mobile-2.webp',
     textPosition: 'right'
   },
   {
@@ -41,7 +44,8 @@ const slides: Slide[] = [
     description: '',
     ctaText: 'Explore Courses',
     ctaHref: '/courses',
-    backgroundImage: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    backgroundImageDesktop: '/hero-desktop-3.webp',
+    backgroundImageMobile: '/hero-mobile-3.webp',
     textPosition: 'center'
   }
 ];
@@ -102,11 +106,14 @@ export const HeroSlider: React.FC = () => {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
-              src={slideItem.backgroundImage}
-              alt={slideItem.title}
-              className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'scale-110' : 'scale-100'}`}
-            />
+            <picture>
+              <source media="(min-width: 768px)" srcSet={slideItem.backgroundImageDesktop} />
+              <img
+                src={slideItem.backgroundImageMobile}
+                alt={slideItem.title}
+                className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'scale-110' : 'scale-100'}`}
+              />
+            </picture>
             {/* Overlay removed for a cleaner image presentation */}
           </div>
         ))}
