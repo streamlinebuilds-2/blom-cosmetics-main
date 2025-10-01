@@ -1033,7 +1033,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <div className="grid grid-cols-3 gap-4 mb-8 text-center">
                   <div className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-xl">
                     <Truck className="h-6 w-6 text-green-500" />
-                    <span className="font-semibold text-green-700">Free shipping over R500</span>
+                    <span className="font-semibold text-green-700">Free shipping over R1500</span>
                   </div>
                   <div className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl">
                     <Shield className="h-6 w-6 text-blue-500" />

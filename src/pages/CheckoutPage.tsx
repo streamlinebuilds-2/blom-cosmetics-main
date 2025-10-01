@@ -519,7 +519,7 @@ export const CheckoutPage: React.FC = () => {
                   {cartState.subtotal < 500 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-sm text-blue-800">
-                        Add {formatPrice(500 - cartState.subtotal)} more for free shipping!
+                        Add {formatPrice(1500 - cartState.subtotal)} more for free shipping!
                       </p>
                     </div>
                   )}

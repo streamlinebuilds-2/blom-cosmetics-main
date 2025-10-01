@@ -246,7 +246,7 @@ export const CartWidget: React.FC = () => {
                 
                 {cartState.subtotal < 500 && (
                   <p className="text-sm text-gray-600 text-center">
-                    Add {formatPrice(500 - cartState.subtotal)} more for free shipping!
+                    Add {formatPrice(1500 - cartState.subtotal)} more for free shipping!
                   </p>
                 )}
 
