@@ -57,7 +57,10 @@ export const HomePage: React.FC = () => {
 
       <main>
         {/* Hero Slider */}
-        <HeroSlider />`n`n        {/* Trust Badges */}`n        <TrustBadges />
+        <HeroSlider />
+
+        {/* Trust Badges */}
+        <TrustBadges />
 
         {/* Our Vision Section */}
         <section id="our-vision" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
@@ -80,7 +83,10 @@ export const HomePage: React.FC = () => {
         </section>
 
         {/* Featured Products */}
-        <FeaturedProducts />`n`n        {/* Shop by Category */}`n        <ShopByCategory />
+        <FeaturedProducts />
+
+        {/* Shop by Category */}
+        <ShopByCategory />
 
         {/* Our Promise Section */}
         <section id="our-promise" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
@@ -139,6 +145,7 @@ export const HomePage: React.FC = () => {
     </div>
   );
 };
+
 
 
 

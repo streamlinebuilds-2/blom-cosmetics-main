@@ -88,7 +88,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
   return (
     <>
-      <AnnouncementBar />`n      <AnnouncementSignup />
+      <AnnouncementBar />
+      <AnnouncementSignup />
 
       {/* Main Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-50">
@@ -258,4 +259,5 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     </>
   );
 };
+
 
