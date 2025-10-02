@@ -42,6 +42,35 @@ export const FeaturedProducts: React.FC = () => {
     fetchFeaturedProducts();
   }, []);
 
+  // Intersection Observer for mobile shimmer effect
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const shimmerElement = entry.target.querySelector('.shimmer');
+          if (shimmerElement && !shimmerElement.classList.contains('shimmer-on-scroll')) {
+            shimmerElement.classList.add('shimmer-on-scroll');
+            // Remove class after animation to allow re-triggering
+            setTimeout(() => {
+              shimmerElement.classList.remove('shimmer-on-scroll');
+            }, 4000);
+          }
+        }
+      });
+    }, observerOptions);
+
+    // Observe all best seller cards
+    const bestSellerCards = document.querySelectorAll('.best-seller-card');
+    bestSellerCards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [products, loading, error]);
+
   if (loading) {
     return (
       <section className="section-padding">

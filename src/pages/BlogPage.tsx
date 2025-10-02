@@ -170,7 +170,7 @@ export const BlogPage: React.FC = () => {
             // Remove class after animation to allow re-triggering
             setTimeout(() => {
               shimmerElement.classList.remove('shimmer-on-scroll');
-            }, 14000);
+            }, 4000);
           }
         }
       });
