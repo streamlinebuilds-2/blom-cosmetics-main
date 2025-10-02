@@ -541,7 +541,7 @@ export const ContactPage: React.FC = () => {
                                 }));
                               }
                             }}
-                            className={`w-4 h-4 rounded border-2 focus:ring-2 focus:ring-primary-pink transition-colors ${
+                            className={`w-4 h-4 rounded-md border-2 focus:ring-2 focus:ring-primary-pink transition-colors ${
                               agreedToTerms 
                                 ? 'bg-primary-pink border-primary-pink text-white' 
                                 : 'border-gray-300 hover:border-primary-pink'
