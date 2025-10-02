@@ -18,7 +18,11 @@ import {
   ShoppingCart,
   BookOpen,
   Heart,
-  CheckCircle
+  CheckCircle,
+  Paperclip,
+  Upload,
+  X,
+  FileText
 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
@@ -32,6 +36,8 @@ export const ContactPage: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+  const [dragActive, setDragActive] = useState(false);
 
 
   const inquiryTypes = [
@@ -85,6 +91,42 @@ export const ContactPage: React.FC = () => {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachedFiles(prev => [...prev, ...files]);
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    const files = Array.from(e.dataTransfer.files);
+    setAttachedFiles(prev => [...prev, ...files]);
+  };
+
+  const removeFile = (index: number) => {
+    setAttachedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -198,13 +240,13 @@ export const ContactPage: React.FC = () => {
                   below and our team will get back to you within 24 hours.
                 </p>
 
-                <Card>
+                <Card className="shadow-lg border-0">
                   <CardContent className="pt-10 pb-8 px-8">
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-8">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                            Full Name *
+                          <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
+                            Full Name <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="text"
@@ -213,13 +255,13 @@ export const ContactPage: React.FC = () => {
                             value={formData.name}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
-                            placeholder="Your full name"
+                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                            placeholder="Enter your full name"
                           />
                         </div>
                         <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                            Email Address *
+                          <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
+                            Email Address <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="email"
@@ -228,15 +270,15 @@ export const ContactPage: React.FC = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
-                            placeholder="your@email.com"
+                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                            placeholder="your.email@example.com"
                           />
                         </div>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
-                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
                             Phone Number
                           </label>
                           <input
@@ -245,13 +287,13 @@ export const ContactPage: React.FC = () => {
                             name="phone"
                             value={formData.phone}
                             onChange={handleInputChange}
-                            className="input-field"
+                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                             placeholder="+27 XX XXX XXXX"
                           />
                         </div>
                         <div>
-                          <label htmlFor="inquiryType" className="block text-sm font-medium text-gray-700 mb-2">
-                            Inquiry Type *
+                          <label htmlFor="inquiryType" className="block text-sm font-semibold text-gray-800 mb-2">
+                            Inquiry Type <span className="text-red-500">*</span>
                           </label>
                           <select
                             id="inquiryType"
@@ -259,7 +301,7 @@ export const ContactPage: React.FC = () => {
                             value={formData.inquiryType}
                             onChange={handleInputChange}
                             required
-                            className="input-field"
+                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                           >
                             {inquiryTypes.map((type) => (
                               <option key={type.value} value={type.value}>
@@ -271,8 +313,8 @@ export const ContactPage: React.FC = () => {
                       </div>
 
                       <div>
-                        <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
-                          Subject *
+                        <label htmlFor="subject" className="block text-sm font-semibold text-gray-800 mb-2">
+                          Subject <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -281,14 +323,14 @@ export const ContactPage: React.FC = () => {
                           value={formData.subject}
                           onChange={handleInputChange}
                           required
-                          className="input-field"
+                          className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                           placeholder="Brief description of your inquiry"
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                          Message *
+                        <label htmlFor="message" className="block text-sm font-semibold text-gray-800 mb-2">
+                          Message <span className="text-red-500">*</span>
                         </label>
                         <textarea
                           id="message"
@@ -297,20 +339,97 @@ export const ContactPage: React.FC = () => {
                           onChange={handleInputChange}
                           required
                           rows={6}
-                          className="input-field resize-none"
-                          placeholder="Please provide details about your inquiry..."
+                          className="input-field resize-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                          placeholder="Please provide detailed information about your inquiry. The more specific you are, the better we can assist you."
                         />
                       </div>
 
-                      <Button 
-                        type="submit" 
-                        size="md" 
-                        className="w-fit mx-auto flex items-center gap-2"
-                        loading={isSubmitting}
-                      >
-                        <Send className="h-4 w-4" />
-                        {isSubmitting ? 'Sending Message...' : 'Send Message'}
-                      </Button>
+                      {/* File Attachment Section */}
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
+                          Attachments <span className="text-gray-500">(Optional)</span>
+                        </label>
+                        <div 
+                          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                            dragActive 
+                              ? 'border-pink-400 bg-pink-50' 
+                              : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                          onDragEnter={handleDrag}
+                          onDragLeave={handleDrag}
+                          onDragOver={handleDrag}
+                          onDrop={handleDrop}
+                        >
+                          <Upload className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                          <p className="text-gray-600 mb-2">
+                            Drag and drop files here, or 
+                            <label className="text-pink-500 hover:text-pink-600 cursor-pointer ml-1">
+                              browse
+                              <input
+                                type="file"
+                                multiple
+                                onChange={handleFileUpload}
+                                className="hidden"
+                                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.gif"
+                              />
+                            </label>
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Supported formats: PDF, DOC, DOCX, TXT, JPG, PNG, GIF (Max 10MB per file)
+                          </p>
+                        </div>
+
+                        {/* Attached Files List */}
+                        {attachedFiles.length > 0 && (
+                          <div className="mt-4 space-y-2">
+                            <p className="text-sm font-medium text-gray-700">Attached Files:</p>
+                            {attachedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                <div className="flex items-center gap-3">
+                                  <FileText className="h-4 w-4 text-gray-500" />
+                                  <div>
+                                    <p className="text-sm font-medium text-gray-900">{file.name}</p>
+                                    <p className="text-xs text-gray-500">{formatFileSize(file.size)}</p>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeFile(index)}
+                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Privacy Notice */}
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-start gap-3">
+                          <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <div className="text-sm text-blue-700">
+                            <p className="font-medium mb-1">Your privacy is important to us</p>
+                            <p>We'll only use your information to respond to your inquiry and will never share it with third parties.</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-center">
+                        <Button 
+                          type="submit" 
+                          size="lg" 
+                          className="px-8 py-3 flex items-center gap-2 shadow-lg hover:shadow-xl transition-shadow"
+                          loading={isSubmitting}
+                        >
+                          <Send className="h-4 w-4" />
+                          {isSubmitting ? 'Sending Message...' : 'Send Message'}
+                        </Button>
+                        <p className="text-xs text-gray-500 mt-3">
+                          We typically respond within 24 hours during business days
+                        </p>
+                      </div>
                     </form>
                   </CardContent>
                 </Card>
