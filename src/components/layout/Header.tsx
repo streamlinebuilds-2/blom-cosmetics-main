@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       }`}>
         <Container>
           <div className="flex items-center justify-between h-16">
-            {/* Mobile menu button - Left side */}
+            {/* Mobile menu button - Left side (mobile only) */}
             {showMobileMenu && (
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -121,15 +121,15 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
               </button>
             )}
 
-            {/* Logo - Center */}
-            <div className="flex-shrink-0 flex-1 flex justify-center">
+            {/* Logo - Left on desktop, center on mobile */}
+            <div className="flex-shrink-0 lg:flex-shrink-0 lg:flex-none flex-1 flex justify-center lg:justify-start">
               <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
                 <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10" />
               </a>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            {/* Desktop Navigation - Center */}
+            <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
               {navigationItems.map((item) => {
                 const isActive = currentPath === item.href;
                 return (
