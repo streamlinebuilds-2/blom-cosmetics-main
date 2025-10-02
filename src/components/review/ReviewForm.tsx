@@ -169,7 +169,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                     <Star
                       className={`h-8 w-8 ${
                         star <= (hoveredRating || rating)
-                          ? 'text-yellow-400 fill-current'
+                          ? 'text-primary-blue fill-current'
                           : 'text-gray-300'
                       }`}
                     />

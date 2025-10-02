@@ -72,8 +72,8 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Customer Reviews</h2>
-            <div className="flex items-center gap-4 my-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Customer Reviews</h2>
+            <div className="flex items-center gap-4 mt-6 mb-2">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -81,7 +81,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                       key={i}
                       className={`h-7 w-7 ${
                         i < Math.floor(averageRating)
-                          ? 'text-blue-400 fill-current'
+                          ? 'text-primary-blue fill-current'
                           : 'text-gray-300'
                       }`}
                     />
@@ -111,8 +111,8 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           <div className="grid md:grid-cols-2 gap-8">
             {/* Overall Rating */}
             <div className="text-center">
-              <div className="text-6xl font-bold text-gray-900 mb-4">{averageRating.toFixed(1)}</div>
-              <div className="flex items-center justify-center gap-1 my-4">
+              <div className="text-6xl font-bold text-gray-900 mb-6">{averageRating.toFixed(1)}</div>
+              <div className="flex items-center justify-center gap-1 py-3">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
@@ -124,7 +124,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                   />
                 ))}
               </div>
-              <p className="text-gray-600 mt-3">Based on {reviewCount} review{reviewCount !== 1 ? 's' : ''}</p>
+              <p className="text-gray-600 mt-4">Based on {reviewCount} review{reviewCount !== 1 ? 's' : ''}</p>
             </div>
 
             {/* Star Rating Breakdown */}
@@ -207,14 +207,14 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center gap-1 py-1">
+                      <div className="flex items-center gap-3 mb-3 mt-1">
+                        <div className="flex items-center gap-1 py-2">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
                               className={`h-5 w-5 ${
                                 i < review.rating
-                                  ? 'text-blue-400 fill-current'
+                                  ? 'text-primary-blue fill-current'
                                   : 'text-gray-300'
                               }`}
                             />
