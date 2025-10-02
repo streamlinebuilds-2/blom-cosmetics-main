@@ -59,11 +59,11 @@ const CoursesPage: React.FC = () => {
               <h2 className="heading-with-stripe">In-Person Training</h2>
             </div>
 
-            <div className="max-w-lg mx-auto">
+            <div className="grid md:grid-cols-2 gap-8">
               {inPersonCourses.map((course) => (
                 <Card key={course.id} className="group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
                   {/* Image with Shimmer */}
-                  <div className="relative aspect-video overflow-hidden">
+                  <div className="relative aspect-[4/3] overflow-hidden">
                     <img
                       src={course.image}
                       alt={course.title}
@@ -115,7 +115,7 @@ const CoursesPage: React.FC = () => {
               {onlineCourses.map((course) => (
                 <Card key={course.id} className="group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
                   {/* Image with Shimmer */}
-                  <div className="relative aspect-video overflow-hidden">
+                  <div className="relative aspect-[4/3] overflow-hidden">
                     <img
                       src={course.image}
                       alt={course.title}
