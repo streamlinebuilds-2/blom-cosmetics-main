@@ -1177,9 +1177,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
           <Container>
             <h2 className="heading-with-stripe">You May Also Like</h2>
             <div className="flex justify-center">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl w-full">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl w-full">
                 {relatedProducts.map((relatedProduct) => (
-                  <Card key={relatedProduct.id} className="group cursor-pointer bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+                  <Card key={relatedProduct.id} className="group cursor-pointer bg-white rounded-xl md:rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
                     <div className="relative aspect-square overflow-hidden">
                       <img
                         src={relatedProduct.image}
@@ -1187,17 +1187,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       />
                       {/* Heart Icon */}
-                      <button className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-200 shadow-lg hover:shadow-xl">
-                        <Heart className="h-5 w-5 text-gray-600 hover:text-pink-500 transition-colors" />
+                      <button className="absolute top-2 right-2 md:top-3 md:right-3 w-7 h-7 md:w-9 md:h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-200 shadow-md hover:shadow-lg">
+                        <Heart className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-600 hover:text-pink-500 transition-colors" />
                       </button>
                     </div>
-                    <CardContent className="p-6">
-                      <h3 className="font-bold text-xl mb-3 text-gray-900 group-hover:text-pink-500 transition-colors">
+                    <CardContent className="p-3 md:p-4">
+                      <h3 className="font-bold text-xs sm:text-sm md:text-base mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2rem] md:min-h-[2.5rem]">
                         {relatedProduct.name}
                       </h3>
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-pink-500">R{relatedProduct.price}</span>
-                        <button className="btn btn-primary btn-sm">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-2">
+                        <span className="text-base sm:text-lg md:text-xl font-bold text-pink-500">R{relatedProduct.price}</span>
+                        <button className="w-full sm:w-auto btn btn-primary text-[10px] sm:text-xs md:text-sm px-2 py-1.5 md:px-3 md:py-2">
                           Add to Cart
                         </button>
                       </div>
