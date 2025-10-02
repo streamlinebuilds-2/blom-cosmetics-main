@@ -98,8 +98,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         />
         
         {/* Shimmer Effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-          <div className="shimmer shimmer--lux"></div>
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+          <div className="shimmer"></div>
         </div>
 
         {/* Bestseller Badge */}
@@ -216,42 +216,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           background: linear-gradient(
             135deg,
             transparent 0%,
-            transparent 35%,
-            rgba(255, 255, 255, 0.4) 45%,
-            rgba(255, 255, 255, 0.8) 50%,
-            rgba(255, 255, 255, 0.6) 55%,
-            rgba(255, 255, 255, 0.3) 65%,
-            transparent 75%,
+            transparent 40%,
+            rgba(255, 255, 255, 0.3) 50%,
+            rgba(255, 255, 255, 0.6) 50%,
+            rgba(255, 255, 255, 0.3) 50%,
+            transparent 60%,
             transparent 100%
           );
           transform: translateX(-100%) translateY(-100%);
-          animation: shimmerLuxury 12s ease-in-out infinite;
+          animation: shimmerSimple 2s ease-in-out;
         }
         
-        .shimmer--lux {
-          background: linear-gradient(
-            135deg,
-            transparent 0%,
-            transparent 30%,
-            rgba(255, 255, 255, 0.5) 40%,
-            rgba(255, 255, 255, 0.9) 50%,
-            rgba(255, 255, 255, 0.7) 60%,
-            rgba(255, 255, 255, 0.4) 70%,
-            transparent 80%,
-            transparent 100%
-          );
-          animation: shimmerLuxury 15s ease-in-out infinite;
-        }
-        
-        @keyframes shimmerLuxury {
+        @keyframes shimmerSimple {
           0% {
             transform: translateX(-100%) translateY(-100%);
             opacity: 0;
           }
-          3% {
+          10% {
             opacity: 1;
           }
-          97% {
+          90% {
             opacity: 1;
           }
           100% {
