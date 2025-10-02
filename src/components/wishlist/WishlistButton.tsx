@@ -15,8 +15,8 @@ export const WishlistButton: React.FC = () => {
       const newCount = wishlistStore.getItemCount();
       setItemCount(newCount);
       
-      // Trigger animation when items are added
-      if (newCount > itemCount) {
+      // Trigger animation when items are added or removed
+      if (newCount !== itemCount) {
         setIsAnimating(true);
         setTimeout(() => setIsAnimating(false), 300);
       }

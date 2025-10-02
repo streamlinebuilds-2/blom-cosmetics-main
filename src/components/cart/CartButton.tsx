@@ -9,13 +9,28 @@ interface CartButtonProps {
 
 export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' }) => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
+  const [itemCount, setItemCount] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = cartStore.subscribe(setCartState);
-    return unsubscribe;
-  }, []);
+    // Initialize count
+    setItemCount(cartStore.getItemCount());
 
-  const itemCount = cartStore.getItemCount();
+    const unsubscribe = cartStore.subscribe((newState) => {
+      setCartState(newState);
+      const newCount = cartStore.getItemCount();
+      
+      // Trigger animation when items are added or removed
+      if (newCount !== itemCount) {
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 300);
+      }
+      
+      setItemCount(newCount);
+    });
+    
+    return unsubscribe;
+  }, [itemCount]);
 
   return (
     <button 
@@ -27,10 +42,19 @@ export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' 
       }}
       className={`p-2 text-gray-700 hover:text-gray-900 transition-colors duration-200 relative ${className}`}
     >
-      <ShoppingCart className="h-5 w-5" />
+      <ShoppingCart 
+        className={`h-5 w-5 transition-all duration-200 ${
+          isAnimating ? 'scale-125' : ''
+        }`} 
+      />
       {itemCount > 0 && (
-        <span className="absolute -top-1 -right-1 text-gray-800 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold" style={{ backgroundColor: '#CEE5FF' }}>
-          {itemCount}
+        <span 
+          className={`absolute -top-1 -right-1 text-gray-800 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold transition-all duration-200 ${
+            isAnimating ? 'scale-125' : ''
+          }`} 
+          style={{ backgroundColor: '#CEE5FF' }}
+        >
+          {itemCount > 99 ? '99+' : itemCount}
         </span>
       )}
     </button>
