@@ -655,6 +655,10 @@
   /* Actions spacing */
   .master__actions{ display:flex; flex-wrap:wrap; gap:12px; margin-top: clamp(16px, 2.2vw, 28px); }
 
+  @media (max-width: 768px){
+    .master__actions{ justify-content:center; }
+  }
+
   .btn{ display:inline-block; padding:.9rem 1.2rem; border-radius:25px; font-weight:800; cursor:pointer; text-decoration:none; }
   .btn-pink{ background:#FF74A4; color:#fff; }
   .btn-outline{ background:#fff; color:#FF74A4; border:1px solid #FF74A4; }
