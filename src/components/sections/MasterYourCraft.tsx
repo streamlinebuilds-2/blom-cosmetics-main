@@ -56,8 +56,8 @@ export const MasterYourCraft: React.FC = () => {
               >
                 <div className="m-type__icon"><User className="h-5 w-5" /></div>
                 <div className="m-type__body">
-                  <h3>In-Class Professional Courses</h3>
-                  <p>Hands-on training from prep to finishes — kits included, small groups, certificate.</p>
+                  <h3 className="font-bold text-sm md:text-base">In-Class Professional Courses</h3>
+                  <p className="text-xs md:text-sm text-gray-700">Hands-on training from prep to finishes — kits included, small groups, certificate.</p>
                 </div>
               </article>
 
@@ -75,8 +75,8 @@ export const MasterYourCraft: React.FC = () => {
               >
                 <div className="m-type__icon"><Computer className="h-5 w-5" /></div>
                 <div className="m-type__body">
-                  <h3>Creative Online Workshops</h3>
-                  <p>Learn at your own pace with instructor feedback — flexible modules, certificate.</p>
+                  <h3 className="font-bold text-sm md:text-base">Creative Online Workshops</h3>
+                  <p className="text-xs md:text-sm text-gray-700">Learn at your own pace with instructor feedback — flexible modules, certificate.</p>
                 </div>
               </article>
             </div>
