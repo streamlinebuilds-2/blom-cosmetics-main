@@ -595,6 +595,7 @@ export const ShopPage: React.FC = () => {
                     images={product.images}
                     inStock={product.inStock}
                     badges={product.badges}
+                    isListView={viewMode === 'list'}
                   />
                 ))}
               </div>

@@ -14,6 +14,7 @@ interface ProductCardProps {
   inStock?: boolean;
   badges?: string[];
   className?: string;
+  isListView?: boolean;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -26,7 +27,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   images,
   inStock = true,
   badges = [],
-  className = ''
+  className = '',
+  isListView = false
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
 
@@ -79,6 +81,89 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
+  // List view layout for mobile
+  if (isListView) {
+    return (
+      <article 
+        className={`group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 ${className}`}
+        onClick={handleCardClick}
+      >
+        <div className="flex gap-4 p-4">
+          {/* Image Container - Square 1:1 ratio */}
+          <div className="relative w-28 h-28 flex-shrink-0 overflow-hidden rounded-xl bg-gray-50">
+            <img
+              src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+              alt={name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+              }}
+            />
+            
+            {/* Badges */}
+            {badges.length > 0 && badges[0] && (
+              <div className="absolute top-1 left-1">
+                <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-bold uppercase shadow-sm ${
+                  badges[0] === 'Bestseller' ? 'bg-pink-100 text-pink-600' :
+                  badges[0] === 'New' ? 'bg-blue-500 text-white' :
+                  badges[0] === 'Sale' ? 'bg-red-500 text-white' : ''
+                }`}>
+                  {badges[0]}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 flex flex-col justify-between min-w-0">
+            {/* Title and Price */}
+            <div>
+              <h3 className="font-bold text-base leading-tight mb-1.5 text-gray-900 line-clamp-2">
+                {name}
+              </h3>
+              {shortDescription && (
+                <p className="text-xs text-gray-600 mb-2 line-clamp-1">
+                  {shortDescription}
+                </p>
+              )}
+            </div>
+
+            {/* Price and Button */}
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-pink-500">
+                  {price === -1 ? 'Coming Soon' : formatPrice(price)}
+                </span>
+                {compareAtPrice && price !== -1 && (
+                  <span className="text-xs text-gray-400 line-through">
+                    {formatPrice(compareAtPrice)}
+                  </span>
+                )}
+              </div>
+              
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                disabled={!inStock || price === -1}
+                className={`flex-shrink-0 p-2.5 rounded-full transition-all ${
+                  inStock && price !== -1
+                    ? 'bg-pink-400 text-white hover:bg-pink-500 hover:scale-110'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+                aria-label="Add to cart"
+              >
+                <ShoppingCart className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  // Grid view layout
   return (
     <article 
       className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
