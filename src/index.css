@@ -480,20 +480,37 @@
   .promise-card:hover::before {
     left: 100%;
   }
+  .promise-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(206, 229, 255, 0.1) 0%, rgba(255, 116, 164, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .promise-card:hover::after {
+    opacity: 1;
+  }
   .promise-icon {
     @apply w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     border: 2px solid #e2e8f0;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 10;
   }
   .promise-card:hover .promise-icon { 
-    background: linear-gradient(135deg, #fef7ff 0%, #f0f9ff 100%);
-    border-color: #f472b6;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-color: #e2e8f0;
     transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 8px 15px -3px rgba(244, 114, 182, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
   .promise-card:hover .promise-icon svg { 
-    color: #f472b6;
+    color: #1e293b;
     transform: scale(1.1);
   }
   .promise-card h3 {
