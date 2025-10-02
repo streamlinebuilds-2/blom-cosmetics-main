@@ -127,7 +127,7 @@ export const AnnouncementSignup: React.FC = () => {
             {/* Visual Panel - Desktop Only (Image) */}
             <div className="hidden md:block relative overflow-hidden" aria-hidden="true">
               <img
-                src="/sign-up-image-4.webp"
+                src="/sign-up-image.webp"
                 alt="BLOM signup visual"
                 className="absolute inset-0 w-full h-full object-cover"
                 loading="lazy"
