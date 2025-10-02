@@ -70,12 +70,12 @@ export const HomePage: React.FC = () => {
                 <p className="section-header mb-2 animate-fade-in">
                   OUR VISION
                 </p>
-                <div className="h-1 w-16 bg-pink-400 rounded mb-4"></div>
+                <div className="h-1 w-16 bg-pink-400 rounded mb-6"></div>
                 <h2 className="text-lg md:text-xl font-medium mb-6 text-slate-700">
                   To be the most trusted and loved nail care brand in South Africa, empowering our clients with the tools, knowledge, and products to succeed.
                 </h2>
-                <div className="animate-slide-up">
-                  <Button size="lg" onClick={() => window.location.href = '/about'}>
+                <div className="animate-slide-up flex justify-start md:justify-start">
+                  <Button size="lg" onClick={() => window.location.href = '/about'} className="mx-auto md:mx-0">
                     Learn More About Us
                   </Button>
                 </div>
