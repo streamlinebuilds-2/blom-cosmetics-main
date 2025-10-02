@@ -431,8 +431,22 @@
   }
 
   .grid-responsive {
-    @apply grid gap-6;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    @apply grid gap-8;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  @media (max-width: 900px) {
+    .grid-responsive {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .grid-responsive {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
   }
 
   .card {

@@ -104,7 +104,7 @@ export const HomePage: React.FC = () => {
               {/* 1 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Heart className="h-7 w-7 text-gray-700" />
+                  <Heart className="h-7 w-7" style={{ color: '#CEE5FF' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-3">HEMA-Free Formulas</h3>
                 <p className="text-gray-600 text-sm">Safe for sensitive clients with our carefully formulated, hypoallergenic products</p>
@@ -113,7 +113,7 @@ export const HomePage: React.FC = () => {
               {/* 2 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Star className="h-7 w-7 text-gray-700" />
+                  <Star className="h-7 w-7" style={{ color: '#CEE5FF' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Professional Grade</h3>
                 <p className="text-gray-600 text-sm">Used by leading salons and nail technicians across South Africa</p>
@@ -122,7 +122,7 @@ export const HomePage: React.FC = () => {
               {/* 3 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Zap className="h-7 w-7 text-gray-700" />
+                  <Zap className="h-7 w-7" style={{ color: '#CEE5FF' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Fast & Reliable</h3>
                 <p className="text-gray-600 text-sm">Free shipping on orders over R1500 with 2–3 day delivery nationwide</p>
@@ -131,7 +131,7 @@ export const HomePage: React.FC = () => {
               {/* 4 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <CheckCircle className="h-7 w-7 text-gray-700" />
+                  <CheckCircle className="h-7 w-7" style={{ color: '#CEE5FF' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Hassle-Free Returns</h3>
                 <p className="text-gray-600 text-sm">7-day return policy for unopened items. Damaged or incorrect orders replaced free.</p>

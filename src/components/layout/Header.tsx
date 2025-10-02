@@ -124,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             {/* Logo - Left on desktop, center on mobile */}
             <div className="flex-shrink-0 lg:flex-shrink-0 lg:flex-none flex-1 flex justify-center lg:justify-start">
               <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
-                <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10" />
+                <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-12 md:h-10" />
               </a>
             </div>
 
