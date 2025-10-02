@@ -553,6 +553,8 @@ export const ContactPage: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg mb-2">BLOM Cosmetics Headquarters</h3>
+                      <p className="text-gray-600 mb-1">34 Horingbek Avenue</p>
+                      <p className="text-gray-600 mb-1">Helikonpark, Randfontein</p>
                       <p className="text-gray-600 mb-2">South Africa</p>
                       <p className="text-sm text-gray-500">Visits by appointment only</p>
                     </div>
@@ -572,14 +574,19 @@ export const ContactPage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Map Placeholder */}
+              {/* Google Maps */}
               <Card>
-                <div className="aspect-video bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-pink-400 mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium">Interactive Map</p>
-                    <p className="text-sm text-gray-500">Location details available upon appointment</p>
-                  </div>
+                <div className="aspect-video overflow-hidden rounded-lg">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3580.8!2d27.7!3d-26.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s34%20Horingbek%20Avenue%2C%20Helikonpark%2C%20Randfontein!5e0!3m2!1sen!2sza!4v1"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="BLOM Cosmetics Headquarters - 34 Horingbek Avenue, Helikonpark, Randfontein"
+                  ></iframe>
                 </div>
               </Card>
             </div>
