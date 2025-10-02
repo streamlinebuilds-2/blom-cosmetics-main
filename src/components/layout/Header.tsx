@@ -105,8 +105,24 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       }`}>
         <Container>
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0">
+            {/* Mobile menu button - Left side */}
+            {showMobileMenu && (
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 text-gray-400 hover:text-gray-500"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
+            )}
+
+            {/* Logo - Center */}
+            <div className="flex-shrink-0 flex-1 flex justify-center">
               <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
                 <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10" />
               </a>
@@ -122,7 +138,12 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       href={item.href}
                       className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative ${
                         isActive 
-                          ? 'bg-blue-100 text-gray-900 rounded-md' 
+                          ? 'text-gray-900 rounded-md' 
+                          : 'text-gray-700 hover:text-gray-900'
+                      }`}
+                      style={{
+                        backgroundColor: isActive ? '#CEE5FF' : 'transparent'
+                      }} 
                           : 'text-gray-700 hover:text-gray-900'
                       }`}
                       onClick={(e) => handleNavClick(e, item.href)}
@@ -187,7 +208,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             })}
             </nav>
 
-            {/* Action Icons */}
+            {/* Action Icons - Right side */}
             <div className="flex items-center space-x-4">
               <a
                 href="/account"
@@ -198,22 +219,6 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 <User className="h-5 w-5" />
               </a>
               <CartButton />
-
-              {/* Mobile menu button */}
-              {showMobileMenu && (
-                <button
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden p-2 text-gray-400 hover:text-gray-500"
-                  aria-expanded={isMobileMenuOpen}
-                  aria-controls="mobile-menu"
-                >
-                  {isMobileMenuOpen ? (
-                    <X className="h-6 w-6" />
-                  ) : (
-                    <Menu className="h-6 w-6" />
-                  )}
-                </button>
-              )}
             </div>
           </div>
         </Container>

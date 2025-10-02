@@ -256,10 +256,19 @@
   }
 }
 :root {
-  --primary-pink: #FF8BB3;
+  /* Main brand colors */
+  --brand-primary: #CEE5FF; /* Primary Blue */
+  --brand-primary-600: #8EC5FF; /* Mid Blue */
+  --brand-primary-700: #9CCBFF; /* Deeper Blue */
+  --brand-accent: #FF74A4; /* Primary Pink */
+  --brand-accent-600: #ff5f97; /* Deeper pink */
+  --brand-accent-hover: #FF5A96; /* Pink hover state */
+  
+  /* Legacy/alternative names (same colors) */
   --primary-blue: #CEE5FF;
-  --accent-gold: #FFD700;
-  --accent-coral: #FF6B6B;
+  --accent-pink: #FF74A4;
+  --primary-pink: #FF74A4;
+  
   --neutral-white: #FFFFFF;
   --neutral-light: #F8F9FA;
   --neutral-medium: #6C757D;

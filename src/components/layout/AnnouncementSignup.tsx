@@ -133,7 +133,7 @@ export const AnnouncementSignup: React.FC = () => {
                 className="absolute right-0 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200"
                 onClick={closeBanner}
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4 md:h-5 md:w-5" />
               </button>
             </div>
           </Container>
@@ -168,7 +168,7 @@ export const AnnouncementSignup: React.FC = () => {
                 className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 transition-colors z-10"
                 onClick={closePopup}
               >
-                <X className="h-5 w-5 text-gray-500" />
+                <X className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
               </button>
 
               <div className="max-w-md mx-auto">
