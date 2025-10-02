@@ -6,6 +6,21 @@ import { Award, Computer, User } from 'lucide-react';
 export const MasterYourCraft: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
+  const handleNavigation = (e: React.MouseEvent<HTMLElement>, section: string) => {
+    e.preventDefault();
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const overlay = document.createElement('div');
+      overlay.className = 'page-transition-overlay';
+      document.body.appendChild(overlay);
+      window.setTimeout(() => {
+        window.location.assign(`/courses${section}`);
+      }, 500);
+    } catch {
+      window.location.assign(`/courses${section}`);
+    }
+  };
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -32,7 +47,18 @@ export const MasterYourCraft: React.FC = () => {
             <p className="master__lead">Professional training designed to give nail technicians the skills and confidence to succeed in their careers.</p>
 
             <div className="master__types">
-              <article className="m-type" tabIndex={0} aria-label="In-Class Professional Courses">
+              <article 
+                className="m-type cursor-pointer" 
+                tabIndex={0} 
+                aria-label="In-Class Professional Courses"
+                onClick={(e) => handleNavigation(e, '#in-person-training')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNavigation(e as any, '#in-person-training');
+                  }
+                }}
+              >
                 <div className="m-type__icon"><User className="h-5 w-5" /></div>
                 <div className="m-type__body">
                   <h3>In-Class Professional Courses</h3>
@@ -40,7 +66,18 @@ export const MasterYourCraft: React.FC = () => {
                 </div>
               </article>
 
-              <article className="m-type" tabIndex={0} aria-label="Creative Online Workshops">
+              <article 
+                className="m-type cursor-pointer" 
+                tabIndex={0} 
+                aria-label="Creative Online Workshops"
+                onClick={(e) => handleNavigation(e, '#online-workshops')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleNavigation(e as any, '#online-workshops');
+                  }
+                }}
+              >
                 <div className="m-type__icon"><Computer className="h-5 w-5" /></div>
                 <div className="m-type__body">
                   <h3>Creative Online Workshops</h3>

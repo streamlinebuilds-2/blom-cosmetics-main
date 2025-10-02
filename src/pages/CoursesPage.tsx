@@ -54,7 +54,7 @@ const CoursesPage: React.FC = () => {
       <main>
         <Container>
           {/* In-Person Training */}
-          <div className="py-16">
+          <div id="in-person-training" className="py-16">
             <div className="text-center mb-12">
               <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">In-Person Training</h2>
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
@@ -107,7 +107,7 @@ const CoursesPage: React.FC = () => {
           </div>
 
           {/* Online Workshops */}
-          <div className="py-16">
+          <div id="online-workshops" className="py-16">
             <div className="text-center mb-12">
               <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">Online Workshops</h2>
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
