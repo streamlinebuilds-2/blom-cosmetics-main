@@ -64,11 +64,19 @@ export const AnnouncementSignup: React.FC = () => {
   }, [isPopupOpen]);
 
   const closePopup = () => {
+    // Preserve current scroll position
+    const currentScrollY = window.scrollY;
+    
     setIsPopupOpen(false);
     session.popupClosed = true;
     session.hasShown = true;
     if (!session.bannerClosed) setIsBannerVisible(true);
     try { sessionStorage.setItem('signup_popup_closed', '1'); } catch {}
+    
+    // Restore scroll position after a brief delay to ensure DOM updates are complete
+    setTimeout(() => {
+      window.scrollTo(0, currentScrollY);
+    }, 0);
   };
 
   const closeBanner = () => {
