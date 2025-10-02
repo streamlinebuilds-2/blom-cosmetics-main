@@ -30,6 +30,7 @@ export const ContactPage: React.FC = () => {
     name: '',
     email: '',
     phone: '',
+    countryCode: '+27',
     subject: '',
     message: '',
     inquiryType: 'general'
@@ -38,6 +39,7 @@ export const ContactPage: React.FC = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
 
   const inquiryTypes = [
@@ -47,6 +49,35 @@ export const ContactPage: React.FC = () => {
     { value: 'support', label: 'Technical Support' },
     { value: 'business', label: 'Business Partnership' },
     { value: 'media', label: 'Media & Press' }
+  ];
+
+  const countryCodes = [
+    { code: '+27', country: 'South Africa', flag: '🇿🇦' },
+    { code: '+1', country: 'United States', flag: '🇺🇸' },
+    { code: '+44', country: 'United Kingdom', flag: '🇬🇧' },
+    { code: '+33', country: 'France', flag: '🇫🇷' },
+    { code: '+49', country: 'Germany', flag: '🇩🇪' },
+    { code: '+39', country: 'Italy', flag: '🇮🇹' },
+    { code: '+34', country: 'Spain', flag: '🇪🇸' },
+    { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+    { code: '+32', country: 'Belgium', flag: '🇧🇪' },
+    { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+    { code: '+43', country: 'Austria', flag: '🇦🇹' },
+    { code: '+46', country: 'Sweden', flag: '🇸🇪' },
+    { code: '+47', country: 'Norway', flag: '🇳🇴' },
+    { code: '+45', country: 'Denmark', flag: '🇩🇰' },
+    { code: '+358', country: 'Finland', flag: '🇫🇮' },
+    { code: '+351', country: 'Portugal', flag: '🇵🇹' },
+    { code: '+353', country: 'Ireland', flag: '🇮🇪' },
+    { code: '+61', country: 'Australia', flag: '🇦🇺' },
+    { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+    { code: '+81', country: 'Japan', flag: '🇯🇵' },
+    { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+    { code: '+86', country: 'China', flag: '🇨🇳' },
+    { code: '+91', country: 'India', flag: '🇮🇳' },
+    { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+    { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+    { code: '+54', country: 'Argentina', flag: '🇦🇷' }
   ];
 
 
@@ -85,12 +116,50 @@ export const ContactPage: React.FC = () => {
     }
   ];
 
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    // Remove all non-digit characters for validation
+    const cleanPhone = phone.replace(/\D/g, '');
+    // Check if phone has at least 7 digits and max 15 digits
+    return cleanPhone.length >= 7 && cleanPhone.length <= 15;
+  };
+
+  const validateForm = (): boolean => {
+    const errors: {[key: string]: string} = {};
+
+    // Email validation
+    if (formData.email && !validateEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    // Phone validation (only if phone is provided)
+    if (formData.phone && !validatePhone(formData.phone)) {
+      errors.phone = 'Please enter a valid phone number (7-15 digits)';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,6 +200,12 @@ export const ContactPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     
     // Simulate form submission
@@ -141,10 +216,13 @@ export const ContactPage: React.FC = () => {
       name: '',
       email: '',
       phone: '',
+      countryCode: '+27',
       subject: '',
       message: '',
       inquiryType: 'general'
     });
+    setAttachedFiles([]);
+    setValidationErrors({});
     
     setIsSubmitting(false);
     alert('Thank you for your message! We\'ll get back to you within 24 hours.');
@@ -234,14 +312,16 @@ export const ContactPage: React.FC = () => {
             <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
               <div>
-                <h2 className="heading-with-stripe">Send Us a Message</h2>
-                <p className="text-lg text-gray-600 mb-8">
-                  Have a specific question or need personalized assistance? Fill out the form 
-                  below and our team will get back to you within 24 hours.
-                </p>
-
                 <Card className="shadow-lg border-0">
                   <CardContent className="pt-10 pb-8 px-8">
+                    {/* Form Header */}
+                    <div className="text-center mb-8">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-3">Send us a Message</h2>
+                      <p className="text-gray-600">
+                        Fill out the form below and we'll get back to you within 1 business day.
+                      </p>
+                    </div>
+                    
                     <form onSubmit={handleSubmit} className="space-y-8">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
@@ -270,9 +350,14 @@ export const ContactPage: React.FC = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                            className={`input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all ${
+                              validationErrors.email ? 'border-red-500' : ''
+                            }`}
                             placeholder="your.email@example.com"
                           />
+                          {validationErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+                          )}
                         </div>
                       </div>
 
@@ -281,15 +366,34 @@ export const ContactPage: React.FC = () => {
                           <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
                             Phone Number
                           </label>
-                          <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                            placeholder="+27 XX XXX XXXX"
-                          />
+                          <div className="flex gap-2">
+                            <select
+                              name="countryCode"
+                              value={formData.countryCode}
+                              onChange={handleInputChange}
+                              className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all w-32 flex-shrink-0"
+                            >
+                              {countryCodes.map((country) => (
+                                <option key={country.code} value={country.code}>
+                                  {country.flag} {country.code}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              type="tel"
+                              id="phone"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleInputChange}
+                              className={`input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all flex-1 ${
+                                validationErrors.phone ? 'border-red-500' : ''
+                              }`}
+                              placeholder="XX XXX XXXX"
+                            />
+                          </div>
+                          {validationErrors.phone && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
+                          )}
                         </div>
                         <div>
                           <label htmlFor="inquiryType" className="block text-sm font-semibold text-gray-800 mb-2">
@@ -416,7 +520,7 @@ export const ContactPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="text-center">
+                      <div className="flex flex-col items-center">
                         <Button 
                           type="submit" 
                           size="lg" 
@@ -426,9 +530,6 @@ export const ContactPage: React.FC = () => {
                           <Send className="h-4 w-4" />
                           {isSubmitting ? 'Sending Message...' : 'Send Message'}
                         </Button>
-                        <p className="text-xs text-gray-500 mt-3">
-                          We typically respond within 24 hours during business days
-                        </p>
                       </div>
                     </form>
                   </CardContent>
@@ -452,6 +553,8 @@ export const ContactPage: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-lg mb-2">BLOM Cosmetics Headquarters</h3>
+                      <p className="text-gray-600 mb-1">34 Horingbek Avenue</p>
+                      <p className="text-gray-600 mb-1">Helikonpark, Randfontein</p>
                       <p className="text-gray-600 mb-2">South Africa</p>
                       <p className="text-sm text-gray-500">Visits by appointment only</p>
                     </div>
@@ -471,14 +574,19 @@ export const ContactPage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              {/* Map Placeholder */}
+              {/* Google Maps */}
               <Card>
-                <div className="aspect-video bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center">
-                  <div className="text-center">
-                    <MapPin className="h-12 w-12 text-pink-400 mx-auto mb-4" />
-                    <p className="text-gray-600 font-medium">Interactive Map</p>
-                    <p className="text-sm text-gray-500">Location details available upon appointment</p>
-                  </div>
+                <div className="aspect-video overflow-hidden rounded-lg">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3580.8!2d27.7!3d-26.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s34%20Horingbek%20Avenue%2C%20Helikonpark%2C%20Randfontein!5e0!3m2!1sen!2sza!4v1"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="BLOM Cosmetics Headquarters - 34 Horingbek Avenue, Helikonpark, Randfontein"
+                  ></iframe>
                 </div>
               </Card>
             </div>
