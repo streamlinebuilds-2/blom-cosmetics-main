@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, ShoppingBag } from 'lucide-react';
-import { cartStore, showNotification } from '../../lib/cart';
+import { cartStore } from '../../lib/cart';
 
 interface BestSellerCardProps {
   id: string;
@@ -39,13 +39,11 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
       image
     });
     
-    showNotification(`Added ${name} to cart!`);
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    showNotification(`Added ${name} to wishlist!`, 'info');
   };
 
   const handleCardClick = () => {
@@ -93,22 +91,16 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
             <button
               onClick={handleWishlistToggle}
               className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
-              aria-label="Add to wishlist"
+              aria-label="Toggle wishlist"
             >
-              <Heart className="h-4 w-4 text-gray-700 group-hover/btn:opacity-0 transition-opacity duration-300" />
-              <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-gray-700 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                Add to Wishlist
-              </span>
+              <Heart className="h-4 w-4 text-gray-700" />
             </button>
             <button
               onClick={handleAddToCart}
               className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
               aria-label="Add to cart"
             >
-              <ShoppingBag className="h-4 w-4 text-gray-700 group-hover/btn:opacity-0 transition-opacity duration-300" />
-              <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-gray-700 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                Add to Cart
-              </span>
+              <ShoppingBag className="h-4 w-4 text-gray-700" />
             </button>
           </div>
         </div>
