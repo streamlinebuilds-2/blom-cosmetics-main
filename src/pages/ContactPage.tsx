@@ -121,7 +121,7 @@ export const ContactPage: React.FC = () => {
         <section className="bg-gradient-to-r from-pink-50 to-blue-50 section-padding">
           <Container>
             <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">We're Here to Help</h1>
+              <h1 className="heading-with-stripe">We're Here to Help</h1>
               <p className="text-xl text-gray-600 leading-relaxed">
                 Questions about orders, products, or courses? Message us on WhatsApp for the fastest reply, or use the form below.
               </p>
@@ -192,7 +192,7 @@ export const ContactPage: React.FC = () => {
             <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
               <div>
-                <h2 className="text-4xl font-bold mb-6">Send Us a Message</h2>
+                <h2 className="heading-with-stripe">Send Us a Message</h2>
                 <p className="text-lg text-gray-600 mb-8">
                   Have a specific question or need personalized assistance? Fill out the form 
                   below and our team will get back to you within 24 hours.
@@ -370,7 +370,7 @@ export const ContactPage: React.FC = () => {
         <section className="section-padding bg-gradient-to-r from-pink-50 to-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Quick Help</h2>
+              <h2 className="heading-with-stripe">Quick Help</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Find answers to common questions and access helpful resources quickly.
               </p>
@@ -433,7 +433,7 @@ export const ContactPage: React.FC = () => {
         <section className="section-padding bg-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4 text-gray-900 uppercase tracking-wide">FREQUENTLY ASKED QUESTIONS</h2>
+              <h2 className="heading-with-stripe">FREQUENTLY ASKED QUESTIONS</h2>
             </div>
 
             <div className="max-w-4xl mx-auto">

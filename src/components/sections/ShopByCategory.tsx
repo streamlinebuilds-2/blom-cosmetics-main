@@ -38,7 +38,7 @@ export const ShopByCategory: React.FC = () => {
     <section className="section-padding bg-gray-50">
       <Container>
         <div className="text-center mb-12">
-          <h2 className="section-header">SHOP BY CATEGORY</h2>
+          <h2 className="heading-with-stripe">SHOP BY CATEGORY</h2>
           <p className="section-subheader">
             Find exactly what you need for your nail artistry
           </p>

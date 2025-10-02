@@ -23,7 +23,7 @@ export const Testimonials: React.FC = () => {
     <section id="testimonials" className="section-padding">
       <Container>
         <div className="text-center mb-8 md:mb-12">
-          <h2 className="text-4xl font-bold mb-4">WHAT PEOPLE SAY</h2>
+          <h2 className="heading-with-stripe">WHAT PEOPLE SAY</h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">Real reviews from pros & students</p>
         </div>
 

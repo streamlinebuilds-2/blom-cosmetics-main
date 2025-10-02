@@ -43,7 +43,7 @@ export const MasterYourCraft: React.FC = () => {
         <div className="master__container">
           {/* Left copy */}
           <div className="master__copy">
-            <h2 className="master__title">MASTER YOUR CRAFT</h2>
+            <h2 className="heading-with-stripe">MASTER YOUR CRAFT</h2>
             <p className="master__lead">Professional training designed to give nail technicians the skills and confidence to succeed in their careers.</p>
 
             <div className="master__types">

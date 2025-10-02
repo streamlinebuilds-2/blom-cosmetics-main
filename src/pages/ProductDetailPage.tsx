@@ -1059,7 +1059,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         <section className="section-padding bg-gray-50">
           <Container>
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
+              <h2 className="heading-with-stripe">Product Information</h2>
               
               <div className="space-y-4">
                 {/* Overview */}
@@ -1232,7 +1232,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         {/* Related Products */}
         <section className="section-padding bg-gray-50">
           <Container>
-            <h2 className="text-4xl font-bold text-center mb-16 text-gray-900">You May Also Like</h2>
+            <h2 className="heading-with-stripe">You May Also Like</h2>
             <div className="grid md:grid-cols-4 gap-8">
               {relatedProducts.map((relatedProduct) => (
                 <Card key={relatedProduct.id} className="group cursor-pointer bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">

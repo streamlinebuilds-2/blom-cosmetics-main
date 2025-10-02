@@ -104,10 +104,7 @@ export const AboutPage: React.FC = () => {
           <Container>
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-6 text-gray-900 relative inline-block">
-                  THE DREAM BEHIND BLOM
-                  <span className="absolute left-0 bottom-0 h-1 bg-blue-200 rounded-full w-full"></span>
-                </h2>
+                <h2 className="heading-with-stripe">THE DREAM BEHIND BLOM</h2>
                 <div className="space-y-6 text-gray-600 leading-relaxed">
                   <p>
                     BLOM began as a dream. One night, the word "BLOM" appeared, with the O transformed into a lily—the flower of our founder's birth month. Paired with the calming blue of water, it became a constant reminder that passion and dedication are what help beauty bloom.
@@ -178,7 +175,7 @@ export const AboutPage: React.FC = () => {
         <section className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Why Choose BLOM?</h2>
+              <h2 className="heading-with-stripe">Why Choose BLOM?</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Discover what sets us apart and makes BLOM the preferred choice 
                 for nail professionals worldwide.
@@ -203,7 +200,7 @@ export const AboutPage: React.FC = () => {
         <section id="team" className="section-padding">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Meet Our Team</h2>
+              <h2 className="heading-with-stripe">Meet Our Team</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                 Our passionate team of experts brings together decades of experience, 
                 creativity, and dedication to serve the nail professional community.

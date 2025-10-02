@@ -363,7 +363,7 @@ export const ShopPage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 to-blue-300/10"></div>
           <Container>
             <div className="relative text-center max-w-4xl mx-auto">
-              <h1 className="text-5xl font-bold mb-6">Discover Professional Nail Essentials</h1>
+              <h1 className="heading-with-stripe">Discover Professional Nail Essentials</h1>
               <p className="text-xl text-gray-600 leading-relaxed mb-8">
                 High-quality products trusted by nail artists and beauty professionals.
               </p>

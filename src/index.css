@@ -2,6 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   GLOBAL HEADING STYLES
+   ======================================== */
+
+.heading-with-stripe {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 36px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #1e293b;
+  text-align: center;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.heading-with-stripe::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: #FF74A4;
+  border-radius: 2px;
+}
+
+/* Responsive heading sizes */
+@media (max-width: 768px) {
+  .heading-with-stripe {
+    font-size: 28px;
+    letter-spacing: 1.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heading-with-stripe {
+    font-size: 24px;
+    letter-spacing: 1px;
+  }
+}
+
 /* Custom shake animation for sticky cart */
 @keyframes subtle-shake {
   0%, 100% { transform: translateX(0); }

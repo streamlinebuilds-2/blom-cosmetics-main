@@ -242,7 +242,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
               {/* CTA Button */}
               <button
                 onClick={scrollToBooking}
-                className="bg-pink-400 hover:bg-gradient-to-r hover:from-pink-500 hover:to-blue-400 text-gray-900 font-bold py-5 px-12 rounded-full text-lg uppercase tracking-wide transition-all duration-300 transform hover:scale-105 hover:-translate-y-1"
+                className="bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-12 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
                 style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
               >
                 Book Your Spot
@@ -255,9 +255,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         <section className="py-20 bg-white">
           <Container>
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 uppercase tracking-wide text-gray-900">
-                Meet Your Instructor
-              </h2>
+              <h2 className="heading-with-stripe">Meet Your Instructor</h2>
               <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
@@ -306,9 +304,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         <section className="py-20 bg-gray-50">
           <Container>
             <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 uppercase tracking-wide text-gray-900">
-                What You'll Learn
-              </h2>
+              <h2 className="heading-with-stripe">What You'll Learn</h2>
               <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="space-y-4">
@@ -356,21 +352,19 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         <section className="py-20 bg-white">
           <Container>
             <div className="max-w-5xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 uppercase tracking-wide text-gray-900">
-                Choose Your Package
-              </h2>
+              <h2 className="heading-with-stripe">Choose Your Package</h2>
               <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Standard Package */}
-                <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
                   <div className="text-center mb-8">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 uppercase">Standard Package</h3>
                     <div className="text-4xl font-bold text-pink-400 mb-2">R7,200</div>
                     <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: R3,200</div>
                   </div>
                   
-                  <ul className="space-y-4 mb-8">
+                  <ul className="space-y-4 mb-8 flex-grow">
                     {[
                       '5-day comprehensive training',
                       'Basic starter kit included',
@@ -378,7 +372,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       'Course materials and handouts'
                     ].map((item, index) => (
                       <li key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                        <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
                         <span className="text-gray-700">{item}</span>
                       </li>
                     ))}
@@ -386,7 +380,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                   
                   <button
                     onClick={() => selectPackage('Standard')}
-                    className="w-full bg-pink-400 hover:bg-gradient-to-r hover:from-pink-500 hover:to-blue-400 text-gray-900 font-bold py-4 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-4 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
                     style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                   >
                     Choose Standard
@@ -394,9 +388,9 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 </div>
 
                 {/* Deluxe Package */}
-                <div className="bg-white border-2 border-pink-400 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative" style={{ boxShadow: '0 8px 30px rgba(255,116,164,0.2)' }}>
+                <div className="bg-white border-2 border-pink-400 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full" style={{ boxShadow: '0 8px 30px rgba(255,116,164,0.2)' }}>
                   <div className="absolute -top-1 left-1/2 -translate-x-1/2">
-                    <div className="bg-pink-400 text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide">
+                    <div className="bg-blue-400 text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide">
                       Most Popular
                     </div>
                   </div>
@@ -407,7 +401,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                     <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: R5,100</div>
                   </div>
                   
-                  <ul className="space-y-4 mb-8">
+                  <ul className="space-y-4 mb-8 flex-grow">
                     {[
                       '5-day comprehensive training',
                       'Premium professional kit included',
@@ -416,7 +410,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       'Bigger kit — electric e-file & LED lamp included'
                     ].map((item, index) => (
                       <li key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
+                        <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
                         <span className="text-gray-700">{item}</span>
                       </li>
                     ))}
@@ -424,7 +418,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                   
                   <button
                     onClick={() => selectPackage('Deluxe')}
-                    className="w-full bg-pink-400 hover:bg-gradient-to-r hover:from-pink-500 hover:to-blue-400 text-gray-900 font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 transform hover:scale-105"
+                    className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
                     style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                   >
                     Choose Deluxe
@@ -439,9 +433,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         <section className="py-20 bg-gray-50">
           <Container>
             <div className="max-w-5xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 uppercase tracking-wide text-gray-900">
-                Important Information
-              </h2>
+              <h2 className="heading-with-stripe">Important Information</h2>
               <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="grid md:grid-cols-2 gap-8">
@@ -660,7 +652,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                     <button
                       type="submit"
                       disabled={isSubmitting || !selectedPackage || !selectedDate || !formData.terms}
-                      className="w-full bg-pink-400 hover:bg-gradient-to-r hover:from-pink-500 hover:to-blue-400 text-gray-900 font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                      className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                       style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                     >
                       {isSubmitting ? 'Processing...' : 'Pay Deposit & Secure Spot (R2,000)'}

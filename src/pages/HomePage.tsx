@@ -97,7 +97,7 @@ export const HomePage: React.FC = () => {
         <section id="our-promise" className="section-padding bg-gradient-to-br from-pink-50 to-blue-50">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="section-header text-center">Our Promise</h2>
+              <h2 className="heading-with-stripe">Our Promise</h2>
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 

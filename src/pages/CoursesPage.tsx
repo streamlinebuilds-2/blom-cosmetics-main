@@ -56,7 +56,7 @@ const CoursesPage: React.FC = () => {
           {/* In-Person Training */}
           <div id="in-person-training" className="py-16">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">In-Person Training</h2>
+              <h2 className="heading-with-stripe">In-Person Training</h2>
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
@@ -109,7 +109,7 @@ const CoursesPage: React.FC = () => {
           {/* Online Workshops */}
           <div id="online-workshops" className="py-16">
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-semibold text-slate-900 mb-2">Online Workshops</h2>
+              <h2 className="heading-with-stripe">Online Workshops</h2>
               <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
@@ -180,7 +180,7 @@ const CoursesPage: React.FC = () => {
         <section className="why-bloom py-16" aria-label="Why Train with BLOM">
           <Container>
             <div className="text-center mb-12">
-              <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Why Train with BLOM</h2>
+              <h2 className="heading-with-stripe">Why Train with BLOM</h2>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
