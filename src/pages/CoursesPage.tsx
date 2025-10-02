@@ -63,7 +63,7 @@ const CoursesPage: React.FC = () => {
             // Remove class after animation to allow re-triggering
             setTimeout(() => {
               shimmerElement.classList.remove('shimmer-on-scroll');
-            }, 3500);
+            }, 14000);
           }
         }
       });
