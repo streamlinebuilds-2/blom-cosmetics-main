@@ -42,6 +42,7 @@ export const ContactPage: React.FC = () => {
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const [isMapHovered, setIsMapHovered] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [showAllFaqs, setShowAllFaqs] = useState(false);
 
 
   const inquiryTypes = [
@@ -213,6 +214,13 @@ export const ContactPage: React.FC = () => {
     setIsMapHovered(false);
   };
 
+  const scrollToContactForm = () => {
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -323,7 +331,7 @@ export const ContactPage: React.FC = () => {
         </section>
 
         {/* Contact Form Section */}
-        <section className="section-padding bg-gray-50">
+        <section id="contact-form" className="section-padding bg-gray-50">
           <Container>
             <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
@@ -723,8 +731,8 @@ export const ContactPage: React.FC = () => {
             </div>
 
             <div className="max-w-4xl mx-auto">
-              <div className="space-y-4">
-                {faqs.map((faq, index) => (
+              <div className="space-y-4 mb-8">
+                {faqs.slice(0, showAllFaqs ? faqs.length : 4).map((faq, index) => (
                   <Card key={index} className="bg-white shadow-sm border-0 rounded-lg overflow-hidden">
                     <button
                       onClick={() => toggleFaq(index)}
@@ -746,6 +754,26 @@ export const ContactPage: React.FC = () => {
                     )}
                   </Card>
                 ))}
+              </div>
+
+              {/* FAQ Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                {!showAllFaqs && (
+                  <Button
+                    onClick={() => setShowAllFaqs(true)}
+                    className="btn btn-secondary flex items-center gap-2"
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                    Read More
+                  </Button>
+                )}
+                <Button
+                  onClick={scrollToContactForm}
+                  className="btn btn-primary flex items-center gap-2"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  Ask Your Own Question
+                </Button>
               </div>
             </div>
           </Container>
