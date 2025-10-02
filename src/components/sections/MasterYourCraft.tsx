@@ -104,9 +104,9 @@ export const MasterYourCraft: React.FC = () => {
                 muted
                 playsInline
                 preload="metadata"
-                poster="/images/myc-poster.jpg"
+                poster="/workshop-poster.jpg"
               >
-                <source src="/videos/myc-demo.mp4" type="video/mp4" />
+                <source src="/workshop-video.mp4" type="video/mp4" />
               </video>
             </figure>
           </div>
@@ -117,5 +117,3 @@ export const MasterYourCraft: React.FC = () => {
 };
 
 export default MasterYourCraft;
-
-
