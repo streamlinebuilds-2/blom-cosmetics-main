@@ -114,7 +114,15 @@ export const AnnouncementSignup: React.FC = () => {
   return (
     <>
       {isBannerVisible && (
-        <div className="bg-blue-100 text-gray-900">
+        <div 
+          className="bg-blue-100 text-gray-900 cursor-pointer md:cursor-default"
+          onClick={() => {
+            // On mobile, clicking the banner opens the popup
+            if (window.innerWidth < 768) {
+              openPopup();
+            }
+          }}
+        >
           <Container className="py-2 px-4">
             <div className="relative flex items-center justify-center gap-3">
               <p className="text-sm font-medium text-center announcement-text">
@@ -123,7 +131,7 @@ export const AnnouncementSignup: React.FC = () => {
               <Button
                 variant="secondary"
                 size="sm"
-                className="!py-1 !px-3 uppercase font-sans bg-white text-gray-900 border border-gray-900 hover:bg-gray-100"
+                className="hidden md:block !py-1 !px-3 uppercase font-sans bg-blue-100 text-gray-800 border border-gray-800 hover:bg-gray-800 hover:text-blue-100 transition-all duration-200"
                 onClick={openPopup}
               >
                 JOIN NOW
