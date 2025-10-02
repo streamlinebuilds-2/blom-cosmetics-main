@@ -980,14 +980,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   <button
                     onClick={handleAddToCart}
                     disabled={!product.inStock}
-                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full btn btn-primary btn-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     ADD TO CART
                   </button>
                   <button
                     onClick={handleBuyNow}
                     disabled={!product.inStock}
-                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full btn btn-pink btn-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     BUY NOW
                   </button>
