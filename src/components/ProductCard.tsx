@@ -73,6 +73,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
           }}
         />
+        
+        {/* Shimmer Effect */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+          <div className="shimmer shimmer--lux"></div>
+        </div>
 
         {/* Bestseller Badge */}
         {badges.includes('Bestseller') && (
@@ -129,38 +134,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </p>
         )}
 
-        {/* Price */}
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-2xl font-bold text-pink-500">
-            {formatPrice(price)}
-          </span>
-          {compareAtPrice && (
-            <>
-              <span className="text-lg text-gray-400 line-through">
-                {formatPrice(compareAtPrice)}
-              </span>
-              <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
-              </span>
-            </>
-          )}
+        {/* Price - Centered */}
+        <div className="text-center mb-4">
+          <div className="flex items-center justify-center gap-3">
+            <span className="text-2xl font-bold text-pink-500">
+              {formatPrice(price)}
+            </span>
+            {compareAtPrice && (
+              <>
+                <span className="text-lg text-gray-400 line-through">
+                  {formatPrice(compareAtPrice)}
+                </span>
+                <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Add to Cart Button */}
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={!inStock}
-          className={`w-full py-3.5 px-6 rounded-2xl font-bold text-sm uppercase transition-all duration-200 flex items-center justify-center gap-2 ${
-            inStock
-              ? 'bg-pink-500 text-white hover:bg-pink-600 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
-              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-          }`}
-          aria-disabled={!inStock}
-        >
-          <ShoppingCart className="h-4 w-4" />
-          {inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
-        </button>
+        {/* Add to Cart Button - Centered */}
+        <div className="text-center">
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!inStock}
+            className={`inline-flex items-center justify-center gap-2 py-3.5 px-8 rounded-full font-bold text-sm uppercase transition-all duration-200 ${
+              inStock
+                ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white hover:from-pink-600 hover:to-pink-700 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+            aria-disabled={!inStock}
+          >
+            <ShoppingCart className="h-4 w-4" />
+            {inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+          </button>
+        </div>
       </div>
 
       <style jsx>{`
@@ -169,6 +178,41 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        
+        .shimmer {
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.4),
+            transparent
+          );
+          animation: shimmer 2s infinite;
+        }
+        
+        .shimmer--lux {
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 182, 193, 0.3),
+            rgba(255, 255, 255, 0.6),
+            rgba(255, 182, 193, 0.3),
+            transparent
+          );
+        }
+        
+        @keyframes shimmer {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 100%;
+          }
         }
       `}</style>
     </article>
