@@ -311,7 +311,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                           onClick={() => setSelectedVariant(variant)}
                           className={`px-4 py-2 border-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
                             selectedVariant === variant
-                              ? 'border-pink-400 bg-pink-500 text-white shadow-lg'
+                              ? 'border-pink-400 bg-pink-400 text-white shadow-lg'
                               : 'border-gray-300 bg-white text-gray-700 hover:border-pink-300 hover:bg-pink-50'
                           }`}
                         >

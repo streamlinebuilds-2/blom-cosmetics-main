@@ -271,7 +271,7 @@ export const ContactPage: React.FC = () => {
             <div className="grid md:grid-cols-3 gap-8">
               {/* WhatsApp Card */}
               <Card className="text-center p-8 hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
                   <MessageCircle className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">WhatsApp</h3>
@@ -289,7 +289,7 @@ export const ContactPage: React.FC = () => {
 
               {/* Email Card */}
               <Card className="text-center p-8 hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Mail className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Email</h3>
@@ -305,7 +305,7 @@ export const ContactPage: React.FC = () => {
 
               {/* Phone Card */}
               <Card className="text-center p-8 hover:shadow-lg transition-shadow">
-                <div className="w-16 h-16 bg-pink-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Phone className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Phone</h3>

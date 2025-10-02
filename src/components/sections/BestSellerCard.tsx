@@ -133,7 +133,7 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
 
         <button
           onClick={handleAddToCart}
-          className="w-full bg-pink-400 hover:bg-[#ff5f97] text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-out hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(255,116,164,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+          className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-out hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(255,116,164,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
           disabled={!inStock}
         >
           {inStock ? 'Shop Now' : 'Out of Stock'}

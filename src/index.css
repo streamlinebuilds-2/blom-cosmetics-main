@@ -261,8 +261,8 @@
   --brand-primary-600: #8EC5FF; /* Mid Blue */
   --brand-primary-700: #9CCBFF; /* Deeper Blue */
   --brand-accent: #FF74A4; /* Primary Pink */
-  --brand-accent-600: #ff5f97; /* Deeper pink */
-  --brand-accent-hover: #FF5A96; /* Pink hover state */
+  --brand-accent-600: #FF74A4; /* Lighter pink */
+  --brand-accent-hover: #FF74A4; /* Pink hover state */
   
   /* Legacy/alternative names (same colors) */
   --primary-blue: #CEE5FF;
@@ -385,7 +385,7 @@
   }
 
   .btn-primary {
-    @apply bg-pink-400 text-white hover:bg-pink-500 focus:ring-pink-300;
+    @apply bg-pink-400 text-white hover:bg-pink-400 focus:ring-pink-300;
     background-color: var(--primary-pink);
   }
 
@@ -399,7 +399,7 @@
   }
 
   /* Pink primary (rounded, white text) */
-  .btn-primary { background: linear-gradient(135deg, #FF74A4 0%, #FF5A96 100%); color: #fff; box-shadow: 0 8px 25px rgba(255,116,164,.40); border-radius: 9999px; }
+  .btn-primary { background: linear-gradient(135deg, #FF74A4 0%, #FF74A4 100%); color: #fff; box-shadow: 0 8px 25px rgba(255,116,164,.40); border-radius: 9999px; }
   .btn-primary:hover { background: transparent; color: #000; border: 2px solid #000; transform: translateY(-1px); box-shadow: 0 12px 35px rgba(255,116,164,.20); }
   .btn-primary:active { transform: translateY(0); filter: brightness(.98); }
 
@@ -833,7 +833,7 @@
     top: 20px;
     right: 20px;
     z-index: 9999;
-    background: linear-gradient(135deg, #FF74A4 0%, #ff5f97 100%);
+    background: linear-gradient(135deg, #FF74A4 0%, #FF74A4 100%);
     color: white;
     padding: 16px 24px;
     border-radius: 12px;

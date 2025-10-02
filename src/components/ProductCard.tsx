@@ -161,7 +161,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             disabled={!inStock}
             className={`inline-flex items-center justify-center gap-2 py-3.5 px-8 rounded-full font-bold text-sm uppercase transition-all duration-200 ${
               inStock
-                ? 'bg-pink-400 text-white hover:bg-pink-500 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+                ? 'bg-pink-400 text-white hover:bg-pink-400 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
             aria-disabled={!inStock}
