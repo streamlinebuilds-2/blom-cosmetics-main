@@ -380,9 +380,10 @@ export const OrderConfirmationPage: React.FC = () => {
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(product.rating)
-                              ? 'text-primary-blue fill-current'
+                              ? 'fill-current'
                               : 'text-gray-300'
                           }`}
+                          style={{ color: i < Math.floor(product.rating) ? '#F59E0B' : undefined }}
                         />
                       ))}
                     </div>

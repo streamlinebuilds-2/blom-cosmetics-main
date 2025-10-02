@@ -81,9 +81,10 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                       key={i}
                       className={`h-7 w-7 ${
                         i < Math.floor(averageRating)
-                          ? 'text-primary-blue fill-current'
+                          ? 'fill-current'
                           : 'text-gray-300'
                       }`}
+                      style={{ color: i < Math.floor(averageRating) ? '#F59E0B' : undefined }}
                     />
                   ))}
                 </div>
@@ -118,9 +119,10 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                     key={i}
                     className={`h-8 w-8 ${
                       i < Math.floor(averageRating)
-                        ? 'text-blue-400 fill-current'
+                        ? 'fill-current'
                         : 'text-gray-300'
                     }`}
+                    style={{ color: i < Math.floor(averageRating) ? '#F59E0B' : undefined }}
                   />
                 ))}
               </div>
@@ -214,9 +216,10 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                               key={i}
                               className={`h-5 w-5 ${
                                 i < review.rating
-                                  ? 'text-primary-blue fill-current'
+                                  ? 'fill-current'
                                   : 'text-gray-300'
                               }`}
+                              style={{ color: i < review.rating ? '#F59E0B' : undefined }}
                             />
                           ))}
                         </div>

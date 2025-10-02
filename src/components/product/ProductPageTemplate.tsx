@@ -261,9 +261,10 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                           key={i}
                           className={`h-5 w-5 ${
                             i < Math.floor(product.rating || 4.8)
-                              ? 'text-primary-blue fill-current'
+                              ? 'fill-current'
                               : 'text-gray-300'
                           }`}
+                          style={{ color: i < Math.floor(product.rating || 4.8) ? '#F59E0B' : undefined }}
                         />
                       ))}
                     </div>
@@ -593,9 +594,10 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(relatedProduct.rating)
-                              ? 'text-primary-blue fill-current'
+                              ? 'fill-current'
                               : 'text-gray-300'
                           }`}
+                          style={{ color: i < Math.floor(relatedProduct.rating) ? '#F59E0B' : undefined }}
                         />
                       ))}
                     </div>
