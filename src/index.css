@@ -74,7 +74,7 @@
 .footer-wrap {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px 40px 20px;
+  padding: 0 20px 20px 20px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 40px;
@@ -188,7 +188,7 @@
   padding: 10px 20px;
   background: #FF74A4;
   color: white;
-  border: none;
+  border: 2px solid #FF74A4;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 700;
@@ -198,8 +198,11 @@
 }
 
 .newsletter .btn-blue:hover {
-  background: #ff5f97;
-  transform: translateY(-1px);
+  background: transparent;
+  color: #111827;
+  border: 2px solid #111827;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(17,24,39,.10);
 }
 
 .newsletter-helper {
