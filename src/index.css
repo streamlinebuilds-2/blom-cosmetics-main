@@ -989,29 +989,34 @@ body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
-/* Premium Shimmer effect for course cards */
+/* Premium Shimmer effect - Luxurious light beam */
 .shimmer {
   position: absolute;
-  inset: -100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0) 25%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 75%);
-  filter: blur(8px);
-  transform: translate(-250%, -250%) rotate(25deg);
-  border-radius: 32px;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    transparent 0%, 
+    transparent 30%,
+    rgba(255, 255, 255, 0.6) 50%, 
+    transparent 70%,
+    transparent 100%
+  );
+  transform: translate(-150%, -150%);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-/* Desktop hover trigger */
+/* Best seller card shimmer - always animating */
+.best-seller-card .shimmer {
+  animation: luxurious-light-beam 2s ease-in-out infinite !important;
+  opacity: 1 !important;
+}
+
+/* Course and blog card shimmer on hover */
 @media (hover: hover) and (pointer: fine) {
-  .group:hover .shimmer {
-    animation: premium-shimmer-sweep 14000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards;
-  }
-  
-  /* More specific triggers for course, blog, and best seller cards */
   .course-card:hover .shimmer,
-  .blog-card:hover .shimmer,
-  .best-seller-card:hover .shimmer {
-    animation: premium-shimmer-sweep 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  .blog-card:hover .shimmer {
+    animation: luxurious-light-beam 2s ease-in-out infinite;
+    opacity: 1;
   }
   
   /* Hover effects for cards */
@@ -1021,61 +1026,31 @@ body {
   }
 }
 
-/* NUCLEAR OPTION - SHIMMER WORKS EVERYWHERE (RESTORED) */
-.course-card .absolute.inset-0,
-.blog-card .absolute.inset-0,
-.best-seller-card .absolute.inset-0 {
-  opacity: 1 !important;
-}
-
-.course-card .shimmer,
-.blog-card .shimmer,
-.best-seller-card .shimmer {
-  animation: premium-shimmer-sweep 3000ms linear infinite !important;
-  opacity: 1 !important;
-}
-
-/* DESKTOP HOVER - ADDITIONAL EFFECT ON TOP OF NUCLEAR */
-@media (hover: hover) and (pointer: fine) {
-  .group:hover .shimmer {
-    animation: premium-shimmer-sweep 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-  }
-}
-
-/* MOBILE SCROLL - ADDITIONAL EFFECT ON TOP OF NUCLEAR */
+/* Mobile - shimmer on scroll */
 @media (hover: none) and (pointer: coarse) {
   .course-card .shimmer-on-scroll,
-  .blog-card .shimmer-on-scroll,
-  .best-seller-card .shimmer-on-scroll {
-    animation: premium-shimmer-sweep 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards !important;
+  .blog-card .shimmer-on-scroll {
+    animation: luxurious-light-beam 2s ease-in-out 1 forwards !important;
+    opacity: 1 !important;
   }
 }
 
-@keyframes premium-shimmer-sweep {
+/* Slow, luxurious light beam animation */
+@keyframes luxurious-light-beam {
   0% { 
-    opacity: 1; 
-    transform: translate(-200%, -200%) rotate(25deg); 
+    transform: translate(-150%, -150%);
+    opacity: 0;
   }
-  50% { 
-    opacity: 1; 
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
   }
   100% { 
-    opacity: 1; 
-    transform: translate(200%, 200%) rotate(25deg); 
+    transform: translate(150%, 150%);
+    opacity: 0;
   }
-}
-
-/* Single clear shimmer line */
-.shimmer--lux {
-  background: linear-gradient(135deg, 
-    rgba(255,255,255,0) 40%, 
-    rgba(255,255,255,0.9) 48%, 
-    rgba(255,255,255,1) 50%, 
-    rgba(255,255,255,0.9) 52%, 
-    rgba(255,255,255,0) 60%
-  ) !important;
-  filter: blur(1px);
-  box-shadow: 0 0 15px rgba(255,255,255,0.5);
 }
 
 /* Line clamp utility for best seller cards */
@@ -1084,18 +1059,4 @@ body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-/* Premium glow effect for enhanced luxury */
-.shimmer--lux::after {
-  content: '';
-  position: absolute;
-  inset: -50%;
-  background: linear-gradient(135deg, 
-    transparent 30%, 
-    rgba(255,116,164,0.15) 50%, 
-    transparent 70%
-  );
-  filter: blur(12px);
-  opacity: 0.7;
 }
