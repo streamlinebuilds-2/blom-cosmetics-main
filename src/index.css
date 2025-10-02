@@ -62,7 +62,7 @@
    ======================================== */
 
 .site-footer {
-  background: linear-gradient(135deg, #CEE5FF 0%, #8EC5FF 50%, #9CCBFF 100%);
+  background: #B8D4F0;
   padding: 40px 0 0 0;
   color: #1e293b;
   margin-top: auto;
@@ -211,7 +211,7 @@
 }
 
 .footer-bottom {
-  background: linear-gradient(135deg, #CEE5FF 0%, #8EC5FF 50%, #9CCBFF 100%);
+  background: #B8D4F0;
   padding: 20px 20px;
   display: flex;
   justify-content: space-between;
