@@ -183,35 +183,48 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         .shimmer {
           position: absolute;
           top: 0;
-          left: -100%;
+          left: 0;
           width: 100%;
           height: 100%;
           background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.4),
-            transparent
+            135deg,
+            transparent 0%,
+            transparent 30%,
+            rgba(255, 255, 255, 0.8) 50%,
+            rgba(255, 255, 255, 0.4) 70%,
+            transparent 100%
           );
-          animation: shimmer 2s infinite;
+          transform: translateX(-100%) translateY(-100%);
+          animation: shimmerLuxury 3s ease-in-out infinite;
         }
         
         .shimmer--lux {
           background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 182, 193, 0.3),
-            rgba(255, 255, 255, 0.6),
-            rgba(255, 182, 193, 0.3),
-            transparent
+            135deg,
+            transparent 0%,
+            transparent 25%,
+            rgba(255, 255, 255, 0.9) 45%,
+            rgba(255, 255, 255, 0.7) 55%,
+            rgba(255, 255, 255, 0.3) 75%,
+            transparent 100%
           );
+          animation: shimmerLuxury 4s ease-in-out infinite;
         }
         
-        @keyframes shimmer {
+        @keyframes shimmerLuxury {
           0% {
-            left: -100%;
+            transform: translateX(-100%) translateY(-100%);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
           }
           100% {
-            left: 100%;
+            transform: translateX(100%) translateY(100%);
+            opacity: 0;
           }
         }
       `}</style>
