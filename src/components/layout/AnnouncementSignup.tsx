@@ -147,12 +147,12 @@ export const AnnouncementSignup: React.FC = () => {
               <div className="max-w-md mx-auto">
                 {/* Logo */}
                 <div className="text-center mb-8">
-                  <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10 mx-auto mb-3" />
+                  <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-12 mx-auto mb-4" />
                   <div className="w-12 h-0.5 bg-pink-400 mx-auto"></div>
                 </div>
 
                 <div className="mb-8">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2 text-center">Join Our VIP Club</h3>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2 text-center">Join Our Blom Beauty Club</h3>
                   <p className="text-pink-500 font-semibold text-center text-lg">Get 15% off + exclusive drops</p>
                 </div>
 
