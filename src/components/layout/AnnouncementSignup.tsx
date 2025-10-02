@@ -20,14 +20,28 @@ const getSessionState = () => {
 
 export const AnnouncementSignup: React.FC = () => {
   const session = getSessionState();
+  
+  // Check if user has already signed up
+  const hasSignedUp = (() => {
+    try {
+      return localStorage.getItem('blom_user_signed_up') === 'true';
+    } catch {
+      return false;
+    }
+  })();
+  
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
   const [isBannerVisible, setIsBannerVisible] = useState<boolean>(() => {
+    if (hasSignedUp) return false;
     try { return sessionStorage.getItem('signup_banner_closed') === '1' ? false : true; } catch { return !session.bannerClosed; }
   });
   const timerRef = useRef<number | null>(null);
 
   // Auto show popup once after 7s on first page load in this tab
   useEffect(() => {
+    // Don't show popup if user has already signed up
+    if (hasSignedUp) return;
+    
     // If this is a reload, allow popup again by clearing the session flag
     try {
       const nav = (performance.getEntriesByType('navigation')[0] as any);
@@ -45,7 +59,7 @@ export const AnnouncementSignup: React.FC = () => {
     return () => {
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [hasSignedUp]);
 
   // Lock body scroll when popup is open
   useEffect(() => {
@@ -91,6 +105,11 @@ export const AnnouncementSignup: React.FC = () => {
     setIsPopupOpen(true);
     // User intent overrides previous close. Do not set closed flag here.
   };
+
+  // Don't render anything if user has already signed up
+  if (hasSignedUp) {
+    return null;
+  }
 
   return (
     <>
@@ -221,6 +240,16 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       // Replace with your provider (Mailchimp, Supabase, API route, etc.)
       await new Promise((res) => setTimeout(res, 800));
       setSuccess(true);
+      
+      // Mark user as signed up to hide popup and banner permanently
+      try {
+        localStorage.setItem('blom_user_signed_up', 'true');
+        sessionStorage.setItem('signup_popup_closed', '1');
+        sessionStorage.setItem('signup_banner_closed', '1');
+      } catch (error) {
+        console.warn('Could not save signup status:', error);
+      }
+      
       setTimeout(() => {
         onSuccess();
       }, 900);

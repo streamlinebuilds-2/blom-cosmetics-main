@@ -2,9 +2,25 @@ import React, { useState } from 'react';
 import { X, Truck } from 'lucide-react';
 
 export const AnnouncementBar: React.FC = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  // Check if user has already signed up
+  const hasSignedUp = (() => {
+    try {
+      return localStorage.getItem('blom_user_signed_up') === 'true';
+    } catch {
+      return false;
+    }
+  })();
+  
+  const [isVisible, setIsVisible] = useState(() => {
+    if (hasSignedUp) return false;
+    try {
+      return sessionStorage.getItem('signup_banner_closed') !== '1';
+    } catch {
+      return true;
+    }
+  });
 
-  if (!isVisible) return null;
+  if (!isVisible || hasSignedUp) return null;
 
   return (
     <div className="bg-gradient-to-r from-pink-500 via-pink-400 to-pink-500 text-white py-2 px-4 relative z-50">
