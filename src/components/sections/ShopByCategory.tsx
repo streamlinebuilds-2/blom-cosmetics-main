@@ -15,21 +15,21 @@ export const ShopByCategory: React.FC = () => {
       name: 'Cuticle Care',
       icon: Droplet,
       href: '/shop#cuticle-care',
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      image: '/placeholders/cuticle-care.jpg',
       description: 'Nourishing oils & treatments'
     },
     {
       name: 'Nail Art',
       icon: Palette,
       href: '/shop#nail-art',
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      image: '/placeholders/nail-art.jpg',
       description: 'Colors, glitters & finishes'
     },
     {
       name: 'Education',
       icon: GraduationCap,
       href: '/courses',
-      image: '/professional-acrylic-training-hero.jpg',
+      image: '/professional-acrylic-training-hero.webp',
       description: 'Professional training courses'
     }
   ];
@@ -56,15 +56,20 @@ export const ShopByCategory: React.FC = () => {
                   src={category.image}
                   alt={category.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    // fallback placeholder
+                    target.src = `https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop`;
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <div className="mb-2">
-                  <category.icon className="h-6 w-6" />
+                <div className="mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
+                  <category.icon className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold mb-1">{category.name}</h3>
-                <p className="text-sm text-white/90">{category.description}</p>
+                <h3 className="text-xl font-extrabold mb-1 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">{category.name}</h3>
+                <p className="text-sm text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">{category.description}</p>
               </div>
             </a>
           ))}

@@ -91,6 +91,30 @@
     grid-template-columns: 1fr;
     gap: 30px;
   }
+
+  /* Center align all footer content on mobile */
+  .footer-col {
+    text-align: center;
+  }
+
+  .footer-col h4,
+  .footer-col h5.newsletter-title {
+    text-align: center;
+  }
+
+  .footer-socials {
+    justify-content: center;
+  }
+
+  .newsletter {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .newsletter-input,
+  .newsletter .btn-blue {
+    width: 100%;
+  }
 }
 
 .footer-col h4 {
