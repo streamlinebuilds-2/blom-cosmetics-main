@@ -982,19 +982,27 @@
   }
 }
 
-/* Desktop - continuous shimmer */
+/* Desktop - hover-triggered shimmer */
 @media (hover: hover) and (pointer: fine) {
-  .course-card .absolute.inset-0,
-  .blog-card .absolute.inset-0,
-  .best-seller-card .absolute.inset-0 {
+  .course-card:hover .absolute.inset-0,
+  .blog-card:hover .absolute.inset-0,
+  .best-seller-card:hover .absolute.inset-0 {
     opacity: 1 !important;
   }
 
-  .course-card .shimmer,
-  .blog-card .shimmer,
-  .best-seller-card .shimmer {
+  .course-card:hover .shimmer,
+  .blog-card:hover .shimmer,
+  .best-seller-card:hover .shimmer {
     animation: premium-shimmer-sweep 3000ms linear infinite !important;
     opacity: 1 !important;
+  }
+  
+  /* Hide shimmer by default on desktop */
+  .course-card .absolute.inset-0,
+  .blog-card .absolute.inset-0,
+  .best-seller-card .absolute.inset-0 {
+    opacity: 0 !important;
+    transition: opacity 0.3s ease;
   }
 }
 
@@ -1033,17 +1041,17 @@
   }
 }
 
-/* Luxurious shimmer variant with enhanced premium effect */
+/* Single clear shimmer line */
 .shimmer--lux {
   background: linear-gradient(135deg, 
-    rgba(255,255,255,0) 30%, 
-    rgba(255,255,255,0.5) 45%, 
-    rgba(206,229,255,0.3) 50%, 
-    rgba(255,255,255,0.5) 55%, 
-    rgba(255,255,255,0) 70%
+    rgba(255,255,255,0) 40%, 
+    rgba(255,255,255,0.9) 48%, 
+    rgba(255,255,255,1) 50%, 
+    rgba(255,255,255,0.9) 52%, 
+    rgba(255,255,255,0) 60%
   ) !important;
-  filter: blur(3px);
-  box-shadow: 0 0 20px rgba(255,255,255,0.3);
+  filter: blur(1px);
+  box-shadow: 0 0 15px rgba(255,255,255,0.5);
 }
 
 /* Line clamp utility for best seller cards */
