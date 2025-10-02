@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { cartStore } from '../../lib/cart';
 
@@ -25,6 +25,40 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
   inStock = true,
   badges = []
 }) => {
+  const cardRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const shimmerContainer = card.querySelector('.shimmer-container');
+    if (!shimmerContainer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Trigger shimmer animation on mobile when card comes into view
+            shimmerContainer.classList.add('shimmer-triggered');
+            
+            // Remove class after animation completes to allow re-triggering
+            setTimeout(() => {
+              shimmerContainer.classList.remove('shimmer-triggered');
+            }, 2000);
+          }
+        });
+      },
+      {
+        threshold: 0.5,
+        rootMargin: '0px 0px -100px 0px'
+      }
+    );
+
+    observer.observe(card);
+
+    return () => observer.disconnect();
+  }, []);
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -54,6 +88,7 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
 
   return (
     <article 
+      ref={cardRef}
       className="best-seller-card group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
       style={{ boxShadow: '0 10px 30px rgba(15,23,42,0.06)' }}
       onClick={handleCardClick}
@@ -67,8 +102,8 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
         />
         
         {/* Shimmer Effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-          <div className="shimmer shimmer--lux"></div>
+        <div className="shimmer-container absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+          <div className="shimmer"></div>
         </div>
 
         {/* Badges */}

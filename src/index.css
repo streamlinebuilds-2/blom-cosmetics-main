@@ -92,14 +92,14 @@ body {
 /* Responsive heading sizes */
 @media (max-width: 768px) {
   .heading-with-stripe {
-    font-size: 28px;
+    font-size: 32px;
     letter-spacing: 1.5px;
   }
 }
 
 @media (max-width: 480px) {
   .heading-with-stripe {
-    font-size: 24px;
+    font-size: 28px;
     letter-spacing: 1px;
   }
 }
@@ -1021,9 +1021,17 @@ body {
   }
 }
 
-/* Mobile - shimmer on tap/touch for individual card */
+/* Mobile - shimmer on scroll into view */
 @media (hover: none) and (pointer: coarse) {
-  .best-seller-card:active .shimmer,
+  .best-seller-card .shimmer-container.shimmer-triggered {
+    opacity: 1 !important;
+  }
+  
+  .best-seller-card .shimmer-container.shimmer-triggered .shimmer {
+    animation: luxurious-light-beam 2s ease-in-out 1 !important;
+    opacity: 1 !important;
+  }
+  
   .course-card:active .shimmer,
   .blog-card:active .shimmer {
     animation: luxurious-light-beam 2s ease-in-out 1 !important;
