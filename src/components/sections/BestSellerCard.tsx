@@ -54,7 +54,7 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
 
   return (
     <article 
-      className="group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
+      className="best-seller-card group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
       style={{ boxShadow: '0 10px 30px rgba(15,23,42,0.06)' }}
       onClick={handleCardClick}
     >
@@ -66,9 +66,9 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
           className="w-full h-full object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.03]"
         />
         
-        {/* Shine Sweep Effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-[2]">
-          <div className="shine-sweep"></div>
+        {/* Shimmer Effect */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+          <div className="shimmer shimmer--lux"></div>
         </div>
 
         {/* Badges */}
@@ -138,37 +138,6 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
         </button>
       </div>
 
-      <style jsx>{`
-        .shine-sweep {
-          position: absolute;
-          top: -100%;
-          left: -100%;
-          width: 300%;
-          height: 300%;
-          background: linear-gradient(
-            135deg,
-            transparent 0%,
-            transparent 40%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.4) 60%,
-            transparent 100%
-          );
-          transform: translateX(0) translateY(0);
-          transition: transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-          pointer-events: none;
-        }
-        
-        .group:hover .shine-sweep {
-          transform: translateX(100%) translateY(100%);
-        }
-        
-        .line-clamp-2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
     </article>
   );
 };
