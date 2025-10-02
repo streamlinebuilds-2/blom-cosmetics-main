@@ -6,11 +6,22 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle, LogOut, AlertCircle } from 'lucide-react';
 import { authService, AuthState } from '../lib/auth';
+import { wishlistStore } from '../lib/wishlist';
 
 export const AccountPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
+
+  // Check URL parameters for initial tab
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab && ['profile', 'orders', 'wishlist', 'settings'].includes(tab)) {
+      setActiveTab(tab as 'profile' | 'orders' | 'wishlist' | 'settings');
+    }
+  }, []);
   const [authState, setAuthState] = useState<AuthState>({ user: null, loading: true, error: null });
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
 
   useEffect(() => {
     document.title = 'My Account - BLOM Cosmetics';
@@ -127,29 +138,14 @@ export const AccountPage: React.FC = () => {
     }
   ];
 
-  const wishlistItems = [
-    {
-      id: '1',
-      name: 'Premium Acrylic Powder Set',
-      price: 850,
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-      inStock: true
-    },
-    {
-      id: '2',
-      name: 'Professional LED Lamp',
-      price: 1299,
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-      inStock: false
-    },
-    {
-      id: '3',
-      name: 'Watercolor Workshop Course',
-      price: 480,
-      image: 'https://images.pexels.com/photos/3997991/pexels-photo-3997991.jpeg?auto=compress&cs=tinysrgb&w=200&h=200&fit=crop',
-      inStock: true
-    }
-  ];
+  // Subscribe to wishlist changes
+  useEffect(() => {
+    const unsubscribe = wishlistStore.subscribe(() => {
+      setWishlistItems(wishlistStore.getItems());
+    });
+
+    return unsubscribe;
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {

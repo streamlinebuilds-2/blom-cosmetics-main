@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
-import { User, Menu, X, ShoppingBag } from 'lucide-react';
+import { User, Menu, X, ShoppingBag, Heart } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
+import { WishlistButton } from '../wishlist/WishlistButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
 import { AnnouncementBar } from './AnnouncementBar';
 
@@ -216,6 +217,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
               >
                 <User className="h-5 w-5" />
               </a>
+              <WishlistButton />
               <CartButton />
             </div>
           </div>

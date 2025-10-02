@@ -1,6 +1,7 @@
 import React from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { cartStore, showNotification } from '../lib/cart';
+import { wishlistStore, showWishlistNotification } from '../lib/wishlist';
 
 interface ProductCardProps {
   id: string;
@@ -27,6 +28,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   badges = [],
   className = ''
 }) => {
+  const [isWishlisted, setIsWishlisted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsWishlisted(wishlistStore.isInWishlist(slug));
+    
+    const unsubscribe = wishlistStore.subscribe(() => {
+      setIsWishlisted(wishlistStore.isInWishlist(slug));
+    });
+
+    return unsubscribe;
+  }, [slug]);
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -47,7 +60,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    showNotification(`Added ${name} to wishlist!`, 'info');
+    
+    const wishlistItem = {
+      id: slug,
+      productId: slug,
+      name,
+      price,
+      image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      slug
+    };
+    
+    const wasAdded = wishlistStore.toggleItem(wishlistItem);
+    
+    if (wasAdded) {
+      showWishlistNotification(`Added ${name} to wishlist!`, 'success');
+    } else {
+      showWishlistNotification(`Removed ${name} from wishlist!`, 'info');
+    }
   };
 
   const handleCardClick = () => {
@@ -116,7 +145,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
           aria-label={`Add ${name} to wishlist`}
         >
-          <Heart className="h-5 w-5 text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current transition-all" />
+          <Heart className={`h-5 w-5 transition-all ${
+            isWishlisted 
+              ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
+              : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
+          }`} />
         </button>
       </div>
 
