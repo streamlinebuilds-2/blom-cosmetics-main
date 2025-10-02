@@ -416,7 +416,7 @@ export const ContactPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="text-center">
+                      <div className="flex flex-col items-center">
                         <Button 
                           type="submit" 
                           size="lg" 
