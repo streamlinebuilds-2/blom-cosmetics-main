@@ -1005,17 +1005,12 @@ body {
   pointer-events: none;
 }
 
-/* Best seller card shimmer - always animating */
-.best-seller-card .shimmer {
-  animation: luxurious-light-beam 2s ease-in-out infinite !important;
-  opacity: 1 !important;
-}
-
-/* Course and blog card shimmer on hover */
+/* Desktop - shimmer on hover only for the hovered card */
 @media (hover: hover) and (pointer: fine) {
+  .best-seller-card:hover .shimmer,
   .course-card:hover .shimmer,
   .blog-card:hover .shimmer {
-    animation: luxurious-light-beam 2s ease-in-out infinite;
+    animation: luxurious-light-beam 2s ease-in-out 1;
     opacity: 1;
   }
   
@@ -1026,11 +1021,12 @@ body {
   }
 }
 
-/* Mobile - shimmer on scroll */
+/* Mobile - shimmer on tap/touch for individual card */
 @media (hover: none) and (pointer: coarse) {
-  .course-card .shimmer-on-scroll,
-  .blog-card .shimmer-on-scroll {
-    animation: luxurious-light-beam 2s ease-in-out 1 forwards !important;
+  .best-seller-card:active .shimmer,
+  .course-card:active .shimmer,
+  .blog-card:active .shimmer {
+    animation: luxurious-light-beam 2s ease-in-out 1 !important;
     opacity: 1 !important;
   }
 }
