@@ -312,14 +312,16 @@ export const ContactPage: React.FC = () => {
             <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
               <div>
-                <h2 className="heading-with-stripe">Send Us a Message</h2>
-                <p className="text-lg text-gray-600 mb-8">
-                  Have a specific question or need personalized assistance? Fill out the form 
-                  below and our team will get back to you within 24 hours.
-                </p>
-
                 <Card className="shadow-lg border-0">
                   <CardContent className="pt-10 pb-8 px-8">
+                    {/* Form Header */}
+                    <div className="text-center mb-8">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-3">Send us a Message</h2>
+                      <p className="text-gray-600">
+                        Fill out the form below and we'll get back to you within 1 business day.
+                      </p>
+                    </div>
+                    
                     <form onSubmit={handleSubmit} className="space-y-8">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
@@ -528,9 +530,6 @@ export const ContactPage: React.FC = () => {
                           <Send className="h-4 w-4" />
                           {isSubmitting ? 'Sending Message...' : 'Send Message'}
                         </Button>
-                        <p className="text-xs text-gray-500 mt-3">
-                          We typically respond within 24 hours during business days
-                        </p>
                       </div>
                     </form>
                   </CardContent>
