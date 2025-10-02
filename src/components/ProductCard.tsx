@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
-import { cartStore, showNotification } from '../lib/cart';
-import { wishlistStore, showWishlistNotification } from '../lib/wishlist';
+import { cartStore } from '../lib/cart';
+import { wishlistStore } from '../lib/wishlist';
 
 interface ProductCardProps {
   id: string;
@@ -54,7 +54,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
     });
     
-    showNotification(`Added ${name} to cart!`);
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -72,11 +71,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     
     const wasAdded = wishlistStore.toggleItem(wishlistItem);
     
-    if (wasAdded) {
-      showWishlistNotification(`Added ${name} to wishlist!`, 'success');
-    } else {
-      showWishlistNotification(`Removed ${name} from wishlist!`, 'info');
-    }
   };
 
   const handleCardClick = () => {
@@ -143,7 +137,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           type="button"
           onClick={handleWishlistToggle}
           className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
-          aria-label={`Add ${name} to wishlist`}
+          aria-label="Toggle wishlist"
         >
           <Heart className={`h-5 w-5 transition-all ${
             isWishlisted 
