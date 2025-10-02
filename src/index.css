@@ -982,34 +982,49 @@
   }
 }
 
-/* FORCE shimmer to work EVERYWHERE - back to nuclear approach that WORKED */
-.course-card .absolute.inset-0,
-.blog-card .absolute.inset-0,
-.best-seller-card .absolute.inset-0 {
-  opacity: 1 !important;
-}
-
-.course-card .shimmer,
-.blog-card .shimmer,
-.best-seller-card .shimmer {
-  animation: premium-shimmer-sweep 3000ms linear infinite !important;
-  opacity: 1 !important;
-}
-
-/* Desktop hover trigger - keep for additional effect */
+/* Desktop - shimmer ONLY on hover */
 @media (hover: hover) and (pointer: fine) {
-  .group:hover .shimmer {
-    animation: premium-shimmer-sweep 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+  .course-card .absolute.inset-0,
+  .blog-card .absolute.inset-0,
+  .best-seller-card .absolute.inset-0 {
+    opacity: 0 !important;
+    transition: opacity 0.3s ease;
+  }
+
+  .course-card:hover .absolute.inset-0,
+  .blog-card:hover .absolute.inset-0,
+  .best-seller-card:hover .absolute.inset-0 {
+    opacity: 1 !important;
+  }
+
+  .course-card:hover .shimmer,
+  .blog-card:hover .shimmer,
+  .best-seller-card:hover .shimmer {
+    animation: premium-shimmer-sweep 3000ms linear infinite !important;
+    opacity: 1 !important;
   }
 }
 
-/* ADDITIONAL scroll mechanics for mobile - ADDING to existing shimmer */
+/* Mobile - shimmer ONLY when scrolled into view */
 @media (hover: none) and (pointer: coarse) {
-  /* When scroll-triggered class is added, enhance the existing animation */
+  .course-card .absolute.inset-0,
+  .blog-card .absolute.inset-0,
+  .best-seller-card .absolute.inset-0 {
+    opacity: 0 !important;
+    transition: opacity 0.3s ease;
+  }
+
+  .course-card .shimmer,
+  .blog-card .shimmer,
+  .best-seller-card .shimmer {
+    opacity: 1 !important;
+  }
+  
+  /* When scroll-triggered class is added - ONE animation, not infinite */
   .course-card .shimmer-on-scroll,
   .blog-card .shimmer-on-scroll,
   .best-seller-card .shimmer-on-scroll {
-    animation: premium-shimmer-sweep 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards !important;
+    animation: premium-shimmer-sweep 3000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards !important;
   }
 }
 
