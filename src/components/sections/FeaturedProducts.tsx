@@ -45,8 +45,8 @@ export const FeaturedProducts: React.FC = () => {
   // Intersection Observer for mobile shimmer effect
   useEffect(() => {
     const observerOptions = {
-      threshold: 0.3,
-      rootMargin: '0px 0px -100px 0px'
+      threshold: 0.5,
+      rootMargin: '0px 0px -50px 0px'
     };
 
     const observer = new IntersectionObserver((entries) => {
