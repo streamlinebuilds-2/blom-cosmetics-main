@@ -111,7 +111,7 @@ export const MasterYourCraft: React.FC = () => {
 
           {/* Right visual */}
           <div className="master__visual">
-            <figure className="m-visual aspect-1-1">
+            <figure className="m-visual aspect-[4/3]">
               <video
                 ref={videoRef}
                 className="myc__image"
