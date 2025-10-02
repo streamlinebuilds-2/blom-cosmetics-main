@@ -44,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
     
-    if (!inStock) return;
+    if (!inStock || price === -1) return;
     
     cartStore.addItem({
       id: `item_${Date.now()}`,
@@ -165,7 +165,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className="text-center mb-4">
           <div className="flex items-center justify-center gap-3">
             <span className="text-2xl font-bold text-pink-500">
-              {formatPrice(price)}
+              {price === -1 ? 'Coming Soon' : formatPrice(price)}
             </span>
             {compareAtPrice && (
               <>
@@ -185,16 +185,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={!inStock}
+            disabled={!inStock || price === -1}
             className={`inline-flex items-center justify-center gap-2 py-3.5 px-8 rounded-full font-bold text-sm uppercase transition-all duration-200 ${
-              inStock
+              inStock && price !== -1
                 ? 'bg-pink-400 text-white hover:bg-pink-400 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
-            aria-disabled={!inStock}
+            aria-disabled={!inStock || price === -1}
           >
             <ShoppingCart className="h-4 w-4" />
-            {inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+            {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
         </div>
       </div>
