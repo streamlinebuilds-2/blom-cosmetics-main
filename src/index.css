@@ -613,8 +613,14 @@
   }
   @media (max-width: 900px){ .master__container{ grid-template-columns:1fr; } }
 
-  .master__title{ font-size: clamp(26px,3.2vw,42px); font-weight:900; letter-spacing:.02em; color:#0f172a; margin:0 0 10px; }
+  .master__title{ font-size: clamp(32px,4vw,42px); font-weight:900; letter-spacing:.02em; color:#0f172a; margin:0 0 10px; }
   .master__lead{ color:#475569; font-size: clamp(15px,1.6vw,18px); line-height:1.7; margin:0 0 16px; }
+  
+  /* Mobile-specific adjustments */
+  @media (max-width: 768px) {
+    .master__title { font-size: clamp(36px,5vw,48px); }
+    .m-type__body h3 { font-size: clamp(14px,2.5vw,16px); font-weight: 600; }
+  }
 
   .master__types{ display:grid; gap:14px; margin:14px 0 8px; }
   .m-type{ display:grid; grid-template-columns:54px 1fr; gap:14px; align-items:center; background:#fff; border-radius:20px; padding:14px;
