@@ -14,6 +14,7 @@ export const ShopPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showInStockOnly, setShowInStockOnly] = useState(false);
 
   // All BLOM products with detailed information
   const allProducts = [
@@ -283,7 +284,8 @@ export const ShopPage: React.FC = () => {
       product.category.toLowerCase().replace(' & ', '-').replace(' ', '-') === selectedCategory;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.short_description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
+    return matchesCategory && matchesSearch && matchesStock;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -325,6 +327,7 @@ export const ShopPage: React.FC = () => {
     setSelectedCategory('all');
     setSearchTerm('');
     setSortBy('featured');
+    setShowInStockOnly(false);
   };
 
   const getGridClasses = () => {
@@ -675,6 +678,21 @@ export const ShopPage: React.FC = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Stock Filter */}
+                <div className="mb-6">
+                  <h4 className="font-medium mb-3">Availability</h4>
+                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                    <input
+                      type="checkbox"
+                      checked={showInStockOnly}
+                      onChange={(e) => setShowInStockOnly(e.target.checked)}
+                      className="w-5 h-5 text-pink-400 bg-white border-gray-300 rounded focus:ring-pink-400 focus:ring-2"
+                    />
+                    <span className="text-gray-700 font-medium">In Stock Only</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-2 px-3">Hide "Coming Soon" products</p>
                 </div>
 
                 {/* Mobile View Mode */}
