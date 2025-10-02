@@ -189,26 +189,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           background: linear-gradient(
             135deg,
             transparent 0%,
-            transparent 30%,
+            transparent 35%,
+            rgba(255, 255, 255, 0.4) 45%,
             rgba(255, 255, 255, 0.8) 50%,
-            rgba(255, 255, 255, 0.4) 70%,
+            rgba(255, 255, 255, 0.6) 55%,
+            rgba(255, 255, 255, 0.3) 65%,
+            transparent 75%,
             transparent 100%
           );
           transform: translateX(-100%) translateY(-100%);
-          animation: shimmerLuxury 8s ease-in-out infinite;
+          animation: shimmerLuxury 12s ease-in-out infinite;
         }
         
         .shimmer--lux {
           background: linear-gradient(
             135deg,
             transparent 0%,
-            transparent 25%,
-            rgba(255, 255, 255, 0.9) 45%,
-            rgba(255, 255, 255, 0.7) 55%,
-            rgba(255, 255, 255, 0.3) 75%,
+            transparent 30%,
+            rgba(255, 255, 255, 0.5) 40%,
+            rgba(255, 255, 255, 0.9) 50%,
+            rgba(255, 255, 255, 0.7) 60%,
+            rgba(255, 255, 255, 0.4) 70%,
+            transparent 80%,
             transparent 100%
           );
-          animation: shimmerLuxury 10s ease-in-out infinite;
+          animation: shimmerLuxury 15s ease-in-out infinite;
         }
         
         @keyframes shimmerLuxury {
@@ -216,10 +221,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             transform: translateX(-100%) translateY(-100%);
             opacity: 0;
           }
-          10% {
+          3% {
             opacity: 1;
           }
-          90% {
+          97% {
             opacity: 1;
           }
           100% {
