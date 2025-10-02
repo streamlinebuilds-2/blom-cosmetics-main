@@ -1003,6 +1003,16 @@
   }
 }
 
+/* ADDITIONAL scroll mechanics for mobile - ADDING to existing shimmer */
+@media (hover: none) and (pointer: coarse) {
+  /* When scroll-triggered class is added, enhance the existing animation */
+  .course-card .shimmer-on-scroll,
+  .blog-card .shimmer-on-scroll,
+  .best-seller-card .shimmer-on-scroll {
+    animation: premium-shimmer-sweep 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards !important;
+  }
+}
+
 @keyframes premium-shimmer-sweep {
   0% { 
     opacity: 1; 
