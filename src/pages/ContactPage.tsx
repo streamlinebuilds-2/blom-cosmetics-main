@@ -304,11 +304,11 @@ export const ContactPage: React.FC = () => {
 
                       <Button 
                         type="submit" 
-                        size="lg" 
-                        className="w-full"
+                        size="md" 
+                        className="w-fit mx-auto flex items-center gap-2"
                         loading={isSubmitting}
                       >
-                        <Send className="h-4 w-4 mr-2" />
+                        <Send className="h-4 w-4" />
                         {isSubmitting ? 'Sending Message...' : 'Send Message'}
                       </Button>
                     </form>
