@@ -174,6 +174,7 @@ const CoursesPage: React.FC = () => {
               ))}
             </div>
           </div>
+        </Container>
 
         {/* Why Train with BLOM (card style) */}
         <section className="why-bloom py-16" aria-label="Why Train with BLOM">
