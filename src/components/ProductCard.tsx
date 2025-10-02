@@ -195,7 +195,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             transparent 100%
           );
           transform: translateX(-100%) translateY(-100%);
-          animation: shimmerLuxury 3s ease-in-out infinite;
+          animation: shimmerLuxury 8s ease-in-out infinite;
         }
         
         .shimmer--lux {
@@ -208,7 +208,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             rgba(255, 255, 255, 0.3) 75%,
             transparent 100%
           );
-          animation: shimmerLuxury 4s ease-in-out infinite;
+          animation: shimmerLuxury 10s ease-in-out infinite;
         }
         
         @keyframes shimmerLuxury {
