@@ -10,7 +10,7 @@ import { Filter, Grid2x2 as Grid, List, Search, ShoppingCart, Star, Eye, Heart, 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>('grid-3');
+  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
@@ -495,6 +495,30 @@ export const ShopPage: React.FC = () => {
                     <SlidersHorizontal className="h-4 w-4" />
                     Filters
                   </button>
+                  {/* Mobile view controls */}
+                  <div className="ml-2 flex lg:hidden border rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => setViewMode('list')}
+                      className={`px-3 py-2 text-xs ${viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      title="1 product per row"
+                    >
+                      1
+                    </button>
+                    <button
+                      onClick={() => setViewMode('grid-2')}
+                      className={`px-3 py-2 text-xs ${viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      title="2 products per row"
+                    >
+                      2
+                    </button>
+                    <button
+                      onClick={() => setViewMode('grid-3')}
+                      className={`px-3 py-2 text-xs ${viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      title="3 products per row"
+                    >
+                      3
+                    </button>
+                  </div>
                 </div>
 
                 {/* Pink Category Pills */}
