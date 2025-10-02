@@ -123,7 +123,7 @@ export const AnnouncementSignup: React.FC = () => {
             if (e.target === e.currentTarget) closePopup();
           }}
         >
-          <div className="bg-white rounded-2xl shadow-2xl w-[min(900px,95vw)] max-h-[90vh] overflow-hidden grid grid-cols-1 md:grid-cols-2">
+          <div className="bg-white rounded-2xl shadow-2xl w-[min(900px,95vw)] max-h-[95vh] overflow-hidden grid grid-cols-1 md:grid-cols-2">
             {/* Visual Panel - Desktop Only (Image) */}
             <div className="hidden md:block relative overflow-hidden" aria-hidden="true">
               <img
@@ -135,10 +135,10 @@ export const AnnouncementSignup: React.FC = () => {
             </div>
 
             {/* Form Panel */}
-            <div className="relative p-6 md:p-10 overflow-auto">
+            <div className="relative p-4 md:p-6 overflow-y-auto">
               <button
                 aria-label="Close"
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors"
+                className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 transition-colors z-10"
                 onClick={closePopup}
               >
                 <X className="h-5 w-5 text-gray-500" />
@@ -146,31 +146,31 @@ export const AnnouncementSignup: React.FC = () => {
 
               <div className="max-w-md mx-auto">
                 {/* Logo */}
-                <div className="text-center mb-8">
-                  <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-12 mx-auto mb-4" />
+                <div className="text-center mb-4">
+                  <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-16 mx-auto mb-2" />
                   <div className="w-12 h-0.5 bg-pink-400 mx-auto"></div>
                 </div>
 
-                <div className="mb-8">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2 text-center">Join Our Blom Beauty Club</h3>
-                  <p className="text-pink-500 font-semibold text-center text-lg">Get 15% off + exclusive drops</p>
+                <div className="mb-4">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-1 text-center">Join Our Blom Beauty Club</h3>
+                  <p className="text-pink-500 font-semibold text-center text-base">Get 15% off + exclusive drops</p>
                 </div>
 
-                <ul className="mb-8 space-y-3 text-sm text-gray-600">
-                  <li className="flex items-center gap-3">
-                    <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
+                <ul className="mb-4 space-y-2 text-sm text-gray-600">
+                  <li className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
                       <span className="text-pink-500 font-bold text-xs">✓</span>
                     </div>
                     <span>Instant 15% welcome code</span>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
+                  <li className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
                       <span className="text-pink-500 font-bold text-xs">✓</span>
                     </div>
                     <span>Early access to launches</span>
                   </li>
-                  <li className="flex items-center gap-3">
-                    <div className="w-5 h-5 bg-pink-100 rounded-full flex items-center justify-center">
+                  <li className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
                       <span className="text-pink-500 font-bold text-xs">✓</span>
                     </div>
                     <span>Member-only promos</span>
@@ -224,15 +224,15 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-6">
+    <form onSubmit={submit} className="space-y-4">
       <div>
-        <label htmlFor="beautyclub-email" className="block text-sm font-semibold text-gray-800 mb-3">
+        <label htmlFor="beautyclub-email" className="block text-sm font-semibold text-gray-800 mb-2">
           Email address
         </label>
         <input
           id="beautyclub-email"
           type="email"
-          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
           placeholder="Enter your email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -242,13 +242,13 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       </div>
 
       <div>
-        <label htmlFor="beautyclub-phone" className="block text-sm font-semibold text-gray-800 mb-3">
+        <label htmlFor="beautyclub-phone" className="block text-sm font-semibold text-gray-800 mb-2">
           Phone number
         </label>
         <input
           id="beautyclub-phone"
           type="tel"
-          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
           placeholder="Enter your phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
@@ -282,7 +282,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        className="w-full bg-pink-400 hover:bg-pink-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
       >
         {submitting ? 'Joining...' : 'Join Now & Save 15%'}
       </button>

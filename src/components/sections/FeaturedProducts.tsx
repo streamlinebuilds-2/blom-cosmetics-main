@@ -121,47 +121,17 @@ export const FeaturedProducts: React.FC = () => {
 
           <div className="grid-responsive">
             {fallbackProducts.map((product) => (
-              <a key={product.id} href={`/products/${product.slug}`} className="block">
-                <Card className="group cursor-pointer relative overflow-hidden">
-                  {/* Lux shimmer overlay */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none hidden md:block">
-                    <div className="shimmer shimmer--lux" />
-                  </div>
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <CardContent>
-                    <h3 className="font-semibold text-lg mb-2">{product.name}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{product.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-pink-400">R{product.price}</span>
-                      <Button
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          cartStore.addItem({
-                            id: `item_${Date.now()}`,
-                            productId: product.slug,
-                            name: product.name,
-                            price: product.price,
-                            image: product.image
-                          });
-                          showNotification(`Added ${product.name} to cart!`);
-                          const trigger = document.getElementById('cart-drawer-trigger');
-                          if (trigger) (trigger as HTMLDivElement).click();
-                        }}
-                      >
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </a>
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                slug={product.slug}
+                price={product.price}
+                shortDescription={product.description}
+                images={[product.image]}
+                inStock={true}
+                badges={['Bestseller']}
+              />
             ))}
           </div>
 
