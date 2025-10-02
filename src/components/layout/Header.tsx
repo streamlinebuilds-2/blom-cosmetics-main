@@ -143,9 +143,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       }`}
                       style={{
                         backgroundColor: isActive ? '#CEE5FF' : 'transparent'
-                      }} 
-                          : 'text-gray-700 hover:text-gray-900'
-                      }`}
+                      }}
                       onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
@@ -242,9 +240,12 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                         href={item.href}
                         className={`block py-3 px-4 font-medium rounded-lg transition-all duration-200 relative ${
                           isActive 
-                            ? 'bg-blue-100 text-gray-900' 
+                            ? 'text-gray-900' 
                             : 'text-gray-700 hover:text-gray-900'
                         }`}
+                        style={{
+                          backgroundColor: isActive ? '#CEE5FF' : 'transparent'
+                        }}
                         onClick={(e) => handleNavClick(e, item.href)}
                       >
                         {item.name}

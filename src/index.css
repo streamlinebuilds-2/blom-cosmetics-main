@@ -62,7 +62,7 @@
    ======================================== */
 
 .site-footer {
-  background: linear-gradient(135deg, #CFEAFF 0%, #CFE3FF 50%, #CFEAFF 100%);
+  background: linear-gradient(135deg, #CEE5FF 0%, #8EC5FF 50%, #9CCBFF 100%);
   padding: 40px 0 0 0;
   color: #1e293b;
   margin-top: auto;
@@ -211,7 +211,7 @@
 }
 
 .footer-bottom {
-  background: linear-gradient(135deg, #CFEAFF 0%, #CFE3FF 50%, #CFEAFF 100%);
+  background: linear-gradient(135deg, #CEE5FF 0%, #8EC5FF 50%, #9CCBFF 100%);
   padding: 20px 20px;
   display: flex;
   justify-content: space-between;
@@ -409,7 +409,7 @@
 
   /* Secondary outline (black) */
   .btn-outline, .btn-secondary { background: #fff; color: #000; border: 2px solid #000; border-radius: 9999px; }
-  .btn-outline:hover, .btn-secondary:hover { background: #CEE5FF; transform: translateY(-1px); }
+  .btn-outline:hover, .btn-secondary:hover { background: #8EC5FF; transform: translateY(-1px); }
 
   .btn-ghost {
     @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-200;
