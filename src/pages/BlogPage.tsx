@@ -154,6 +154,35 @@ export const BlogPage: React.FC = () => {
     fetchPosts();
   }, []);
 
+  // Intersection Observer for mobile shimmer effect
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const shimmerElement = entry.target.querySelector('.shimmer');
+          if (shimmerElement && !shimmerElement.classList.contains('shimmer-on-scroll')) {
+            shimmerElement.classList.add('shimmer-on-scroll');
+            // Remove class after animation to allow re-triggering
+            setTimeout(() => {
+              shimmerElement.classList.remove('shimmer-on-scroll');
+            }, 14000);
+          }
+        }
+      });
+    }, observerOptions);
+
+    // Observe all blog post cards
+    const blogCards = document.querySelectorAll('.blog-card');
+    blogCards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [filteredPosts]);
+
   const filteredPosts = fallbackPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
@@ -217,14 +246,17 @@ export const BlogPage: React.FC = () => {
                 <h2 className="text-3xl font-bold mb-4">Featured Article</h2>
               </div>
 
-              <Card className="overflow-hidden max-w-4xl mx-auto">
+              <Card className="blog-card group overflow-hidden max-w-4xl mx-auto">
                 <div className="md:flex">
-                  <div className="md:w-1/2">
+                  <div className="md:w-1/2 relative overflow-hidden">
                     <img
                       src={featuredPost.featured_image || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop'}
                       alt={featuredPost.title}
-                      className="w-full h-64 md:h-full object-cover"
+                      className="w-full h-64 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                      <div className="shimmer shimmer--lux"></div>
+                    </div>
                   </div>
                   <div className="md:w-1/2 p-8">
                     <div className="flex items-center gap-2 mb-4">
@@ -268,13 +300,16 @@ export const BlogPage: React.FC = () => {
 
             <div className="grid md:grid-cols-3 gap-8">
               {recentPosts.map((post) => (
-                <Card key={post.id} className="group cursor-pointer overflow-hidden">
+                <Card key={post.id} className="blog-card group cursor-pointer overflow-hidden">
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img
                       src={post.featured_image || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'}
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                      <div className="shimmer shimmer--lux"></div>
+                    </div>
                     <div className="absolute top-4 left-4">
                       <span className="px-2 py-1 bg-white text-gray-700 rounded text-sm font-medium">
                         {post.tags[0]}
@@ -326,7 +361,7 @@ export const BlogPage: React.FC = () => {
 
                 <div className="space-y-8">
                   {allPosts.map((post) => (
-                    <Card key={post.id} className="group cursor-pointer">
+                    <Card key={post.id} className="blog-card group cursor-pointer">
                       <div className="flex gap-6 p-6">
                         <div className="relative w-32 h-32 flex-shrink-0 overflow-hidden rounded-lg">
                           <img
@@ -334,6 +369,9 @@ export const BlogPage: React.FC = () => {
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="shimmer shimmer--lux"></div>
+                          </div>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
