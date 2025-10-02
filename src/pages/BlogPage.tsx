@@ -154,7 +154,43 @@ export const BlogPage: React.FC = () => {
     fetchPosts();
   }, []);
 
-  // Mobile shimmer now handled by CSS - no complex observers needed
+  // Intersection Observer for mobile shimmer effect
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const shimmerElement = entry.target.querySelector('.shimmer');
+          if (shimmerElement && !shimmerElement.classList.contains('shimmer-on-scroll')) {
+            // Make container visible first
+            const shimmerContainer = entry.target.querySelector('.absolute.inset-0');
+            if (shimmerContainer) {
+              shimmerContainer.style.opacity = '1';
+            }
+            
+            shimmerElement.classList.add('shimmer-on-scroll');
+            // Remove class after animation to allow re-triggering
+            setTimeout(() => {
+              shimmerElement.classList.remove('shimmer-on-scroll');
+              if (shimmerContainer) {
+                shimmerContainer.style.opacity = '0';
+              }
+            }, 4000);
+          }
+        }
+      });
+    }, observerOptions);
+
+    // Observe all blog post cards
+    const blogCards = document.querySelectorAll('.blog-card');
+    blogCards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [filteredPosts]);
 
   const filteredPosts = fallbackPosts.filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
