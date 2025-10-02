@@ -468,7 +468,8 @@ export const ShopPage: React.FC = () => {
               <div className="lg:hidden">
                 {/* Top row: search + filters button */}
                 <div className="flex items-center gap-3">
-                  <div className="relative flex-1">
+                  {/* Hide search on mobile to make room; keep on desktop */}
+                  <div className="relative flex-1 hidden lg:block">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                     <input
                       type="text"
@@ -499,24 +500,25 @@ export const ShopPage: React.FC = () => {
                   <div className="ml-2 flex lg:hidden border rounded-lg overflow-hidden">
                     <button
                       onClick={() => setViewMode('list')}
-                      className={`px-3 py-2 text-xs ${viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                      title="1 product per row"
+                      className={`p-2 ${viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      title="1 product per row (list)"
                     >
-                      1
+                      <List className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setViewMode('grid-2')}
-                      className={`px-3 py-2 text-xs ${viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      className={`p-2 ${viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                       title="2 products per row"
                     >
-                      2
+                      <Grid className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => setViewMode('grid-3')}
-                      className={`px-3 py-2 text-xs ${viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                      className={`p-2 ${viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
                       title="3 products per row"
                     >
-                      3
+                      {/* 3x3 grid icon using the same Grid icon for consistency */}
+                      <Grid className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
