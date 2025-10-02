@@ -95,9 +95,6 @@ export const CartWidget: React.FC = () => {
           }`}
         >
           <ShoppingCart className="h-6 w-6 text-white" />
-          <span className="absolute -top-2 -right-2 bg-blue-400 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold">
-            {cartStore.getItemCount()}
-          </span>
         </button>
       )}
       {/* Triggerable from header cart button */}

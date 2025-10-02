@@ -29,7 +29,7 @@ export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' 
     >
       <ShoppingCart className="h-5 w-5" />
       {itemCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-blue-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+        <span className="absolute -top-1 -right-1 text-gray-800 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold" style={{ backgroundColor: '#CEE5FF' }}>
           {itemCount}
         </span>
       )}
