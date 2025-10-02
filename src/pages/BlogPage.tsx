@@ -254,7 +254,8 @@ export const BlogPage: React.FC = () => {
                       alt={featuredPost.title}
                       className="w-full h-64 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    {/* Shimmer Effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                       <div className="shimmer shimmer--lux"></div>
                     </div>
                   </div>
@@ -307,7 +308,8 @@ export const BlogPage: React.FC = () => {
                       alt={post.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    {/* Shimmer Effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                       <div className="shimmer shimmer--lux"></div>
                     </div>
                     <div className="absolute top-4 left-4">

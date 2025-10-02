@@ -99,7 +99,8 @@ const CoursesPage: React.FC = () => {
                       alt={course.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    {/* Shimmer Effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                       <div className="shimmer shimmer--lux"></div>
                     </div>
                   </div>
@@ -152,7 +153,8 @@ const CoursesPage: React.FC = () => {
                       alt={course.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                    {/* Shimmer Effect */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
                       <div className="shimmer shimmer--lux"></div>
                     </div>
                     {/* Sale Badge */}
