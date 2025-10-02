@@ -982,43 +982,31 @@
   }
 }
 
-/* Mobile - make shimmer always animate and VERY visible */
-@media (hover: none) and (pointer: coarse) {
-  /* Override the shimmer container opacity */
-  .course-card .absolute.inset-0,
-  .blog-card .absolute.inset-0,
-  .best-seller-card .absolute.inset-0 {
-    opacity: 1 !important;
-  }
-  
-  .course-card .shimmer,
-  .blog-card .shimmer,
-  .best-seller-card .shimmer {
-    animation: premium-shimmer-sweep 2000ms linear infinite !important;
-    opacity: 1 !important;
-    background: red !important; /* Temporary - make it super obvious */
-  }
+/* FORCE shimmer to work EVERYWHERE - no media queries */
+.course-card .absolute.inset-0,
+.blog-card .absolute.inset-0,
+.best-seller-card .absolute.inset-0 {
+  opacity: 1 !important;
+}
+
+.course-card .shimmer,
+.blog-card .shimmer,
+.best-seller-card .shimmer {
+  animation: premium-shimmer-sweep 1000ms linear infinite !important;
+  opacity: 1 !important;
+  background: red !important; /* SUPER OBVIOUS RED */
 }
 
 @keyframes premium-shimmer-sweep {
   0% { 
-    opacity: 0; 
+    opacity: 1; 
     transform: translate(-200%, -200%) rotate(25deg); 
   }
-  15% { 
-    opacity: 0.4; 
-  }
-  25% { 
-    opacity: 0.6; 
-  }
-  75% { 
-    opacity: 0.6; 
-  }
-  85% { 
-    opacity: 0.4; 
+  50% { 
+    opacity: 1; 
   }
   100% { 
-    opacity: 0; 
+    opacity: 1; 
     transform: translate(200%, 200%) rotate(25deg); 
   }
 }
