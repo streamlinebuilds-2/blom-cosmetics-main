@@ -47,55 +47,7 @@ const CoursesPage: React.FC = () => {
     }
   ];
 
-  // Intersection Observer for mobile shimmer effect
-  useEffect(() => {
-    // Add a small delay to ensure DOM is fully rendered
-    const setupObserver = () => {
-      const observerOptions = {
-        threshold: 0.3,
-        rootMargin: '0px 0px -100px 0px'
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const shimmerElement = entry.target.querySelector('.shimmer');
-            if (shimmerElement && !shimmerElement.classList.contains('shimmer-on-scroll')) {
-              shimmerElement.classList.add('shimmer-on-scroll');
-              // Remove class after animation to allow re-triggering
-              setTimeout(() => {
-                shimmerElement.classList.remove('shimmer-on-scroll');
-              }, 4000);
-            }
-          }
-        });
-      }, observerOptions);
-
-      // Observe all course cards
-      const courseCards = document.querySelectorAll('.course-card');
-      if (courseCards.length > 0) {
-        courseCards.forEach((card) => observer.observe(card));
-      }
-
-      return observer;
-    };
-
-    // Setup observer after a short delay
-    const timeoutId = setTimeout(() => {
-      const observer = setupObserver();
-      
-      // Cleanup function
-      return () => {
-        if (observer) {
-          observer.disconnect();
-        }
-      };
-    }, 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, []);
+  // Mobile shimmer now handled by CSS - no complex observers needed
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
