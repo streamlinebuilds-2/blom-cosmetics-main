@@ -1021,10 +1021,14 @@
     opacity: 1 !important;
   }
   
-  /* When scroll-triggered class is added */
-  .shimmer-on-scroll {
+  /* When scroll-triggered class is added - make container visible AND animate shimmer */
+  .course-card .shimmer-on-scroll,
+  .blog-card .shimmer-on-scroll,
+  .best-seller-card .shimmer-on-scroll {
     animation: premium-shimmer-sweep 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards !important;
   }
+  
+  /* Make shimmer container visible when shimmer is active - handled by JavaScript */
 }
 
 @keyframes premium-shimmer-sweep {
