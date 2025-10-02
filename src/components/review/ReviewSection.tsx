@@ -99,7 +99,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           
           <Button
             onClick={() => setShowReviewForm(true)}
-            className="bg-pink-400 hover:bg-pink-500 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] flex items-center gap-2"
+            className="btn btn-primary flex items-center gap-2"
           >
             <MessageSquare className="h-5 w-5" />
             Write a Review
