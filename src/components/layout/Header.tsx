@@ -149,7 +149,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       {item.name}
                       
                       {/* Pink underline stripe - only on hover */}
-                      <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-pink-400 transition-all duration-200 opacity-0 group-hover:opacity-100"></span>
+                      <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-pink-400 transition-all duration-200 opacity-0 group-hover:opacity-100"></span>
                       
                       {/* Light pink highlight background - behind text */}
                       <span className={`absolute inset-0 bg-pink-50 rounded-md transition-all duration-200 -z-10 ${
