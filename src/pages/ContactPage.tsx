@@ -758,13 +758,21 @@ export const ContactPage: React.FC = () => {
 
               {/* FAQ Action Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                {!showAllFaqs && (
+                {!showAllFaqs ? (
                   <Button
                     onClick={() => setShowAllFaqs(true)}
                     className="btn btn-secondary flex items-center gap-2"
                   >
                     <ChevronDown className="h-4 w-4" />
                     Read More
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setShowAllFaqs(false)}
+                    className="btn btn-secondary flex items-center gap-2"
+                  >
+                    <ChevronUp className="h-4 w-4" />
+                    Show Less
                   </Button>
                 )}
                 <Button
