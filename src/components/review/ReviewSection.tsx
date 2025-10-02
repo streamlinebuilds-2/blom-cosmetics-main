@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Star, MessageSquare, ThumbsUp, Calendar } from 'lucide-react';
+import { Star, MessageSquare, ThumbsUp, Calendar, ChevronDown } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { ReviewForm } from './ReviewForm';
@@ -36,8 +36,30 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
 }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
+  const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
 
-  const displayedReviews = showAllReviews ? reviews : reviews.slice(0, 3);
+  // Filter and sort reviews
+  const filteredReviews = selectedRating 
+    ? reviews.filter(review => review.rating === selectedRating)
+    : reviews;
+
+  const sortedReviews = [...filteredReviews].sort((a, b) => {
+    switch (sortBy) {
+      case 'newest':
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      case 'oldest':
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      case 'highest':
+        return b.rating - a.rating;
+      case 'lowest':
+        return a.rating - b.rating;
+      default:
+        return 0;
+    }
+  });
+
+  const displayedReviews = showAllReviews ? sortedReviews : sortedReviews.slice(0, 3);
 
   const handleReviewSubmit = (reviewData: any) => {
     onReviewSubmit(reviewData);
@@ -84,32 +106,96 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           </Button>
         </div>
 
-        {/* Rating Breakdown */}
-        <div className="bg-gray-50 rounded-2xl p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Rating Breakdown</h3>
-          <div className="space-y-3">
-            {[5, 4, 3, 2, 1].map((star) => {
-              const count = reviews.filter(r => r.rating === star).length;
-              const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
-              
-              return (
-                <div key={star} className="flex items-center gap-4">
-                  <div className="flex items-center gap-1 w-16">
-                    <span className="text-sm font-medium text-gray-700">{star}</span>
-                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+        {/* Rating Summary & Breakdown */}
+        <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm border border-gray-100">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Overall Rating */}
+            <div className="text-center">
+              <div className="text-6xl font-bold text-gray-900 mb-2">{averageRating.toFixed(1)}</div>
+              <div className="flex items-center justify-center gap-1 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-6 w-6 ${
+                      i < Math.floor(averageRating)
+                        ? 'text-yellow-400 fill-current'
+                        : 'text-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-gray-600">Based on {reviewCount} review{reviewCount !== 1 ? 's' : ''}</p>
+            </div>
+
+            {/* Star Rating Breakdown */}
+            <div className="space-y-3">
+              {[5, 4, 3, 2, 1].map((star) => {
+                const count = reviews.filter(r => r.rating === star).length;
+                const percentage = reviewCount > 0 ? (count / reviewCount) * 100 : 0;
+                
+                return (
+                  <div key={star} className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 w-12">
+                      <span className="text-sm font-medium text-gray-700">{star}★</span>
+                    </div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-pink-400 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-600 w-8 text-right">
+                      {count}
+                    </span>
                   </div>
-                  <div className="flex-1 bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                  <span className="text-sm text-gray-600 w-12 text-right">
-                    {count}
-                  </span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Filters and Sorting */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          {/* Star Rating Filters */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedRating(null)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                selectedRating === null
+                  ? 'bg-pink-400 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All
+            </button>
+            {[5, 4, 3, 2, 1].map((star) => (
+              <button
+                key={star}
+                onClick={() => setSelectedRating(star)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedRating === star
+                    ? 'bg-pink-400 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {star}★
+              </button>
+            ))}
+          </div>
+
+          {/* Sort By Dropdown */}
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className="appearance-none bg-white border border-gray-300 rounded-full px-4 py-2 pr-8 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"
+            >
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="highest">Highest Rated</option>
+              <option value="lowest">Lowest Rated</option>
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
           </div>
         </div>
 

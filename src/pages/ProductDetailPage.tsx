@@ -881,13 +881,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
               </div>
 
               {/* Product Buy Box */}
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
+              <div className="bg-white rounded-3xl p-8 shadow-xl border border-gray-100">
                 <div className="mb-8">
-                  <h1 className="text-4xl font-bold text-gray-900 mb-3">{product.name}</h1>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
                   <p className="text-lg text-gray-600 mb-6 leading-relaxed">{product.subtitle}</p>
                   
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-6">
+                  <div className="flex items-center gap-3 mb-6">
                     <div className="flex items-center gap-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -903,7 +903,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     <span className="text-lg font-semibold text-gray-900">
                       {product.rating} out of 5
                     </span>
-                    <span className="text-gray-500">({product.reviewCount} reviews)</span>
+                    <span className="text-gray-500 font-medium">({product.reviewCount} reviews)</span>
                   </div>
 
                   {/* Price */}
@@ -913,26 +913,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       <span className="text-2xl text-gray-400 line-through">R{product.comparePrice}</span>
                     )}
                     {product.comparePrice && (
-                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                      <span className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-semibold">
                         {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
                       </span>
                     )}
                   </div>
 
                   {/* Stock Status */}
-                  <div className="flex items-center gap-2 mb-6">
+                  <div className="flex items-center gap-3 mb-6">
                     {product.inStock ? (
                       <>
-                        <Check className="h-5 w-5 text-green-500" />
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <span className="text-green-600 font-semibold text-lg">In Stock</span>
                         {product.stockCount <= 10 && (
-                          <span className="text-orange-600 text-sm font-medium">
-                            (Only {product.stockCount} left!)
+                          <span className="text-orange-600 text-sm font-medium bg-orange-50 px-3 py-1 rounded-full">
+                            Only {product.stockCount} left!
                           </span>
                         )}
                       </>
                     ) : (
-                      <span className="text-red-600 font-semibold text-lg">Out of Stock</span>
+                      <>
+                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <span className="text-red-600 font-semibold text-lg">Out of Stock</span>
+                      </>
                     )}
                   </div>
 
@@ -954,7 +957,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                           key={variant.id}
                           onClick={() => setSelectedVariant(variant.id)}
                           disabled={!variant.inStock}
-                          className={`px-6 py-3 border-2 rounded-xl font-semibold text-base transition-all duration-200 ${
+                          className={`px-6 py-3 border-2 rounded-full font-semibold text-base transition-all duration-200 ${
                             selectedVariant === variant.id
                               ? 'border-pink-400 bg-pink-500 text-white shadow-lg'
                               : variant.inStock
@@ -976,17 +979,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <div className="mb-8">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity:</h3>
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white">
+                    <div className="flex items-center border-2 border-gray-200 rounded-full bg-white">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="p-3 hover:bg-gray-50 transition-colors rounded-l-xl"
+                        className="p-3 hover:bg-gray-50 transition-colors rounded-l-full"
                       >
                         <Minus className="h-5 w-5 text-gray-600" />
                       </button>
                       <span className="px-6 py-3 font-bold text-lg text-gray-900 min-w-[60px] text-center">{quantity}</span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="p-3 hover:bg-gray-50 transition-colors rounded-r-xl"
+                        className="p-3 hover:bg-gray-50 transition-colors rounded-r-full"
                       >
                         <Plus className="h-5 w-5 text-gray-600" />
                       </button>
@@ -1002,7 +1005,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   <button
                     onClick={handleAddToCart}
                     disabled={!product.inStock}
-                    className="w-full btn btn-primary btn-lg flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white font-semibold py-4 px-6 rounded-full transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                   >
                     <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
@@ -1010,19 +1013,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   <button
                     onClick={handleBuyNow}
                     disabled={!product.inStock}
-                    className="w-full btn btn-pink btn-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                   >
                     BUY NOW
                   </button>
                   <div className="flex gap-3">
                     <button 
                       onClick={() => setIsWishlisted(!isWishlisted)}
-                      className="flex-1 btn btn-outline flex items-center justify-center gap-2"
+                      className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-semibold py-3 px-4 rounded-full transition-all duration-200 flex items-center justify-center gap-2"
                     >
                       <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : ''}`} />
                       {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
                     </button>
-                    <button className="flex-1 btn btn-outline flex items-center justify-center gap-2">
+                    <button className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-semibold py-3 px-4 rounded-full transition-all duration-200 flex items-center justify-center gap-2">
                       <Share2 className="h-5 w-5" />
                       Share
                     </button>
@@ -1031,17 +1034,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
                 {/* Trust Row */}
                 <div className="grid grid-cols-3 gap-4 mb-8 text-center">
-                  <div className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-xl">
+                  <div className="flex flex-col items-center gap-2 p-4 bg-green-50 rounded-2xl">
                     <Truck className="h-6 w-6 text-green-500" />
-                    <span className="font-semibold text-green-700">Free shipping over R1500</span>
+                    <span className="font-semibold text-green-700 text-sm">Free shipping over R1500</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-xl">
+                  <div className="flex flex-col items-center gap-2 p-4 bg-blue-50 rounded-2xl">
                     <Shield className="h-6 w-6 text-blue-500" />
-                    <span className="font-semibold text-blue-700">100% authentic</span>
+                    <span className="font-semibold text-blue-700 text-sm">100% authentic</span>
                   </div>
-                  <div className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-xl">
+                  <div className="flex flex-col items-center gap-2 p-4 bg-purple-50 rounded-2xl">
                     <RotateCcw className="h-6 w-6 text-purple-500" />
-                    <span className="font-semibold text-purple-700">30-day returns</span>
+                    <span className="font-semibold text-purple-700 text-sm">30-day returns</span>
                   </div>
                 </div>
 
