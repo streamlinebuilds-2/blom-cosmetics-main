@@ -2,26 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force light mode always */
+/* Force light mode always - Enhanced for mobile */
 :root {
-  color-scheme: light only;
+  color-scheme: light only !important;
+  background-color: #ffffff !important;
 }
 
 html,
 body {
-  color-scheme: light;
+  color-scheme: light !important;
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+html {
+  background: #ffffff !important;
+}
+
+body {
+  background: #ffffff !important;
+}
+
+#root {
+  background-color: #ffffff !important;
+  color: #000000 !important;
 }
 
 /* Prevent dark mode from being applied */
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: light only;
+    color-scheme: light only !important;
+    background-color: #ffffff !important;
   }
   
   html,
   body {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  #root {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  * {
+    color-scheme: light !important;
+  }
+}
+
+/* Additional mobile-specific overrides */
+@supports (-webkit-touch-callout: none) {
+  html,
+  body {
+    color-scheme: light !important;
+    background-color: #ffffff !important;
   }
 }
 
