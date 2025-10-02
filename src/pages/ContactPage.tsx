@@ -525,17 +525,6 @@ export const ContactPage: React.FC = () => {
                         )}
                       </div>
 
-                      {/* Privacy Notice */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-start gap-3">
-                          <CheckCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                          <div className="text-sm text-blue-700">
-                            <p className="font-medium mb-1">Your privacy is important to us</p>
-                            <p>We'll only use your information to respond to your inquiry and will never share it with third parties.</p>
-                          </div>
-                        </div>
-                      </div>
-
                       {/* Terms and Conditions Checkbox */}
                       <div className="flex items-start gap-3">
                         <div className="flex items-center h-5">
