@@ -803,10 +803,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
-      <main>
+      <main className="flex-1">
         {/* Breadcrumb */}
         <section className="py-4 border-b">
           <Container>

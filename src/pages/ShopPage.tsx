@@ -354,10 +354,10 @@ export const ShopPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
-      <main>
+      <main className="flex-1">
         {/* Shop Hero Section */}
         <section className="relative bg-gradient-to-br from-pink-50 to-blue-50 section-padding overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 to-blue-300/10"></div>

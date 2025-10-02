@@ -113,10 +113,10 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
-      <main>
+      <main className="flex-1">
         {/* Contact Hero Section - Original Design */}
         <section className="bg-gradient-to-r from-pink-50 to-blue-50 section-padding">
           <Container>

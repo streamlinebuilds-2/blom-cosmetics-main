@@ -53,7 +53,6 @@ export const FeaturedProducts: React.FC = () => {
           <div className="text-center mb-12">
             <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
             <h2 className="heading-with-stripe">BEST SELLERS</h2>
-            <div className="h-1 w-16 bg-blue-200 rounded-full mx-auto mb-4" />
             <p className="section-subheader">
               Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
             </p>
@@ -113,7 +112,6 @@ export const FeaturedProducts: React.FC = () => {
           <div className="text-center mb-12">
             <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
             <h2 className="heading-with-stripe">BEST SELLERS</h2>
-            <div className="h-1 w-16 bg-blue-200 rounded-full mx-auto mb-4" />
             <p className="section-subheader">
               Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
             </p>
@@ -153,7 +151,6 @@ export const FeaturedProducts: React.FC = () => {
           <div className="text-center mb-12">
             <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
             <h2 className="heading-with-stripe">BEST SELLERS</h2>
-            <div className="h-1 w-16 bg-blue-200 rounded-full mx-auto mb-4" />
             <p className="section-subheader">
               Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
             </p>

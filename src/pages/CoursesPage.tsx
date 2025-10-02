@@ -48,16 +48,15 @@ const CoursesPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
-      <main>
+      <main className="flex-1">
         <Container>
           {/* In-Person Training */}
           <div id="in-person-training" className="py-16">
             <div className="text-center mb-12">
               <h2 className="heading-with-stripe">In-Person Training</h2>
-              <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
             <div className="max-w-lg mx-auto">
@@ -110,7 +109,6 @@ const CoursesPage: React.FC = () => {
           <div id="online-workshops" className="py-16">
             <div className="text-center mb-12">
               <h2 className="heading-with-stripe">Online Workshops</h2>
-              <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">

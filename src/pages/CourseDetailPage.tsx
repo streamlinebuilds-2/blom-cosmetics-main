@@ -6,8 +6,8 @@ import { Button } from '../ui/Button';
 import { 
   Clock, 
   MapPin, 
-  ChevronDown, 
-  ChevronUp, 
+  ChevronDown,
+  ChevronUp,
   CheckCircle,
   Calendar,
   Phone,
@@ -205,10 +205,10 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
-      <main>
+      <main className="flex-1">
         {/* Hero Section */}
         <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
           <img
@@ -232,23 +232,23 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 <div className="flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}>
                   <Clock className="h-5 w-5" />
                   <span className="font-medium">5 Days</span>
-                </div>
+                    </div>
                 <div className="flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}>
                   <CreditCard className="h-5 w-5" />
                   <span className="font-medium">From R7,200</span>
-                </div>
-              </div>
-              
+                    </div>
+                  </div>
+
               {/* CTA Button */}
               <button
                 onClick={scrollToBooking}
                 className="bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-12 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
                 style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
-              >
-                Book Your Spot
-              </button>
-            </div>
-          </div>
+                  >
+                    Book Your Spot
+                    </button>
+                  </div>
+                </div>
         </section>
 
         {/* Meet Your Instructor */}
@@ -256,7 +256,6 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           <Container>
             <div className="max-w-4xl mx-auto">
               <h2 className="heading-with-stripe">Meet Your Instructor</h2>
-              <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                 <div className="flex flex-col md:flex-row gap-8 items-center">
@@ -266,14 +265,14 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       alt="Avané Crous"
                       className="w-full h-full object-cover rounded-xl shadow-lg"
                     />
-                  </div>
+                          </div>
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4">Avané Crous</h3>
                     <p className="text-lg text-gray-600 leading-relaxed">
                       Professional nail artist and educator with over 8 years of experience in acrylic nail application. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.
                     </p>
-                  </div>
-                </div>
+                      </div>
+                    </div>
               </div>
             </div>
           </Container>
@@ -286,7 +285,6 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
               <h2 className="text-3xl md:text-4xl font-bold mb-12 uppercase tracking-wide text-gray-900">
                 About This Course
               </h2>
-              <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
                 <p>
@@ -305,7 +303,6 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           <Container>
             <div className="max-w-4xl mx-auto">
               <h2 className="heading-with-stripe">What You'll Learn</h2>
-              <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="space-y-4">
                 {accordionData.map((item, index) => (
@@ -337,8 +334,8 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                         {item.note && (
                           <div className="mt-4 p-4 bg-blue-100 rounded-lg">
                             <p className="text-blue-800 text-sm font-medium">{item.note}</p>
-                          </div>
-                        )}
+                      </div>
+                    )}
                       </div>
                     )}
                   </div>
@@ -353,7 +350,6 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           <Container>
             <div className="max-w-5xl mx-auto">
               <h2 className="heading-with-stripe">Choose Your Package</h2>
-              <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Standard Package */}
@@ -374,9 +370,9 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       <li key={index} className="flex items-center gap-3">
                         <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
                         <span className="text-gray-700">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                        </li>
+                      ))}
+                    </ul>
                   
                   <button
                     onClick={() => selectPackage('Standard')}
@@ -385,7 +381,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                   >
                     Choose Standard
                   </button>
-                </div>
+            </div>
 
                 {/* Deluxe Package */}
                 <div className="bg-white border-2 border-pink-400 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full" style={{ boxShadow: '0 8px 30px rgba(255,116,164,0.2)' }}>
@@ -393,14 +389,14 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                     <div className="bg-blue-400 text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide">
                       Most Popular
                     </div>
-                  </div>
+                      </div>
                   
                   <div className="text-center mb-8 mt-4">
                     <h3 className="text-2xl font-bold text-gray-900 mb-4 uppercase">Deluxe Package</h3>
                     <div className="text-4xl font-bold text-pink-400 mb-2">R9,900</div>
                     <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: R5,100</div>
-                  </div>
-                  
+                    </div>
+
                   <ul className="space-y-4 mb-8 flex-grow">
                     {[
                       '5-day comprehensive training',
@@ -412,10 +408,10 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       <li key={index} className="flex items-center gap-3">
                         <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
                         <span className="text-gray-700">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  
+                        </li>
+                      ))}
+                    </ul>
+
                   <button
                     onClick={() => selectPackage('Deluxe')}
                     className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
@@ -434,20 +430,19 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           <Container>
             <div className="max-w-5xl mx-auto">
               <h2 className="heading-with-stripe">Important Information</h2>
-              <div className="w-20 h-1 bg-pink-400 rounded-full mx-auto mb-12"></div>
               
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Location */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <MapPin className="h-8 w-8 text-pink-400" />
-                  </div>
+                    </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Location</h3>
                   <p className="text-gray-600">
                     Randfontein, Gauteng<br />
                     <span className="text-sm text-gray-500">Detailed address provided upon booking</span>
                   </p>
-                </div>
+                    </div>
 
                 {/* Deposit Required */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
@@ -459,30 +454,30 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                     R2,000 to secure your spot<br />
                     <span className="text-sm text-gray-500">Balance due on course start date</span>
                   </p>
-                </div>
+              </div>
 
                 {/* Available Dates */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Calendar className="h-8 w-8 text-pink-400" />
-                  </div>
+              </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Available Dates</h3>
                   <div className="space-y-2">
                     {availableDates.map((date, index) => (
-                      <button
-                        key={index}
-                        onClick={() => selectDate(date)}
+                  <button
+                    key={index}
+                    onClick={() => selectDate(date)}
                         className={`block w-full px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-1 ${
-                          selectedDate === date
-                            ? 'bg-pink-400 text-white'
+                      selectedDate === date
+                        ? 'bg-pink-400 text-white'
                             : 'bg-blue-200 text-gray-900 hover:bg-pink-400 hover:text-white'
-                        }`}
-                      >
-                        {date}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                    }`}
+                  >
+                    {date}
+                  </button>
+                ))}
+              </div>
+            </div>
 
                 {/* Contact */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
@@ -502,7 +497,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
 
         {/* Booking Form */}
         <section id="booking-form" className="py-20 bg-white">
-          <Container>
+            <Container>
             <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 {/* Form Header */}
@@ -512,94 +507,94 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                   </h2>
                   <p className="text-lg opacity-90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
                     Secure your place in this professional training course
-                  </p>
-                </div>
+                          </p>
+                        </div>
 
                 {/* Form Body */}
                 <div className="p-12">
                   <form onSubmit={handleSubmit} className="space-y-7">
                     {/* Row 1: Date & Package */}
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div>
+                        <div>
                         <label className="block text-sm font-semibold text-gray-800 mb-3">
                           Select Date <span className="text-red-500">*</span>
-                        </label>
-                        <select
+                          </label>
+                          <select
                           value={selectedDate}
                           onChange={(e) => setSelectedDate(e.target.value)}
                           className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
-                          required
-                        >
+                            required
+                          >
                           <option value="">Choose a date...</option>
                           {availableDates.map((date, index) => (
                             <option key={index} value={date}>{date}</option>
-                          ))}
-                        </select>
-                      </div>
+                            ))}
+                          </select>
+                        </div>
 
-                      <div>
+                        <div>
                         <label className="block text-sm font-semibold text-gray-800 mb-3">
                           Select Package <span className="text-red-500">*</span>
-                        </label>
-                        <select
+                          </label>
+                          <select
                           value={selectedPackage}
                           onChange={(e) => setSelectedPackage(e.target.value)}
                           className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
-                          required
-                        >
+                            required
+                          >
                           <option value="">Choose a package...</option>
                           <option value="Standard">Standard Package - R7,200</option>
                           <option value="Deluxe">Deluxe Package - R9,900</option>
-                        </select>
-                      </div>
+                          </select>
+                        </div>
                     </div>
 
                     {/* Row 2: Name & Email */}
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div>
+                        <div>
                         <label className="block text-sm font-semibold text-gray-800 mb-3">
                           Full Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
+                          </label>
+                          <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleInputChange}
                           className={`w-full px-4 py-4 border rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base ${
                             formErrors.name ? 'border-red-500' : 'border-gray-300'
                           }`}
-                          required
-                        />
-                        {formErrors.name && (
+                            required
+                          />
+                          {formErrors.name && (
                           <p className="text-red-500 text-sm mt-2">{formErrors.name}</p>
-                        )}
-                      </div>
+                          )}
+                        </div>
 
-                      <div>
+                        <div>
                         <label className="block text-sm font-semibold text-gray-800 mb-3">
                           Email Address <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
                           className={`w-full px-4 py-4 border rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base ${
                             formErrors.email ? 'border-red-500' : 'border-gray-300'
                           }`}
-                          required
-                        />
-                        {formErrors.email && (
+                            required
+                          />
+                          {formErrors.email && (
                           <p className="text-red-500 text-sm mt-2">{formErrors.email}</p>
-                        )}
+                          )}
+                        </div>
                       </div>
-                    </div>
 
                     {/* Row 3: Phone Number */}
-                    <div>
+                      <div>
                       <label className="block text-sm font-semibold text-gray-800 mb-3">
                         Phone Number <span className="text-red-500">*</span>
-                      </label>
+                        </label>
                       <div className="flex gap-3">
                         <select
                           name="countryCode"
@@ -625,32 +620,32 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                           required
                         />
                       </div>
-                      {formErrors.phone && (
+                        {formErrors.phone && (
                         <p className="text-red-500 text-sm mt-2">{formErrors.phone}</p>
-                      )}
-                    </div>
+                        )}
+                      </div>
 
                     {/* Terms & Conditions */}
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        name="terms"
-                        checked={formData.terms}
-                        onChange={handleInputChange}
+                      <div className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          name="terms"
+                          checked={formData.terms}
+                          onChange={handleInputChange}
                         className="mt-1 rounded border-gray-300 text-pink-400 focus:ring-pink-300 w-5 h-5"
-                        required
-                      />
+                          required
+                        />
                       <label className="text-sm text-gray-600 leading-relaxed">
                         I agree to the <a href="/terms" className="text-pink-500 hover:text-pink-600 underline">Terms & Conditions</a>
-                      </label>
-                    </div>
-                    {formErrors.terms && (
-                      <p className="text-red-500 text-sm">{formErrors.terms}</p>
-                    )}
+                        </label>
+                      </div>
+                      {formErrors.terms && (
+                        <p className="text-red-500 text-sm">{formErrors.terms}</p>
+                      )}
 
-                    {/* Submit Button */}
+                      {/* Submit Button */}
                     <button
-                      type="submit"
+                        type="submit"
                       disabled={isSubmitting || !selectedPackage || !selectedDate || !formData.terms}
                       className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                       style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
@@ -663,14 +658,14 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       <div className="flex items-center gap-2 text-green-600">
                         <Shield className="h-5 w-5" />
                         <span className="text-sm font-semibold">Secure Payment</span>
-                      </div>
+            </div>
                       <div className="flex items-center gap-2 text-green-600">
                         <CheckCircle className="h-5 w-5" />
                         <span className="text-sm font-semibold">Instant Confirmation</span>
                       </div>
-                    </div>
+              </div>
                   </form>
-                </div>
+            </div>
               </div>
             </div>
           </Container>

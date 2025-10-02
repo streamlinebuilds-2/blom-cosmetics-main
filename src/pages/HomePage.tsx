@@ -52,10 +52,10 @@ export const HomePage: React.FC = () => {
   const stats: any[] = [];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
-      <main>
+      <main className="flex-1">
         {/* Hero Slider */}
         <HeroSlider />
 
@@ -98,7 +98,6 @@ export const HomePage: React.FC = () => {
           <Container>
             <div className="text-center mb-12">
               <h2 className="heading-with-stripe">Our Promise</h2>
-              <div className="h-1 w-16 bg-pink-400 rounded-full mx-auto"></div>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
