@@ -58,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   return (
     <article 
-      className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 flex flex-col h-full ${className}`}
+      className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container */}
@@ -116,46 +116,44 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-6 flex flex-col h-full">
+      <div className="p-6">
         {/* Product Name */}
-        <h3 className="font-bold text-lg mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2">
+        <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[3.5rem]">
           {name}
         </h3>
 
         {/* Short Description */}
         {shortDescription && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed flex-grow">
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
             {shortDescription}
           </p>
         )}
 
-        {/* Price - Positioned above button */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl font-bold text-pink-500">
-              {formatPrice(price)}
-            </span>
-            {compareAtPrice && (
-              <>
-                <span className="text-lg text-gray-400 line-through">
-                  {formatPrice(compareAtPrice)}
-                </span>
-                <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
-                </span>
-              </>
-            )}
-          </div>
+        {/* Price */}
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-2xl font-bold text-pink-500">
+            {formatPrice(price)}
+          </span>
+          {compareAtPrice && (
+            <>
+              <span className="text-lg text-gray-400 line-through">
+                {formatPrice(compareAtPrice)}
+              </span>
+              <span className="text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+              </span>
+            </>
+          )}
         </div>
 
-        {/* Add to Cart Button - Full width, positioned at bottom */}
+        {/* Add to Cart Button */}
         <button
           type="button"
           onClick={handleAddToCart}
           disabled={!inStock}
-          className={`w-full py-3.5 px-6 rounded-full font-bold text-sm uppercase transition-all duration-200 flex items-center justify-center gap-2 mt-auto ${
+          className={`w-full py-3.5 px-6 rounded-2xl font-bold text-sm uppercase transition-all duration-200 flex items-center justify-center gap-2 ${
             inStock
-              ? 'bg-gradient-to-r from-pink-500 to-pink-600 text-white hover:from-pink-600 hover:to-pink-700 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+              ? 'bg-pink-500 text-white hover:bg-pink-600 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
               : 'bg-gray-200 text-gray-400 cursor-not-allowed'
           }`}
           aria-disabled={!inStock}
