@@ -1000,6 +1000,13 @@
   .shimmer-on-scroll {
     animation: premium-shimmer-sweep 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards;
   }
+  
+  /* Force shimmer to be visible on mobile when triggered */
+  .course-card .shimmer-on-scroll,
+  .blog-card .shimmer-on-scroll,
+  .best-seller-card .shimmer-on-scroll {
+    opacity: 1 !important;
+  }
 }
 
 @keyframes premium-shimmer-sweep {
@@ -1007,17 +1014,17 @@
     opacity: 0; 
     transform: translate(-200%, -200%) rotate(25deg); 
   }
-  15% { 
-    opacity: 0.4; 
+  10% { 
+    opacity: 0.8; 
   }
-  25% { 
-    opacity: 0.6; 
+  20% { 
+    opacity: 1; 
   }
-  75% { 
-    opacity: 0.6; 
+  80% { 
+    opacity: 1; 
   }
-  85% { 
-    opacity: 0.4; 
+  90% { 
+    opacity: 0.8; 
   }
   100% { 
     opacity: 0; 
