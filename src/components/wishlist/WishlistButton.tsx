@@ -31,15 +31,15 @@ export const WishlistButton: React.FC = () => {
     // Smooth scroll to top first
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
-    // Navigate to wishlist (account page with wishlist tab)
+    // Navigate to dedicated wishlist page
     setTimeout(() => {
-      window.location.href = '/account?tab=wishlist';
+      window.location.href = '/wishlist';
     }, 100);
   };
 
   return (
     <a
-      href="/account?tab=wishlist"
+      href="/wishlist"
       onClick={handleClick}
       className="relative p-2 text-gray-700 hover:text-pink-500 transition-colors group"
       aria-label={`Wishlist (${itemCount} items)`}

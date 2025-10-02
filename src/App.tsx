@@ -16,6 +16,7 @@ import { TermsPage } from './pages/TermsPage';
 import { ReturnsPage } from './pages/ReturnsPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { AccountPage } from './pages/AccountPage';
+import { WishlistPage } from './pages/WishlistPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 
@@ -56,6 +57,8 @@ function App() {
   if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
   if (path === '/account') { return <><AccountPage /><CartWidget /></>; }
+
+  if (path === '/wishlist') { return <><WishlistPage /><CartWidget /></>; }
   
   if (path === '/login') { return <><LoginPage /><CartWidget /></>; }
   
