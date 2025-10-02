@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       href={item.href}
                       className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative ${
                         isActive 
-                          ? 'text-pink-500' 
+                          ? 'bg-blue-100 text-gray-900 rounded-md' 
                           : 'text-gray-700 hover:text-gray-900'
                       }`}
                       onClick={(e) => handleNavClick(e, item.href)}
@@ -124,9 +124,9 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                         isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                       }`}></span>
                       
-                      {/* Light pink highlight background */}
-                      <span className={`absolute inset-0 bg-pink-50 rounded-md transition-all duration-200 ${
-                        isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      {/* Light pink highlight background - behind text */}
+                      <span className={`absolute inset-0 bg-pink-50 rounded-md transition-all duration-200 -z-10 ${
+                        isActive ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
                       }`}></span>
                     </a>
 
@@ -229,8 +229,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                         href={item.href}
                         className={`block py-3 px-4 font-medium rounded-lg transition-all duration-200 relative ${
                           isActive 
-                            ? 'text-pink-500 bg-pink-50' 
-                            : 'text-gray-700 hover:text-pink-400 hover:bg-pink-50'
+                            ? 'bg-blue-100 text-gray-900' 
+                            : 'text-gray-700 hover:text-gray-900'
                         }`}
                         onClick={(e) => handleNavClick(e, item.href)}
                       >
@@ -239,6 +239,11 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                         {/* Pink underline stripe for mobile */}
                         <span className={`absolute bottom-0 left-4 right-4 h-0.5 bg-pink-400 transition-all duration-200 ${
                           isActive ? 'opacity-100' : 'opacity-0'
+                        }`}></span>
+                        
+                        {/* Light pink highlight background - behind text for mobile */}
+                        <span className={`absolute inset-0 bg-pink-50 rounded-lg transition-all duration-200 -z-10 ${
+                          isActive ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
                         }`}></span>
                       </a>
                       
