@@ -67,18 +67,40 @@ export const HeroSlider: React.FC = () => {
   };
 
   useEffect(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    intervalRef.current = window.setInterval(() => {
-      nextSlide();
-    }, 6000);
+    // Start auto-scroll immediately
+    const startAutoScroll = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      intervalRef.current = window.setInterval(() => {
+        nextSlide();
+      }, 6000);
+    };
+
+    // Start immediately
+    startAutoScroll();
+
+    // Also start on any user interaction (in case browser blocks auto-play)
+    const handleUserInteraction = () => {
+      if (!intervalRef.current) {
+        startAutoScroll();
+      }
+    };
+
+    // Add event listeners for user interaction
+    document.addEventListener('click', handleUserInteraction, { once: true });
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('keydown', handleUserInteraction, { once: true });
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
     };
   }, []);
 
@@ -176,16 +198,6 @@ export const HeroSlider: React.FC = () => {
       </button>
 
 
-      {/* Slide Progress Bar */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-black bg-opacity-20">
-        <div
-          className="h-full bg-pink-400 transition-all duration-6000 ease-linear"
-          style={{
-            width: '100%',
-            transitionDuration: '6000ms'
-          }}
-        />
-      </div>
     </section>
   );
 };
