@@ -148,23 +148,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         {/* Product Name */}
-        <h3 className="font-bold text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[3.5rem]">
+        <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem]">
           {name}
         </h3>
 
         {/* Short Description */}
         {shortDescription && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed">
             {shortDescription}
           </p>
         )}
 
         {/* Price - Centered */}
-        <div className="text-center mb-4">
-          <div className="flex items-center justify-center gap-3">
-            <span className="text-2xl font-bold text-pink-500">
+        <div className="text-center mb-2 sm:mb-3 md:mb-4">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-pink-500">
               {price === -1 ? 'Coming Soon' : formatPrice(price)}
             </span>
             {compareAtPrice && (

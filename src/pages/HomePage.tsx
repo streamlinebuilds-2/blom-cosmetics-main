@@ -81,7 +81,7 @@ export const HomePage: React.FC = () => {
                 </div>
               </div>
               <div className="hidden md:block absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none">
-                <Sparkles className="w-28 h-28 text-pink-300/50" />
+                <Zap className="w-32 h-32 text-pink-400" />
               </div>
             </div>
           </Container>
