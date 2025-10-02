@@ -41,6 +41,7 @@ export const ContactPage: React.FC = () => {
   const [dragActive, setDragActive] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const [isMapHovered, setIsMapHovered] = useState(false);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
 
   const inquiryTypes = [
@@ -143,6 +144,11 @@ export const ContactPage: React.FC = () => {
       errors.phone = 'Please enter a valid phone number (7-15 digits)';
     }
 
+    // Terms and conditions validation
+    if (!agreedToTerms) {
+      errors.terms = 'You must agree to the Terms & Conditions and Privacy Policy';
+    }
+
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -232,6 +238,7 @@ export const ContactPage: React.FC = () => {
     });
     setAttachedFiles([]);
     setValidationErrors({});
+    setAgreedToTerms(false);
     
     setIsSubmitting(false);
     alert('Thank you for your message! We\'ll get back to you within 24 hours.');
@@ -526,6 +533,50 @@ export const ContactPage: React.FC = () => {
                             <p className="font-medium mb-1">Your privacy is important to us</p>
                             <p>We'll only use your information to respond to your inquiry and will never share it with third parties.</p>
                           </div>
+                        </div>
+                      </div>
+
+                      {/* Terms and Conditions Checkbox */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center h-5">
+                          <input
+                            id="terms"
+                            type="checkbox"
+                            checked={agreedToTerms}
+                            onChange={(e) => {
+                              setAgreedToTerms(e.target.checked);
+                              if (validationErrors.terms) {
+                                setValidationErrors(prev => ({
+                                  ...prev,
+                                  terms: ''
+                                }));
+                              }
+                            }}
+                            className={`w-4 h-4 rounded border-2 focus:ring-2 focus:ring-primary-pink transition-colors ${
+                              agreedToTerms 
+                                ? 'bg-primary-pink border-primary-pink text-white' 
+                                : 'border-gray-300 hover:border-primary-pink'
+                            } ${validationErrors.terms ? 'border-red-500' : ''}`}
+                            style={{
+                              accentColor: '#FF74A4'
+                            }}
+                          />
+                        </div>
+                        <div className="text-sm">
+                          <label htmlFor="terms" className="text-gray-700 cursor-pointer">
+                            I agree to the{' '}
+                            <a href="/terms" className="text-primary-pink hover:text-pink-600 underline">
+                              Terms & Conditions
+                            </a>
+                            {' '}and{' '}
+                            <a href="/privacy" className="text-primary-pink hover:text-pink-600 underline">
+                              Privacy Policy
+                            </a>
+                            {' '}<span className="text-red-500">*</span>
+                          </label>
+                          {validationErrors.terms && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.terms}</p>
+                          )}
                         </div>
                       </div>
 
