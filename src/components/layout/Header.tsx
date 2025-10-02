@@ -12,6 +12,27 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down
+        setIsScrolledDown(true);
+      } else {
+        // Scrolling up
+        setIsScrolledDown(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     try {
@@ -77,7 +98,11 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       <AnnouncementSignup />
 
       {/* Main Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+        isScrolledDown 
+          ? 'bg-white/80 backdrop-blur-md shadow-lg' 
+          : 'bg-white shadow-sm'
+      }`}>
         <Container>
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
