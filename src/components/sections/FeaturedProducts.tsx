@@ -58,6 +58,7 @@ export const FeaturedProducts: React.FC = () => {
             const shimmerContainer = entry.target.querySelector('.absolute.inset-0');
             if (shimmerContainer) {
               shimmerContainer.style.opacity = '1';
+              shimmerContainer.style.pointerEvents = 'none';
             }
             
             shimmerElement.classList.add('shimmer-on-scroll');
@@ -68,6 +69,16 @@ export const FeaturedProducts: React.FC = () => {
                 shimmerContainer.style.opacity = '0';
               }
             }, 4000);
+          }
+        } else {
+          // When element goes out of view, reset for re-triggering
+          const shimmerElement = entry.target.querySelector('.shimmer');
+          if (shimmerElement) {
+            shimmerElement.classList.remove('shimmer-on-scroll');
+            const shimmerContainer = entry.target.querySelector('.absolute.inset-0');
+            if (shimmerContainer) {
+              shimmerContainer.style.opacity = '0';
+            }
           }
         }
       });
