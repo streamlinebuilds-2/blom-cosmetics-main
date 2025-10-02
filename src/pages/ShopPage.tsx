@@ -372,8 +372,8 @@ export const ShopPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Sticky Filter Bar */}
-        <section className="sticky top-16 z-40 bg-white border-b shadow-sm">
+        {/* Filter Bar (not sticky) */}
+        <section className="bg-white border-b shadow-sm">
           <Container>
             <div className="py-4">
               {/* Desktop Filter Bar */}
