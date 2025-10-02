@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -47,6 +47,35 @@ const CoursesPage: React.FC = () => {
     }
   ];
 
+  // Intersection Observer for mobile shimmer effect
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.3,
+      rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const shimmerElement = entry.target.querySelector('.shimmer');
+          if (shimmerElement && !shimmerElement.classList.contains('shimmer-on-scroll')) {
+            shimmerElement.classList.add('shimmer-on-scroll');
+            // Remove class after animation to allow re-triggering
+            setTimeout(() => {
+              shimmerElement.classList.remove('shimmer-on-scroll');
+            }, 3500);
+          }
+        }
+      });
+    }, observerOptions);
+
+    // Observe all course cards
+    const courseCards = document.querySelectorAll('.course-card');
+    courseCards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
@@ -62,7 +91,7 @@ const CoursesPage: React.FC = () => {
             <div className="flex justify-center">
               <div className="grid md:grid-cols-1 gap-8 max-w-md">
                 {inPersonCourses.map((course) => (
-                <Card key={course.id} className="group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
+                <Card key={course.id} className="course-card group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
                   {/* Image with Shimmer */}
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img
@@ -115,7 +144,7 @@ const CoursesPage: React.FC = () => {
 
             <div className="grid md:grid-cols-2 gap-8">
               {onlineCourses.map((course) => (
-                <Card key={course.id} className="group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
+                <Card key={course.id} className="course-card group overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 bg-white">
                   {/* Image with Shimmer */}
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <img
