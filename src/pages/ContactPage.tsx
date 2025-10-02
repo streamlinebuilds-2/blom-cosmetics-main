@@ -40,6 +40,7 @@ export const ContactPage: React.FC = () => {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+  const [isMapHovered, setIsMapHovered] = useState(false);
 
 
   const inquiryTypes = [
@@ -196,6 +197,14 @@ export const ContactPage: React.FC = () => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleMapMouseEnter = () => {
+    setIsMapHovered(true);
+  };
+
+  const handleMapMouseLeave = () => {
+    setIsMapHovered(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -576,17 +585,27 @@ export const ContactPage: React.FC = () => {
 
               {/* Google Maps */}
               <Card>
-                <div className="aspect-video overflow-hidden rounded-lg">
+                <div 
+                  className="aspect-video overflow-hidden rounded-lg relative"
+                  onMouseEnter={handleMapMouseEnter}
+                  onMouseLeave={handleMapMouseLeave}
+                >
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3580.8!2d27.7!3d-26.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s34%20Horingbek%20Avenue%2C%20Helikonpark%2C%20Randfontein!5e0!3m2!1sen!2sza!4v1"
                     width="100%"
                     height="100%"
-                    style={{ border: 0 }}
+                    style={{ 
+                      border: 0,
+                      pointerEvents: isMapHovered ? 'auto' : 'none'
+                    }}
                     allowFullScreen={true}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                     title="BLOM Cosmetics Headquarters - 34 Horingbek Avenue, Helikonpark, Randfontein"
                   ></iframe>
+                  {!isMapHovered && (
+                    <div className="absolute inset-0 bg-transparent cursor-pointer" />
+                  )}
                 </div>
               </Card>
             </div>
