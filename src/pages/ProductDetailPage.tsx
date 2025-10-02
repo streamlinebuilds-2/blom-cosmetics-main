@@ -852,6 +852,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     </>
                   )}
 
+                  {/* Wishlist Heart */}
+                  <button 
+                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    className="absolute top-4 right-4 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
+                  >
+                    <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : 'text-gray-600'}`} />
+                  </button>
+
                   {/* Sale Badge */}
                   {product.comparePrice && (
                     <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -880,95 +888,67 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 </div>
               </div>
 
-              {/* Product Buy Box */}
-              <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100">
-                <div className="mb-6">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-3">{product.name}</h1>
-                  <p className="text-base text-gray-600 mb-4 leading-relaxed">{product.subtitle}</p>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${
-                            i < Math.floor(product.rating)
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-base font-semibold text-gray-900">
-                      {product.rating} out of 5
-                    </span>
-                    <span className="text-gray-500 font-medium text-sm">({product.reviewCount} reviews)</span>
+              {/* Product Buy Box - Original Design */}
+              <div className="bg-white">
+                {/* Product Title */}
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h1>
+                
+                {/* Product Description */}
+                <p className="text-gray-600 mb-4">{product.subtitle}</p>
+                
+                {/* Rating */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className="h-4 w-4 text-yellow-400 fill-current"
+                      />
+                    ))}
                   </div>
-
-                  {/* Price */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl font-bold text-pink-500">R{product.price}</span>
-                    {product.comparePrice && (
-                      <span className="text-xl text-gray-400 line-through">R{product.comparePrice}</span>
-                    )}
-                    {product.comparePrice && (
-                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
-                        {Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)}% OFF
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Stock Status */}
-                  <div className="flex items-center gap-2 mb-4">
-                    {product.inStock ? (
-                      <>
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span className="text-green-600 font-semibold">In Stock</span>
-                        {product.stockCount <= 10 && (
-                          <span className="text-orange-600 text-xs font-medium bg-orange-50 px-2 py-1 rounded-full">
-                            Only {product.stockCount} left!
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                        <span className="text-red-600 font-semibold">Out of Stock</span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Product Benefits */}
-                  <div className="bg-gray-50 rounded-xl p-3 mb-4">
-                    <p className="text-gray-700 leading-relaxed text-sm">
-                      {product.description}
-                    </p>
-                  </div>
+                  <span className="text-gray-500 text-sm">({product.reviewCount} reviews)</span>
                 </div>
 
-                {/* Variants */}
+                {/* Price */}
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-2xl font-bold text-gray-900">R {product.price}.00</span>
+                  {product.comparePrice && (
+                    <span className="text-lg text-gray-400 line-through">R {product.comparePrice}.00</span>
+                  )}
+                </div>
+
+                {/* Stock Status */}
+                <div className="mb-6">
+                  {product.inStock ? (
+                    <span className="inline-block bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                      In Stock
+                    </span>
+                  ) : (
+                    <span className="inline-block bg-red-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                      Out of Stock
+                    </span>
+                  )}
+                </div>
+
+                {/* Scent Selection */}
                 {product.variants.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-base font-semibold text-gray-900 mb-3">Scent:</h3>
+                    <h3 className="text-gray-900 font-medium mb-3">Scent</h3>
                     <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => (
                         <button
                           key={variant.id}
                           onClick={() => setSelectedVariant(variant.id)}
                           disabled={!variant.inStock}
-                          className={`px-4 py-2 border-2 rounded-full font-semibold text-sm transition-all duration-200 ${
+                          className={`px-4 py-2 border rounded-full text-sm font-medium transition-colors ${
                             selectedVariant === variant.id
-                              ? 'border-pink-400 bg-pink-500 text-white shadow-lg'
+                              ? 'bg-pink-500 text-white border-pink-500'
                               : variant.inStock
-                              ? 'border-gray-300 bg-white text-gray-700 hover:border-pink-300 hover:bg-pink-50'
-                              : 'border-gray-200 text-gray-400 cursor-not-allowed bg-gray-100'
+                              ? 'bg-white text-gray-700 border-gray-300 hover:border-pink-300'
+                              : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
                           }`}
                         >
                           {variant.name}
-                          {!variant.inStock && (
-                            <span className="block text-xs mt-1">Out of Stock</span>
-                          )}
                         </button>
                       ))}
                     </div>
@@ -977,79 +957,41 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
                 {/* Quantity */}
                 <div className="mb-6">
-                  <h3 className="text-base font-semibold text-gray-900 mb-3">Quantity:</h3>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center border-2 border-gray-200 rounded-full bg-white">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="p-2 hover:bg-gray-50 transition-colors rounded-l-full"
-                      >
-                        <Minus className="h-4 w-4 text-gray-600" />
-                      </button>
-                      <span className="px-4 py-2 font-bold text-base text-gray-900 min-w-[50px] text-center">{quantity}</span>
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="p-2 hover:bg-gray-50 transition-colors rounded-r-full"
-                      >
-                        <Plus className="h-4 w-4 text-gray-600" />
-                      </button>
-                    </div>
-                    <div className="text-base font-semibold text-gray-900">
-                      Total: <span className="text-pink-500">R{(product.price * quantity).toFixed(2)}</span>
-                    </div>
+                  <h3 className="text-gray-900 font-medium mb-3">Quantity</h3>
+                  <div className="flex items-center border border-gray-300 rounded w-fit">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-3 py-2 hover:bg-gray-50 transition-colors"
+                    >
+                      <Minus className="h-4 w-4 text-gray-600" />
+                    </button>
+                    <span className="px-4 py-2 font-medium text-gray-900 min-w-[50px] text-center border-l border-r border-gray-300">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-3 py-2 hover:bg-gray-50 transition-colors"
+                    >
+                      <Plus className="h-4 w-4 text-gray-600" />
+                    </button>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-3 mb-6">
+                <div className="space-y-3">
                   <button
                     onClick={handleAddToCart}
                     disabled={!product.inStock}
-                    className="w-full bg-gradient-to-r from-pink-400 to-pink-500 hover:from-pink-500 hover:to-pink-600 text-white font-semibold py-3 px-5 rounded-full transition-all duration-200 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </button>
                   <button
                     onClick={handleBuyNow}
                     disabled={!product.inStock}
-                    className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-semibold py-3 px-5 rounded-full transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                    className="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-6 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     BUY NOW
                   </button>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => setIsWishlisted(!isWishlisted)}
-                      className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-semibold py-2 px-3 rounded-full transition-all duration-200 flex items-center justify-center gap-2 text-sm"
-                    >
-                      <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current text-pink-400' : ''}`} />
-                      {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
-                    </button>
-                    <button className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-semibold py-2 px-3 rounded-full transition-all duration-200 flex items-center justify-center gap-2 text-sm">
-                      <Share2 className="h-4 w-4" />
-                      Share
-                    </button>
-                  </div>
                 </div>
-
-                {/* Trust Row */}
-                <div className="grid grid-cols-3 gap-2 mb-6 text-center">
-                  <div className="flex flex-col items-center gap-1 p-3 bg-green-50 rounded-2xl">
-                    <Truck className="h-5 w-5 text-green-500" />
-                    <span className="font-semibold text-green-700 text-xs">Free shipping over R1500</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 p-3 bg-blue-50 rounded-2xl">
-                    <Shield className="h-5 w-5 text-blue-500" />
-                    <span className="font-semibold text-blue-700 text-xs">100% authentic</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 p-3 bg-purple-50 rounded-2xl">
-                    <RotateCcw className="h-5 w-5 text-purple-500" />
-                    <span className="font-semibold text-purple-700 text-xs">30-day returns</span>
-                  </div>
-                </div>
-
-                {/* Payment Methods */}
-                <PaymentMethods />
               </div>
             </div>
           </Container>
