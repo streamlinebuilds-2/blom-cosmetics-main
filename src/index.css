@@ -982,13 +982,21 @@
   }
 }
 
-/* Mobile - make shimmer always animate */
+/* Mobile - make shimmer always animate and VERY visible */
 @media (hover: none) and (pointer: coarse) {
+  /* Override the shimmer container opacity */
+  .course-card .absolute.inset-0,
+  .blog-card .absolute.inset-0,
+  .best-seller-card .absolute.inset-0 {
+    opacity: 1 !important;
+  }
+  
   .course-card .shimmer,
   .blog-card .shimmer,
   .best-seller-card .shimmer {
-    animation: premium-shimmer-sweep 4000ms cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-    opacity: 0.3;
+    animation: premium-shimmer-sweep 2000ms linear infinite !important;
+    opacity: 1 !important;
+    background: red !important; /* Temporary - make it super obvious */
   }
 }
 
