@@ -115,7 +115,7 @@ export const HeroSlider: React.FC = () => {
   return (
     <section
       id="heroSlider"
-      className="relative h-screen min-h-[600px] overflow-hidden"
+      className="relative h-screen min-h-[600px] max-h-[800px] md:max-h-none overflow-hidden"
     >
       {/* Background Images */}
       <div className="absolute inset-0">
@@ -133,7 +133,7 @@ export const HeroSlider: React.FC = () => {
               <img
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
-                className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'scale-110' : 'scale-100'}`}
+                className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'}`}
               />
             </picture>
             {/* Overlay removed for a cleaner image presentation */}
