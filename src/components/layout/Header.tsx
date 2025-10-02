@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
 import { User, Menu, X, ShoppingBag } from 'lucide-react';
