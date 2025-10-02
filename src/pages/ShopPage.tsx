@@ -345,7 +345,7 @@ export const ShopPage: React.FC = () => {
       case 'New':
         return 'bg-green-500 text-white';
       case 'Bestseller':
-        return 'bg-pink-500 text-white';
+        return 'bg-pink-400 text-white';
       case 'Coming Soon':
         return 'bg-gray-500 text-white';
       default:

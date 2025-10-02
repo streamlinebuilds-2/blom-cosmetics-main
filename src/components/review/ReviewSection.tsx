@@ -256,7 +256,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
               <p className="text-gray-600 mb-6">Be the first to share your experience with this product!</p>
               <Button
                 onClick={() => setShowReviewForm(true)}
-                className="bg-pink-400 hover:bg-pink-500 text-white font-semibold px-6 py-3 rounded-xl"
+                className="bg-pink-400 hover:bg-pink-400 text-white font-semibold px-6 py-3 rounded-xl"
               >
                 Write the First Review
               </Button>
