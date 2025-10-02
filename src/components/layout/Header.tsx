@@ -28,24 +28,9 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       // Close mobile menu if open
       if (isMobileMenuOpen) setIsMobileMenuOpen(false);
 
-      // If navigating to a different page, perform navigation after brief delay
+      // If navigating to a different page, perform instant navigation
       if (!isSamePage) {
-        const delayMs = 500; // allow scroll animation to be perceived
-
-        // Show page transition overlay to avoid white flash and keep continuity
-        const overlay = document.createElement('div');
-        overlay.className = 'page-transition-overlay';
-        document.body.appendChild(overlay);
-
-        // Ensure overlay remains during unload
-        const beforeUnload = () => {
-          try { document.body.appendChild(overlay); } catch {}
-        };
-        window.addEventListener('beforeunload', beforeUnload, { once: true });
-
-        window.setTimeout(() => {
-          window.location.assign(href);
-        }, delayMs);
+        window.location.assign(href);
       }
       // If same page, the smooth scroll already achieved the effect
     } catch {

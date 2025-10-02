@@ -34,12 +34,9 @@ createRoot(document.getElementById('root')!).render(
     // Smooth scroll to top
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
 
-    // If navigating to another page, show overlay and delay navigate
+    // If navigating to another page, navigate instantly
     if (currentPath !== targetPath) {
-      const overlay = document.createElement('div');
-      overlay.className = 'page-transition-overlay';
-      document.body.appendChild(overlay);
-      window.setTimeout(() => { window.location.assign(url.href); }, 500);
+      window.location.assign(url.href);
     }
   };
 

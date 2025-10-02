@@ -19,12 +19,7 @@ export const FeaturedProducts: React.FC = () => {
     e.preventDefault();
     try {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      const overlay = document.createElement('div');
-      overlay.className = 'page-transition-overlay';
-      document.body.appendChild(overlay);
-      window.setTimeout(() => {
-        window.location.assign('/shop');
-      }, 500);
+      window.location.assign('/shop');
     } catch {
       window.location.assign('/shop');
     }

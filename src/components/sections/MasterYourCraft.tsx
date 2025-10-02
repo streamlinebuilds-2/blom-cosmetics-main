@@ -10,12 +10,7 @@ export const MasterYourCraft: React.FC = () => {
     e.preventDefault();
     try {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      const overlay = document.createElement('div');
-      overlay.className = 'page-transition-overlay';
-      document.body.appendChild(overlay);
-      window.setTimeout(() => {
-        window.location.assign(`/courses${section}`);
-      }, 500);
+      window.location.assign(`/courses${section}`);
     } catch {
       window.location.assign(`/courses${section}`);
     }
