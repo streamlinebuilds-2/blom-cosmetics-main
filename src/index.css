@@ -622,7 +622,7 @@
   .btn{ display:inline-block; padding:.9rem 1.2rem; border-radius:25px; font-weight:800; cursor:pointer; text-decoration:none; }
   .btn-pink{ background:#FF74A4; color:#fff; }
   .btn-outline{ background:#fff; color:#FF74A4; border:1px solid #FF74A4; }
-  .btn-outline:hover{ background:#CEE5FF; color:#000; border:1px solid #000; }
+  .btn-outline:hover{ background:#8EC5FF; color:#000; border:1px solid #000; }
 
   .master__visual{ position:relative; }
   .aspect-9-16{ aspect-ratio: 9 / 16; width: min(420px, 100%); }
