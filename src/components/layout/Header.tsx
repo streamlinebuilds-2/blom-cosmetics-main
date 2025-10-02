@@ -55,23 +55,23 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
 
   const navigationItems = [
     {
-      name: 'HOME',
+      name: 'Home',
       href: '/'
     },
     {
-      name: 'SHOP',
+      name: 'Shop',
       href: '/shop'
     },
     {
-      name: 'COURSES & BLOG',
+      name: 'Courses & Blog',
       href: '/courses'
     },
     {
-      name: 'ABOUT',
+      name: 'About',
       href: '/about'
     },
     {
-      name: 'CONTACT',
+      name: 'Contact',
       href: '/contact'
     }
   ];
@@ -110,14 +110,24 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                   <div key={item.name} className="relative group">
                     <a
                       href={item.href}
-                      className={`px-3 py-2 text-sm font-medium header-nav transition-colors ${
+                      className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative ${
                         isActive 
-                          ? 'bg-blue-100 text-gray-900 rounded-md' 
+                          ? 'text-pink-500' 
                           : 'text-gray-700 hover:text-gray-900'
                       }`}
                       onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
+                      
+                      {/* Pink underline stripe */}
+                      <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-pink-400 transition-all duration-200 ${
+                        isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}></span>
+                      
+                      {/* Light pink highlight background */}
+                      <span className={`absolute inset-0 bg-pink-50 rounded-md transition-all duration-200 ${
+                        isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}></span>
                     </a>
 
                   {/* Dropdown/Mega Menu */}
@@ -211,16 +221,28 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
           >
             <Container>
               <div className="py-6 space-y-1">
-                {navigationItems.map((item) => (
-                  <div key={item.name}>
-                    <a
-                      href={item.href}
-                      className="block py-3 px-4 text-gray-700 hover:text-pink-400 hover:bg-pink-50 font-medium rounded-lg transition-colors"
-                      onClick={(e) => handleNavClick(e, item.href)}
-                    >
-                      {item.name}
-                    </a>
-                    {item.dropdown && (
+                {navigationItems.map((item) => {
+                  const isActive = currentPath === item.href;
+                  return (
+                    <div key={item.name}>
+                      <a
+                        href={item.href}
+                        className={`block py-3 px-4 font-medium rounded-lg transition-all duration-200 relative ${
+                          isActive 
+                            ? 'text-pink-500 bg-pink-50' 
+                            : 'text-gray-700 hover:text-pink-400 hover:bg-pink-50'
+                        }`}
+                        onClick={(e) => handleNavClick(e, item.href)}
+                      >
+                        {item.name}
+                        
+                        {/* Pink underline stripe for mobile */}
+                        <span className={`absolute bottom-0 left-4 right-4 h-0.5 bg-pink-400 transition-all duration-200 ${
+                          isActive ? 'opacity-100' : 'opacity-0'
+                        }`}></span>
+                      </a>
+                      
+                      {item.dropdown && (
                       <div className="pl-6 space-y-1">
                         {item.dropdown.map((subItem) => (
                           <a
@@ -235,7 +257,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
 
                 {/* Mobile Contact Info */}
                 <div className="pt-6 border-t mt-6 bg-gray-50 -mx-4 px-4 py-4 rounded-lg">
