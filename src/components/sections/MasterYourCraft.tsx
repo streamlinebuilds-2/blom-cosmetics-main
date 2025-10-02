@@ -19,6 +19,13 @@ export const MasterYourCraft: React.FC = () => {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    
+    // Ensure seamless looping
+    const handleEnded = () => {
+      video.currentTime = 0;
+      video.play?.().catch(() => {});
+    };
+    
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -28,8 +35,15 @@ export const MasterYourCraft: React.FC = () => {
         }
       });
     }, { threshold: 0.5 });
+    
+    // Add event listener for seamless looping
+    video.addEventListener('ended', handleEnded);
     observer.observe(video);
-    return () => observer.disconnect();
+    
+    return () => {
+      observer.disconnect();
+      video.removeEventListener('ended', handleEnded);
+    };
   }, []);
 
   return (
@@ -97,12 +111,14 @@ export const MasterYourCraft: React.FC = () => {
 
           {/* Right visual */}
           <div className="master__visual">
-            <figure className="m-visual aspect-1-1">
+            <figure className="m-visual aspect-[4/3]">
               <video
                 ref={videoRef}
                 className="myc__image"
                 muted
                 playsInline
+                loop
+                autoPlay
                 preload="metadata"
                 poster="/workshop-poster.jpg"
               >
