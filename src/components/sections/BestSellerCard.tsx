@@ -92,17 +92,23 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
           <div className="flex flex-col gap-2">
             <button
               onClick={handleWishlistToggle}
-              className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
+              className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
               aria-label="Add to wishlist"
             >
-              <Heart className="h-4 w-4 text-gray-700" />
+              <Heart className="h-4 w-4 text-gray-700 group-hover/btn:opacity-0 transition-opacity duration-300" />
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-gray-700 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                Add to Wishlist
+              </span>
             </button>
             <button
               onClick={handleAddToCart}
-              className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors"
+              className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
               aria-label="Add to cart"
             >
-              <ShoppingBag className="h-4 w-4 text-gray-700" />
+              <ShoppingBag className="h-4 w-4 text-gray-700 group-hover/btn:opacity-0 transition-opacity duration-300" />
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-gray-700 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                Add to Cart
+              </span>
             </button>
           </div>
         </div>
