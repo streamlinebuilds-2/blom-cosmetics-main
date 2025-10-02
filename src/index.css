@@ -484,16 +484,15 @@
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
+    left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(206, 229, 255, 0.1) 0%, rgba(255, 116, 164, 0.1) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    background: linear-gradient(90deg, rgba(255, 116, 164, 0.15) 0%, rgba(206, 229, 255, 0.15) 100%);
+    transition: left 0.6s ease;
     pointer-events: none;
   }
   .promise-card:hover::after {
-    opacity: 1;
+    left: 100%;
   }
   .promise-icon {
     @apply w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5;
@@ -737,7 +736,21 @@
   @media (max-width: 900px){ .why-grid{ grid-template-columns: 1fr; } }
   .why-card{ background:#fff; border-radius:var(--why-radius); box-shadow:0 10px 30px var(--why-ring); padding: clamp(18px,3vw,28px); text-align:center; transition: transform .2s ease, box-shadow .2s ease; position: relative; overflow: hidden; }
   .why-card:hover{ transform: translateY(-4px); box-shadow:0 16px 36px rgba(15,23,42,.16); }
-  .why-icon{ width:76px; height:76px; margin-inline:auto; border-radius:50%; display:grid; place-items:center; color:#243547; background: radial-gradient(ellipse at 30% 30%, #ffffff 0%, #f3f7ff 55%, #eaf3ff 100%); box-shadow: inset 0 0 0 2px #ffffff, 0 10px 22px rgba(15,23,42,.10); transition: transform .22s ease; }
+  .why-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255, 116, 164, 0.15) 0%, rgba(206, 229, 255, 0.15) 100%);
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
+  .why-card:hover::after {
+    left: 100%;
+  }
+  .why-icon{ width:76px; height:76px; margin-inline:auto; border-radius:50%; display:grid; place-items:center; color:#243547; background: radial-gradient(ellipse at 30% 30%, #ffffff 0%, #f3f7ff 55%, #eaf3ff 100%); box-shadow: inset 0 0 0 2px #ffffff, 0 10px 22px rgba(15,23,42,.10); transition: transform .22s ease; position: relative; z-index: 10; }
   .why-card:hover .why-icon{ transform: translateY(-2px) scale(1.03); }
   .why-heading{ margin: 14px 0 8px; font-weight:800; color:#1f2a44; letter-spacing:.02em; font-size:clamp(1.05rem,1.8vw,1.25rem); }
   .why-copy{ margin:0; color:#475569; line-height:1.6; font-size:clamp(.95rem,1.4vw,1rem); }
