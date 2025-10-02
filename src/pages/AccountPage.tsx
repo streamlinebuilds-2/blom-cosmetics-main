@@ -352,7 +352,7 @@ export const AccountPage: React.FC = () => {
                     
                     <Card className="text-center">
                       <CardContent className="p-6">
-                        <Star className="h-12 w-12 text-yellow-400 mx-auto mb-4" />
+                        <Star className="h-12 w-12 text-primary-blue mx-auto mb-4" />
                         <div className="text-3xl font-bold text-yellow-600 mb-2">{userData.loyaltyPoints}</div>
                         <div className="text-gray-600">Loyalty Points</div>
                       </CardContent>

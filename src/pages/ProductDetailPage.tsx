@@ -902,7 +902,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className="h-4 w-4 text-yellow-400 fill-current"
+                        className="h-4 w-4 text-primary-blue fill-current"
                       />
                     ))}
                   </div>
