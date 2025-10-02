@@ -466,10 +466,28 @@ export const ShopPage: React.FC = () => {
 
               {/* Mobile Filter Summary */}
               <div className="lg:hidden">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-600">
-                    {/* Product count removed as requested */}
+                {/* Top row: search + filters button */}
+                <div className="flex items-center gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="input-field pl-10 pr-10 w-full"
+                    />
+                    {searchTerm && (
+                      <button
+                        onClick={clearSearch}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+                        aria-label="Clear search"
+                      >
+                        <X className="h-4 w-4 text-gray-400" />
+                      </button>
+                    )}
                   </div>
+
                   <button
                     onClick={() => setShowMobileFilters(true)}
                     className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
@@ -477,6 +495,25 @@ export const ShopPage: React.FC = () => {
                     <SlidersHorizontal className="h-4 w-4" />
                     Filters
                   </button>
+                </div>
+
+                {/* Pink Category Pills */}
+                <div className="mt-3 overflow-x-auto">
+                  <div className="flex gap-2 min-w-max">
+                    {productCategories.map((category) => (
+                      <button
+                        key={category.slug}
+                        onClick={() => setSelectedCategory(category.slug)}
+                        className={`px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors border ${
+                          selectedCategory === category.slug
+                            ? 'bg-pink-400 text-white border-pink-400 shadow-sm'
+                            : 'bg-pink-100 text-pink-700 border-pink-200 hover:bg-pink-200'
+                        }`}
+                      >
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
