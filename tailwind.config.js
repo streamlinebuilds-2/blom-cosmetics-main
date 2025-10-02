@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  darkMode: false, // Completely disable dark mode
+  darkMode: 'class', // Use class-based dark mode (but we won't apply it)
   theme: {
     extend: {
       colors: {
@@ -11,7 +11,4 @@ export default {
     },
   },
   plugins: [],
-  corePlugins: {
-    preflight: true,
-  },
 };
