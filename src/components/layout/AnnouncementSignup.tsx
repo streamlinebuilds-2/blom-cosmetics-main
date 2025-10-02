@@ -87,10 +87,14 @@ export const AnnouncementSignup: React.FC = () => {
     if (!session.bannerClosed) setIsBannerVisible(true);
     try { sessionStorage.setItem('signup_popup_closed', '1'); } catch {}
     
-    // Restore scroll position after a brief delay to ensure DOM updates are complete
-    setTimeout(() => {
-      window.scrollTo(0, currentScrollY);
-    }, 0);
+    // Restore scroll position after DOM updates complete
+    requestAnimationFrame(() => {
+      window.scrollTo({
+        top: currentScrollY,
+        left: 0,
+        behavior: 'instant'
+      });
+    });
   };
 
   const closeBanner = () => {
