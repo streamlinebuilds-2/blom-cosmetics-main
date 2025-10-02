@@ -12,6 +12,27 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down
+        setIsScrolledDown(true);
+      } else {
+        // Scrolling up
+        setIsScrolledDown(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     try {
@@ -77,18 +98,38 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       <AnnouncementSignup />
 
       {/* Main Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+        isScrolledDown 
+          ? 'bg-white/80 backdrop-blur-md shadow-lg' 
+          : 'bg-white shadow-sm'
+      }`}>
         <Container>
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex-shrink-0">
+            {/* Mobile menu button - Left side (mobile only) */}
+            {showMobileMenu && (
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 text-gray-400 hover:text-gray-500"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
+              </button>
+            )}
+
+            {/* Logo - Left on desktop, center on mobile */}
+            <div className="flex-shrink-0 lg:flex-shrink-0 lg:flex-none flex-1 flex justify-center lg:justify-start">
               <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
                 <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-10" />
               </a>
             </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            {/* Desktop Navigation - Center */}
+            <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
               {navigationItems.map((item) => {
                 const isActive = currentPath === item.href;
                 return (
@@ -97,9 +138,12 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       href={item.href}
                       className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative ${
                         isActive 
-                          ? 'bg-blue-100 text-gray-900 rounded-md' 
+                          ? 'text-gray-900 rounded-md' 
                           : 'text-gray-700 hover:text-gray-900'
                       }`}
+                      style={{
+                        backgroundColor: isActive ? '#CEE5FF' : 'transparent'
+                      }}
                       onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
@@ -162,7 +206,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             })}
             </nav>
 
-            {/* Action Icons */}
+            {/* Action Icons - Right side */}
             <div className="flex items-center space-x-4">
               <a
                 href="/account"
@@ -173,22 +217,6 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 <User className="h-5 w-5" />
               </a>
               <CartButton />
-
-              {/* Mobile menu button */}
-              {showMobileMenu && (
-                <button
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="lg:hidden p-2 text-gray-400 hover:text-gray-500"
-                  aria-expanded={isMobileMenuOpen}
-                  aria-controls="mobile-menu"
-                >
-                  {isMobileMenuOpen ? (
-                    <X className="h-6 w-6" />
-                  ) : (
-                    <Menu className="h-6 w-6" />
-                  )}
-                </button>
-              )}
             </div>
           </div>
         </Container>
@@ -212,9 +240,12 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                         href={item.href}
                         className={`block py-3 px-4 font-medium rounded-lg transition-all duration-200 relative ${
                           isActive 
-                            ? 'bg-blue-100 text-gray-900' 
+                            ? 'text-gray-900' 
                             : 'text-gray-700 hover:text-gray-900'
                         }`}
+                        style={{
+                          backgroundColor: isActive ? '#CEE5FF' : 'transparent'
+                        }}
                         onClick={(e) => handleNavClick(e, item.href)}
                       >
                         {item.name}

@@ -62,7 +62,7 @@
    ======================================== */
 
 .site-footer {
-  background: linear-gradient(135deg, #CFEAFF 0%, #CFE3FF 50%, #CFEAFF 100%);
+  background: linear-gradient(135deg, #CEE5FF 0%, #8EC5FF 50%, #9CCBFF 100%);
   padding: 40px 0 0 0;
   color: #1e293b;
   margin-top: auto;
@@ -211,7 +211,7 @@
 }
 
 .footer-bottom {
-  background: linear-gradient(135deg, #CFEAFF 0%, #CFE3FF 50%, #CFEAFF 100%);
+  background: linear-gradient(135deg, #CEE5FF 0%, #8EC5FF 50%, #9CCBFF 100%);
   padding: 20px 20px;
   display: flex;
   justify-content: space-between;
@@ -256,10 +256,19 @@
   }
 }
 :root {
-  --primary-pink: #FF8BB3;
+  /* Main brand colors */
+  --brand-primary: #CEE5FF; /* Primary Blue */
+  --brand-primary-600: #8EC5FF; /* Mid Blue */
+  --brand-primary-700: #9CCBFF; /* Deeper Blue */
+  --brand-accent: #FF74A4; /* Primary Pink */
+  --brand-accent-600: #ff5f97; /* Deeper pink */
+  --brand-accent-hover: #FF5A96; /* Pink hover state */
+  
+  /* Legacy/alternative names (same colors) */
   --primary-blue: #CEE5FF;
-  --accent-gold: #FFD700;
-  --accent-coral: #FF6B6B;
+  --accent-pink: #FF74A4;
+  --primary-pink: #FF74A4;
+  
   --neutral-white: #FFFFFF;
   --neutral-light: #F8F9FA;
   --neutral-medium: #6C757D;
@@ -400,7 +409,7 @@
 
   /* Secondary outline (black) */
   .btn-outline, .btn-secondary { background: #fff; color: #000; border: 2px solid #000; border-radius: 9999px; }
-  .btn-outline:hover, .btn-secondary:hover { background: #CEE5FF; transform: translateY(-1px); }
+  .btn-outline:hover, .btn-secondary:hover { background: #8EC5FF; transform: translateY(-1px); }
 
   .btn-ghost {
     @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-200;
@@ -613,7 +622,7 @@
   .btn{ display:inline-block; padding:.9rem 1.2rem; border-radius:25px; font-weight:800; cursor:pointer; text-decoration:none; }
   .btn-pink{ background:#FF74A4; color:#fff; }
   .btn-outline{ background:#fff; color:#FF74A4; border:1px solid #FF74A4; }
-  .btn-outline:hover{ background:#CEE5FF; color:#000; border:1px solid #000; }
+  .btn-outline:hover{ background:#8EC5FF; color:#000; border:1px solid #000; }
 
   .master__visual{ position:relative; }
   .aspect-9-16{ aspect-ratio: 9 / 16; width: min(420px, 100%); }
