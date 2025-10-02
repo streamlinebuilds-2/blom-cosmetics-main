@@ -189,6 +189,7 @@ export const AnnouncementSignup: React.FC = () => {
 
 const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -199,9 +200,11 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     setError(null);
     setSuccess(false);
 
-    const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-    if (!isValid || !consent) {
-      setError('Please enter a valid email and accept the privacy terms.');
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const isValidPhone = /^[\+]?[0-9\s\-\(\)]{10,}$/.test(phone.trim());
+    
+    if (!isValidEmail || !isValidPhone || !consent) {
+      setError('Please enter a valid email, phone number, and accept the privacy terms.');
       return;
     }
 
@@ -234,6 +237,22 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
+          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="beautyclub-phone" className="block text-sm font-semibold text-gray-800 mb-3">
+          Phone number
+        </label>
+        <input
+          id="beautyclub-phone"
+          type="tel"
+          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
+          placeholder="Enter your phone number"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          autoComplete="tel"
           required
         />
       </div>
