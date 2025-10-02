@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface StickyCartProps {
   productName: string;
@@ -21,6 +21,7 @@ export const StickyCart: React.FC<StickyCartProps> = ({
   isVisible
 }) => {
   const [shouldShake, setShouldShake] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Shake animation every 10 seconds
   useEffect(() => {
@@ -37,8 +38,22 @@ export const StickyCart: React.FC<StickyCartProps> = ({
   if (!isVisible) return null;
 
   return (
-    <div className={`fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50 transform transition-all duration-300 ${shouldShake ? 'animate-subtle-shake' : ''}`}>
-      <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50 transform transition-all duration-300">
+      {/* Collapse Toggle Button */}
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -top-10 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors shadow-lg"
+        aria-label={isCollapsed ? "Show cart" : "Hide cart"}
+      >
+        {isCollapsed ? (
+          <ChevronUp className="h-4 w-4 text-gray-600" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-gray-600" />
+        )}
+      </button>
+
+      {/* Cart Content */}
+      <div className={`max-w-7xl mx-auto px-4 py-4 transition-all duration-300 ${isCollapsed ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
         <div className="flex items-center justify-between gap-4">
           {/* Product Info */}
           <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -79,7 +94,7 @@ export const StickyCart: React.FC<StickyCartProps> = ({
           {/* Add to Cart Button */}
           <button
             onClick={onAddToCart}
-            className="btn btn-primary btn-lg flex items-center gap-3 whitespace-nowrap"
+            className={`btn btn-primary btn-lg flex items-center gap-3 whitespace-nowrap transition-all duration-300 ${shouldShake ? 'animate-subtle-shake' : ''}`}
           >
             <ShoppingCart className="h-5 w-5" />
             ADD TO CART
