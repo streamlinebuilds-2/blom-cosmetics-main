@@ -43,8 +43,8 @@ export const ShopPage: React.FC = () => {
       id: '2',
       name: 'Vitamin Primer',
       slug: 'vitamin-primer',
-      price: 299,
-      compareAtPrice: 350,
+      price: 140,
+      compareAtPrice: undefined,
       short_description: 'Vitamin-infused, acid-free primer for strong adhesion.',
       shortDescription: 'Vitamin-infused, acid-free primer for strong adhesion.',
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
@@ -60,7 +60,7 @@ export const ShopPage: React.FC = () => {
       id: '3',
       name: 'Prep Solution (Nail Dehydrator)',
       slug: 'prep-solution',
-      price: 189,
+      price: 120,
       compareAtPrice: undefined,
       short_description: 'Removes oils & moisture for better adhesion.',
       shortDescription: 'Removes oils & moisture for better adhesion.',
@@ -77,8 +77,8 @@ export const ShopPage: React.FC = () => {
       id: '4',
       name: 'Top Coat',
       slug: 'top-coat',
-      price: 249,
-      compareAtPrice: 299,
+      price: 130,
+      compareAtPrice: undefined,
       short_description: 'Strong, protective top coat with mirror shine.',
       shortDescription: 'Strong, protective top coat with mirror shine.',
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
@@ -94,7 +94,7 @@ export const ShopPage: React.FC = () => {
       id: '5',
       name: 'Fairy Dust Top Coat',
       slug: 'fairy-dust-top-coat',
-      price: 279,
+      price: 140,
       compareAtPrice: undefined,
       short_description: 'Glitter-infused top coat with smooth shine.',
       shortDescription: 'Glitter-infused top coat with smooth shine.',
@@ -111,7 +111,7 @@ export const ShopPage: React.FC = () => {
       id: '6',
       name: 'Nail File (80/80 Grit)',
       slug: 'nail-file-80-80',
-      price: 45,
+      price: 35,
       compareAtPrice: undefined,
       short_description: 'Durable file with eco-friendly sponge core.',
       shortDescription: 'Durable file with eco-friendly sponge core.',
@@ -128,7 +128,7 @@ export const ShopPage: React.FC = () => {
       id: '7',
       name: 'Nail Forms',
       slug: 'nail-forms',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'Sculpting forms with holographic guide for precision.',
       shortDescription: 'Sculpting forms with holographic guide for precision.',
@@ -145,7 +145,7 @@ export const ShopPage: React.FC = () => {
       id: '8',
       name: 'Nail Liquid Monomer',
       slug: 'nail-liquid-monomer',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
       shortDescription: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
@@ -162,7 +162,7 @@ export const ShopPage: React.FC = () => {
       id: '9',
       name: 'Crystal Clear Acrylic',
       slug: 'crystal-clear-acrylic',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'Glass-clear powder for encapsulation & overlays.',
       shortDescription: 'Glass-clear powder for encapsulation & overlays.',
@@ -179,7 +179,7 @@ export const ShopPage: React.FC = () => {
       id: '10',
       name: 'Snow White Acrylic',
       slug: 'snow-white-acrylic',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'Opaque white acrylic for French & design work.',
       shortDescription: 'Opaque white acrylic for French & design work.',
@@ -196,7 +196,7 @@ export const ShopPage: React.FC = () => {
       id: '11',
       name: 'Colour Acrylic',
       slug: 'colour-acrylic',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'High-pigment acrylic powders for bold designs.',
       shortDescription: 'High-pigment acrylic powders for bold designs.',
@@ -213,7 +213,7 @@ export const ShopPage: React.FC = () => {
       id: '12',
       name: 'Glitter Acrylic',
       slug: 'glitter-acrylic',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'Sparkle acrylics for encapsulated effects.',
       shortDescription: 'Sparkle acrylics for encapsulated effects.',
@@ -230,7 +230,7 @@ export const ShopPage: React.FC = () => {
       id: '13',
       name: 'Core Acrylics',
       slug: 'core-acrylics',
-      price: 0, // Price to be updated
+      price: -1, // Coming Soon
       compareAtPrice: undefined,
       short_description: 'Strength powders in clear, white, and natural tones.',
       shortDescription: 'Strength powders in clear, white, and natural tones.',
