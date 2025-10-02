@@ -407,6 +407,12 @@
     @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer border-0 outline-none focus:ring-2 focus:ring-offset-2;
     min-height: 44px;
   }
+  @media (max-width: 640px) {
+    .btn {
+      border-radius: 9999px;
+      padding: 0.75rem 1.5rem;
+    }
+  }
 
   .btn-primary {
     @apply bg-pink-400 text-white hover:bg-pink-400 focus:ring-pink-300;
@@ -630,17 +636,25 @@
     font-weight: 800;
     letter-spacing: 12px;
     color: var(--neutral-white);
-    text-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 6px 30px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.6);
     font-family: 'Playfair Display', serif;
     font-style: italic;
     line-height: 1.2;
     margin: 0 0 40px 0;
   }
   @media (max-width: 1024px) {
-    .hero-slogan { font-size: 64px; letter-spacing: 8px; }
+    .hero-slogan { 
+      font-size: 64px; 
+      letter-spacing: 8px; 
+      text-shadow: 0 6px 30px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
   }
   @media (max-width: 640px) {
-    .hero-slogan { font-size: 42px; letter-spacing: 6px; }
+    .hero-slogan { 
+      font-size: 48px; 
+      letter-spacing: 6px; 
+      text-shadow: 0 6px 30px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.7);
+    }
   }
 
   /* Master Your Craft */
@@ -684,6 +698,9 @@
   }
 
   .btn{ display:inline-block; padding:.9rem 1.2rem; border-radius:25px; font-weight:800; cursor:pointer; text-decoration:none; }
+  @media (max-width: 640px) {
+    .btn { border-radius: 9999px; padding: 0.75rem 1.5rem; }
+  }
   .btn-pink{ background:#FF74A4; color:#fff; }
   .btn-outline{ background:#fff; color:#FF74A4; border:1px solid #FF74A4; }
   .btn-outline:hover{ background:#8EC5FF; color:#000; border:1px solid #000; }

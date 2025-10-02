@@ -146,7 +146,7 @@ export const FeaturedProducts: React.FC = () => {
         slug: 'nail-liquid-monomer',
         name: 'Nail Liquid (Monomer)',
         price: 380,
-        image: '/nail-liquid-01.webp',
+        image: '/nail-liquid-monomer.webp',
         description: 'High-quality monomer for smooth application'
       }
     ];
