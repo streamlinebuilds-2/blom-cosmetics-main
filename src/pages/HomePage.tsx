@@ -104,7 +104,7 @@ export const HomePage: React.FC = () => {
               {/* 1 */}
               <div className="promise-card text-center p-6">
                 <div className="promise-icon">
-                  <Heart className="h-7 w-7 text-gray-700" />
+                  <Heart className="h-7 w-7" style={{ color: '#CEE5FF' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-3">HEMA-Free Formulas</h3>
                 <p className="text-gray-600 text-sm">Safe for sensitive clients with our carefully formulated, hypoallergenic products</p>

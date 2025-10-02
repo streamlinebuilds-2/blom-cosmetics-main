@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from '../layout/Container';
 import { ProductCard } from '../ProductCard';
+import { BestSellerCard } from './BestSellerCard';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { queries, Product, ProductImage } from '../../lib/supabase';
@@ -114,14 +115,14 @@ export const FeaturedProducts: React.FC = () => {
 
           <div className="grid-responsive">
             {fallbackProducts.map((product) => (
-              <ProductCard
+              <BestSellerCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
                 slug={product.slug}
                 price={product.price}
                 shortDescription={product.description}
-                images={[product.image]}
+                image={product.image}
                 inStock={true}
                 badges={['Bestseller']}
               />
@@ -157,7 +158,7 @@ export const FeaturedProducts: React.FC = () => {
             const imageUrl = primaryImage?.image_url || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
 
             return (
-              <ProductCard
+              <BestSellerCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
@@ -165,7 +166,7 @@ export const FeaturedProducts: React.FC = () => {
                 price={product.price}
                 compareAtPrice={product.compare_at_price}
                 shortDescription={product.short_description}
-                images={[imageUrl]}
+                image={imageUrl}
                 inStock={true}
                 badges={['Bestseller']}
               />
