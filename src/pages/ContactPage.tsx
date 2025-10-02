@@ -30,6 +30,7 @@ export const ContactPage: React.FC = () => {
     name: '',
     email: '',
     phone: '',
+    countryCode: '+27',
     subject: '',
     message: '',
     inquiryType: 'general'
@@ -38,6 +39,7 @@ export const ContactPage: React.FC = () => {
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
 
 
   const inquiryTypes = [
@@ -47,6 +49,35 @@ export const ContactPage: React.FC = () => {
     { value: 'support', label: 'Technical Support' },
     { value: 'business', label: 'Business Partnership' },
     { value: 'media', label: 'Media & Press' }
+  ];
+
+  const countryCodes = [
+    { code: '+27', country: 'South Africa', flag: '🇿🇦' },
+    { code: '+1', country: 'United States', flag: '🇺🇸' },
+    { code: '+44', country: 'United Kingdom', flag: '🇬🇧' },
+    { code: '+33', country: 'France', flag: '🇫🇷' },
+    { code: '+49', country: 'Germany', flag: '🇩🇪' },
+    { code: '+39', country: 'Italy', flag: '🇮🇹' },
+    { code: '+34', country: 'Spain', flag: '🇪🇸' },
+    { code: '+31', country: 'Netherlands', flag: '🇳🇱' },
+    { code: '+32', country: 'Belgium', flag: '🇧🇪' },
+    { code: '+41', country: 'Switzerland', flag: '🇨🇭' },
+    { code: '+43', country: 'Austria', flag: '🇦🇹' },
+    { code: '+46', country: 'Sweden', flag: '🇸🇪' },
+    { code: '+47', country: 'Norway', flag: '🇳🇴' },
+    { code: '+45', country: 'Denmark', flag: '🇩🇰' },
+    { code: '+358', country: 'Finland', flag: '🇫🇮' },
+    { code: '+351', country: 'Portugal', flag: '🇵🇹' },
+    { code: '+353', country: 'Ireland', flag: '🇮🇪' },
+    { code: '+61', country: 'Australia', flag: '🇦🇺' },
+    { code: '+64', country: 'New Zealand', flag: '🇳🇿' },
+    { code: '+81', country: 'Japan', flag: '🇯🇵' },
+    { code: '+82', country: 'South Korea', flag: '🇰🇷' },
+    { code: '+86', country: 'China', flag: '🇨🇳' },
+    { code: '+91', country: 'India', flag: '🇮🇳' },
+    { code: '+55', country: 'Brazil', flag: '🇧🇷' },
+    { code: '+52', country: 'Mexico', flag: '🇲🇽' },
+    { code: '+54', country: 'Argentina', flag: '🇦🇷' }
   ];
 
 
@@ -85,12 +116,50 @@ export const ContactPage: React.FC = () => {
     }
   ];
 
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone: string): boolean => {
+    // Remove all non-digit characters for validation
+    const cleanPhone = phone.replace(/\D/g, '');
+    // Check if phone has at least 7 digits and max 15 digits
+    return cleanPhone.length >= 7 && cleanPhone.length <= 15;
+  };
+
+  const validateForm = (): boolean => {
+    const errors: {[key: string]: string} = {};
+
+    // Email validation
+    if (formData.email && !validateEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    // Phone validation (only if phone is provided)
+    if (formData.phone && !validatePhone(formData.phone)) {
+      errors.phone = 'Please enter a valid phone number (7-15 digits)';
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,6 +200,12 @@ export const ContactPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form before submission
+    if (!validateForm()) {
+      return;
+    }
+    
     setIsSubmitting(true);
     
     // Simulate form submission
@@ -141,10 +216,13 @@ export const ContactPage: React.FC = () => {
       name: '',
       email: '',
       phone: '',
+      countryCode: '+27',
       subject: '',
       message: '',
       inquiryType: 'general'
     });
+    setAttachedFiles([]);
+    setValidationErrors({});
     
     setIsSubmitting(false);
     alert('Thank you for your message! We\'ll get back to you within 24 hours.');
@@ -270,9 +348,14 @@ export const ContactPage: React.FC = () => {
                             value={formData.email}
                             onChange={handleInputChange}
                             required
-                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                            className={`input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all ${
+                              validationErrors.email ? 'border-red-500' : ''
+                            }`}
                             placeholder="your.email@example.com"
                           />
+                          {validationErrors.email && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+                          )}
                         </div>
                       </div>
 
@@ -281,15 +364,34 @@ export const ContactPage: React.FC = () => {
                           <label htmlFor="phone" className="block text-sm font-semibold text-gray-800 mb-2">
                             Phone Number
                           </label>
-                          <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleInputChange}
-                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
-                            placeholder="+27 XX XXX XXXX"
-                          />
+                          <div className="flex gap-2">
+                            <select
+                              name="countryCode"
+                              value={formData.countryCode}
+                              onChange={handleInputChange}
+                              className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all w-32 flex-shrink-0"
+                            >
+                              {countryCodes.map((country) => (
+                                <option key={country.code} value={country.code}>
+                                  {country.flag} {country.code}
+                                </option>
+                              ))}
+                            </select>
+                            <input
+                              type="tel"
+                              id="phone"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleInputChange}
+                              className={`input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all flex-1 ${
+                                validationErrors.phone ? 'border-red-500' : ''
+                              }`}
+                              placeholder="XX XXX XXXX"
+                            />
+                          </div>
+                          {validationErrors.phone && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.phone}</p>
+                          )}
                         </div>
                         <div>
                           <label htmlFor="inquiryType" className="block text-sm font-semibold text-gray-800 mb-2">
