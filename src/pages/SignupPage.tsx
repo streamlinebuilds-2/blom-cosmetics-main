@@ -322,13 +322,13 @@ export const SignupPage: React.FC = () => {
                   <Button
                     type="submit"
                     id="signupSubmit"
-                    className="w-full"
+                    className="w-full flex items-center justify-center py-3"
                     size="lg"
                     disabled={!isFormValid || isSubmitting}
                     loading={isSubmitting}
                   >
-                    <UserPlus className="h-5 w-5 mr-2" />
-                    {isSubmitting ? 'Creating Account...' : 'Create Account'}
+                    <UserPlus className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                    <span className="text-sm sm:text-base">{isSubmitting ? 'Creating...' : 'Create Account'}</span>
                   </Button>
                 </form>
 

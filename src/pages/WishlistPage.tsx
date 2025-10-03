@@ -271,7 +271,7 @@ export const WishlistPage: React.FC = () => {
                             {/* Remove Button */}
                             <Button
                               onClick={() => handleRemoveFromWishlist(item)}
-                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                              className="p-2 text-white hover:text-red-500 hover:bg-red-50 bg-red-500 rounded-full transition-colors"
                               aria-label={`Remove ${item.name} from wishlist`}
                             >
                               <Trash2 className="h-4 w-4" />
