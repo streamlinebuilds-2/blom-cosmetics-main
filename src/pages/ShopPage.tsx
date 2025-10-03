@@ -4,13 +4,11 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/Button';
-import { cartStore, showNotification } from '../lib/cart';
-import { Filter, Grid2x2 as Grid, List, Search, ShoppingCart, Star, Eye, Heart, X, SlidersHorizontal } from 'lucide-react';
+import { Search, Filter, Grid3X3, Grid2X2, List, X, ChevronDown } from 'lucide-react';
 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  // Set list view as default on mobile, grid-3 on desktop
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 768 ? 'list' : 'grid-3';
@@ -19,8 +17,8 @@ export const ShopPage: React.FC = () => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [showInStockOnly, setShowInStockOnly] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   // All BLOM products with detailed information
   const allProducts = [
@@ -72,7 +70,7 @@ export const ShopPage: React.FC = () => {
       short_description: 'Removes oils & moisture for better adhesion.',
       shortDescription: 'Removes oils & moisture for better adhesion.',
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      images: ['/prep-solution.webp'],
+          images: ['/prep-solution.webp'],
       category: 'prep-finishing',
       rating: 4.7,
       reviews: 89,
@@ -84,8 +82,8 @@ export const ShopPage: React.FC = () => {
       id: '4',
       name: 'Top Coat',
       slug: 'top-coat',
-          price: 130,
-          compareAtPrice: undefined,
+      price: 160,
+      compareAtPrice: undefined,
       short_description: 'Strong, protective top coat with mirror shine.',
       shortDescription: 'Strong, protective top coat with mirror shine.',
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
@@ -101,7 +99,7 @@ export const ShopPage: React.FC = () => {
       id: '5',
       name: 'Fairy Dust Top Coat',
       slug: 'fairy-dust-top-coat',
-      price: 140,
+      price: 180,
       compareAtPrice: undefined,
       short_description: 'Glitter-infused top coat with smooth shine.',
       shortDescription: 'Glitter-infused top coat with smooth shine.',
@@ -116,48 +114,48 @@ export const ShopPage: React.FC = () => {
     },
     {
       id: '6',
-      name: 'Nail File (80/80 Grit)',
-      slug: 'nail-file-80-80',
-          price: 35,
+      name: 'Nail Forms',
+      slug: 'nail-forms',
+      price: 45,
       compareAtPrice: undefined,
-      short_description: 'Durable file with eco-friendly sponge core.',
-      shortDescription: 'Durable file with eco-friendly sponge core.',
-      description: 'Double-sided professional nail file for shaping and refinements.',
-          images: ['/designer-file-01.webp'],
+      short_description: 'Reusable forms for sculpting extensions.',
+      shortDescription: 'Reusable forms for sculpting extensions.',
+      description: 'Professional nail forms for creating perfect extensions and overlays.',
+          images: ['/nail-forms-01.webp'],
       category: 'tools-essentials',
       rating: 4.5,
-      reviews: 45,
+      reviews: 67,
       badges: [],
       inStock: true,
       variants: []
     },
     {
       id: '7',
-      name: 'Nail Forms',
-      slug: 'nail-forms',
-      price: -1, // Coming Soon
+      name: 'Designer File Set',
+      slug: 'designer-file-set',
+      price: 85,
       compareAtPrice: undefined,
-      short_description: 'Sculpting forms with holographic guide for precision.',
-      shortDescription: 'Sculpting forms with holographic guide for precision.',
-      description: 'Professional sculpting forms with holographic guide lines for precise nail extensions.',
-      images: ['/nail-forms.webp'],
+      short_description: 'Professional file set for shaping & finishing.',
+      shortDescription: 'Professional file set for shaping & finishing.',
+      description: 'Complete set of professional files for shaping, refining, and finishing nail enhancements.',
+          images: ['/designer-file-01.webp'],
       category: 'tools-essentials',
-      rating: 4.5,
-      reviews: 32,
-      badges: [],
+      rating: 4.8,
+      reviews: 112,
+      badges: ['Bestseller'],
       inStock: true,
       variants: []
     },
     {
       id: '8',
-      name: 'Nail Liquid Monomer',
+      name: 'Nail Liquid (Monomer)',
       slug: 'nail-liquid-monomer',
-          price: -1, // Coming Soon
+      price: 180,
       compareAtPrice: undefined,
-      short_description: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
-      shortDescription: 'Low-odor EMA monomer. MMA-free, HEMA-free.',
+      short_description: 'Professional liquid monomer with low odor formula.',
+      shortDescription: 'Professional liquid monomer with low odor formula.',
       description: 'Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application.',
-          images: ['/nail-liquid-01.webp'],
+          images: ['/nail-liquid-monomer.webp'],
       category: 'acrylic-system',
       rating: 4.8,
       reviews: 87,
@@ -167,89 +165,35 @@ export const ShopPage: React.FC = () => {
     },
     {
       id: '9',
-      name: 'Crystal Clear Acrylic',
-      slug: 'crystal-clear-acrylic',
-          price: -1, // Coming Soon
+      name: 'Acrylic Powder',
+      slug: 'acrylic-powder',
+      price: 250,
       compareAtPrice: undefined,
-      short_description: 'Glass-clear powder for encapsulation & overlays.',
-      shortDescription: 'Glass-clear powder for encapsulation & overlays.',
-      description: 'Ultra-clear acrylic powder perfect for encapsulation work and crystal-clear overlays.',
-          images: ['/acrylic-powder-01.webp'],
+      short_description: 'Professional acrylic powder in 13 beautiful colors.',
+      shortDescription: 'Professional acrylic powder in 13 beautiful colors.',
+      description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
+      images: ['/acrylic-powder-baby-blue.webp'],
       category: 'acrylic-system',
       rating: 4.9,
       reviews: 156,
       badges: ['Bestseller'],
       inStock: true,
-      variants: []
-    },
-    {
-      id: '10',
-      name: 'Snow White Acrylic',
-      slug: 'snow-white-acrylic',
-      price: -1, // Coming Soon
-      compareAtPrice: undefined,
-      short_description: 'Opaque white acrylic for French & design work.',
-      shortDescription: 'Opaque white acrylic for French & design work.',
-      description: 'Pure opaque white acrylic powder ideal for French manicures and design work.',
-      images: ['/snow-white-acrylic.webp'],
-      category: 'acrylic-system',
-      rating: 4.7,
-      reviews: 94,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '11',
-      name: 'Colour Acrylic',
-      slug: 'colour-acrylic',
-      price: -1, // Coming Soon
-      compareAtPrice: undefined,
-      short_description: 'High-pigment acrylic powders for bold designs.',
-      shortDescription: 'High-pigment acrylic powders for bold designs.',
-      description: 'Vibrant, high-pigment acrylic powders available in multiple colors for bold nail designs.',
-      images: ['/colour-acrylic.webp'],
-      category: 'acrylic-system',
-      rating: 4.6,
-      reviews: 73,
-      badges: ['New'],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '12',
-      name: 'Glitter Acrylic',
-      slug: 'glitter-acrylic',
-      price: -1, // Coming Soon
-      compareAtPrice: undefined,
-      short_description: 'Sparkle acrylics for encapsulated effects.',
-      shortDescription: 'Sparkle acrylics for encapsulated effects.',
-      description: 'Glitter-infused acrylic powders perfect for creating stunning encapsulated sparkle effects.',
-      images: ['/glitter-acrylic.webp'],
-      category: 'acrylic-system',
-      rating: 4.5,
-      reviews: 61,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-        {
-          id: '13',
-          name: 'Core Acrylics',
-          slug: 'core-acrylics',
-          price: -1, // Coming Soon
-          compareAtPrice: undefined,
-          short_description: 'Strength powders in clear, white, and natural tones.',
-          shortDescription: 'Strength powders in clear, white, and natural tones.',
-          description: 'Essential strength acrylic powders available in clear, white, and natural tones for all nail applications.',
-          images: ['/acrylic-powder-core-01.webp'],
-          category: 'acrylic-system',
-          rating: 4.8,
-          reviews: 128,
-          badges: [],
-          inStock: true,
-          variants: []
-        }
+      variants: [
+        { name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
+        { name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
+        { name: 'Blush Pink', inStock: true, image: '/acrylic-powder-baby-pink.webp' },
+        { name: 'Ballet Pink', inStock: true, image: '/acrylic-powder-ballet-pink.webp' },
+        { name: 'Fuchsia Pink', inStock: true, image: '/acrylic-powder-hot-pink.webp' },
+        { name: 'Cloud Grey', inStock: true, image: '/acrylic-powder-light-grey.webp' },
+        { name: 'Mint Mist', inStock: true, image: '/acrylic-powder-light-mint.webp' },
+        { name: 'Rose Pink', inStock: true, image: '/acrylic-powder-light-pink.webp' },
+        { name: 'Fresh Mint', inStock: true, image: '/acrylic-powder-mint.webp' },
+        { name: 'Soft Nude', inStock: true, image: '/acrylic-powder-nude.webp' },
+        { name: 'Petal Pink', inStock: true, image: '/acrylic-powder-pink.webp' },
+        { name: 'Sky Blue', inStock: true, image: '/acrylic-powder-sky-blue.webp' },
+        { name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
+      ]
+    }
   ];
 
   const productCategories = [
@@ -265,13 +209,18 @@ export const ShopPage: React.FC = () => {
     { value: 'name', label: 'Name A-Z' },
     { value: 'price-low', label: 'Price: Low to High' },
     { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' },
-    { value: 'newest', label: 'Newest' }
+    { value: 'rating', label: 'Highest Rated' }
   ];
 
   useEffect(() => {
+    document.title = 'Shop - BLOM Cosmetics';
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', 'Shop professional nail care products, acrylic systems, and tools. High-quality products trusted by nail artists and beauty professionals.');
+    }
+    window.scrollTo({ top: 0 });
+
     // Simulate loading
-    setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 1000);
@@ -286,55 +235,31 @@ export const ShopPage: React.FC = () => {
   }, []);
 
   const filteredProducts = allProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || 
-      product.category.toLowerCase().replace(' & ', '-').replace(' ', '-') === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' ||
+      product.category === selectedCategory;
+    
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.short_description.toLowerCase().includes(searchTerm.toLowerCase());
+      product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
+    
     const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
+    
     return matchesCategory && matchesSearch && matchesStock;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = a.price;
-    const priceB = b.price;
-    
     switch (sortBy) {
-      case 'price-low':
-        return priceA - priceB;
-      case 'price-high':
-        return priceB - priceA;
       case 'name':
         return a.name.localeCompare(b.name);
-      case 'newest':
-        return allProducts.indexOf(b) - allProducts.indexOf(a);
-      case 'featured':
+      case 'price-low':
+        return a.price - b.price;
+      case 'price-high':
+        return b.price - a.price;
+      case 'rating':
+        return b.rating - a.rating;
       default:
         return 0;
     }
   });
-
-  const handleAddToCart = (product: any) => {
-    const priceValue = product.price || 0;
-    cartStore.addItem({
-      id: `item_${Date.now()}`,
-      productId: product.slug,
-      name: product.name,
-      price: priceValue,
-      image: product.images[0]
-    });
-    showNotification(`Added ${product.name} to cart!`);
-  };
-
-  const clearSearch = () => {
-    setSearchTerm('');
-  };
-
-  const clearFilters = () => {
-    setSelectedCategory('all');
-    setSearchTerm('');
-    setSortBy('featured');
-    setShowInStockOnly(false);
-  };
 
   const getGridClasses = () => {
     switch (viewMode) {
@@ -349,93 +274,127 @@ export const ShopPage: React.FC = () => {
     }
   };
 
-  const getBadgeColor = (badge: string) => {
-    switch (badge) {
-      case 'New':
-        return 'bg-green-500 text-white';
-      case 'Bestseller':
-        return 'bg-pink-400 text-white';
-      case 'Coming Soon':
-        return 'bg-gray-500 text-white';
-      default:
-        return 'bg-blue-500 text-white';
-    }
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSortBy('featured');
+    setShowInStockOnly(false);
+    setSelectedCategory('all');
   };
 
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Header showMobileMenu={true} />
-
-      <main className="flex-1">
-        {/* Shop Hero Section */}
-        <section className="relative bg-gradient-to-br from-pink-50 to-blue-50 section-padding overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-400/10 to-blue-300/10"></div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header showMobileMenu={true} />
+        <main className="section-padding">
           <Container>
-            <div className="relative text-center max-w-4xl mx-auto">
-              <h1 className="heading-with-stripe">Discover Professional Nail Essentials</h1>
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                High-quality products trusted by nail artists and beauty professionals.
-              </p>
-              {/* Buttons removed as requested */}
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading products...</p>
             </div>
           </Container>
-        </section>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-        {/* Filter Bar (not sticky) */}
-        <section className="bg-white border-b shadow-sm">
-          <Container>
-            <div className="py-4">
-              {/* Desktop Filter Bar */}
-              <div className="hidden lg:block">
-                <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-4" id="category-filter-bar">
-                    {/* Category Pills */}
-                    <div className="flex gap-2 overflow-x-auto">
-                      {productCategories.map((category) => (
-                        <button
-                          key={category.slug}
-                          onClick={() => setSelectedCategory(category.slug)}
-                          className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                            selectedCategory === category.slug
-                              ? 'bg-pink-400 text-white'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                          }`}
-                        >
-                          {category.name} ({category.count})
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header showMobileMenu={true} />
+      
+      <main className="section-padding">
+        <Container>
+          {/* Page Header */}
+          <div className="text-center mb-12">
+            <h1 className="heading-with-stripe">SHOP</h1>
+            <p className="section-subheader">
+              High-quality products trusted by nail artists and beauty professionals.
+            </p>
+          </div>
 
-                  <div className="hidden"></div>
+          {/* Search and Filter Bar */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <div className="flex flex-col lg:flex-row gap-4 items-center">
+              {/* Search Bar */}
+              <div className="flex-1 w-full lg:w-auto">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                  />
                 </div>
+              </div>
 
-                {/* Controls row under category pills: search + sort + view */}
-                <div className="mt-3 flex items-center justify-between gap-4 flex-wrap">
-                  <div className="relative flex-1 min-w-[260px] max-w-xl">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="input-field pl-10 pr-10 w-full"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={clearSearch}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                      >
-                        <X className="h-4 w-4 text-gray-400" />
-                      </button>
-                    )}
+              {/* Filter Button (Mobile) */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden flex items-center gap-2 px-4 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors"
+              >
+                <Filter className="h-5 w-5" />
+                Filters
+                <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setViewMode('grid-3')}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  <Grid3X3 className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('grid-2')}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  <Grid2X2 className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-2 rounded-lg transition-colors ${
+                    viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                  }`}
+                >
+                  <List className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Filter Sheet */}
+            {showFilters && (
+              <div className="lg:hidden mt-6 pt-6 border-t border-gray-200">
+                <div className="space-y-4">
+                  {/* Categories */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Category</label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                    >
+                      {productCategories.map((category) => (
+                        <option key={category.slug} value={category.slug}>
+                          {category.name} ({category.count})
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  {/* Sort */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-800 mb-2">Sort by</label>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="input-field w-auto"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
                     >
                       {sortOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -443,314 +402,133 @@ export const ShopPage: React.FC = () => {
                         </option>
                       ))}
                     </select>
-
-                    <div className="flex border rounded-lg overflow-hidden">
-                      <button
-                        onClick={() => setViewMode('grid-3')}
-                        className={`p-2 ${viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
-                        title="3 columns"
-                      >
-                        <Grid className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('grid-2')}
-                        className={`p-2 ${viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
-                        title="2 columns"
-                      >
-                        <Grid className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 ${viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
-                        title="List view"
-                      >
-                        <List className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Product count removed as requested */}
-              </div>
-
-              {/* Mobile Filter Summary */}
-              <div className="lg:hidden">
-                {/* Top row: search + filters button */}
-                <div className="flex items-center gap-3">
-                  {/* Hide search on mobile to make room; keep on desktop */}
-                  <div className="relative flex-1 hidden lg:block">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="input-field pl-10 pr-10 w-full"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={clearSearch}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                        aria-label="Clear search"
-                      >
-                        <X className="h-4 w-4 text-gray-400" />
-                      </button>
-                    )}
                   </div>
 
-                  <button
-                    onClick={() => setShowMobileFilters(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    <SlidersHorizontal className="h-4 w-4" />
-                    Filters
-                  </button>
-                  {/* Mobile view controls */}
-                  <div className="ml-2 flex lg:hidden border rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`p-2 ${viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                      title="1 product per row (list)"
-                    >
-                      <List className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('grid-2')}
-                      className={`p-2 ${viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                      title="2 products per row"
-                    >
-                      <Grid className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('grid-3')}
-                      className={`p-2 ${viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                      title="3 products per row"
-                    >
-                      {/* 3x3 grid icon using the same Grid icon for consistency */}
-                      <Grid className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Pink Category Pills */}
-                <div className="mt-3 overflow-x-auto">
-                  <div className="flex gap-2 min-w-max">
-                    {productCategories.map((category) => (
-                      <button
-                        key={category.slug}
-                        onClick={() => setSelectedCategory(category.slug)}
-                        className={`px-3 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-colors border ${
-                          selectedCategory === category.slug
-                            ? 'bg-pink-400 text-white border-pink-400 shadow-sm'
-                            : 'bg-pink-100 text-pink-700 border-pink-200 hover:bg-pink-200'
-                        }`}
-                      >
-                        {category.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Container>
-        </section>
-
-        {/* Product Grid */}
-        <section className="section-padding bg-gray-50">
-          <Container>
-            {loading ? (
-              <div className={`grid ${getGridClasses()} gap-6`}>
-                {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="card animate-pulse">
-                    <div className="aspect-[4/5] bg-gray-200 rounded-t-lg"></div>
-                    <div className="p-4 space-y-3">
-                      <div className="h-4 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                      <div className="flex items-center justify-between">
-                        <div className="h-6 w-20 bg-gray-200 rounded"></div>
-                        <div className="h-10 w-24 bg-gray-200 rounded"></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : sortedProducts.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-gray-400 mb-4">
-                  <Search className="h-16 w-16 mx-auto" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">No products found</h3>
-                <p className="text-gray-600 mb-6">
-                  Try adjusting your search or filter criteria
-                </p>
-                <Button variant="outline" onClick={clearFilters}>
-                  Clear Filters
-                </Button>
-              </div>
-            ) : (
-              <div className={`grid ${getGridClasses()} gap-x-6 gap-y-10`}>
-                {sortedProducts.map((product) => (
-                  <ProductCard
-                    key={product.slug}
-                    id={product.id}
-                    name={product.name}
-                    slug={product.slug}
-                    price={product.price}
-                    compareAtPrice={product.compareAtPrice}
-                    shortDescription={product.shortDescription}
-                    images={product.images}
-                    inStock={product.inStock}
-                    badges={product.badges}
-                    isListView={viewMode === 'list'}
-                  />
-                ))}
-              </div>
-            )}
-          </Container>
-        </section>
-
-        {/* Mobile Filter Sheet */}
-        {showMobileFilters && (
-          <div className="fixed inset-0 z-50 lg:hidden">
-            <div className="absolute inset-0 bg-black bg-opacity-50" onClick={() => setShowMobileFilters(false)} />
-            <div className="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl max-h-[80vh] overflow-y-auto">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-lg font-bold">Filters & Sort</h3>
-                  <button
-                    onClick={() => setShowMobileFilters(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-
-                {/* Mobile Categories */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Categories</h4>
-                  <div className="space-y-2">
-                    {productCategories.map((category) => (
-                      <button
-                        key={category.slug}
-                        onClick={() => setSelectedCategory(category.slug)}
-                        className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                          selectedCategory === category.slug
-                            ? 'bg-pink-100 text-pink-600 border border-pink-200'
-                            : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span>{category.name}</span>
-                          <span className="text-sm text-gray-500">({category.count})</span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Mobile Search */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Search</h4>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <input
-                      type="text"
-                      placeholder="Search products..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="input-field pl-10 pr-10 w-full"
-                    />
-                    {searchTerm && (
-                      <button
-                        onClick={clearSearch}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
-                      >
-                        <X className="h-4 w-4 text-gray-400" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Mobile Sort */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Sort By</h4>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
-                    className="input-field w-full"
-                  >
-                    {sortOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Stock Filter */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">Availability</h4>
-                  <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                  {/* In Stock Only */}
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
+                      id="inStockOnly"
                       checked={showInStockOnly}
                       onChange={(e) => setShowInStockOnly(e.target.checked)}
-                      className="w-5 h-5 text-pink-400 bg-white border-gray-300 rounded focus:ring-pink-400 focus:ring-2"
+                      className="rounded border-gray-300 text-pink-400 focus:ring-pink-300"
                     />
-                    <span className="text-gray-700 font-medium">In Stock Only</span>
-                  </label>
-                  <p className="text-xs text-gray-500 mt-2 px-3">Hide "Coming Soon" products</p>
-                </div>
-
-                {/* Mobile View Mode */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-3">View</h4>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setViewMode('grid-2')}
-                      className={`flex-1 p-3 rounded-lg border transition-colors ${
-                        viewMode === 'grid-2'
-                          ? 'border-pink-400 bg-pink-50 text-pink-600'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <Grid className="h-5 w-5 mx-auto mb-1" />
-                      <span className="text-sm">Grid</span>
-                    </button>
-                    <button
-                      onClick={() => setViewMode('list')}
-                      className={`flex-1 p-3 rounded-lg border transition-colors ${
-                        viewMode === 'list'
-                          ? 'border-pink-400 bg-pink-50 text-pink-600'
-                          : 'border-gray-200 hover:bg-gray-50'
-                      }`}
-                    >
-                      <List className="h-5 w-5 mx-auto mb-1" />
-                      <span className="text-sm">List</span>
-                    </button>
+                    <label htmlFor="inStockOnly" className="text-sm text-gray-700">
+                      In Stock Only
+                    </label>
                   </div>
-                </div>
 
-                {/* Mobile Actions */}
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
+                  {/* Clear Filters */}
+                  <button
                     onClick={clearFilters}
+                    className="w-full px-4 py-2 text-pink-400 border border-pink-400 rounded-lg hover:bg-pink-50 transition-colors"
                   >
-                    Clear All
-                  </Button>
-                  <Button
-                    className="flex-1"
-                    onClick={() => setShowMobileFilters(false)}
-                  >
-                    Apply Filters
-                  </Button>
+                    Clear Filters
+                  </button>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Desktop Filters */}
+          <div className="hidden lg:flex items-center justify-between mb-8">
+            {/* Categories */}
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-semibold text-gray-800">Category:</span>
+              <div className="flex gap-2">
+                {productCategories.map((category) => (
+                  <button
+                    key={category.slug}
+                    onClick={() => setSelectedCategory(category.slug)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      selectedCategory === category.slug
+                        ? 'bg-pink-400 text-white'
+                        : 'bg-white text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    {category.name} ({category.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sort and Filters */}
+            <div className="flex items-center gap-4">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="inStockOnlyDesktop"
+                  checked={showInStockOnly}
+                  onChange={(e) => setShowInStockOnly(e.target.checked)}
+                  className="rounded border-gray-300 text-pink-400 focus:ring-pink-300"
+                />
+                <label htmlFor="inStockOnlyDesktop" className="text-sm text-gray-700">
+                  In Stock Only
+                </label>
+              </div>
+
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-2 px-3 py-2 text-pink-400 border border-pink-400 rounded-lg hover:bg-pink-50 transition-colors"
+              >
+                <X className="h-4 w-4" />
+                Clear
+              </button>
             </div>
           </div>
-        )}
+
+          {/* Results Count */}
+          <div className="mb-6">
+            <p className="text-gray-600">
+              Showing {sortedProducts.length} of {allProducts.length} products
+            </p>
+          </div>
+
+          {/* Products Grid */}
+          <section className="section-padding bg-gray-50">
+            <div className={`grid ${getGridClasses()} gap-6`}>
+              {sortedProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  slug={product.slug}
+                  price={product.price}
+                  compareAtPrice={product.compareAtPrice}
+                  shortDescription={product.shortDescription}
+                  images={product.images}
+                  inStock={product.inStock}
+                  badges={product.badges}
+                  isListView={viewMode === 'list'}
+                />
+              ))}
+            </div>
+
+            {sortedProducts.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-gray-600 text-lg">No products found matching your criteria.</p>
+                <button
+                  onClick={clearFilters}
+                  className="mt-4 px-6 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              </div>
+            )}
+          </section>
+        </Container>
       </main>
 
       <Footer />
