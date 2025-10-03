@@ -9,6 +9,46 @@
     <link rel="icon" type="image/webp" href="/blom-academy-favicon.webp" />
     <link rel="apple-touch-icon" href="/blom-academy-favicon.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    
+    <!-- CRITICAL: Force light mode with JavaScript BEFORE anything else loads -->
+    <script>
+      // Execute immediately - before any CSS or content loads
+      (function() {
+        // Force light mode on document element
+        document.documentElement.style.colorScheme = 'light';
+        document.documentElement.style.backgroundColor = '#ffffff';
+        document.documentElement.setAttribute('data-theme', 'light');
+        
+        // Remove any dark mode classes
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        
+        // Store preference
+        try {
+          localStorage.setItem('theme', 'light');
+        } catch(e) {}
+        
+        // Watch for any attempts to change theme
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class' || mutation.attributeName === 'style') {
+              if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+              }
+              document.documentElement.style.colorScheme = 'light';
+              document.documentElement.style.backgroundColor = '#ffffff';
+            }
+          });
+        });
+        
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['class', 'style', 'data-theme']
+        });
+      })();
+    </script>
+    
     <style>
       /* CRITICAL: Force light mode on ALL devices including Android */
       html {
@@ -26,6 +66,10 @@
         color: #000000 !important;
       }
       
+      body, #root, #root > *, main, div, section, article {
+        background-color: inherit !important;
+      }
+      
       /* Override Android/mobile dark mode preference */
       @media (prefers-color-scheme: dark) {
         html, body {
@@ -35,18 +79,27 @@
           background: #ffffff !important;
           color: #000000 !important;
         }
+        
+        body, #root, #root > *, main, div, section, article {
+          background-color: inherit !important;
+        }
       }
       
       /* Block any system-level dark mode */
       * {
         color-scheme: light !important;
       }
+      
+      /* Prevent dark mode filters */
+      html[data-theme="dark"] {
+        filter: none !important;
+      }
     </style>
     <title>BLOM Cosmetics - Professional Nail Care Products & Training</title>
     <meta name="description" content="Premium nail care products, professional acrylic systems, and expert training for beauty professionals in South Africa." />
   </head>
-  <body>
-    <div id="root"></div>
+  <body style="background-color: #ffffff !important; color: #000000 !important; color-scheme: light !important;">
+    <div id="root" style="background-color: #ffffff !important; color: #000000 !important;"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
