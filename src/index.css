@@ -1,48 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Force light mode always - Enhanced for mobile */
-:root {
-  color-scheme: light only !important;
-  background-color: #ffffff !important;
-}
-
-html,
-body {
-  color-scheme: light !important;
-  background-color: #ffffff !important;
-  color: #000000 !important;
-}
+/* ========================================
+   FORCE LIGHT MODE - ANDROID & ALL DEVICES
+   CRITICAL: Must be before @tailwind
+   ======================================== */
 
 html {
-  background: #ffffff !important;
-}
-
-body {
-  background: #ffffff !important;
-}
-
-#root {
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
   background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+html, body {
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
   color: #000000 !important;
 }
 
-/* Prevent dark mode from being applied */
+/* Override Android/Samsung/Chrome dark mode */
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: light only !important;
+  html, body {
+    color-scheme: light !important;
+    forced-color-adjust: none !important;
     background-color: #ffffff !important;
-  }
-  
-  html,
-  body {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-  }
-  
-  #root {
-    background-color: #ffffff !important;
+    background: #ffffff !important;
     color: #000000 !important;
   }
   
@@ -51,14 +33,34 @@ body {
   }
 }
 
-/* Additional mobile-specific overrides */
+/* Block system-level dark mode */
+* {
+  color-scheme: light !important;
+}
+
+#root {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+:root {
+  color-scheme: light only !important;
+  forced-color-adjust: none !important;
+  background-color: #ffffff !important;
+}
+
+/* iOS Safari specific */
 @supports (-webkit-touch-callout: none) {
-  html,
-  body {
+  html, body {
     color-scheme: light !important;
+    forced-color-adjust: none !important;
     background-color: #ffffff !important;
   }
 }
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ========================================
    GLOBAL HEADING STYLES

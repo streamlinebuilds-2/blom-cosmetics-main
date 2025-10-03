@@ -2,16 +2,44 @@
 <html lang="en" class="light" style="color-scheme: light !important; background-color: #ffffff !important;">
   <head>
     <meta charset="UTF-8" />
+    <!-- FORCE LIGHT MODE ONLY - Block dark mode completely -->
     <meta name="color-scheme" content="light only" />
     <meta name="supported-color-schemes" content="light" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/webp" href="/blom-academy-favicon.webp" />
     <link rel="apple-touch-icon" href="/blom-academy-favicon.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <style>
-      html, body { 
-        color-scheme: light !important; 
+      /* CRITICAL: Force light mode on ALL devices including Android */
+      html {
+        color-scheme: light !important;
+        forced-color-adjust: none !important;
         background-color: #ffffff !important;
         background: #ffffff !important;
+      }
+      
+      html, body { 
+        color-scheme: light !important;
+        forced-color-adjust: none !important;
+        background-color: #ffffff !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      
+      /* Override Android/mobile dark mode preference */
+      @media (prefers-color-scheme: dark) {
+        html, body {
+          color-scheme: light !important;
+          forced-color-adjust: none !important;
+          background-color: #ffffff !important;
+          background: #ffffff !important;
+          color: #000000 !important;
+        }
+      }
+      
+      /* Block any system-level dark mode */
+      * {
+        color-scheme: light !important;
       }
     </style>
     <title>BLOM Cosmetics - Professional Nail Care Products & Training</title>
