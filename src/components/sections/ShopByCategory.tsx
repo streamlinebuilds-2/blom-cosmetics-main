@@ -19,10 +19,10 @@ export const ShopByCategory: React.FC = () => {
       description: 'Nourishing oils & treatments'
     },
     {
-      name: 'Nail Art',
+      name: 'Nail Essentials',
       icon: Palette,
-      href: '/shop#nail-art',
-      image: '/placeholders/nail-art.jpg',
+      href: '/shop#nail-essentials',
+      image: '/placeholders/nail-essentials.jpg',
       description: 'Colors, glitters & finishes'
     },
     {
