@@ -126,7 +126,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           )}
 
           {/* Wishlist Button - Bigger */}
-          <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute top-3 right-3 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300">
             <button
               type="button"
               onClick={handleWishlistToggle}
