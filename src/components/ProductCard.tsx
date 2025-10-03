@@ -166,7 +166,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   // Grid view layout
   return (
     <article 
-      className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
+      className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container */}

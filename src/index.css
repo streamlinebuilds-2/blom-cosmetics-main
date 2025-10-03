@@ -1003,15 +1003,27 @@ body {
   transform: translate(-150%, -150%);
   opacity: 0;
   pointer-events: none;
+  animation-fill-mode: forwards;
 }
 
 /* Desktop - shimmer on hover only for the hovered card */
 @media (hover: hover) and (pointer: fine) {
   .best-seller-card:hover .shimmer,
   .course-card:hover .shimmer,
-  .blog-card:hover .shimmer {
-    animation: luxurious-light-beam 2s ease-in-out 1;
+  .blog-card:hover .shimmer,
+  .product-card:hover .shimmer {
+    animation: luxurious-light-beam 1.2s ease-in-out 1;
     opacity: 1;
+  }
+  
+  /* Reset shimmer when not hovering */
+  .best-seller-card .shimmer,
+  .course-card .shimmer,
+  .blog-card .shimmer,
+  .product-card .shimmer {
+    animation: none;
+    transform: translate(-150%, -150%);
+    opacity: 0;
   }
   
   /* Hover effects for cards */
@@ -1039,16 +1051,16 @@ body {
   }
 }
 
-/* Slow, luxurious light beam animation */
+/* Fast, luxurious light beam animation */
 @keyframes luxurious-light-beam {
   0% { 
     transform: translate(-150%, -150%);
     opacity: 0;
   }
-  10% {
+  15% {
     opacity: 1;
   }
-  90% {
+  85% {
     opacity: 1;
   }
   100% { 
