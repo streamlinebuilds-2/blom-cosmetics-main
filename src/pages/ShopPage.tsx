@@ -148,23 +148,6 @@ export const ShopPage: React.FC = () => {
     },
     {
       id: '8',
-      name: 'Nail Liquid (Monomer)',
-      slug: 'nail-liquid-monomer',
-      price: 180,
-      compareAtPrice: undefined,
-      short_description: 'Professional liquid monomer with low odor formula.',
-      shortDescription: 'Professional liquid monomer with low odor formula.',
-      description: 'Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application.',
-          images: ['/nail-liquid-monomer.webp'],
-      category: 'acrylic-system',
-      rating: 4.8,
-      reviews: 87,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '9',
       name: 'Acrylic Powder',
       slug: 'acrylic-powder',
       price: 250,
