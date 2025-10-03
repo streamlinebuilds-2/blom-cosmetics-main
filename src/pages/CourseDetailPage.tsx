@@ -21,6 +21,245 @@ interface CourseDetailPageProps {
 }
 
 export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug = 'professional-acrylic-training' }) => {
+  // Course data
+  const courses = {
+    'professional-acrylic-training': {
+      title: 'Professional Acrylic Training',
+      description: 'Master the art of acrylic nail application with hands-on training in Randfontein.',
+      heroImage: '/professional-acrylic-training-hero.webp',
+      duration: '5 Days',
+      price: 'From R7,200',
+      isOnline: false,
+      location: 'Randfontein',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience in acrylic nail application. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.'
+      },
+      about: [
+        'This comprehensive 5-day hands-on training program is designed to give you the skills and confidence to start your career as a professional nail technician. You\'ll master every aspect of acrylic nail application, from preparation to finishing, using professional-grade products and techniques.',
+        'Our expert instructors will guide you through proper nail preparation, acrylic application, shaping, and finishing techniques. By the end of this course, you\'ll have the knowledge and practical experience needed to provide professional acrylic nail services to clients.'
+      ],
+      packages: [
+        {
+          name: 'Standard',
+          price: 'R7,200',
+          kitValue: 'R3,200',
+          features: [
+            '5-day comprehensive training',
+            'Basic starter kit included',
+            'Certificate of completion',
+            'Course materials and handouts'
+          ]
+        },
+        {
+          name: 'Deluxe',
+          price: 'R9,900',
+          kitValue: 'R5,100',
+          features: [
+            '5-day comprehensive training',
+            'Premium professional kit included',
+            'Certificate of completion',
+            'Course materials and handouts',
+            'Bigger kit — electric e-file & LED lamp included'
+          ],
+          popular: true
+        }
+      ],
+      availableDates: [
+        'March 15-19, 2025',
+        'April 12-16, 2025',
+        'May 10-14, 2025'
+      ],
+      accordionData: [
+        {
+          title: 'DAY 1: FOUNDATION & PREPARATION',
+          content: [
+            'Nail anatomy and health assessment',
+            'Proper sanitation and safety protocols',
+            'Nail preparation techniques',
+            'Product knowledge and selection'
+          ]
+        },
+        {
+          title: 'DAY 2-3: ACRYLIC APPLICATION',
+          content: [
+            'Mixing ratios and consistency control',
+            'Brush techniques and maintenance',
+            'Application methods for different nail shapes',
+            'Building structure and strength'
+          ]
+        },
+        {
+          title: 'DAY 4: SHAPING & REFINEMENT',
+          content: [
+            'Filing techniques for different nail shapes',
+            'Surface preparation and smoothing',
+            'Problem-solving and corrections',
+            'Quality control standards'
+          ],
+          note: 'Note: Models are required for Day 4. Please arrange one model in advance.'
+        },
+        {
+          title: 'DAY 5: FINISHING & BUSINESS',
+          content: [
+            'Buffing and polishing techniques',
+            'Cuticle care and finishing touches',
+            'Client consultation and aftercare',
+            'Pricing strategies and business basics'
+          ],
+          note: 'Note: Models are required for Day 5. Please arrange one model in advance.'
+        }
+      ]
+    },
+    'online-watercolour-workshop': {
+      title: 'Online Watercolour Workshop',
+      description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance.',
+      heroImage: '/online-watercolor-card.webp',
+      duration: 'Self-Paced',
+      price: 'R480',
+      isOnline: true,
+      location: 'Online',
+      instructor: {
+        name: 'BLOM Academy Team',
+        image: '/blom-academy-favicon.webp',
+        bio: 'Our experienced team of nail artists and educators bring years of expertise in watercolor nail art techniques, helping you master this beautiful and versatile art form.'
+      },
+      about: [
+        'This comprehensive online workshop teaches you the fundamentals of watercolor nail art. You\'ll learn how to create soft, dreamy designs that are perfect for any occasion.',
+        'Through step-by-step video tutorials and detailed guidance, you\'ll master blending techniques, color theory, and how to create stunning watercolor effects on nails.'
+      ],
+      packages: [
+        {
+          name: 'Complete Workshop',
+          price: 'R480',
+          kitValue: 'Included',
+          features: [
+            'Lifetime access to video tutorials',
+            'Step-by-step guides',
+            'Color theory basics',
+            'Blending techniques',
+            'Certificate of completion'
+          ]
+        }
+      ],
+      availableDates: ['Available Now'],
+      accordionData: [
+        {
+          title: 'MODULE 1: INTRODUCTION TO WATERCOLOR',
+          content: [
+            'Understanding watercolor nail art',
+            'Essential tools and materials',
+            'Color theory and mixing',
+            'Basic techniques overview'
+          ]
+        },
+        {
+          title: 'MODULE 2: BLENDING TECHNIQUES',
+          content: [
+            'Wet-on-wet blending',
+            'Gradient creation',
+            'Color transitions',
+            'Troubleshooting common issues'
+          ]
+        },
+        {
+          title: 'MODULE 3: DESIGN CREATION',
+          content: [
+            'Floral watercolor designs',
+            'Abstract patterns',
+            'Seasonal themes',
+            'Personal style development'
+          ]
+        },
+        {
+          title: 'MODULE 4: FINISHING & MAINTENANCE',
+          content: [
+            'Top coat application',
+            'Longevity tips',
+            'Touch-up techniques',
+            'Client consultation skills'
+          ]
+        }
+      ]
+    },
+    'christmas-watercolor-workshop': {
+      title: 'Christmas Watercolor Workshop',
+      description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
+      heroImage: '/christmas-watercolor-card.webp',
+      duration: 'Self-Paced',
+      price: 'R450',
+      originalPrice: 'R650',
+      isOnline: true,
+      location: 'Online',
+      instructor: {
+        name: 'BLOM Academy Team',
+        image: '/blom-academy-favicon.webp',
+        bio: 'Our experienced team specializes in seasonal nail art, bringing you the most festive and beautiful holiday designs to celebrate the Christmas season.'
+      },
+      about: [
+        'Get into the holiday spirit with this special Christmas watercolor workshop! Learn to create stunning festive designs including Christmas trees, snowflakes, and winter wonderland scenes.',
+        'Perfect for the holiday season, this workshop teaches you seasonal techniques that will make your nail art stand out during Christmas celebrations.'
+      ],
+      packages: [
+        {
+          name: 'Christmas Workshop',
+          price: 'R450',
+          originalPrice: 'R650',
+          kitValue: 'Included',
+          features: [
+            'Lifetime access to Christmas tutorials',
+            'Holiday design templates',
+            'Seasonal color palettes',
+            'Festive techniques guide',
+            'Certificate of completion'
+          ],
+          onSale: true
+        }
+      ],
+      availableDates: ['Available Now'],
+      accordionData: [
+        {
+          title: 'MODULE 1: CHRISTMAS BASICS',
+          content: [
+            'Holiday color theory',
+            'Christmas design elements',
+            'Festive tool selection',
+            'Seasonal inspiration'
+          ]
+        },
+        {
+          title: 'MODULE 2: CHRISTMAS TREE DESIGNS',
+          content: [
+            'Tree shape creation',
+            'Ornament placement',
+            'Light effects',
+            'Tree variations'
+          ]
+        },
+        {
+          title: 'MODULE 3: SNOWFLAKE PATTERNS',
+          content: [
+            'Snowflake geometry',
+            'Crystal effects',
+            'Winter textures',
+            'Frosted finishes'
+          ]
+        },
+        {
+          title: 'MODULE 4: WINTER WONDERLAND',
+          content: [
+            'Landscape creation',
+            'Atmospheric effects',
+            'Holiday scenes',
+            'Final touches'
+          ]
+        }
+      ]
+    }
+  };
+
+  const course = courses[courseSlug as keyof typeof courses] || courses['professional-acrylic-training'];
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(0);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -148,52 +387,6 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
     }, 3000);
   };
 
-  const accordionData = [
-    {
-      title: 'DAY 1: FOUNDATION & PREPARATION',
-      content: [
-        'Nail anatomy and health assessment',
-        'Proper sanitation and safety protocols',
-        'Nail preparation techniques',
-        'Product knowledge and selection'
-      ]
-    },
-    {
-      title: 'DAY 2-3: ACRYLIC APPLICATION',
-      content: [
-        'Mixing ratios and consistency control',
-        'Brush techniques and maintenance',
-        'Application methods for different nail shapes',
-        'Building structure and strength'
-      ]
-    },
-    {
-      title: 'DAY 4: SHAPING & REFINEMENT',
-      content: [
-        'Filing techniques for different nail shapes',
-        'Surface preparation and smoothing',
-        'Problem-solving and corrections',
-        'Quality control standards'
-      ],
-      note: 'Note: Models are required for Day 4. Please arrange one model in advance.'
-    },
-    {
-      title: 'DAY 5: FINISHING & BUSINESS',
-      content: [
-        'Buffing and polishing techniques',
-        'Cuticle care and finishing touches',
-        'Client consultation and aftercare',
-        'Pricing strategies and business basics'
-      ],
-      note: 'Note: Models are required for Day 5. Please arrange one model in advance.'
-    }
-  ];
-
-  const availableDates = [
-    'March 15-19, 2025',
-    'April 12-16, 2025',
-    'May 10-14, 2025'
-  ];
 
   const countryCodes = [
     { code: '+27', country: '🇿🇦 ZA' },
@@ -212,8 +405,8 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         {/* Hero Section */}
         <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
           <img
-            src="/professional-acrylic-training-hero.webp"
-            alt="Professional Acrylic Training"
+            src={course.heroImage}
+            alt={course.title}
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -221,34 +414,40 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           <div className="relative h-full flex items-center justify-center">
             <div className="text-center text-white max-w-4xl mx-auto px-4">
               <h1 className="text-4xl md:text-6xl font-bold mb-4 uppercase tracking-wider" style={{ textShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
-                Professional Acrylic Training
+                {course.title}
               </h1>
               <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-                Master the art of acrylic nail application with hands-on training in Randfontein.
+                {course.description}
               </p>
               
               {/* Detail Pills */}
               <div className="flex flex-wrap justify-center gap-4 mb-8">
                 <div className="flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}>
                   <Clock className="h-5 w-5" />
-                  <span className="font-medium">5 Days</span>
-                    </div>
+                  <span className="font-medium">{course.duration}</span>
+                </div>
                 <div className="flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}>
                   <CreditCard className="h-5 w-5" />
-                  <span className="font-medium">From R7,200</span>
-                    </div>
+                  <span className="font-medium">{course.price}</span>
+                </div>
+                {course.isOnline && (
+                  <div className="flex items-center gap-3 px-6 py-3 rounded-full backdrop-blur-md" style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}>
+                    <MapPin className="h-5 w-5" />
+                    <span className="font-medium">{course.location}</span>
                   </div>
+                )}
+              </div>
 
               {/* CTA Button */}
               <button
                 onClick={scrollToBooking}
                 className="bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-12 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
                 style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
-                  >
-                    Book Your Spot
-                    </button>
-                  </div>
-                </div>
+              >
+                {course.isOnline ? 'Enroll Now' : 'Book Your Spot'}
+              </button>
+            </div>
+          </div>
         </section>
 
         {/* Meet Your Instructor */}
@@ -261,18 +460,18 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 <div className="flex flex-col md:flex-row gap-8 items-center">
                   <div className="w-48 h-48 flex-shrink-0">
                     <img
-                      src="/avane-crous-headshot.webp"
-                      alt="Avané Crous"
+                      src={course.instructor.image}
+                      alt={course.instructor.name}
                       className="w-full h-full object-cover rounded-xl shadow-lg"
                     />
-                          </div>
+                  </div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">Avané Crous</h3>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{course.instructor.name}</h3>
                     <p className="text-lg text-gray-600 leading-relaxed">
-                      Professional nail artist and educator with over 8 years of experience in acrylic nail application. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.
+                      {course.instructor.bio}
                     </p>
-                      </div>
-                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </Container>
@@ -287,12 +486,9 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
               </h2>
               
               <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
-                <p>
-                  This comprehensive 5-day hands-on training program is designed to give you the skills and confidence to start your career as a professional nail technician. You'll master every aspect of acrylic nail application, from preparation to finishing, using professional-grade products and techniques.
-                </p>
-                <p>
-                  Our expert instructors will guide you through proper nail preparation, acrylic application, shaping, and finishing techniques. By the end of this course, you'll have the knowledge and practical experience needed to provide professional acrylic nail services to clients.
-                </p>
+                {course.about.map((paragraph, index) => (
+                  <p key={index}>{paragraph}</p>
+                ))}
               </div>
             </div>
           </Container>
@@ -305,7 +501,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
               <h2 className="heading-with-stripe">What You'll Learn</h2>
               
               <div className="space-y-4">
-                {accordionData.map((item, index) => (
+                {course.accordionData.map((item, index) => (
                   <div key={index} className="bg-white border-2 border-gray-200 rounded-xl shadow-sm hover:border-blue-200 hover:shadow-md transition-all duration-300">
                     <button
                       onClick={() => toggleAccordion(index)}
@@ -351,75 +547,44 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
             <div className="max-w-5xl mx-auto">
               <h2 className="heading-with-stripe">Choose Your Package</h2>
               
-              <div className="grid md:grid-cols-2 gap-8">
-                {/* Standard Package */}
-                <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 flex flex-col h-full">
-                  <div className="text-center mb-8">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 uppercase">Standard Package</h3>
-                    <div className="text-4xl font-bold text-pink-400 mb-2">R7,200</div>
-                    <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: R3,200</div>
-                  </div>
-                  
-                  <ul className="space-y-4 mb-8 flex-grow">
-                    {[
-                      '5-day comprehensive training',
-                      'Basic starter kit included',
-                      'Certificate of completion',
-                      'Course materials and handouts'
-                    ].map((item, index) => (
-                      <li key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  
-                  <button
-                    onClick={() => selectPackage('Standard')}
-                    className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-4 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
-                    style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
-                  >
-                    Choose Standard
-                  </button>
-            </div>
-
-                {/* Deluxe Package */}
-                <div className="bg-white border-2 border-pink-400 rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full" style={{ boxShadow: '0 8px 30px rgba(255,116,164,0.2)' }}>
-                  <div className="absolute -top-1 left-1/2 -translate-x-1/2">
-                    <div className="bg-blue-400 text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide">
-                      Most Popular
-                    </div>
+              <div className={`grid gap-8 ${course.packages.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-2'}`}>
+                {course.packages.map((pkg, index) => (
+                  <div key={index} className={`bg-white border-2 ${pkg.popular ? 'border-pink-400' : 'border-gray-200'} rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full ${pkg.popular ? 'shadow-xl' : ''}`} style={pkg.popular ? { boxShadow: '0 8px 30px rgba(255,116,164,0.2)' } : {}}>
+                    {pkg.popular && (
+                      <div className="absolute -top-1 left-1/2 -translate-x-1/2">
+                        <div className="bg-blue-400 text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide">
+                          Most Popular
+                        </div>
                       </div>
-                  
-                  <div className="text-center mb-8 mt-4">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 uppercase">Deluxe Package</h3>
-                    <div className="text-4xl font-bold text-pink-400 mb-2">R9,900</div>
-                    <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: R5,100</div>
+                    )}
+                    
+                    <div className="text-center mb-8 mt-4">
+                      <h3 className="text-2xl font-bold text-gray-900 mb-4 uppercase">{pkg.name} Package</h3>
+                      <div className="text-4xl font-bold text-pink-400 mb-2">{pkg.price}</div>
+                      {pkg.originalPrice && (
+                        <div className="text-lg text-gray-500 line-through mb-2">{pkg.originalPrice}</div>
+                      )}
+                      <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: {pkg.kitValue}</div>
                     </div>
-
-                  <ul className="space-y-4 mb-8 flex-grow">
-                    {[
-                      '5-day comprehensive training',
-                      'Premium professional kit included',
-                      'Certificate of completion',
-                      'Course materials and handouts',
-                      'Bigger kit — electric e-file & LED lamp included'
-                    ].map((item, index) => (
-                      <li key={index} className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-700">{item}</span>
+                    
+                    <ul className="space-y-4 mb-8 flex-grow">
+                      {pkg.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-center gap-3">
+                          <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                          <span className="text-gray-700">{feature}</span>
                         </li>
                       ))}
                     </ul>
-
-                  <button
-                    onClick={() => selectPackage('Deluxe')}
-                    className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
-                    style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
-                  >
-                    Choose Deluxe
-                  </button>
-                </div>
+                    
+                    <button
+                      onClick={() => selectPackage(pkg.name)}
+                      className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-4 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black"
+                      style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
+                    >
+                      Choose {pkg.name}
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </Container>
@@ -436,48 +601,48 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <MapPin className="h-8 w-8 text-pink-400" />
-                    </div>
+                  </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Location</h3>
                   <p className="text-gray-600">
-                    Randfontein, Gauteng<br />
-                    <span className="text-sm text-gray-500">Detailed address provided upon booking</span>
+                    {course.location}<br />
+                    <span className="text-sm text-gray-500">{course.isOnline ? 'Access from anywhere' : 'Detailed address provided upon booking'}</span>
                   </p>
-                    </div>
+                </div>
 
-                {/* Deposit Required */}
+                {/* Payment Info */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <CreditCard className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Deposit Required</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Deposit Required'}</h3>
                   <p className="text-gray-600">
-                    R2,000 to secure your spot<br />
-                    <span className="text-sm text-gray-500">Balance due on course start date</span>
+                    {course.isOnline ? 'Full payment required' : 'R2,000 to secure your spot'}<br />
+                    <span className="text-sm text-gray-500">{course.isOnline ? 'Instant access after payment' : 'Balance due on course start date'}</span>
                   </p>
-              </div>
+                </div>
 
                 {/* Available Dates */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Calendar className="h-8 w-8 text-pink-400" />
-              </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Available Dates</h3>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Available Dates'}</h3>
                   <div className="space-y-2">
-                    {availableDates.map((date, index) => (
-                  <button
-                    key={index}
-                    onClick={() => selectDate(date)}
+                    {course.availableDates.map((date, index) => (
+                      <button
+                        key={index}
+                        onClick={() => selectDate(date)}
                         className={`block w-full px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-1 ${
-                      selectedDate === date
-                        ? 'bg-pink-400 text-white'
+                          selectedDate === date
+                            ? 'bg-pink-400 text-white'
                             : 'bg-blue-200 text-gray-900 hover:bg-pink-400 hover:text-white'
-                    }`}
-                  >
-                    {date}
-                  </button>
-                ))}
-              </div>
-            </div>
+                        }`}
+                      >
+                        {date}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Contact */}
                 <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
@@ -503,11 +668,11 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 {/* Form Header */}
                 <div className="bg-pink-400 p-12 text-center text-white relative" style={{ background: 'linear-gradient(135deg, rgba(206,229,255,0.1) 0%, rgba(255,116,164,0.1) 100%)' }}>
                   <h2 className="text-3xl md:text-4xl font-bold mb-3 uppercase tracking-wide" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                    Book Your Spot
+                    {course.isOnline ? 'Enroll Now' : 'Book Your Spot'}
                   </h2>
                   <p className="text-lg opacity-90" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
-                    Secure your place in this professional training course
-                          </p>
+                    {course.isOnline ? 'Get instant access to this online workshop' : 'Secure your place in this professional training course'}
+                  </p>
                         </div>
 
                 {/* Form Body */}
@@ -526,7 +691,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                             required
                           >
                           <option value="">Choose a date...</option>
-                          {availableDates.map((date, index) => (
+                          {course.availableDates.map((date, index) => (
                             <option key={index} value={date}>{date}</option>
                             ))}
                           </select>
@@ -543,8 +708,9 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                             required
                           >
                           <option value="">Choose a package...</option>
-                          <option value="Standard">Standard Package - R7,200</option>
-                          <option value="Deluxe">Deluxe Package - R9,900</option>
+                          {course.packages.map((pkg, index) => (
+                            <option key={index} value={pkg.name}>{pkg.name} Package - {pkg.price}</option>
+                          ))}
                           </select>
                         </div>
                     </div>
@@ -650,7 +816,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                       style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                     >
-                      {isSubmitting ? 'Processing...' : 'Pay Deposit & Secure Spot (R2,000)'}
+                      {isSubmitting ? 'Processing...' : course.isOnline ? 'Complete Purchase' : 'Pay Deposit & Secure Spot (R2,000)'}
                     </button>
 
                     {/* Security Icons */}
