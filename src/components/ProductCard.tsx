@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart, ShoppingBag } from 'lucide-react';
 import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 
