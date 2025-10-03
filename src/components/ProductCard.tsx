@@ -81,83 +81,111 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
-  // List view layout for mobile
+  // List view layout - styled like best seller cards
   if (isListView) {
     return (
       <article 
-        className={`product-card group relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer border border-gray-100 ${className}`}
+        className={`product-card group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] ${className}`}
+        style={{ boxShadow: '0 10px 30px rgba(15,23,42,0.06)' }}
         onClick={handleCardClick}
       >
-        <div className="flex gap-4 md:gap-6 p-4 md:p-6">
-          {/* Image Container - Square 1:1 ratio - Much bigger on mobile */}
-          <div className="relative w-40 h-40 md:w-48 md:h-48 flex-shrink-0 overflow-hidden rounded-xl bg-gray-50">
-            <img
-              src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-              alt={name}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-              }}
-            />
-            
-            {/* Badges */}
-            {badges.length > 0 && badges[0] && (
-              <div className="absolute top-2 left-2">
-                <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase shadow-md ${
-                  badges[0] === 'Bestseller' ? 'bg-pink-100 text-pink-600' :
-                  badges[0] === 'New' ? 'bg-blue-500 text-white' :
-                  badges[0] === 'Sale' ? 'bg-red-500 text-white' : ''
-                }`}>
-                  {badges[0]}
-                </span>
-              </div>
-            )}
+        {/* Image Container with Shimmer Effect */}
+        <div className="relative aspect-square overflow-hidden">
+          <img
+            src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+            alt={name}
+            className="w-full h-full object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.03]"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+            }}
+          />
+          
+          {/* Shimmer Effect */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="shimmer"></div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 flex flex-col justify-between min-w-0">
-            {/* Title and Price */}
-            <div>
-              <h3 className="font-bold text-lg md:text-xl leading-tight mb-2 text-gray-900 line-clamp-2">
-                {name}
-              </h3>
-              {shortDescription && (
-                <p className="text-sm md:text-base text-gray-600 mb-3 line-clamp-2">
-                  {shortDescription}
-                </p>
-              )}
-            </div>
-
-            {/* Price and Button */}
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex flex-col">
-                <span className="text-2xl md:text-3xl font-bold text-pink-500">
-                  {price === -1 ? 'Coming Soon' : formatPrice(price)}
+          {/* Badges */}
+          {badges.length > 0 && (
+            <div className="absolute top-3 left-3 z-10">
+              {badges.map((badge, index) => (
+                <span
+                  key={index}
+                  className={`inline-block text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wide ${
+                    badge === 'Bestseller' ? 'bg-pink-400 text-white' :
+                    badge === 'New' ? 'bg-blue-500 text-white' :
+                    badge === 'Sale' ? 'bg-red-500 text-white' : 'bg-pink-400 text-white'
+                  }`}
+                >
+                  {badge}
                 </span>
-                {compareAtPrice && price !== -1 && (
-                  <span className="text-sm md:text-base text-gray-400 line-through">
-                    {formatPrice(compareAtPrice)}
-                  </span>
-                )}
-              </div>
-              
+              ))}
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleWishlistToggle}
+                className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
+                aria-label="Toggle wishlist"
+              >
+                <Heart className={`h-4 w-4 transition-all ${
+                  isWishlisted 
+                    ? 'fill-current text-pink-400' 
+                    : 'text-gray-700'
+                }`} />
+              </button>
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={!inStock || price === -1}
-                className={`flex-shrink-0 p-3 md:p-4 rounded-full transition-all ${
-                  inStock && price !== -1
-                    ? 'bg-pink-400 text-white hover:bg-pink-500 hover:scale-110'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }`}
+                className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn disabled:opacity-50"
                 aria-label="Add to cart"
               >
-                <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" />
+                <ShoppingBag className="h-4 w-4 text-gray-700" />
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Card Content */}
+        <div className="p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-pink-400 transition-colors duration-[800ms] ease-out">
+            {name}
+          </h3>
+          
+          {shortDescription && (
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+              {shortDescription}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-xl font-bold text-gray-900">
+                {price === -1 ? 'Coming Soon' : formatPrice(price)}
+              </span>
+              {compareAtPrice && price !== -1 && (
+                <span className="text-sm text-gray-500 line-through">
+                  {formatPrice(compareAtPrice)}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleAddToCart}
+            disabled={!inStock || price === -1}
+            className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-out hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(255,116,164,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
+          >
+            {price === -1 ? 'Coming Soon' : inStock ? 'Shop Now' : 'Out of Stock'}
+          </button>
         </div>
       </article>
     );
