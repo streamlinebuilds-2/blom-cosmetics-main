@@ -556,7 +556,7 @@ export const ShopPage: React.FC = () => {
         </section>
 
         {/* Product Grid */}
-        <section className="section-padding">
+        <section className="section-padding bg-gray-50">
           <Container>
             {loading ? (
               <div className={`grid ${getGridClasses()} gap-6`}>
