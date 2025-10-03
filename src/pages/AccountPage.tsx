@@ -32,12 +32,15 @@ export const AccountPage: React.FC = () => {
     window.scrollTo({ top: 0 });
 
     // Subscribe to auth state changes
-    const unsubscribe = authService.subscribe(setAuthState);
-    
-    // Check if user is authenticated
-    if (!authService.requireAuth()) {
-      return; // Will redirect to login
-    }
+    const unsubscribe = authService.subscribe((newState) => {
+      setAuthState(newState);
+      
+      // Only check auth after loading is complete
+      if (!newState.loading && !newState.user) {
+        // User is not authenticated, redirect to login
+        window.location.href = '/login?redirect=/account';
+      }
+    });
 
     return unsubscribe;
   }, []);
