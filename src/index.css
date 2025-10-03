@@ -1033,20 +1033,23 @@ body {
   }
 }
 
-/* Mobile - shimmer on scroll into view */
+/* Mobile - shimmer on tap/touch */
 @media (hover: none) and (pointer: coarse) {
   .best-seller-card .shimmer-container.shimmer-triggered {
     opacity: 1 !important;
   }
   
   .best-seller-card .shimmer-container.shimmer-triggered .shimmer {
-    animation: luxurious-light-beam 2s ease-in-out 1 !important;
+    animation: luxurious-light-beam 1.2s ease-in-out 1 !important;
     opacity: 1 !important;
   }
   
+  /* Mobile shimmer on tap for all card types */
+  .product-card:active .shimmer,
   .course-card:active .shimmer,
-  .blog-card:active .shimmer {
-    animation: luxurious-light-beam 2s ease-in-out 1 !important;
+  .blog-card:active .shimmer,
+  .best-seller-card:active .shimmer {
+    animation: luxurious-light-beam 1.2s ease-in-out 1 !important;
     opacity: 1 !important;
   }
 }

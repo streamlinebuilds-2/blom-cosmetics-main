@@ -10,7 +10,13 @@ import { Filter, Grid2x2 as Grid, List, Search, ShoppingCart, Star, Eye, Heart, 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>('grid-3');
+  // Set list view as default on mobile, grid-3 on desktop
+  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768 ? 'list' : 'grid-3';
+    }
+    return 'grid-3';
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
