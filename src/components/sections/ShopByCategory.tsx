@@ -8,28 +8,28 @@ export const ShopByCategory: React.FC = () => {
       name: 'Acrylic System',
       icon: Sparkles,
       href: '/shop#acrylic-system',
-      image: '/acrylic-powder-01.webp',
+      image: '/acrylic-category.webp',
       description: 'Professional powders & liquids'
     },
     {
       name: 'Cuticle Care',
       icon: Droplet,
       href: '/shop#cuticle-care',
-      image: '/placeholders/cuticle-care.jpg',
+      image: '/cuticle-category.webp',
       description: 'Nourishing oils & treatments'
     },
     {
       name: 'Nail Essentials',
       icon: Palette,
       href: '/shop#nail-essentials',
-      image: '/placeholders/nail-essentials.jpg',
+      image: '/nail-essentials-category.webp',
       description: 'Colors, glitters & finishes'
     },
     {
       name: 'Education',
       icon: GraduationCap,
       href: '/courses',
-      image: '/professional-acrylic-training-hero.webp',
+      image: '/education-category.webp',
       description: 'Professional training courses'
     }
   ];
