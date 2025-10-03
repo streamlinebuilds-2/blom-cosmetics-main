@@ -33,14 +33,28 @@ export const AccountPage: React.FC = () => {
 
     // Subscribe to auth state changes
     const unsubscribe = authService.subscribe((newState) => {
+      console.log('Auth state changed:', newState); // Debug log
       setAuthState(newState);
       
       // Only check auth after loading is complete
       if (!newState.loading && !newState.user) {
         // User is not authenticated, redirect to login
-        window.location.href = '/login?redirect=/account';
+        console.log('Redirecting to login - no user found');
+        setTimeout(() => {
+          window.location.href = '/login?redirect=/account';
+        }, 100);
       }
     });
+
+    // Also check immediately in case auth is already initialized
+    const currentState = authService.getState();
+    console.log('Initial auth state:', currentState);
+    if (!currentState.loading && !currentState.user) {
+      console.log('Redirecting to login immediately - no user found');
+      setTimeout(() => {
+        window.location.href = '/login?redirect=/account';
+      }, 100);
+    }
 
     return unsubscribe;
   }, []);
@@ -72,6 +86,29 @@ export const AccountPage: React.FC = () => {
             <div className="text-center py-16">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
               <p className="text-gray-600">Loading your account...</p>
+              <p className="text-xs text-gray-400 mt-2">If this takes too long, you'll be redirected to login</p>
+            </div>
+          </Container>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If not loading and no user, show login prompt (fallback if redirect fails)
+  if (!authState.loading && !authState.user) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header showMobileMenu={true} />
+        <main className="section-padding">
+          <Container>
+            <div className="text-center py-16">
+              <User className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Account Access Required</h2>
+              <p className="text-gray-600 mb-6">Please sign in to view your account</p>
+              <Button onClick={() => window.location.href = '/login?redirect=/account'}>
+                Go to Login
+              </Button>
             </div>
           </Container>
         </main>
