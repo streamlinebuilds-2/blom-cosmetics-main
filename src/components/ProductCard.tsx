@@ -183,7 +183,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         />
         
         {/* Shimmer Effect */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="shimmer"></div>
         </div>
 
@@ -290,43 +290,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-        }
-        
-        .shimmer {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            135deg,
-            transparent 0%,
-            transparent 40%,
-            rgba(255, 255, 255, 0.3) 50%,
-            rgba(255, 255, 255, 0.6) 50%,
-            rgba(255, 255, 255, 0.3) 50%,
-            transparent 60%,
-            transparent 100%
-          );
-          transform: translateX(-100%) translateY(-100%);
-          animation: shimmerSimple 2s ease-in-out;
-        }
-        
-        @keyframes shimmerSimple {
-          0% {
-            transform: translateX(-100%) translateY(-100%);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(100%) translateY(100%);
-            opacity: 0;
-          }
         }
       `}</style>
     </article>

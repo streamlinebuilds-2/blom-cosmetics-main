@@ -275,8 +275,8 @@ export const BlogPage: React.FC = () => {
                       className="w-full h-64 md:h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Shimmer Effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                      <div className="shimmer shimmer--lux"></div>
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="shimmer"></div>
                     </div>
                   </div>
                   <div className="md:w-1/2 p-8">
@@ -329,8 +329,8 @@ export const BlogPage: React.FC = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {/* Shimmer Effect */}
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-                      <div className="shimmer shimmer--lux"></div>
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="shimmer"></div>
                     </div>
                     <div className="absolute top-4 left-4">
                       <span className="px-2 py-1 bg-white text-gray-700 rounded text-sm font-medium">
@@ -391,8 +391,8 @@ export const BlogPage: React.FC = () => {
                             alt={post.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
-                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                            <div className="shimmer shimmer--lux"></div>
+                          <div className="absolute inset-0 pointer-events-none">
+                            <div className="shimmer"></div>
                           </div>
                         </div>
                         <div className="flex-1">

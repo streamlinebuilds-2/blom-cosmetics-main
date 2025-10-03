@@ -102,7 +102,7 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
         />
         
         {/* Shimmer Effect */}
-        <div className="shimmer-container absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
+        <div className="shimmer-container absolute inset-0 pointer-events-none">
           <div className="shimmer"></div>
         </div>
 
