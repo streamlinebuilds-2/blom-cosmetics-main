@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
-import { Button } from '../ui/Button';
+import { Button } from '../components/ui/Button';
 import { ProductPageTemplate } from '../components/product/ProductPageTemplate';
 import { 
   ChevronLeft, 
