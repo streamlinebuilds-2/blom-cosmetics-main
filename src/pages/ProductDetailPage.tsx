@@ -3,6 +3,9 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
+import { Card, CardContent } from '../components/ui/Card';
+import { ReviewSection } from '../components/review/ReviewSection';
+import { PaymentMethods } from '../components/payment/PaymentMethods';
 import { ProductPageTemplate } from '../components/product/ProductPageTemplate';
 import { 
   ChevronLeft, 
@@ -18,6 +21,17 @@ import {
 
 interface ProductDetailPageProps {
   productSlug?: string;
+}
+
+interface Review {
+  id: string;
+  name: string;
+  rating: number;
+  title: string;
+  comment: string;
+  date: string;
+  verified: boolean;
+  helpful: number;
 }
 
 export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlug = 'cuticle-oil' }) => {
@@ -785,6 +799,96 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   const product = allProductsData[productSlug as keyof typeof allProductsData] || allProductsData['cuticle-oil'];
 
+  // Sample reviews data
+  const sampleReviews: Review[] = [
+    {
+      id: '1',
+      name: 'Sarah Mitchell',
+      rating: 5,
+      title: 'Excellent quality!',
+      comment: 'This product exceeded my expectations. The quality is outstanding and it works exactly as described. Highly recommend!',
+      date: '2024-01-15',
+      verified: true,
+      helpful: 12
+    },
+    {
+      id: '2',
+      name: 'Jessica Chen',
+      rating: 4,
+      title: 'Great product',
+      comment: 'Very happy with this purchase. Good value for money and fast delivery. Will definitely order again.',
+      date: '2024-01-10',
+      verified: true,
+      helpful: 8
+    },
+    {
+      id: '3',
+      name: 'Michelle Adams',
+      rating: 5,
+      title: 'Perfect!',
+      comment: 'Exactly what I was looking for. The quality is professional grade and the results are amazing.',
+      date: '2024-01-08',
+      verified: true,
+      helpful: 15
+    },
+    {
+      id: '4',
+      name: 'Amanda Wilson',
+      rating: 4,
+      title: 'Very good',
+      comment: 'Good product overall. Minor issues with packaging but the product itself is great.',
+      date: '2024-01-05',
+      verified: false,
+      helpful: 3
+    },
+    {
+      id: '5',
+      name: 'Lisa Thompson',
+      rating: 5,
+      title: 'Love it!',
+      comment: 'This has become my go-to product. The quality is consistent and the results are always perfect.',
+      date: '2024-01-03',
+      verified: true,
+      helpful: 9
+    }
+  ];
+
+  // Recommended products data
+  const recommendedProducts = [
+    {
+      id: 'rec1',
+      name: 'Cuticle Oil',
+      price: 140,
+      image: '/cuticle-oil-01.webp',
+      rating: 4.8,
+      slug: 'cuticle-oil'
+    },
+    {
+      id: 'rec2',
+      name: 'Vitamin Primer',
+      price: 180,
+      image: '/primer-01.webp',
+      rating: 4.7,
+      slug: 'vitamin-primer'
+    },
+    {
+      id: 'rec3',
+      name: 'Top Coat',
+      price: 120,
+      image: '/top-coat-01.webp',
+      rating: 4.6,
+      slug: 'top-coat'
+    },
+    {
+      id: 'rec4',
+      name: 'Nail File (80/80 Grit)',
+      price: 35,
+      image: '/nail-file-01.webp',
+      rating: 4.5,
+      slug: 'nail-file'
+    }
+  ];
+
   const nextImage = () => {
     setSelectedImage((prev) => (prev + 1) % product.images.length);
   };
@@ -826,6 +930,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   const handleWishlistToggle = () => {
     setIsWishlisted(!isWishlisted);
+  };
+
+  const handleReviewSubmit = (reviewData: any) => {
+    console.log('Review submitted:', reviewData);
+    // In a real app, this would save to a database
   };
 
   const toggleAccordion = (tab: string) => {
@@ -1131,14 +1240,80 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   )}
 
                 {activeTab === 'reviews' && (
-                        <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Customer Reviews</h3>
-                    <div className="text-center py-8">
-                      <p className="text-gray-600">Reviews coming soon!</p>
-                            </div>
+                  <div>
+                    <ReviewSection
+                      productName={product.name}
+                      productImage={product.images[0]}
+                      productSlug={productSlug || 'cuticle-oil'}
+                      averageRating={product.rating}
+                      reviewCount={product.reviewCount}
+                      reviews={sampleReviews}
+                      onReviewSubmit={handleReviewSubmit}
+                    />
                   </div>
                 )}
               </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* Payment Methods */}
+        <section className="section-padding bg-gray-50">
+          <Container>
+            <PaymentMethods />
+          </Container>
+        </section>
+
+        {/* You May Also Like */}
+        <section className="section-padding">
+          <Container>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">You May Also Like</h2>
+              <p className="text-gray-600">Discover more products from our collection</p>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl w-full mx-auto">
+              {recommendedProducts.map((recProduct) => (
+                <Card key={recProduct.id} className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+                  <div className="aspect-square overflow-hidden">
+                    <img
+                      src={recProduct.image}
+                      alt={recProduct.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <CardContent className="p-3 md:p-4">
+                    <div className="flex items-center gap-1 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-3 w-3 sm:h-4 sm:w-4 ${
+                            i < Math.floor(recProduct.rating)
+                              ? 'fill-current'
+                              : 'text-gray-300'
+                          }`}
+                          style={{ color: i < Math.floor(recProduct.rating) ? '#F59E0B' : undefined }}
+                        />
+                      ))}
+                    </div>
+                    <h3 className="font-semibold text-sm md:text-base mb-2 line-clamp-2 group-hover:text-pink-400 transition-colors">
+                      {recProduct.name}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg md:text-xl font-bold text-gray-900">
+                        R{recProduct.price.toFixed(2)}
+                      </span>
+                      <Button 
+                        size="sm" 
+                        className="text-xs md:text-sm px-2 py-1 md:px-3 md:py-2"
+                        onClick={() => window.location.href = `/products/${recProduct.slug}`}
+                      >
+                        View
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </Container>
         </section>
