@@ -10,7 +10,7 @@ import {
   Heart, 
   ShoppingCart, 
   Star, 
-  Minus, 
+  Minus,
   Plus,
   CheckCircle,
   X
@@ -897,22 +897,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {/* Thumbnail Images */}
                 {product.images.length > 1 && (
                   <div className="grid grid-cols-4 gap-2">
-                    {product.images.map((image, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImage(index)}
+                  {product.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(index)}
                         className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                          selectedImage === index ? 'border-pink-400' : 'border-gray-200'
-                        }`}
-                      >
-                        <img
-                          src={image}
-                          alt={`${product.name} ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
-                  </div>
+                        selectedImage === index ? 'border-pink-400' : 'border-gray-200'
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
                 )}
               </div>
 
@@ -921,29 +921,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                   {product.name}
                 </h1>
-                <p className="text-lg text-gray-600 mb-4">{product.subtitle}</p>
-
-                {/* Rating */}
-                <div className="flex items-center gap-2 mb-4">
+                  <p className="text-lg text-gray-600 mb-4">{product.subtitle}</p>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center gap-2 mb-4">
                   <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-5 w-5 ${
-                          i < Math.floor(product.rating)
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(product.rating)
                             ? 'fill-current text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
+                              : 'text-gray-300'
+                          }`}
                         style={{ color: i < Math.floor(product.rating) ? '#F59E0B' : undefined }}
-                      />
-                    ))}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {product.rating} ({product.reviewCount} reviews)
+                    </span>
                   </div>
-                  <span className="text-sm text-gray-600">
-                    {product.rating} ({product.reviewCount} reviews)
-                  </span>
-                </div>
 
-                {/* Price */}
+                  {/* Price */}
                 <div className="mb-6">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl font-bold text-gray-900">
@@ -966,33 +966,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {product.variants.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Colors</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
                       {product.variants.map((variant) => (
                         <button
                           key={variant.id}
                           onClick={() => handleVariantSelect(variant.id)}
                           disabled={!variant.inStock}
-                          className={`p-3 rounded-lg border-2 transition-all text-left ${
+                          className={`p-2 rounded-lg border-2 transition-all ${
                             selectedVariant === variant.id
                               ? 'border-pink-400 bg-pink-50'
                               : 'border-gray-200 hover:border-gray-300'
                           } ${!variant.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          <div className="flex items-center gap-3">
-                            {variant.image && (
-                              <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
-                                <img
-                                  src={variant.image}
-                                  alt={variant.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            )}
-                            <div>
-                              <div className="font-medium text-gray-900">{variant.name}</div>
-                              <div className={`text-sm ${variant.inStock ? 'text-green-600' : 'text-red-600'}`}>
-                                {variant.inStock ? 'In Stock' : 'Out of Stock'}
-                              </div>
+                          <div className="text-center">
+                            <div className="font-medium text-sm text-gray-900 mb-1">{variant.name}</div>
+                            <div className={`text-xs ${variant.inStock ? 'text-green-600' : 'text-red-600'}`}>
+                              {variant.inStock ? 'In Stock' : 'Out of Stock'}
                             </div>
                           </div>
                         </button>
@@ -1005,19 +994,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantity</h3>
                   <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      <button
+                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
                     <span className="text-lg font-medium px-4">{quantity}</span>
-                    <button
-                      onClick={() => setQuantity(quantity + 1)}
+                      <button
+                        onClick={() => setQuantity(quantity + 1)}
                       className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
                   </div>
                 </div>
 
@@ -1030,7 +1019,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   >
                     <ShoppingCart className="h-5 w-5" />
                     {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                  </Button>
+                    </Button>
                 </div>
 
                 {/* Product Details */}
@@ -1048,8 +1037,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     <span className="text-sm text-gray-600">Professional quality guarantee</span>
                   </div>
                 </div>
-              </div>
-            </div>
+                  </div>
+                </div>
 
             {/* Product Information Tabs */}
             <div className="mt-16">
@@ -1062,7 +1051,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     { id: 'ingredients', label: 'Ingredients' },
                     { id: 'reviews', label: 'Reviews' }
                   ].map((tab) => (
-                    <button
+                  <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
@@ -1072,7 +1061,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       }`}
                     >
                       {tab.label}
-                    </button>
+                  </button>
                   ))}
                 </nav>
               </div>
@@ -1081,67 +1070,67 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {activeTab === 'overview' && (
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Product Overview</h3>
-                    <ul className="space-y-2">
-                      {product.overview.map((item, index) => (
+                      <ul className="space-y-2">
+                        {product.overview.map((item, index) => (
                         <li key={index} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-pink-400 mt-0.5 flex-shrink-0" />
                           <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                 {activeTab === 'features' && (
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Key Features</h3>
                     <div className="grid md:grid-cols-2 gap-6">
-                      {product.features.map((feature, index) => (
-                        <div key={index} className="p-4 bg-gray-50 rounded-lg">
+                        {product.features.map((feature, index) => (
+                          <div key={index} className="p-4 bg-gray-50 rounded-lg">
                           <h4 className="font-semibold text-gray-900 mb-2">{feature.title}</h4>
                           <p className="text-gray-600">{feature.description}</p>
-                        </div>
-                      ))}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
                 {activeTab === 'how-to-use' && (
                   <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h3>
-                    <ol className="space-y-3">
-                      {product.howToUse.map((step, index) => (
-                        <li key={index} className="flex items-start gap-3">
+                      <ol className="space-y-3">
+                        {product.howToUse.map((step, index) => (
+                          <li key={index} className="flex items-start gap-3">
                           <span className="flex-shrink-0 w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                            {index + 1}
-                          </span>
+                              {index + 1}
+                            </span>
                           <span className="text-gray-700">{step}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                )}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
 
                 {activeTab === 'ingredients' && (
-                  <div>
+                        <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Ingredients</h3>
-                    <ul className="space-y-2">
-                      {product.ingredients.map((ingredient, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                          <ul className="space-y-2">
+                            {product.ingredients.map((ingredient, index) => (
+                              <li key={index} className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
                           <span className="text-gray-700">{ingredient}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
+                              </li>
+                            ))}
+                          </ul>
+                    </div>
+                  )}
 
                 {activeTab === 'reviews' && (
-                  <div>
+                        <div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-4">Customer Reviews</h3>
                     <div className="text-center py-8">
                       <p className="text-gray-600">Reviews coming soon!</p>
-                    </div>
+                            </div>
                   </div>
                 )}
               </div>

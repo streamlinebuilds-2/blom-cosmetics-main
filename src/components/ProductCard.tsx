@@ -225,14 +225,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {/* Out of Stock Overlay */}
-        {!inStock && (
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-            <span className="bg-gray-900 text-white px-3 py-1 sm:px-4 sm:py-1.5 md:px-6 md:py-2 rounded-full text-[10px] sm:text-xs md:text-sm font-bold uppercase shadow-xl">
-              Out of Stock
-            </span>
-          </div>
-        )}
 
         {/* Wishlist Heart */}
         <button
