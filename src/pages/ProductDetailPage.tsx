@@ -85,32 +85,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         certifications: ['Vegan', 'Cruelty-Free']
       }
     },
-    'acrylic-powder': {
-      id: '9',
-      name: 'Acrylic Powder',
-      subtitle: 'Professional acrylic powder in 13 beautiful colors',
-      price: 250,
+    'crystal-clear-acrylic': {
+      id: '8',
+      name: 'Crystal Clear Acrylic',
+      subtitle: 'Professional grade acrylic powder in 13 beautiful colors',
+      price: 450,
       comparePrice: null,
       rating: 4.9,
       reviewCount: 156,
       inStock: true,
-      stockCount: 25,
+      stockCount: 20,
       description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
-      images: [
-        '/acrylic-powder-baby-blue.webp',
-        '/acrylic-powder-baby-ligt-purple.webp',
-        '/acrylic-powder-baby-pink.webp',
-        '/acrylic-powder-ballet-pink.webp',
-        '/acrylic-powder-hot-pink.webp',
-        '/acrylic-powder-light-grey.webp',
-        '/acrylic-powder-light-mint.webp',
-        '/acrylic-powder-light-pink.webp',
-        '/acrylic-powder-mint.webp',
-        '/acrylic-powder-nude.webp',
-        '/acrylic-powder-pink.webp',
-        '/acrylic-powder-sky-blue.webp',
-        '/acrylic-powder-yellow.webp'
-      ],
+      images: ['/acrylic-powder-baby-blue.webp'],
       variants: [
         { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
         { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
@@ -154,6 +140,273 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       specifications: {
         size: '56g',
         shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'vitamin-primer': {
+      id: '2',
+      name: 'Vitamin Primer',
+      subtitle: 'Vitamin-infused, acid-free primer for strong adhesion',
+      price: 140,
+      comparePrice: null,
+      rating: 4.8,
+      reviewCount: 124,
+      inStock: true,
+      stockCount: 30,
+      description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
+      images: ['/primer-01.webp'],
+      variants: [],
+      overview: [
+        'Acid-free formula protects natural nails',
+        'Vitamin enriched for nail health',
+        'Strong adhesion for long-lasting results',
+        'Professional grade quality',
+        'Suitable for all nail types'
+      ],
+      features: [
+        { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
+        { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
+        { title: 'Strong Bond', description: 'Creates long-lasting adhesion for gels and acrylics' },
+        { title: 'Professional Grade', description: 'High-quality formula trusted by professionals' }
+      ],
+      howToUse: [
+        'Apply to clean, dry nails',
+        'Allow to dry completely',
+        'Apply gel or acrylic immediately',
+        'Do not touch the nail surface after application'
+      ],
+      ingredients: [
+        'Vitamin Complex',
+        'Adhesion Promoters',
+        'Solvents',
+        'Preservatives'
+      ],
+      specifications: {
+        size: '15ml',
+        shelfLife: '18 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'prep-solution': {
+      id: '3',
+      name: 'Prep Solution (Nail Dehydrator)',
+      subtitle: 'Removes oils & moisture for better adhesion',
+      price: 120,
+      comparePrice: null,
+      rating: 4.7,
+      reviewCount: 89,
+      inStock: true,
+      stockCount: 20,
+      description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
+      images: ['/prep-solution.webp'],
+      variants: [],
+      overview: [
+        'Removes surface oils and moisture',
+        'Prevents lifting and improves adhesion',
+        'Quick drying formula',
+        'Essential prep step',
+        'Professional results'
+      ],
+      features: [
+        { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
+        { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
+        { title: 'Quick Drying', description: 'Fast-drying formula saves time' },
+        { title: 'Prevents Lifting', description: 'Reduces risk of enhancement lifting' }
+      ],
+      howToUse: [
+        'Apply to clean nails',
+        'Allow to air dry',
+        'Do not rinse',
+        'Apply primer immediately after'
+      ],
+      ingredients: [
+        'Isopropyl Alcohol',
+        'Dehydrating Agents',
+        'Preservatives'
+      ],
+      specifications: {
+        size: '120ml',
+        shelfLife: '24 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'top-coat': {
+      id: '4',
+      name: 'Top Coat',
+      subtitle: 'Strong, protective top coat with mirror shine',
+      price: 160,
+      comparePrice: null,
+      rating: 4.9,
+      reviewCount: 201,
+      inStock: true,
+      stockCount: 35,
+      description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
+      images: ['/top-coat-01.webp'],
+      variants: [],
+      overview: [
+        'High-gloss mirror finish',
+        'Chip-resistant protection',
+        'Long-lasting durability',
+        'UV protection included',
+        'Professional results'
+      ],
+      features: [
+        { title: 'High-Gloss Finish', description: 'Mirror-like shine that lasts' },
+        { title: 'Chip Resistant', description: 'Strong protection against chipping' },
+        { title: 'UV Protection', description: 'Protects against UV damage' },
+        { title: 'Easy Application', description: 'Smooth, even application' }
+      ],
+      howToUse: [
+        'Apply over cured gel or acrylic',
+        'Cure under UV/LED lamp',
+        'Wipe off inhibition layer',
+        'Enjoy glossy finish'
+      ],
+      ingredients: [
+        'Acrylic Resins',
+        'UV Photoinitiators',
+        'Gloss Enhancers',
+        'Preservatives'
+      ],
+      specifications: {
+        size: '15ml',
+        shelfLife: '18 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'fairy-dust-top-coat': {
+      id: '5',
+      name: 'Fairy Dust Top Coat',
+      subtitle: 'Glitter-infused top coat with smooth shine',
+      price: 180,
+      comparePrice: null,
+      rating: 4.6,
+      reviewCount: 73,
+      inStock: true,
+      stockCount: 15,
+      description: 'Adds a sparkling finish to any gel or acrylic set.',
+      images: ['/fairy-dust-top-coat.webp'],
+      variants: [],
+      overview: [
+        'Fine glitter particles for sparkle',
+        'Smooth application',
+        'High-shine finish',
+        'Versatile use',
+        'Long-lasting sparkle'
+      ],
+      features: [
+        { title: 'Fine Glitter', description: 'Beautiful sparkle without roughness' },
+        { title: 'Smooth Finish', description: 'Glossy surface with embedded glitter' },
+        { title: 'Versatile', description: 'Works with any nail enhancement' },
+        { title: 'Long-Lasting', description: 'Sparkle that lasts' }
+      ],
+      howToUse: [
+        'Apply over cured gel or acrylic',
+        'Cure under UV/LED lamp',
+        'Wipe off inhibition layer',
+        'Enjoy sparkling finish'
+      ],
+      ingredients: [
+        'Acrylic Resins',
+        'Fine Glitter',
+        'UV Photoinitiators',
+        'Gloss Enhancers'
+      ],
+      specifications: {
+        size: '15ml',
+        shelfLife: '18 months',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'nail-forms': {
+      id: '6',
+      name: 'Nail Forms',
+      subtitle: 'Reusable forms for sculpting extensions',
+      price: 45,
+      comparePrice: null,
+      rating: 4.5,
+      reviewCount: 67,
+      inStock: true,
+      stockCount: 50,
+      description: 'Professional nail forms for creating perfect extensions and overlays.',
+      images: ['/nail-forms-01.webp'],
+      variants: [],
+      overview: [
+        'Reusable design',
+        'Easy to apply',
+        'Perfect fit',
+        'Professional results',
+        'Durable material'
+      ],
+      features: [
+        { title: 'Reusable', description: 'Clean and reuse multiple times' },
+        { title: 'Perfect Fit', description: 'Multiple sizes for perfect fit' },
+        { title: 'Easy Application', description: 'Simple to apply and remove' },
+        { title: 'Professional Quality', description: 'Durable material for professional use' }
+      ],
+      howToUse: [
+        'Select appropriate size',
+        'Apply to natural nail',
+        'Sculpt with acrylic or gel',
+        'Remove after curing',
+        'Clean and reuse'
+      ],
+      ingredients: [
+        'Medical-grade adhesive',
+        'Flexible plastic'
+      ],
+      specifications: {
+        size: '50 forms',
+        shelfLife: 'N/A',
+        origin: 'Professional Grade',
+        certifications: ['Vegan', 'Cruelty-Free']
+      }
+    },
+    'designer-file-set': {
+      id: '7',
+      name: 'Designer File Set',
+      subtitle: 'Professional file set for shaping & finishing',
+      price: 85,
+      comparePrice: null,
+      rating: 4.8,
+      reviewCount: 112,
+      inStock: true,
+      stockCount: 25,
+      description: 'Complete set of professional files for shaping, refining, and finishing nail enhancements.',
+      images: ['/designer-file-01.webp'],
+      variants: [],
+      overview: [
+        'Multiple grit options',
+        'Professional quality',
+        'Durable construction',
+        'Precise shaping',
+        'Complete set'
+      ],
+      features: [
+        { title: 'Multiple Grits', description: 'Range from coarse to fine for all needs' },
+        { title: 'Professional Quality', description: 'High-grade materials for professional results' },
+        { title: 'Durable', description: 'Long-lasting construction' },
+        { title: 'Complete Set', description: 'Everything needed for shaping and finishing' }
+      ],
+      howToUse: [
+        'Use coarse file for shaping',
+        'Medium file for refining',
+        'Fine file for finishing',
+        'Buff for smooth surface',
+        'Clean between uses'
+      ],
+      ingredients: [
+        'High-grade emery',
+        'Durable backing'
+      ],
+      specifications: {
+        size: '5 files',
+        shelfLife: 'N/A',
         origin: 'Professional Grade',
         certifications: ['Vegan', 'Cruelty-Free']
       }
