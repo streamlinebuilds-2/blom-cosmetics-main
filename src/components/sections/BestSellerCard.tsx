@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Heart, ShoppingBag } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { cartStore } from '../../lib/cart';
 
 interface BestSellerCardProps {
@@ -120,24 +120,15 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
           </div>
         )}
 
-        {/* Action Buttons */}
+        {/* Wishlist Button */}
         <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={handleWishlistToggle}
-              className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
-              aria-label="Toggle wishlist"
-            >
-              <Heart className="h-4 w-4 text-gray-700" />
-            </button>
-            <button
-              onClick={handleAddToCart}
-              className="relative p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
-              aria-label="Add to cart"
-            >
-              <ShoppingBag className="h-4 w-4 text-gray-700" />
-            </button>
-          </div>
+          <button
+            onClick={handleWishlistToggle}
+            className="relative p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
+            aria-label="Toggle wishlist"
+          >
+            <Heart className="h-6 w-6 text-gray-700" />
+          </button>
         </div>
       </div>
 
@@ -169,7 +160,7 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
           className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-out hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(255,116,164,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
           disabled={!inStock}
         >
-          {inStock ? 'Shop Now' : 'Out of Stock'}
+          {inStock ? 'Add to Cart' : 'Out of Stock'}
         </button>
       </div>
 
