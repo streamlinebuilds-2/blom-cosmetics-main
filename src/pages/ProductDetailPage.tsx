@@ -55,7 +55,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 25,
       description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
-      images: ['/cuticle-oil-01.webp'],
+      images: ['/cuticle-oil-colorful.webp', '/cuticle-oil-white.webp'],
       variants: [
         { id: 'cotton-candy', name: 'Cotton Candy', inStock: true },
         { id: 'vanilla', name: 'Vanilla', inStock: true },
@@ -107,7 +107,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 30,
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-      images: ['/primer-01.webp'],
+      images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
       variants: [],
       overview: [
         'Acid-free formula protects natural nails',
@@ -152,7 +152,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 20,
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      images: ['/prep-solution.webp'],
+      images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
       variants: [],
       overview: [
         'Removes surface oils and moisture',
@@ -196,7 +196,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 35,
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
-      images: ['/top-coat-01.webp'],
+      images: ['/top-coat-colorful.webp', '/top-coat-white.webp'],
       variants: [],
       overview: [
         'High-gloss mirror finish',
@@ -241,7 +241,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 15,
       description: 'Adds a sparkling finish to any gel or acrylic set.',
-      images: ['/fairy-dust-top-coat.webp'],
+      images: ['/fairy-dust-top-coat-colorful.webp', '/fairy-dust-top-coat-white.webp'],
       variants: [],
       overview: [
         'Fine glitter particles for sparkle',
@@ -286,9 +286,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 50,
       description: 'Professional nail file with 80/80 grit for shaping and finishing.',
-      images: ['/nail-file-01.webp', '/nail-file-bundle.webp'],
+      images: ['/nail-file-colorful.webp', '/nail-file-white.webp', '/nail-file-bundle.webp'],
       variants: [
-        { id: 'single', name: 'Single File', inStock: true, price: 35, image: '/nail-file-01.webp' },
+        { id: 'single', name: 'Single File', inStock: true, price: 35, image: '/nail-file-colorful.webp' },
         { id: 'bundle', name: '5-Pack Bundle', inStock: true, price: 160, image: '/nail-file-bundle.webp' }
       ],
       overview: [
@@ -332,7 +332,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 50,
       description: 'Professional nail forms for creating perfect extensions and overlays.',
-      images: ['/nail-forms-01.webp'],
+      images: ['/nail-forms-colorful.webp', '/nail-forms-white.webp'],
       variants: [],
       overview: [
         'Holographic guide',
@@ -376,7 +376,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 25,
       description: 'Professional-grade acetone for fast and effective nail polish removal.',
-      images: ['/acetone-01.webp'],
+      images: ['/acetone-remover-colorful.webp', '/acetone-remover-white.webp'],
       variants: [],
       overview: [
         'Professional-grade formula',
@@ -421,7 +421,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 20,
       description: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art.',
-      images: ['/core-acrylics-01.webp'],
+      images: ['/core-acrylics-colorful.webp', '/core-acrylics-white.webp'],
       variants: [
         { id: 'baby-blue', name: 'Baby Blue', inStock: true },
         { id: 'lilac-mist', name: 'Lilac Mist', inStock: true },
@@ -480,7 +480,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 20,
       description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
-      images: ['/acrylic-powder-baby-blue.webp'],
+      images: ['/crystal-clear-acrylic-colorful.webp', '/crystal-clear-acrylic-white.webp'],
       variants: [
         { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
         { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
@@ -539,7 +539,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 30,
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-      images: ['/primer-01.webp'],
+      images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
       variants: [],
       overview: [
         'Acid-free formula protects natural nails',
@@ -584,7 +584,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 20,
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      images: ['/prep-solution.webp'],
+      images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
       variants: [],
       overview: [
         'Removes surface oils and moisture',
@@ -628,7 +628,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 35,
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
-      images: ['/top-coat-01.webp'],
+      images: ['/top-coat-colorful.webp', '/top-coat-white.webp'],
       variants: [],
       overview: [
         'High-gloss mirror finish',
@@ -673,7 +673,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 15,
       description: 'Adds a sparkling finish to any gel or acrylic set.',
-      images: ['/fairy-dust-top-coat.webp'],
+      images: ['/fairy-dust-top-coat-colorful.webp', '/fairy-dust-top-coat-white.webp'],
       variants: [],
       overview: [
         'Fine glitter particles for sparkle',
@@ -718,7 +718,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 50,
       description: 'Professional nail forms for creating perfect extensions and overlays.',
-      images: ['/nail-forms-01.webp'],
+      images: ['/nail-forms-colorful.webp', '/nail-forms-white.webp'],
       variants: [],
       overview: [
         'Reusable design',
@@ -859,7 +859,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       id: 'rec1',
       name: 'Cuticle Oil',
       price: 140,
-      image: '/cuticle-oil-01.webp',
+      image: '/cuticle-oil-colorful.webp',
       rating: 4.8,
       slug: 'cuticle-oil'
     },
@@ -883,7 +883,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       id: 'rec4',
       name: 'Nail File (80/80 Grit)',
       price: 35,
-      image: '/nail-file-01.webp',
+      image: '/nail-file-colorful.webp',
       rating: 4.5,
       slug: 'nail-file'
     }

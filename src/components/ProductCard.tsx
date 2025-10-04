@@ -91,16 +91,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       >
         {/* Image Container with Shimmer Effect */}
         <div className="relative aspect-square overflow-hidden md:w-24 md:h-24 md:flex-shrink-0">
+          {/* Default white background image */}
           <img
             src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
             alt={name}
-            className="w-full h-full object-cover transition-transform duration-[800ms] ease-out group-hover:scale-[1.03]"
+            className="w-full h-full object-cover transition-all duration-300 ease-out group-hover:opacity-0 group-hover:scale-[1.02]"
             loading="lazy"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
             }}
           />
+          {/* Hover colorful image */}
+          {images[1] && (
+            <img
+              src={images[1]}
+              alt={name}
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-[1.02]"
+              loading="lazy"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+              }}
+            />
+          )}
           
           {/* Shimmer Effect */}
           <div className="absolute inset-0 pointer-events-none">
@@ -188,16 +202,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
+        {/* Default white background image */}
         <img
           src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover transition-all duration-300 ease-out group-hover:opacity-0 group-hover:scale-[1.02]"
           loading="lazy"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
           }}
         />
+        {/* Hover colorful image */}
+        {images[1] && (
+          <img
+            src={images[1]}
+            alt={name}
+            className="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-[1.02]"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+            }}
+          />
+        )}
         
         {/* Shimmer Effect */}
         <div className="absolute inset-0 pointer-events-none">
