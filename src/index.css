@@ -867,14 +867,14 @@ html, body {
   }
 
   .m-type__icon {
-    background: #FF74A4 !important;
-    color: white !important;
+    background: #CEE5FF !important;
+    color: #1f2937 !important;
     position: relative;
     z-index: 2;
   }
 
   .m-type__icon svg {
-    color: white !important;
+    color: #1f2937 !important;
   }
 
   .m-type__body {
