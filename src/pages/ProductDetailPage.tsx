@@ -272,10 +272,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 50,
       description: 'Professional nail file with 80/80 grit for shaping and finishing.',
-      images: ['/nail-file-01.webp'],
+      images: ['/nail-file-01.webp', '/nail-file-bundle.webp'],
       variants: [
-        { id: 'single', name: 'Single File', inStock: true, price: 35 },
-        { id: 'bundle', name: '5-Pack Bundle', inStock: true, price: 160 }
+        { id: 'single', name: 'Single File', inStock: true, price: 35, image: '/nail-file-01.webp' },
+        { id: 'bundle', name: '5-Pack Bundle', inStock: true, price: 160, image: '/nail-file-bundle.webp' }
       ],
       overview: [
         'Professional 80/80 grit',
@@ -805,11 +805,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     }
   };
 
+  // Get current price based on selected variant
+  const getCurrentPrice = () => {
+    if (selectedVariant) {
+      const variant = product.variants.find(v => v.id === selectedVariant);
+      return variant ? variant.price : product.price;
+    }
+    return product.price;
+  };
+
   const handleAddToCart = () => {
     // Add to cart logic here
     console.log('Added to cart:', {
       product: product.name,
       variant: selectedVariant,
+      price: getCurrentPrice(),
       quantity
     });
   };
@@ -947,7 +957,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <div className="mb-6">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl font-bold text-gray-900">
-                      R{product.price.toFixed(2)}
+                      R{getCurrentPrice().toFixed(2)}
                     </span>
                     {product.comparePrice && (
                       <span className="text-xl text-gray-500 line-through">
@@ -957,7 +967,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   </div>
                   {product.comparePrice && (
                     <div className="text-sm text-green-600 font-medium">
-                      Save R{(product.comparePrice - product.price).toFixed(2)}
+                      Save R{(product.comparePrice - getCurrentPrice()).toFixed(2)}
                     </div>
                   )}
                 </div>
@@ -965,7 +975,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {/* Variants */}
                 {product.variants.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Colors</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Options</h3>
                     <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => (
                         <button
