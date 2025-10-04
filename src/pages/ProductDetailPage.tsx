@@ -966,24 +966,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {product.variants.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Colors</h3>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => (
                         <button
                           key={variant.id}
                           onClick={() => handleVariantSelect(variant.id)}
                           disabled={!variant.inStock}
-                          className={`p-2 rounded-lg border-2 transition-all ${
+                          className={`px-4 py-2 rounded-full border transition-all ${
                             selectedVariant === variant.id
-                              ? 'border-pink-400 bg-pink-50'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'bg-pink-400 text-white border-pink-400'
+                              : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
                           } ${!variant.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          <div className="text-center">
-                            <div className="font-medium text-sm text-gray-900 mb-1">{variant.name}</div>
-                            <div className={`text-xs ${variant.inStock ? 'text-green-600' : 'text-red-600'}`}>
-                              {variant.inStock ? 'In Stock' : 'Out of Stock'}
-                            </div>
-                          </div>
+                          <span className="text-sm font-medium">{variant.name}</span>
                         </button>
                       ))}
                     </div>
