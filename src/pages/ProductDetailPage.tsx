@@ -905,6 +905,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       const imageIndex = product.images.findIndex(img => img === variant.image);
       if (imageIndex !== -1) {
         setSelectedImage(imageIndex);
+      } else {
+        // If variant image not in main images array, add it temporarily
+        const tempImages = [...product.images, variant.image];
+        const newIndex = tempImages.length - 1;
+        setSelectedImage(newIndex);
       }
     }
   };
@@ -914,27 +919,30 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     const newIndex = (selectedImage + 1) % product.images.length;
     setSelectedImage(newIndex);
     // Sync with variant selection if this image corresponds to a variant
-    if (newIndex > 0 && newIndex <= product.variants.length) {
-      const variant = product.variants[newIndex - 1];
-      if (variant) {
-        setSelectedVariant(variant.id);
-      }
-    } else if (newIndex === 0) {
-      setSelectedVariant(null); // White background image
-    }
+    syncVariantWithImage(newIndex);
   };
 
   const prevImage = () => {
     const newIndex = (selectedImage - 1 + product.images.length) % product.images.length;
     setSelectedImage(newIndex);
     // Sync with variant selection if this image corresponds to a variant
-    if (newIndex > 0 && newIndex <= product.variants.length) {
-      const variant = product.variants[newIndex - 1];
-      if (variant) {
-        setSelectedVariant(variant.id);
+    syncVariantWithImage(newIndex);
+  };
+
+  // Helper function to sync variant selection with image index
+  const syncVariantWithImage = (imageIndex: number) => {
+    const currentImage = product.images[imageIndex];
+    if (currentImage) {
+      // Find variant that matches this image
+      const matchingVariant = product.variants.find(v => v.image === currentImage);
+      if (matchingVariant) {
+        setSelectedVariant(matchingVariant.id);
+      } else {
+        // Check if it's the first image (usually white background)
+        if (imageIndex === 0) {
+          setSelectedVariant(null);
+        }
       }
-    } else if (newIndex === 0) {
-      setSelectedVariant(null); // White background image
     }
   };
 
@@ -1010,9 +1018,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {/* Main Image */}
                 <div className="relative aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100">
                   <img
-                    src={product.images[selectedImage]}
+                    src={product.images[selectedImage] || product.images[0]}
                     alt={product.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = product.images[0] || '/placeholder.webp';
+                    }}
                   />
                   
                   {/* Navigation Arrows */}
@@ -1057,6 +1069,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                         src={image}
                         alt={`${product.name} ${index + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = product.images[0] || '/placeholder.webp';
+                        }}
                       />
                     </button>
                   ))}
