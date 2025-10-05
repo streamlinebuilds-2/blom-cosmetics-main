@@ -286,7 +286,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* Price - Centered */}
         <div className="text-center mb-2 sm:mb-3 md:mb-4">
           <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <span className="text-lg sm:text-xl md:text-2xl font-bold text-pink-500">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
               {price === -1 ? 'Coming Soon' : formatPrice(price)}
             </span>
             {compareAtPrice && (
