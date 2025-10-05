@@ -55,7 +55,14 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 25,
       description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
-      images: ['/cuticle-oil-white.webp', '/cuticle-oil-cotton-candy.webp'],
+      images: [
+        '/cuticle-oil-white.webp', 
+        '/cuticle-oil-cotton-candy.webp',
+        '/cuticle-oil-vanilla.webp',
+        '/cuticle-oil-tiny-touch.webp',
+        '/cuticle-oil-dragon-fruit-lotus.webp',
+        '/cuticle-oil-watermelon.webp'
+      ],
       variants: [
         { id: 'cotton-candy', name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
         { id: 'vanilla', name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
@@ -889,13 +896,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     }
   ];
 
-  const nextImage = () => {
-    setSelectedImage((prev) => (prev + 1) % product.images.length);
-  };
-
-  const prevImage = () => {
-    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
-  };
 
   const handleVariantSelect = (variantId: string) => {
     setSelectedVariant(variantId);
@@ -906,6 +906,35 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       if (imageIndex !== -1) {
         setSelectedImage(imageIndex);
       }
+    }
+  };
+
+  // Handle carousel navigation and sync with variant selection
+  const nextImage = () => {
+    const newIndex = (selectedImage + 1) % product.images.length;
+    setSelectedImage(newIndex);
+    // Sync with variant selection if this image corresponds to a variant
+    if (newIndex > 0 && newIndex <= product.variants.length) {
+      const variant = product.variants[newIndex - 1];
+      if (variant) {
+        setSelectedVariant(variant.id);
+      }
+    } else if (newIndex === 0) {
+      setSelectedVariant(null); // White background image
+    }
+  };
+
+  const prevImage = () => {
+    const newIndex = (selectedImage - 1 + product.images.length) % product.images.length;
+    setSelectedImage(newIndex);
+    // Sync with variant selection if this image corresponds to a variant
+    if (newIndex > 0 && newIndex <= product.variants.length) {
+      const variant = product.variants[newIndex - 1];
+      if (variant) {
+        setSelectedVariant(variant.id);
+      }
+    } else if (newIndex === 0) {
+      setSelectedVariant(null); // White background image
     }
   };
 
@@ -1034,29 +1063,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   </div>
                 )}
 
-                {/* Variant Thumbnails */}
-                {product.variants.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Variants</h4>
-                    <div className="grid grid-cols-5 gap-2">
-                      {product.variants.map((variant) => (
-                        <button
-                          key={variant.id}
-                          onClick={() => handleVariantSelect(variant.id)}
-                          className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
-                            selectedVariant === variant.id ? 'border-pink-400' : 'border-gray-200'
-                          }`}
-                        >
-                          <img
-                            src={variant.image || product.images[0]}
-                            alt={variant.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Product Info */}
