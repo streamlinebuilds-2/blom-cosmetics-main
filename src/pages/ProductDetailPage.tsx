@@ -57,11 +57,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
       images: ['/cuticle-oil-colorful.webp', '/cuticle-oil-white.webp'],
       variants: [
-        { id: 'cotton-candy', name: 'Cotton Candy', inStock: true },
-        { id: 'vanilla', name: 'Vanilla', inStock: true },
-        { id: 'tiny-touch', name: 'Tiny Touch', inStock: true },
-        { id: 'dragon-fruit-lotus', name: 'Dragon Fruit Lotus', inStock: true },
-        { id: 'watermelon', name: 'Watermelon', inStock: true }
+        { id: 'cotton-candy', name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
+        { id: 'vanilla', name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
+        { id: 'tiny-touch', name: 'Tiny Touch', inStock: true, image: '/cuticle-oil-tiny-touch.webp' },
+        { id: 'dragon-fruit-lotus', name: 'Dragon Fruit Lotus', inStock: true, image: '/cuticle-oil-dragon-fruit-lotus.webp' },
+        { id: 'watermelon', name: 'Watermelon', inStock: true, image: '/cuticle-oil-watermelon.webp' }
       ],
       overview: [
         '100% Cruelty-Free, Handmade in South Africa',
@@ -423,19 +423,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       description: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art.',
       images: ['/core-acrylics-colorful.webp', '/core-acrylics-white.webp'],
       variants: [
-        { id: 'baby-blue', name: 'Baby Blue', inStock: true },
-        { id: 'lilac-mist', name: 'Lilac Mist', inStock: true },
-        { id: 'blush-pink', name: 'Blush Pink', inStock: true },
-        { id: 'ballet-pink', name: 'Ballet Pink', inStock: true },
-        { id: 'fuchsia-pink', name: 'Fuchsia Pink', inStock: true },
-        { id: 'cloud-grey', name: 'Cloud Grey', inStock: true },
-        { id: 'mint-mist', name: 'Mint Mist', inStock: true },
-        { id: 'rose-pink', name: 'Rose Pink', inStock: true },
-        { id: 'fresh-mint', name: 'Fresh Mint', inStock: true },
-        { id: 'soft-nude', name: 'Soft Nude', inStock: true },
-        { id: 'petal-pink', name: 'Petal Pink', inStock: true },
-        { id: 'sky-blue', name: 'Sky Blue', inStock: true },
-        { id: 'lemon-glow', name: 'Lemon Glow', inStock: true }
+        { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/core-acrylics-baby-blue.webp' },
+        { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/core-acrylics-lilac-mist.webp' },
+        { id: 'blush-pink', name: 'Blush Pink', inStock: true, image: '/core-acrylics-blush-pink.webp' },
+        { id: 'ballet-pink', name: 'Ballet Pink', inStock: true, image: '/core-acrylics-ballet-pink.webp' },
+        { id: 'fuchsia-pink', name: 'Fuchsia Pink', inStock: true, image: '/core-acrylics-fuchsia-pink.webp' },
+        { id: 'cloud-grey', name: 'Cloud Grey', inStock: true, image: '/core-acrylics-cloud-grey.webp' },
+        { id: 'mint-mist', name: 'Mint Mist', inStock: true, image: '/core-acrylics-mint-mist.webp' },
+        { id: 'rose-pink', name: 'Rose Pink', inStock: true, image: '/core-acrylics-rose-pink.webp' },
+        { id: 'fresh-mint', name: 'Fresh Mint', inStock: true, image: '/core-acrylics-fresh-mint.webp' },
+        { id: 'soft-nude', name: 'Soft Nude', inStock: true, image: '/core-acrylics-soft-nude.webp' },
+        { id: 'petal-pink', name: 'Petal Pink', inStock: true, image: '/core-acrylics-petal-pink.webp' },
+        { id: 'sky-blue', name: 'Sky Blue', inStock: true, image: '/core-acrylics-sky-blue.webp' },
+        { id: 'lemon-glow', name: 'Lemon Glow', inStock: true, image: '/core-acrylics-lemon-glow.webp' }
       ],
       overview: [
         'Professional strength formula',

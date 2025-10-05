@@ -297,7 +297,10 @@ export const ShopPage: React.FC = () => {
       reviews: 87,
       badges: ['Coming Soon'],
       inStock: false,
-      variants: []
+      variants: [
+        { name: '250ml', inStock: false, price: -1 },
+        { name: '500ml', inStock: false, price: -1 }
+      ]
     },
     {
       id: '15',
