@@ -55,7 +55,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: true,
       stockCount: 25,
       description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
-      images: ['/cuticle-oil-colorful.webp', '/cuticle-oil-white.webp'],
+      images: ['/cuticle-oil-white.webp', '/cuticle-oil-cotton-candy.webp'],
       variants: [
         { id: 'cotton-candy', name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
         { id: 'vanilla', name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
@@ -1031,7 +1031,31 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       />
                     </button>
                   ))}
-                </div>
+                  </div>
+                )}
+
+                {/* Variant Thumbnails */}
+                {product.variants.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Variants</h4>
+                    <div className="grid grid-cols-5 gap-2">
+                      {product.variants.map((variant) => (
+                        <button
+                          key={variant.id}
+                          onClick={() => handleVariantSelect(variant.id)}
+                          className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                            selectedVariant === variant.id ? 'border-pink-400' : 'border-gray-200'
+                          }`}
+                        >
+                          <img
+                            src={variant.image || product.images[0]}
+                            alt={variant.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
 
