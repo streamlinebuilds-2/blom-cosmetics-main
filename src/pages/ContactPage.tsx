@@ -4,11 +4,11 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Clock, 
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Clock,
   MessageCircle,
   Send,
   HelpCircle,
@@ -22,7 +22,9 @@ import {
   Paperclip,
   Upload,
   X,
-  FileText
+  FileText,
+  Truck,
+  RotateCcw
 } from 'lucide-react';
 
 export const ContactPage: React.FC = () => {
@@ -674,9 +676,7 @@ export const ContactPage: React.FC = () => {
               {/* Shipping & Delivery Card */}
               <Card className="text-center p-8 hover:shadow-lg transition-shadow">
                 <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
-                  </svg>
+                  <Truck className="w-8 h-8 text-amber-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Shipping & Delivery</h3>
                 <p className="text-gray-600 mb-6">Track your order and delivery options</p>
@@ -691,9 +691,7 @@ export const ContactPage: React.FC = () => {
               {/* Returns & Refunds Card */}
               <Card className="text-center p-8 hover:shadow-lg transition-shadow">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <svg className="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
+                  <RotateCcw className="w-8 h-8 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Returns & Refunds</h3>
                 <p className="text-gray-600 mb-6">Easy returns within 30 days</p>
