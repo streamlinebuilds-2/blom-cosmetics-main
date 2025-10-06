@@ -848,7 +848,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   const getCurrentPrice = () => {
     if (selectedVariant) {
       const variant = product.variants.find(v => v.id === selectedVariant);
-      return variant ? variant.price : product.price;
+      if (variant && variant.price !== undefined) {
+        return variant.price;
+      }
     }
     return product.price;
   };
@@ -940,7 +942,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
                 {/* Thumbnail Images */}
                 {product.images.length > 1 && (
-                  <div className="grid grid-cols-6 gap-1">
+                  <div className="flex gap-2 overflow-x-auto pb-2">
                   {product.images.map((image, index) => (
                     <button
                       key={index}
@@ -950,7 +952,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                         setSelectedImage(index);
                         syncVariantWithImage(index);
                       }}
-                        className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
+                        className={`w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
                         selectedImage === index ? 'border-pink-400' : 'border-gray-200'
                       }`}
                     >
@@ -1003,16 +1005,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {/* Price */}
               <div className="mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold text-gray-900">
-                    R{getCurrentPrice().toFixed(2)}
-                  </span>
-                  {product.comparePrice && (
-                    <span className="text-xl text-gray-500 line-through">
-                      R{product.comparePrice.toFixed(2)}
-                    </span>
+                  {product.price === -1 ? (
+                    <span className="text-3xl font-bold text-gray-600">Coming Soon</span>
+                  ) : (
+                    <>
+                      <span className="text-3xl font-bold text-gray-900">
+                        R{getCurrentPrice().toFixed(2)}
+                      </span>
+                      {product.comparePrice && (
+                        <span className="text-xl text-gray-500 line-through">
+                          R{product.comparePrice.toFixed(2)}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
-                {product.comparePrice && (
+                {product.comparePrice && product.price !== -1 && (
                   <div className="text-sm text-green-600 font-medium">
                     Save R{(product.comparePrice - getCurrentPrice()).toFixed(2)}
                   </div>
