@@ -452,146 +452,147 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         certifications: ['Professional Grade']
       }
     },
-    'crystal-clear-acrylic': {
-      id: '10',
-      name: 'Crystal Clear Acrylic',
-      subtitle: 'Professional grade acrylic powder',
-      price: -1,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 203,
-      inStock: false,
-      stockCount: 20,
-      description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
-      images: ['/crystal-clear-acrylic-colorful.webp', '/crystal-clear-acrylic-white.webp'],
-      variants: [
-        { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
-        { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
-        { id: 'blush-pink', name: 'Blush Pink', inStock: true, image: '/acrylic-powder-baby-pink.webp' },
-        { id: 'ballet-pink', name: 'Ballet Pink', inStock: true, image: '/acrylic-powder-ballet-pink.webp' },
-        { id: 'fuchsia-pink', name: 'Fuchsia Pink', inStock: true, image: '/acrylic-powder-hot-pink.webp' },
-        { id: 'cloud-grey', name: 'Cloud Grey', inStock: true, image: '/acrylic-powder-light-grey.webp' },
-        { id: 'mint-mist', name: 'Mint Mist', inStock: true, image: '/acrylic-powder-light-mint.webp' },
-        { id: 'rose-pink', name: 'Rose Pink', inStock: true, image: '/acrylic-powder-light-pink.webp' },
-        { id: 'fresh-mint', name: 'Fresh Mint', inStock: true, image: '/acrylic-powder-mint.webp' },
-        { id: 'soft-nude', name: 'Soft Nude', inStock: true, image: '/acrylic-powder-nude.webp' },
-        { id: 'petal-pink', name: 'Petal Pink', inStock: true, image: '/acrylic-powder-pink.webp' },
-        { id: 'sky-blue', name: 'Sky Blue', inStock: true, image: '/acrylic-powder-sky-blue.webp' },
-        { id: 'lemon-glow', name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
-      ],
-      overview: [
-        'Professional grade formula',
-        'Smooth, easy application',
-        '13 beautiful color variants',
-        'Excellent coverage',
-        'Long-lasting results'
-      ],
-      features: [
-        { title: 'Professional Grade', description: 'Salon-quality formula' },
-        { title: 'Smooth Application', description: 'Easy to work with' },
-        { title: 'Vibrant Colors', description: 'Rich, pigmented hues' },
-        { title: 'Durable', description: 'Long-lasting wear' }
-      ],
-      howToUse: [
-        'Select your desired color',
-        'Pick up product with wet brush',
-        'Apply to prepared nail or form',
-        'Shape and file when dry'
-      ],
-      ingredients: 'Acrylic polymer, pigments',
-      specifications: {
-        weight: '56g',
-        type: 'Acrylic Powder',
-        colors: '13 variants',
-        application: 'Brush application',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
-    },
-    'snow-white-acrylic': {
-      id: '11',
-      name: 'Snow White Acrylic',
-      subtitle: 'Coming Soon',
-      price: -1,
-      comparePrice: null,
-      rating: 4.8,
-      reviewCount: 134,
-      inStock: false,
-      stockCount: 30,
-      description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-      images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
-      variants: [],
-      overview: [
-        'Acid-free formula protects natural nails',
-        'Vitamin enriched for nail health',
-        'Strong adhesion for long-lasting results',
-        'Professional grade quality',
-        'Suitable for all nail types'
-      ],
-      features: [
-        { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
-        { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
-        { title: 'Long-Lasting', description: 'Creates a durable bond for extended wear' },
-        { title: 'Professional Grade', description: 'Salon-quality results at home' }
-      ],
-      howToUse: [
-        'Apply a thin layer to prepared nails',
-        'Allow to air dry completely',
-        'Proceed with your nail enhancement',
-        'Do not cure in lamp'
-      ],
-      ingredients: 'Proprietary vitamin-enriched formula',
-      specifications: {
-        volume: '15ml',
-        type: 'Nail Primer',
-        finish: 'Matte',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade', 'Acid-Free']
-      }
-    },
-    'colour-acrylics': {
-      id: '12',
-      name: 'Colour Acrylics',
-      subtitle: 'Coming Soon',
-      price: -1,
-      comparePrice: null,
-      rating: 4.7,
-      reviewCount: 99,
-      inStock: false,
-      stockCount: 20,
-      description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
-      variants: [],
-      overview: [
-        'Removes surface oils and moisture',
-        'Prevents lifting and improves adhesion',
-        'Quick drying formula',
-        'Essential prep step',
-        'Professional results'
-      ],
-      features: [
-        { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
-        { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
-        { title: 'Quick Drying', description: 'Fast-acting formula saves time' },
-        { title: 'Professional Results', description: 'Ensures long-lasting nail enhancements' }
-      ],
-      howToUse: [
-        'Apply to clean, dry nails',
-        'Allow to air dry completely',
-        'Proceed with primer and enhancement',
-        'Use before each application'
-      ],
-      ingredients: 'Isopropyl Alcohol, Proprietary blend',
-      specifications: {
-        volume: '15ml',
-        type: 'Nail Prep',
-        finish: 'Clear',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
-    },
+    // HIDDEN - Coming Soon Products
+    // 'crystal-clear-acrylic': {
+    //   id: '10',
+    //   name: 'Crystal Clear Acrylic',
+    //   subtitle: 'Professional grade acrylic powder',
+    //   price: -1,
+    //   comparePrice: null,
+    //   rating: 4.9,
+    //   reviewCount: 203,
+    //   inStock: false,
+    //   stockCount: 20,
+    //   description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
+    //   images: ['/crystal-clear-acrylic-colorful.webp', '/crystal-clear-acrylic-white.webp'],
+    //   variants: [
+    //     { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
+    //     { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
+    //     { id: 'blush-pink', name: 'Blush Pink', inStock: true, image: '/acrylic-powder-baby-pink.webp' },
+    //     { id: 'ballet-pink', name: 'Ballet Pink', inStock: true, image: '/acrylic-powder-ballet-pink.webp' },
+    //     { id: 'fuchsia-pink', name: 'Fuchsia Pink', inStock: true, image: '/acrylic-powder-hot-pink.webp' },
+    //     { id: 'cloud-grey', name: 'Cloud Grey', inStock: true, image: '/acrylic-powder-light-grey.webp' },
+    //     { id: 'mint-mist', name: 'Mint Mist', inStock: true, image: '/acrylic-powder-light-mint.webp' },
+    //     { id: 'rose-pink', name: 'Rose Pink', inStock: true, image: '/acrylic-powder-light-pink.webp' },
+    //     { id: 'fresh-mint', name: 'Fresh Mint', inStock: true, image: '/acrylic-powder-mint.webp' },
+    //     { id: 'soft-nude', name: 'Soft Nude', inStock: true, image: '/acrylic-powder-nude.webp' },
+    //     { id: 'petal-pink', name: 'Petal Pink', inStock: true, image: '/acrylic-powder-pink.webp' },
+    //     { id: 'sky-blue', name: 'Sky Blue', inStock: true, image: '/acrylic-powder-sky-blue.webp' },
+    //     { id: 'lemon-glow', name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
+    //   ],
+    //   overview: [
+    //     'Professional grade formula',
+    //     'Smooth, easy application',
+    //     '13 beautiful color variants',
+    //     'Excellent coverage',
+    //     'Long-lasting results'
+    //   ],
+    //   features: [
+    //     { title: 'Professional Grade', description: 'Salon-quality formula' },
+    //     { title: 'Smooth Application', description: 'Easy to work with' },
+    //     { title: 'Vibrant Colors', description: 'Rich, pigmented hues' },
+    //     { title: 'Durable', description: 'Long-lasting wear' }
+    //   ],
+    //   howToUse: [
+    //     'Select your desired color',
+    //     'Pick up product with wet brush',
+    //     'Apply to prepared nail or form',
+    //     'Shape and file when dry'
+    //   ],
+    //   ingredients: 'Acrylic polymer, pigments',
+    //   specifications: {
+    //     weight: '56g',
+    //     type: 'Acrylic Powder',
+    //     colors: '13 variants',
+    //     application: 'Brush application',
+    //     madeIn: 'South Africa',
+    //     certifications: ['Professional Grade']
+    //   }
+    // },
+    // 'snow-white-acrylic': {
+    //   id: '11',
+    //   name: 'Snow White Acrylic',
+    //   subtitle: 'Coming Soon',
+    //   price: -1,
+    //   comparePrice: null,
+    //   rating: 4.8,
+    //   reviewCount: 134,
+    //   inStock: false,
+    //   stockCount: 30,
+    //   description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
+    //   images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
+    //   variants: [],
+    //   overview: [
+    //     'Acid-free formula protects natural nails',
+    //     'Vitamin enriched for nail health',
+    //     'Strong adhesion for long-lasting results',
+    //     'Professional grade quality',
+    //     'Suitable for all nail types'
+    //   ],
+    //   features: [
+    //     { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
+    //     { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
+    //     { title: 'Long-Lasting', description: 'Creates a durable bond for extended wear' },
+    //     { title: 'Professional Grade', description: 'Salon-quality results at home' }
+    //   ],
+    //   howToUse: [
+    //     'Apply a thin layer to prepared nails',
+    //     'Allow to air dry completely',
+    //     'Proceed with your nail enhancement',
+    //     'Do not cure in lamp'
+    //   ],
+    //   ingredients: 'Proprietary vitamin-enriched formula',
+    //   specifications: {
+    //     volume: '15ml',
+    //     type: 'Nail Primer',
+    //     finish: 'Matte',
+    //     application: 'Brush applicator',
+    //     madeIn: 'South Africa',
+    //     certifications: ['Professional Grade', 'Acid-Free']
+    //   }
+    // },
+    // 'colour-acrylics': {
+    //   id: '12',
+    //   name: 'Colour Acrylics',
+    //   subtitle: 'Coming Soon',
+    //   price: -1,
+    //   comparePrice: null,
+    //   rating: 4.7,
+    //   reviewCount: 99,
+    //   inStock: false,
+    //   stockCount: 20,
+    //   description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
+    //   images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
+    //   variants: [],
+    //   overview: [
+    //     'Removes surface oils and moisture',
+    //     'Prevents lifting and improves adhesion',
+    //     'Quick drying formula',
+    //     'Essential prep step',
+    //     'Professional results'
+    //   ],
+    //   features: [
+    //     { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
+    //     { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
+    //     { title: 'Quick Drying', description: 'Fast-acting formula saves time' },
+    //     { title: 'Professional Results', description: 'Ensures long-lasting nail enhancements' }
+    //   ],
+    //   howToUse: [
+    //     'Apply to clean, dry nails',
+    //     'Allow to air dry completely',
+    //     'Proceed with primer and enhancement',
+    //     'Use before each application'
+    //   ],
+    //   ingredients: 'Isopropyl Alcohol, Proprietary blend',
+    //   specifications: {
+    //     volume: '15ml',
+    //     type: 'Nail Prep',
+    //     finish: 'Clear',
+    //     application: 'Brush applicator',
+    //     madeIn: 'South Africa',
+    //     certifications: ['Professional Grade']
+    //   }
+    // },
     'glitter-acrylics': {
       id: '13',
       name: 'Glitter Acrylics',
