@@ -90,11 +90,15 @@ export const CartWidget: React.FC = () => {
       {showCart && (
         <button
           onClick={() => setIsOpen(true)}
-          className={`fixed bottom-6 right-6 z-40 w-14 h-14 bg-pink-400 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110 ${
+          className={`fixed bottom-6 right-6 z-40 w-16 h-16 bg-pink-400 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center group hover:scale-110 ${
             cartState.items.length > 0 ? 'animate-bounce-in' : 'animate-fade-out'
           }`}
         >
-          <ShoppingCart className="h-6 w-6 text-white" />
+          <ShoppingCart className="h-7 w-7 text-white" />
+          {/* Item count badge */}
+          <span className="absolute -top-2 -right-2 bg-white text-pink-400 text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+            {cartState.items.length}
+          </span>
         </button>
       )}
       {/* Triggerable from header cart button */}

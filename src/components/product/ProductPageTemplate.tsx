@@ -333,25 +333,26 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 <div className="space-y-4 mb-8">
                   <button
                     onClick={handleAddToCart}
-                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-base uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
+                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-lg uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
                   >
                     ADD TO CART
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full bg-white text-pink-400 border-2 border-pink-400 rounded-full py-4 px-8 font-bold text-base uppercase tracking-wide hover:bg-pink-50 transition-all duration-200 active:scale-95"
+                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-lg uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
                   >
                     BUY NOW
                   </button>
                   <div className="flex gap-3 pt-2">
                     <button
                       onClick={() => setIsWishlisted(!isWishlisted)}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-pink-400 transition-colors"
                     >
                       <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : 'text-gray-600'}`} />
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors">
+                    <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-pink-400 transition-colors">
                       <Share2 className="h-5 w-5 text-gray-600" />
+                      <span className="text-sm font-medium">Share</span>
                     </button>
                   </div>
                 </div>

@@ -2,1339 +2,1090 @@ import React, { useState, useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
-import { Button } from '../components/ui/Button';
 import { Card, CardContent } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
 import { ReviewSection } from '../components/review/ReviewSection';
 import { PaymentMethods } from '../components/payment/PaymentMethods';
-import { ProductPageTemplate } from '../components/product/ProductPageTemplate';
+import { StickyCart } from '../components/cart/StickyCart';
+import { cartStore, showNotification } from '../lib/cart';
+import { wishlistStore } from '../lib/wishlist';
 import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Heart, 
-  ShoppingCart, 
   Star, 
+  Heart, 
+  Share2, 
+  ShoppingCart, 
+  Plus, 
   Minus,
-  Plus,
-  CheckCircle,
-  X
+  Check,
+  Truck,
+  Shield,
+  RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Leaf,
+  Award,
+  MessageCircle,
+  Phone,
+  ArrowLeft
 } from 'lucide-react';
 
 interface ProductDetailPageProps {
-  productSlug?: string;
+  productSlug: string;
 }
 
-interface Review {
-  id: string;
-  name: string;
-  rating: number;
-  title: string;
-  comment: string;
-  date: string;
-  verified: boolean;
-  helpful: number;
-}
-
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlug = 'cuticle-oil' }) => {
+export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlug }) => {
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<'overview' | 'features' | 'how-to-use' | 'ingredients' | 'reviews'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'features' | 'how-to-use' | 'ingredients' | 'details'>('overview');
   const [expandedAccordion, setExpandedAccordion] = useState<string | null>('overview');
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // All product data - Final Product List
-  const allProductsData = {
+  // Product database - matches ShopPage products
+  const productDatabase = {
     'cuticle-oil': {
       id: '1',
       name: 'Cuticle Oil',
-      subtitle: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil',
+      slug: 'cuticle-oil',
+      category: 'Prep & Finishing',
+      shortDescription: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
+      overview: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use. Enriched with Vitamin E, Jojoba Oil, and Soybean Oil for maximum nourishment.',
       price: 140,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 156,
-      inStock: true,
-      stockCount: 25,
-      description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
+      compareAtPrice: null,
+      stock: 'In Stock',
       images: [
-        '/cuticle-oil-white.webp', 
+        '/cuticle-oil-white.webp',
+        '/cuticle-oil-colorful.webp',
         '/cuticle-oil-cotton-candy.webp',
-        '/cuticle-oil-vanilla.webp',
-        '/cuticle-oil-tiny-touch.webp',
-        '/cuticle-oil-dragon-fruit-lotus.webp',
-        '/cuticle-oil-watermelon.webp'
-      ],
-      variants: [
-        { id: 'cotton-candy', name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
-        { id: 'vanilla', name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
-        { id: 'tiny-touch', name: 'Tiny Touch', inStock: true, image: '/cuticle-oil-tiny-touch.webp' },
-        { id: 'dragon-fruit-lotus', name: 'Dragon Fruit Lotus', inStock: true, image: '/cuticle-oil-dragon-fruit-lotus.webp' },
-        { id: 'watermelon', name: 'Watermelon', inStock: true, image: '/cuticle-oil-watermelon.webp' }
-      ],
-      overview: [
-        '100% Cruelty-Free, Handmade in South Africa',
-        'Non-greasy, quick absorbing formula',
-        'Packed with Vitamin E for nail and skin health',
-        'Available in 5 delicious scents',
-        '30ml bottle with precision applicator'
+        '/cuticle-oil-vanilla.webp'
       ],
       features: [
-        { title: 'Vitamin E Enriched', description: 'Powerful antioxidant that nourishes and protects' },
-        { title: 'Jojoba Oil', description: 'Deeply moisturizes without clogging pores' },
-        { title: 'Soybean Oil', description: 'Rich in nutrients for healthy nail growth' },
-        { title: 'Fast Absorbing', description: 'Non-greasy formula absorbs quickly' }
+        'Enriched with Vitamin E for nail health',
+        'Fast-absorbing, non-greasy formula',
+        'Strengthens and nourishes cuticles',
+        'Available in 5 beautiful scents',
+        'Professional salon quality'
       ],
       howToUse: [
-        'Apply a small amount to each cuticle',
-        'Massage gently into cuticle and nail',
+        'Apply a small amount to clean cuticles',
+        'Gently massage into cuticle area',
         'Use daily for best results',
-        'Can be used on hands and feet'
+        'Can be used before or after manicure'
       ],
-      ingredients: 'Vitamin E, Jojoba Oil, Soybean Oil, Sweet Almond Oil, Fragrance',
-      specifications: {
-        volume: '30ml',
-        type: 'Cuticle Treatment',
-        finish: 'Non-greasy',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['Cruelty-Free', 'Handmade']
-      }
+      ingredients: {
+        inci: [
+          'Simmondsia Chinensis (Jojoba) Seed Oil',
+          'Glycine Soja (Soybean) Oil',
+          'Tocopheryl Acetate (Vitamin E)',
+          'Fragrance'
+        ],
+        key: [
+          'Jojoba Oil – deeply moisturizes and conditions',
+          'Vitamin E – antioxidant protection',
+          'Soybean Oil – strengthens nail structure'
+        ]
+      },
+      details: {
+        size: '15ml',
+        shelfLife: '24 months',
+        claims: ['Vegan', 'Cruelty-Free', 'HEMA-Free']
+      },
+      variants: ['Cotton Candy', 'Vanilla', 'Tiny Touch', 'Dragon Fruit Lotus', 'Watermelon'],
+      rating: 4.9,
+      reviewCount: 156,
+      reviews: [
+        {
+          id: '1',
+          name: 'Sarah M.',
+          rating: 5,
+          title: 'Amazing quality!',
+          comment: 'This cuticle oil is incredible. My cuticles have never looked better!',
+          date: '2024-01-15',
+          verified: true,
+          helpful: 12
+        }
+      ]
     },
     'vitamin-primer': {
       id: '2',
       name: 'Vitamin Primer',
-      subtitle: 'Acid-free primer with vitamins',
-      price: 180,
-      comparePrice: null,
-      rating: 4.8,
-      reviewCount: 132,
-      inStock: true,
-      stockCount: 30,
-      description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-      images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
-      variants: [],
-      overview: [
-        'Acid-free formula protects natural nails',
-        'Vitamin enriched for nail health',
-        'Strong adhesion for long-lasting results',
-        'Professional grade quality',
-        'Suitable for all nail types'
+      slug: 'vitamin-primer',
+      category: 'Prep & Finishing',
+      shortDescription: 'Acid-free primer for adhesion, vitamin-enriched.',
+      overview: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail. Our acid-free formula is enriched with vitamins to promote nail health while ensuring superior adhesion.',
+      price: 210,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/vitamin-primer-white.webp',
+        '/vitamin-primer-colorful.webp'
       ],
       features: [
-        { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
-        { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
-        { title: 'Long-Lasting', description: 'Creates a durable bond for extended wear' },
-        { title: 'Professional Grade', description: 'Salon-quality results at home' }
+        'Acid-free formula for nail safety',
+        'Vitamin-enriched for nail health',
+        'Superior adhesion for gels and acrylics',
+        'Prevents lifting and chipping',
+        'Professional salon quality'
       ],
       howToUse: [
-        'Apply a thin layer to prepared nails',
-        'Allow to air dry completely',
-        'Proceed with your nail enhancement',
-        'Do not cure in lamp'
+        'Apply thin layer to clean, dry nails',
+        'Allow to air dry for 30 seconds',
+        'Proceed with gel or acrylic application',
+        'Do not over-apply'
       ],
-      ingredients: 'Proprietary vitamin-enriched formula',
-      specifications: {
-        volume: '15ml',
-        type: 'Nail Primer',
-        finish: 'Matte',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade', 'Acid-Free']
-      }
+      ingredients: {
+        inci: [
+          'Ethyl Acetate',
+          'Butyl Acetate',
+          'Nitrocellulose',
+          'Tocopheryl Acetate (Vitamin E)'
+        ],
+        key: [
+          'Vitamin E – promotes nail health',
+          'Acid-free formula – safe for natural nails',
+          'Superior bonding agents – long-lasting adhesion'
+        ]
+      },
+      details: {
+        size: '15ml',
+        shelfLife: '24 months',
+        claims: ['Acid-Free', 'Vitamin-Enriched', 'Professional Grade']
+      },
+      variants: [],
+      rating: 4.8,
+      reviewCount: 124,
+      reviews: []
     },
     'prep-solution': {
       id: '3',
-      name: 'Prep Solution',
-      subtitle: 'Dehydrates and preps the nail plate',
-      price: 150,
-      comparePrice: null,
-      rating: 4.7,
-      reviewCount: 98,
-      inStock: true,
-      stockCount: 20,
-      description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
-      variants: [],
-      overview: [
-        'Removes surface oils and moisture',
-        'Prevents lifting and improves adhesion',
-        'Quick drying formula',
-        'Essential prep step',
-        'Professional results'
+      name: 'Prep Solution (Nail Dehydrator)',
+      slug: 'prep-solution',
+      category: 'Prep & Finishing',
+      shortDescription: 'Removes oils & moisture for better adhesion.',
+      overview: 'Professional nail dehydrator that removes oils and moisture from the nail plate, ensuring optimal adhesion for gel and acrylic applications. Essential for preventing lifting and extending wear time.',
+      price: 200,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/prep-solution-white.webp',
+        '/prep-solution-colorful.webp'
       ],
       features: [
-        { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
-        { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
-        { title: 'Quick Drying', description: 'Fast-acting formula saves time' },
-        { title: 'Professional Results', description: 'Ensures long-lasting nail enhancements' }
+        'Removes oils and moisture effectively',
+        'Prevents lifting and chipping',
+        'Fast-acting formula',
+        'Professional salon standard',
+        'Essential for long-lasting results'
       ],
       howToUse: [
         'Apply to clean, dry nails',
         'Allow to air dry completely',
-        'Proceed with primer and enhancement',
-        'Use before each application'
+        'Proceed with primer application',
+        'Use sparingly for best results'
       ],
-      ingredients: 'Isopropyl Alcohol, Proprietary blend',
-      specifications: {
-        volume: '15ml',
-        type: 'Nail Prep',
-        finish: 'Clear',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
+      ingredients: {
+        inci: [
+          'Isopropyl Alcohol',
+          'Ethyl Acetate',
+          'Dehydrating Agents'
+        ],
+        key: [
+          'Isopropyl Alcohol – removes oils and moisture',
+          'Fast-evaporating formula – quick preparation',
+          'Professional grade – salon quality results'
+        ]
+      },
+      details: {
+        size: '15ml',
+        shelfLife: '24 months',
+        claims: ['Professional Grade', 'Fast-Acting', 'Salon Quality']
+      },
+      variants: [],
+      rating: 4.7,
+      reviewCount: 89,
+      reviews: []
     },
     'top-coat': {
       id: '4',
       name: 'Top Coat',
-      subtitle: 'High-gloss, chip-resistant finish',
-      price: 160,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 145,
-      inStock: true,
-      stockCount: 35,
-      description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
-      images: ['/top-coat-colorful.webp', '/top-coat-white.webp'],
-      variants: [],
-      overview: [
-        'High-gloss mirror finish',
-        'Chip-resistant protection',
-        'Long-lasting durability',
-        'UV protection included',
-        'Professional results'
+      slug: 'top-coat',
+      category: 'Gel System',
+      shortDescription: 'Mirror shine, chip-resistant, professional finish.',
+      overview: 'High-gloss, chip-resistant finish for both gels and acrylics. Our professional formula provides mirror-like shine and superior protection against chips and wear.',
+      price: 190,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/top-coat-white.webp',
+        '/top-coat-colorful.webp'
       ],
       features: [
-        { title: 'High-Gloss Finish', description: 'Mirror-like shine that lasts' },
-        { title: 'Chip Resistant', description: 'Strong protection against chipping' },
-        { title: 'UV Protection', description: 'Prevents yellowing and fading' },
-        { title: 'Quick Dry', description: 'Fast-drying formula for convenience' }
+        'Mirror-like high gloss finish',
+        'Chip-resistant formula',
+        'Works with gels and acrylics',
+        'Long-lasting protection',
+        'Professional salon quality'
       ],
       howToUse: [
-        'Apply thin layer over cured color',
-        'Cure in LED lamp for 60 seconds',
-        'Wipe with alcohol if needed',
-        'Apply cuticle oil to finish'
+        'Apply thin layer over cured gel or acrylic',
+        'Cure under LED lamp for 60 seconds',
+        'Wipe with alcohol to remove sticky layer',
+        'Enjoy long-lasting shine'
       ],
-      ingredients: 'UV-resistant polymer blend',
-      specifications: {
-        volume: '15ml',
-        type: 'Top Coat',
-        finish: 'High-Gloss',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['UV Protection', 'Professional Grade']
-      }
+      ingredients: {
+        inci: [
+          'Acrylates Copolymer',
+          'Trimethylbenzoyl Diphenylphosphine Oxide',
+          'Hydroxycyclohexyl Phenyl Ketone'
+        ],
+        key: [
+          'Acrylates Copolymer – provides durability and shine',
+          'Photo-initiators – ensure proper curing',
+          'High-gloss formula – mirror-like finish'
+        ]
+      },
+      details: {
+        size: '15ml',
+        shelfLife: '24 months',
+        claims: ['High Gloss', 'Chip-Resistant', 'Professional Grade']
+      },
+      variants: [],
+      rating: 4.9,
+      reviewCount: 201,
+      reviews: []
     },
     'fairy-dust-top-coat': {
       id: '5',
       name: 'Fairy Dust Top Coat',
-      subtitle: 'Sparkling glitter finish',
-      price: 170,
-      comparePrice: null,
-      rating: 4.8,
-      reviewCount: 89,
-      inStock: true,
-      stockCount: 15,
-      description: 'Adds a sparkling finish to any gel or acrylic set.',
-      images: ['/fairy-dust-top-coat-colorful.webp', '/fairy-dust-top-coat-white.webp'],
-      variants: [],
-      overview: [
-        'Fine glitter particles for sparkle',
-        'Smooth application',
-        'High-shine finish',
-        'Versatile use',
-        'Long-lasting sparkle'
+      slug: 'fairy-dust-top-coat',
+      category: 'Gel System',
+      shortDescription: 'Subtle glitter-infused top coat with smooth shine.',
+      overview: 'Adds a sparkling finish to any gel or acrylic set. Our fairy dust formula contains fine glitter particles that create a magical shimmer while maintaining a smooth, professional finish.',
+      price: 195,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/fairy-dust-top-coat-white.webp',
+        '/fairy-dust-top-coat-colorful.webp'
       ],
       features: [
-        { title: 'Fine Glitter', description: 'Beautiful sparkle without roughness' },
-        { title: 'Smooth Finish', description: 'Glossy surface with embedded glitter' },
-        { title: 'Versatile', description: 'Use over any color or clear' },
-        { title: 'Long-Lasting', description: 'Sparkle stays brilliant' }
+        'Fine glitter particles for subtle sparkle',
+        'Smooth, professional finish',
+        'Works over any base color',
+        'Easy application and removal',
+        'Magical shimmer effect'
       ],
       howToUse: [
-        'Apply over cured color coat',
-        'Use thin to thick layers as desired',
-        'Cure in LED lamp for 60 seconds',
-        'Seal with clear top coat if desired'
+        'Apply over cured base color',
+        'Use thin, even coats',
+        'Cure under LED lamp for 60 seconds',
+        'Seal with regular top coat if desired'
       ],
-      ingredients: 'UV polymer, fine glitter particles',
-      specifications: {
-        volume: '15ml',
-        type: 'Glitter Top Coat',
-        finish: 'Sparkle',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
+      ingredients: {
+        inci: [
+          'Acrylates Copolymer',
+          'Mica',
+          'Titanium Dioxide',
+          'Iron Oxides'
+        ],
+        key: [
+          'Mica – creates natural shimmer',
+          'Fine glitter particles – subtle sparkle',
+          'Smooth formula – professional finish'
+        ]
+      },
+      details: {
+        size: '15ml',
+        shelfLife: '24 months',
+        claims: ['Glitter-Infused', 'Smooth Finish', 'Professional Grade']
+      },
+      variants: [],
+      rating: 4.6,
+      reviewCount: 73,
+      reviews: []
     },
     'nail-file': {
       id: '6',
       name: 'Nail File (80/80 Grit)',
-      subtitle: 'Professional nail file',
+      slug: 'nail-file',
+      category: 'Tools & Essentials',
+      shortDescription: 'Durable pro file with floral design.',
+      overview: 'Professional nail file with 80/80 grit for shaping and finishing. Features beautiful floral design and durable construction for long-lasting use in professional settings.',
       price: 35,
-      comparePrice: null,
-      rating: 4.7,
-      reviewCount: 201,
-      inStock: true,
-      stockCount: 50,
-      description: 'Professional nail file with 80/80 grit for shaping and finishing.',
-      images: ['/nail-file-colorful.webp', '/nail-file-white.webp', '/nail-file-bundle.webp'],
-      variants: [
-        { id: 'single', name: 'Single File', inStock: true, price: 35, image: '/nail-file-colorful.webp' },
-        { id: 'bundle', name: '5-Pack Bundle', inStock: true, price: 160, image: '/nail-file-bundle.webp' }
-      ],
-      overview: [
-        'Professional 80/80 grit',
-        'Durable construction',
-        'Floral design',
-        'Perfect for shaping',
-        'Long-lasting quality'
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/nail-file-white.webp',
+        '/nail-file-colorful.webp'
       ],
       features: [
-        { title: '80/80 Grit', description: 'Perfect grit for acrylic shaping' },
-        { title: 'Durable', description: 'Long-lasting construction' },
-        { title: 'Professional Quality', description: 'Salon-grade performance' },
-        { title: 'Ergonomic', description: 'Comfortable to hold and use' }
+        '80/80 grit for versatile use',
+        'Durable construction',
+        'Beautiful floral design',
+        'Professional quality',
+        'Washable and sanitizable'
       ],
       howToUse: [
-        'File in one direction for best results',
-        'Use for shaping and refining',
-        'Clean after each use',
-        'Replace when worn'
+        'File nails in one direction',
+        'Use gentle, smooth strokes',
+        'Shape according to desired style',
+        'Clean after each use'
       ],
-      ingredients: 'Abrasive paper, wooden core',
-      specifications: {
-        grit: '80/80',
-        type: 'Nail File',
-        length: 'Standard',
-        material: 'Paper/Wood',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
+      ingredients: {
+        inci: [
+          'Aluminum Oxide',
+          'Adhesive Backing',
+          'Foam Core'
+        ],
+        key: [
+          'Aluminum Oxide – effective filing surface',
+          'Foam Core – comfortable grip',
+          'Durable backing – long-lasting use'
+        ]
+      },
+      details: {
+        size: 'Standard',
+        shelfLife: 'Indefinite with proper care',
+        claims: ['Professional Grade', 'Washable', 'Durable']
+      },
+      variants: ['Single File', '5-Pack Bundle'],
+      rating: 4.5,
+      reviewCount: 67,
+      reviews: []
     },
     'nail-forms': {
       id: '7',
       name: 'Nail Forms',
-      subtitle: 'Professional nail forms with holographic guide',
-      price: 220,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 178,
-      inStock: true,
-      stockCount: 50,
-      description: 'Professional nail forms for creating perfect extensions and overlays.',
-      images: ['/nail-forms-colorful.webp', '/nail-forms-white.webp'],
-      variants: [],
-      overview: [
-        'Holographic guide',
-        'Strong adhesive',
-        '300 forms per roll',
-        'Professional quality',
-        'Easy to use'
+      slug: 'nail-forms',
+      category: 'Tools & Essentials',
+      shortDescription: 'Holographic guide, strong adhesive, 300 forms per roll.',
+      overview: 'Professional nail forms for creating perfect extensions and overlays. Features holographic guidelines for precise application and strong adhesive for secure placement during sculpting.',
+      price: 290,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/nail-forms-white.webp',
+        '/nail-forms-colorful.webp'
       ],
       features: [
-        { title: 'Holographic Guide', description: 'Clear visual guide for perfect placement' },
-        { title: 'Strong Adhesive', description: 'Secure hold during application' },
-        { title: 'Durable Paper', description: 'High-quality construction' },
-        { title: 'Easy Removal', description: 'Tears away cleanly' }
+        'Holographic guidelines for precision',
+        'Strong adhesive backing',
+        '300 forms per roll',
+        'Professional quality',
+        'Easy removal after curing'
       ],
       howToUse: [
-        'Fit form to natural nail',
-        'Ensure snug fit at apex',
-        'Apply product over form',
-        'Remove when cured'
+        'Clean and prep natural nail',
+        'Apply form under free edge',
+        'Ensure secure adhesion',
+        'Sculpt acrylic or gel extension',
+        'Remove form after curing'
       ],
-      ingredients: 'Paper, adhesive backing',
-      specifications: {
-        quantity: '300 forms',
-        type: 'Nail Forms',
-        material: 'Paper',
-        adhesive: 'Strong hold',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
+      ingredients: {
+        inci: [
+          'Paper Substrate',
+          'Adhesive Coating',
+          'Holographic Film'
+        ],
+        key: [
+          'Strong adhesive – secure placement',
+          'Holographic guides – precise application',
+          'Quality paper – clean removal'
+        ]
+      },
+      details: {
+        size: '300 forms per roll',
+        shelfLife: 'Indefinite when stored properly',
+        claims: ['Professional Grade', 'Precision Guides', 'Strong Adhesive']
+      },
+      variants: [],
+      rating: 4.5,
+      reviewCount: 67,
+      reviews: []
     },
     'acetone-remover': {
       id: '8',
       name: 'Acetone (Remover)',
-      subtitle: 'Professional-grade acetone for removal',
-      price: 120,
-      comparePrice: null,
-      rating: 4.6,
-      reviewCount: 87,
-      inStock: true,
-      stockCount: 25,
-      description: 'Professional-grade acetone for fast and effective nail polish removal.',
-      images: ['/acetone-remover-colorful.webp', '/acetone-remover-white.webp'],
-      variants: [],
-      overview: [
-        'Professional-grade formula',
-        'Fast acting',
-        'Effective removal',
-        '1L size',
-        'Professional results'
+      slug: 'acetone-remover',
+      category: 'Tools & Essentials',
+      shortDescription: 'Professional-grade, fast acting nail remover.',
+      overview: 'Professional-grade acetone for fast and effective nail polish removal. Pure formula ensures quick removal of gel polish, acrylics, and regular polish without damaging the natural nail.',
+      price: 60,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/acetone-remover-white.webp',
+        '/acetone-remover-colorful.webp'
       ],
       features: [
-        { title: 'Professional Grade', description: 'High-quality formula for professionals' },
-        { title: 'Fast Acting', description: 'Quick and effective removal' },
-        { title: 'Large Size', description: '1L bottle for extended use' },
-        { title: 'Versatile', description: 'Works on all nail products' }
+        'Professional-grade purity',
+        'Fast-acting formula',
+        'Effective on all polish types',
+        'Clean removal without residue',
+        'Salon quality'
       ],
       howToUse: [
         'Soak cotton pad with acetone',
-        'Place on nail for 10-15 minutes',
-        'Gently remove product',
-        'Moisturize after use'
+        'Place on nail for 10-15 seconds',
+        'Gently wipe away polish',
+        'Moisturize nails after use'
       ],
-      ingredients: '100% Pure Acetone',
-      specifications: {
-        volume: '1L',
-        type: 'Nail Remover',
-        concentration: '100% Acetone',
-        application: 'Soak-off',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
+      ingredients: {
+        inci: [
+          'Acetone (99.9% Pure)'
+        ],
+        key: [
+          'Pure Acetone – effective removal',
+          'Professional grade – salon quality',
+          'Fast-acting – quick results'
+        ]
+      },
+      details: {
+        size: '100ml',
+        shelfLife: 'Indefinite when sealed',
+        claims: ['Professional Grade', 'Pure Formula', 'Fast-Acting']
+      },
+      variants: [],
+      rating: 4.8,
+      reviewCount: 112,
+      reviews: []
     },
     'core-acrylics': {
       id: '9',
       name: 'Core Acrylics (56 g)',
-      subtitle: 'Professional strength acrylic powders',
+      slug: 'core-acrylics',
+      category: 'Acrylic System',
+      shortDescription: 'Professional acrylic powders in 13 beautiful colors.',
+      overview: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art. Each powder is carefully formulated for optimal consistency, strength, and color payoff.',
       price: 280,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 167,
-      inStock: true,
-      stockCount: 20,
-      description: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art.',
-      images: ['/core-acrylics-colorful.webp', '/core-acrylics-white.webp'],
-      variants: [
-        { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/core-acrylics-baby-blue.webp' },
-        { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/core-acrylics-lilac-mist.webp' },
-        { id: 'blush-pink', name: 'Blush Pink', inStock: true, image: '/core-acrylics-blush-pink.webp' },
-        { id: 'ballet-pink', name: 'Ballet Pink', inStock: true, image: '/core-acrylics-ballet-pink.webp' },
-        { id: 'fuchsia-pink', name: 'Fuchsia Pink', inStock: true, image: '/core-acrylics-fuchsia-pink.webp' },
-        { id: 'cloud-grey', name: 'Cloud Grey', inStock: true, image: '/core-acrylics-cloud-grey.webp' },
-        { id: 'mint-mist', name: 'Mint Mist', inStock: true, image: '/core-acrylics-mint-mist.webp' },
-        { id: 'rose-pink', name: 'Rose Pink', inStock: true, image: '/core-acrylics-rose-pink.webp' },
-        { id: 'fresh-mint', name: 'Fresh Mint', inStock: true, image: '/core-acrylics-fresh-mint.webp' },
-        { id: 'soft-nude', name: 'Soft Nude', inStock: true, image: '/core-acrylics-soft-nude.webp' },
-        { id: 'petal-pink', name: 'Petal Pink', inStock: true, image: '/core-acrylics-petal-pink.webp' },
-        { id: 'sky-blue', name: 'Sky Blue', inStock: true, image: '/core-acrylics-sky-blue.webp' },
-        { id: 'lemon-glow', name: 'Lemon Glow', inStock: true, image: '/core-acrylics-lemon-glow.webp' }
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/core-acrylics-white.webp',
+        '/core-acrylics-colorful.webp'
       ],
-      overview: [
+      features: [
+        '13 beautiful color options',
         'Professional strength formula',
-        'Smooth application',
-        'Excellent coverage',
-        'Available in 13 beautiful color variants',
-        '56g jar'
-      ],
-      features: [
-        { title: 'Professional Strength', description: 'High-quality formula for professionals' },
-        { title: 'Smooth Application', description: 'Easy to work with' },
-        { title: 'Excellent Coverage', description: 'Vibrant, opaque colors' },
-        { title: 'Versatile', description: 'Perfect for nail art and full sets' }
+        'Optimal consistency for sculpting',
+        'Vibrant color payoff',
+        'Self-leveling properties'
       ],
       howToUse: [
-        'Pick up product with brush',
-        'Apply to prepared nail',
-        'Shape and file when dry',
-        'Finish with top coat'
+        'Prep nails with primer and dehydrator',
+        'Pick up bead with monomer using brush',
+        'Sculpt and shape the enhancement',
+        'File, buff and finish as desired'
       ],
-      ingredients: 'Acrylic polymer, pigments',
-      specifications: {
-        weight: '56g',
-        type: 'Acrylic Powder',
-        colors: '13 variants',
-        application: 'Brush application',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
-    },
-    // HIDDEN - Coming Soon Products
-    // 'crystal-clear-acrylic': {
-    //   id: '10',
-    //   name: 'Crystal Clear Acrylic',
-    //   subtitle: 'Professional grade acrylic powder',
-    //   price: -1,
-    //   comparePrice: null,
-    //   rating: 4.9,
-    //   reviewCount: 203,
-    //   inStock: false,
-    //   stockCount: 20,
-    //   description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
-    //   images: ['/crystal-clear-acrylic-colorful.webp', '/crystal-clear-acrylic-white.webp'],
-    //   variants: [
-    //     { id: 'baby-blue', name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
-    //     { id: 'lilac-mist', name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
-    //     { id: 'blush-pink', name: 'Blush Pink', inStock: true, image: '/acrylic-powder-baby-pink.webp' },
-    //     { id: 'ballet-pink', name: 'Ballet Pink', inStock: true, image: '/acrylic-powder-ballet-pink.webp' },
-    //     { id: 'fuchsia-pink', name: 'Fuchsia Pink', inStock: true, image: '/acrylic-powder-hot-pink.webp' },
-    //     { id: 'cloud-grey', name: 'Cloud Grey', inStock: true, image: '/acrylic-powder-light-grey.webp' },
-    //     { id: 'mint-mist', name: 'Mint Mist', inStock: true, image: '/acrylic-powder-light-mint.webp' },
-    //     { id: 'rose-pink', name: 'Rose Pink', inStock: true, image: '/acrylic-powder-light-pink.webp' },
-    //     { id: 'fresh-mint', name: 'Fresh Mint', inStock: true, image: '/acrylic-powder-mint.webp' },
-    //     { id: 'soft-nude', name: 'Soft Nude', inStock: true, image: '/acrylic-powder-nude.webp' },
-    //     { id: 'petal-pink', name: 'Petal Pink', inStock: true, image: '/acrylic-powder-pink.webp' },
-    //     { id: 'sky-blue', name: 'Sky Blue', inStock: true, image: '/acrylic-powder-sky-blue.webp' },
-    //     { id: 'lemon-glow', name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
-    //   ],
-    //   overview: [
-    //     'Professional grade formula',
-    //     'Smooth, easy application',
-    //     '13 beautiful color variants',
-    //     'Excellent coverage',
-    //     'Long-lasting results'
-    //   ],
-    //   features: [
-    //     { title: 'Professional Grade', description: 'Salon-quality formula' },
-    //     { title: 'Smooth Application', description: 'Easy to work with' },
-    //     { title: 'Vibrant Colors', description: 'Rich, pigmented hues' },
-    //     { title: 'Durable', description: 'Long-lasting wear' }
-    //   ],
-    //   howToUse: [
-    //     'Select your desired color',
-    //     'Pick up product with wet brush',
-    //     'Apply to prepared nail or form',
-    //     'Shape and file when dry'
-    //   ],
-    //   ingredients: 'Acrylic polymer, pigments',
-    //   specifications: {
-    //     weight: '56g',
-    //     type: 'Acrylic Powder',
-    //     colors: '13 variants',
-    //     application: 'Brush application',
-    //     madeIn: 'South Africa',
-    //     certifications: ['Professional Grade']
-    //   }
-    // },
-    // 'snow-white-acrylic': {
-    //   id: '11',
-    //   name: 'Snow White Acrylic',
-    //   subtitle: 'Coming Soon',
-    //   price: -1,
-    //   comparePrice: null,
-    //   rating: 4.8,
-    //   reviewCount: 134,
-    //   inStock: false,
-    //   stockCount: 30,
-    //   description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-    //   images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
-    //   variants: [],
-    //   overview: [
-    //     'Acid-free formula protects natural nails',
-    //     'Vitamin enriched for nail health',
-    //     'Strong adhesion for long-lasting results',
-    //     'Professional grade quality',
-    //     'Suitable for all nail types'
-    //   ],
-    //   features: [
-    //     { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
-    //     { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
-    //     { title: 'Long-Lasting', description: 'Creates a durable bond for extended wear' },
-    //     { title: 'Professional Grade', description: 'Salon-quality results at home' }
-    //   ],
-    //   howToUse: [
-    //     'Apply a thin layer to prepared nails',
-    //     'Allow to air dry completely',
-    //     'Proceed with your nail enhancement',
-    //     'Do not cure in lamp'
-    //   ],
-    //   ingredients: 'Proprietary vitamin-enriched formula',
-    //   specifications: {
-    //     volume: '15ml',
-    //     type: 'Nail Primer',
-    //     finish: 'Matte',
-    //     application: 'Brush applicator',
-    //     madeIn: 'South Africa',
-    //     certifications: ['Professional Grade', 'Acid-Free']
-    //   }
-    // },
-    // 'colour-acrylics': {
-    //   id: '12',
-    //   name: 'Colour Acrylics',
-    //   subtitle: 'Coming Soon',
-    //   price: -1,
-    //   comparePrice: null,
-    //   rating: 4.7,
-    //   reviewCount: 99,
-    //   inStock: false,
-    //   stockCount: 20,
-    //   description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-    //   images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
-    //   variants: [],
-    //   overview: [
-    //     'Removes surface oils and moisture',
-    //     'Prevents lifting and improves adhesion',
-    //     'Quick drying formula',
-    //     'Essential prep step',
-    //     'Professional results'
-    //   ],
-    //   features: [
-    //     { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
-    //     { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
-    //     { title: 'Quick Drying', description: 'Fast-acting formula saves time' },
-    //     { title: 'Professional Results', description: 'Ensures long-lasting nail enhancements' }
-    //   ],
-    //   howToUse: [
-    //     'Apply to clean, dry nails',
-    //     'Allow to air dry completely',
-    //     'Proceed with primer and enhancement',
-    //     'Use before each application'
-    //   ],
-    //   ingredients: 'Isopropyl Alcohol, Proprietary blend',
-    //   specifications: {
-    //     volume: '15ml',
-    //     type: 'Nail Prep',
-    //     finish: 'Clear',
-    //     application: 'Brush applicator',
-    //     madeIn: 'South Africa',
-    //     certifications: ['Professional Grade']
-    //   }
-    // },
-    'glitter-acrylics': {
-      id: '13',
-      name: 'Glitter Acrylics',
-      subtitle: 'Coming Soon',
-      price: -1,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 146,
-      inStock: false,
-      stockCount: 35,
-      description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
-      images: ['/top-coat-colorful.webp', '/top-coat-white.webp'],
-      variants: [],
-      overview: [
-        'High-gloss mirror finish',
-        'Chip-resistant protection',
-        'Long-lasting durability',
-        'UV protection included',
-        'Professional results'
-      ],
-      features: [
-        { title: 'High-Gloss Finish', description: 'Mirror-like shine that lasts' },
-        { title: 'Chip Resistant', description: 'Strong protection against chipping' },
-        { title: 'UV Protection', description: 'Prevents yellowing and fading' },
-        { title: 'Quick Dry', description: 'Fast-drying formula for convenience' }
-      ],
-      howToUse: [
-        'Apply thin layer over cured color',
-        'Cure in LED lamp for 60 seconds',
-        'Wipe with alcohol if needed',
-        'Apply cuticle oil to finish'
-      ],
-      ingredients: 'UV-resistant polymer blend',
-      specifications: {
-        volume: '15ml',
-        type: 'Top Coat',
-        finish: 'High-Gloss',
-        application: 'Brush applicator',
-        madeIn: 'South Africa',
-        certifications: ['UV Protection', 'Professional Grade']
-      }
-    },
-    'nail-liquid-monomer': {
-      id: '14',
-      name: 'Nail Liquid (Monomer)',
-      subtitle: 'Coming Soon',
-      price: -1,
-      comparePrice: null,
-      rating: 4.8,
-      reviewCount: 87,
-      inStock: false,
-      stockCount: 25,
-      description: 'Professional-grade monomer for acrylic nail application.',
-      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
+      ingredients: {
+        inci: [
+          'Polymethyl Methacrylate',
+          'Polyethyl Methacrylate',
+          'Benzoyl Peroxide',
+          'Color Pigments'
+        ],
+        key: [
+          'PMMA – provides strength and durability',
+          'Color pigments – vibrant, long-lasting color',
+          'Benzoyl Peroxide – curing activator'
+        ]
+      },
+      details: {
+        size: '56g',
+        shelfLife: '24 months',
+        claims: ['Professional Grade', '13 Colors', 'Self-Leveling']
+      },
       variants: [
-        { id: '250ml', name: '250ml', inStock: false, price: -1 },
-        { id: '500ml', name: '500ml', inStock: false, price: -1 }
+        'Baby Blue', 'Lilac Mist', 'Blush Pink', 'Ballet Pink', 'Fuchsia Pink',
+        'Cloud Grey', 'Mint Mist', 'Rose Pink', 'Fresh Mint', 'Soft Nude',
+        'Petal Pink', 'Sky Blue', 'Lemon Glow'
       ],
-      overview: [
-        'Professional-grade formula',
-        'Fast acting',
-        'Effective removal',
-        'Available in 250ml and 500ml',
-        'Professional results'
-      ],
-      features: [
-        { title: 'Professional Grade', description: 'High-quality formula for professionals' },
-        { title: 'Fast Acting', description: 'Quick and effective removal' },
-        { title: 'Large Size', description: '1L bottle for extended use' },
-        { title: 'Versatile', description: 'Works on all nail products' }
-      ],
-      howToUse: [
-        'Soak cotton pad with acetone',
-        'Place on nail for 10-15 minutes',
-        'Gently remove product',
-        'Moisturize after use'
-      ],
-      ingredients: '100% Pure Acetone',
-      specifications: {
-        volume: '250ml/500ml',
-        type: 'Monomer',
-        concentration: '100% Pure',
-        application: 'Acrylic application',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
-    },
-    'crystal-kolinsky-sculpting-brush': {
-      id: '15',
-      name: 'Crystal Kolinsky Sculpting Brush',
-      subtitle: 'Coming Soon',
-      price: -1,
-      comparePrice: null,
       rating: 4.9,
-      reviewCount: 178,
-      inStock: false,
-      stockCount: 50,
-      description: 'Professional acrylic brush for sculpting and shaping.',
-      images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-colorful.webp'],
-      variants: [],
-      overview: [
-        'Professional quality bristles',
-        'Perfect for sculpting',
-        'Ergonomic handle',
-        'Easy to clean',
-        'Long-lasting'
-      ],
-      features: [
-        { title: 'Quality Bristles', description: 'Professional-grade bristles for smooth application' },
-        { title: 'Ergonomic', description: 'Comfortable grip for extended use' },
-        { title: 'Versatile', description: 'Perfect for all acrylic techniques' },
-        { title: 'Durable', description: 'Long-lasting construction' }
-      ],
-      howToUse: [
-        'Dip brush in monomer',
-        'Pick up acrylic powder',
-        'Apply to nail or form',
-        'Clean thoroughly after use'
-      ],
-      ingredients: 'Professional bristles, ergonomic handle',
-      specifications: {
-        size: 'Professional',
-        type: 'Acrylic Brush',
-        bristles: 'Synthetic',
-        handle: 'Ergonomic',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
-    },
-    'diamond-precision-nail-art-brush': {
-      id: '16',
-      name: 'Diamond Precision Nail Art Brush',
-      subtitle: 'Coming Soon',
-      price: -1,
-      comparePrice: null,
-      rating: 4.9,
-      reviewCount: 178,
-      inStock: false,
-      stockCount: 50,
-      description: 'Professional acrylic brush for sculpting and shaping.',
-      images: ['/acrylic-sculpture-brush-white-2.webp', '/acrylic-sculpture-brush-colorful-2.webp'],
-      variants: [],
-      overview: [
-        'Professional quality bristles',
-        'Perfect for sculpting',
-        'Ergonomic handle',
-        'Easy to clean',
-        'Long-lasting'
-      ],
-      features: [
-        { title: 'Quality Bristles', description: 'Professional-grade bristles for smooth application' },
-        { title: 'Ergonomic', description: 'Comfortable grip for extended use' },
-        { title: 'Versatile', description: 'Perfect for all acrylic techniques' },
-        { title: 'Durable', description: 'Long-lasting construction' }
-      ],
-      howToUse: [
-        'Dip brush in monomer',
-        'Pick up acrylic powder',
-        'Apply to nail or form',
-        'Clean thoroughly after use'
-      ],
-      ingredients: 'Professional bristles, ergonomic handle',
-      specifications: {
-        size: 'Professional',
-        type: 'Acrylic Brush',
-        bristles: 'Synthetic',
-        handle: 'Ergonomic',
-        madeIn: 'South Africa',
-        certifications: ['Professional Grade']
-      }
+      reviewCount: 156,
+      reviews: []
     }
   };
 
-  const product = allProductsData[productSlug as keyof typeof allProductsData] || allProductsData['cuticle-oil'];
+  useEffect(() => {
+    // Find product by slug
+    const foundProduct = productDatabase[productSlug as keyof typeof productDatabase];
+    
+    if (foundProduct) {
+      setProduct(foundProduct);
+      setSelectedVariant(foundProduct.variants[0] || '');
+      
+      // Set page title and meta description
+      document.title = `${foundProduct.name} - BLOM Cosmetics`;
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute('content', foundProduct.shortDescription);
+      }
+    }
+    
+    setLoading(false);
+  }, [productSlug]);
 
-  // Sample reviews data
-  const sampleReviews: Review[] = [
+  useEffect(() => {
+    // Check if product is in wishlist
+    setIsWishlisted(wishlistStore.isInWishlist(productSlug));
+    
+    const unsubscribe = wishlistStore.subscribe(() => {
+      setIsWishlisted(wishlistStore.isInWishlist(productSlug));
+    });
+
+    return unsubscribe;
+  }, [productSlug]);
+
+  const handleAddToCart = () => {
+    if (!product) return;
+    
+    cartStore.addItem({
+      id: `item_${Date.now()}`,
+      productId: product.slug,
+      variantId: selectedVariant,
+      name: product.name,
+      price: product.price,
+      image: product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      variant: selectedVariant ? { title: selectedVariant } : undefined
+    }, quantity);
+
+    showNotification(`Added ${quantity} ${product.name} to cart!`);
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    window.location.href = '/checkout';
+  };
+
+  const handleWishlistToggle = () => {
+    if (!product) return;
+    
+    const wishlistItem = {
+      id: product.slug,
+      productId: product.slug,
+      name: product.name,
+      price: product.price,
+      image: product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      slug: product.slug
+    };
+    
+    wishlistStore.toggleItem(wishlistItem);
+  };
+
+  const nextImage = () => {
+    if (!product) return;
+    setSelectedImage((prev) => (prev + 1) % product.images.length);
+  };
+
+  const prevImage = () => {
+    if (!product) return;
+    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+  };
+
+  const toggleAccordion = (section: string) => {
+    setExpandedAccordion(expandedAccordion === section ? null : section);
+  };
+
+  const formatPrice = (price: number) => `R${price.toFixed(2)}`;
+
+  const relatedProducts = [
     {
       id: '1',
-      name: 'Sarah Mitchell',
-      rating: 5,
-      title: 'Excellent quality!',
-      comment: 'This product exceeded my expectations. The quality is outstanding and it works exactly as described. Highly recommend!',
-      date: '2024-01-15',
-      verified: true,
-      helpful: 12
-    },
-    {
-      id: '2',
-      name: 'Emma Johnson',
-      rating: 4,
-      title: 'Great product',
-      comment: 'Very happy with this purchase. Does exactly what it says. Would buy again.',
-      date: '2024-01-10',
-      verified: true,
-      helpful: 8
-    },
-    {
-      id: '3',
-      name: 'Jessica Williams',
-      rating: 5,
-      title: 'Love it!',
-      comment: 'Absolutely love this product! The quality is amazing and it lasts so long. Worth every penny.',
-      date: '2024-01-05',
-      verified: false,
-      helpful: 6
-    }
-  ];
-
-  const recommendedProducts = [
-    {
-      id: 'rec1',
-      name: 'Cuticle Oil',
-      price: 140,
-      image: '/cuticle-oil-colorful.webp',
-      rating: 4.8,
-      slug: 'cuticle-oil'
-    },
-    {
-      id: 'rec2',
       name: 'Vitamin Primer',
-      price: 180,
-      image: '/primer-01.webp',
-      rating: 4.7,
+      price: 210,
+      image: '/vitamin-primer-white.webp',
+      rating: 4.8,
       slug: 'vitamin-primer'
     },
     {
-      id: 'rec3',
+      id: '2',
       name: 'Top Coat',
-      price: 160,
-      image: '/top-coat-01.webp',
+      price: 190,
+      image: '/top-coat-white.webp',
       rating: 4.9,
       slug: 'top-coat'
     },
     {
-      id: 'rec4',
-      name: 'Nail File',
-      price: 35,
-      image: '/nail-file-01.webp',
-      rating: 4.5,
-      slug: 'nail-file'
+      id: '3',
+      name: 'Prep Solution',
+      price: 200,
+      image: '/prep-solution-white.webp',
+      rating: 4.7,
+      slug: 'prep-solution'
     }
   ];
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header showMobileMenu={true} />
+        <main className="section-padding">
+          <Container>
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading product...</p>
+            </div>
+          </Container>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
-  const handleVariantSelect = (variantId: string) => {
-    setSelectedVariant(variantId);
-    // Update the main image to show the selected variant
-    const variant = product.variants.find(v => v.id === variantId);
-    if (variant && variant.image) {
-      const imageIndex = product.images.findIndex(img => img === variant.image);
-      if (imageIndex !== -1) {
-        setSelectedImage(imageIndex);
-      } else {
-        // If variant image not in main images array, add it temporarily
-        const tempImages = [...product.images, variant.image];
-        const newIndex = tempImages.length - 1;
-        setSelectedImage(newIndex);
-      }
-    }
-  };
-
-  // Handle carousel navigation and sync with variant selection
-  const nextImage = () => {
-    const newIndex = (selectedImage + 1) % product.images.length;
-    setSelectedImage(newIndex);
-    // Sync with variant selection if this image corresponds to a variant
-    syncVariantWithImage(newIndex);
-  };
-
-  const prevImage = () => {
-    const newIndex = (selectedImage - 1 + product.images.length) % product.images.length;
-    setSelectedImage(newIndex);
-    // Sync with variant selection if this image corresponds to a variant
-    syncVariantWithImage(newIndex);
-  };
-
-  // Helper function to sync variant selection with image index
-  const syncVariantWithImage = (imageIndex: number) => {
-    const currentImage = product.images[imageIndex];
-    if (currentImage) {
-      // Find variant that matches this image
-      const matchingVariant = product.variants.find(v => v.image === currentImage);
-      if (matchingVariant) {
-        setSelectedVariant(matchingVariant.id);
-      } else {
-        // Check if it's the first image (usually white background)
-        if (imageIndex === 0) {
-          setSelectedVariant(null);
-        }
-      }
-    }
-  };
-
-  // Get current price based on selected variant
-  const getCurrentPrice = () => {
-    if (selectedVariant) {
-      const variant = product.variants.find(v => v.id === selectedVariant);
-      if (variant && variant.price !== undefined) {
-        return variant.price;
-      }
-    }
-    return product.price;
-  };
-
-  const handleWishlistToggle = () => {
-    setIsWishlisted(!isWishlisted);
-    // TODO: Add actual wishlist functionality
-  };
-
-  const handleAddToCart = () => {
-    // TODO: Add actual cart functionality
-    console.log('Adding to cart:', { 
-      product: product.name, 
-      quantity,
-      variant: selectedVariant 
-    });
-  };
-
-  const handleReviewSubmit = (review: any) => {
-    console.log('New review:', review);
-    // TODO: Add actual review submission functionality
-  };
-
-  useEffect(() => {
-    document.title = `${product.name} - BLOM Cosmetics`;
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute('content', product.description);
-    }
-    window.scrollTo({ top: 0 });
-  }, [product]);
+  if (!product) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Header showMobileMenu={true} />
+        <main className="section-padding">
+          <Container>
+            <div className="text-center py-16">
+              <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+              <p className="text-gray-600 mb-6">The product you're looking for doesn't exist.</p>
+              <Button onClick={() => window.location.href = '/shop'}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Shop
+              </Button>
+            </div>
+          </Container>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
 
       <main>
+        {/* Breadcrumb */}
+        <section className="py-4 border-b bg-gray-50">
+          <Container>
+            <nav className="text-sm text-gray-500">
+              <a href="/" className="hover:text-pink-400">Home</a>
+              <span className="mx-2">/</span>
+              <a href="/shop" className="hover:text-pink-400">Shop</a>
+              <span className="mx-2">/</span>
+              <a href={`/shop#${product.category.toLowerCase().replace(' & ', '-').replace(' ', '-')}`} className="hover:text-pink-400">
+                {product.category}
+              </a>
+              <span className="mx-2">/</span>
+              <span className="text-gray-900">{product.name}</span>
+            </nav>
+          </Container>
+        </section>
+
+        {/* Product Detail */}
         <section className="section-padding">
           <Container>
             <div className="grid lg:grid-cols-2 gap-12">
               {/* Product Media */}
               <div>
                 {/* Main Image */}
-                <div className="relative aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100">
+                <div className="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gray-50">
                   <img
-                    src={product.images[selectedImage] || product.images[0]}
+                    src={product.images[selectedImage] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'}
                     alt={product.name}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = product.images[0] || '/placeholder.webp';
-                    }}
                   />
                   
                   {/* Navigation Arrows */}
                   {product.images.length > 1 && (
                     <>
                       <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          prevImage();
-                        }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
+                        onClick={prevImage}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all shadow-lg"
                       >
                         <ChevronLeft className="h-5 w-5" />
                       </button>
                       <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          nextImage();
-                        }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
+                        onClick={nextImage}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all shadow-lg"
                       >
                         <ChevronRight className="h-5 w-5" />
                       </button>
                     </>
                   )}
 
+                  {/* Sale Badge */}
+                  {product.compareAtPrice && (
+                    <div className="absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold uppercase shadow-lg">
+                      SALE
+                    </div>
+                  )}
+
                   {/* Wishlist Button */}
                   <button
                     onClick={handleWishlistToggle}
-                    className="absolute top-4 right-4 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
+                    className="absolute top-4 right-4 p-3 bg-white bg-opacity-90 rounded-full hover:bg-white transition-all shadow-lg"
                   >
-                    <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : 'text-gray-600'}`} />
+                    <Heart className={`h-6 w-6 ${isWishlisted ? 'fill-current text-pink-400' : 'text-gray-600'}`} />
                   </button>
                 </div>
 
                 {/* Thumbnail Images */}
                 {product.images.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                  {product.images.map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setSelectedImage(index);
-                        syncVariantWithImage(index);
-                      }}
-                        className={`w-16 h-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                        selectedImage === index ? 'border-pink-400' : 'border-gray-200'
-                      }`}
-                    >
-                      <img
-                        src={image}
-                        alt={`${product.name} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = product.images[0] || '/placeholder.webp';
-                        }}
-                      />
-                    </button>
-                  ))}
+                  <div className="flex gap-3">
+                    {product.images.map((image: string, index: number) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImage(index)}
+                        className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
+                          selectedImage === index ? 'border-pink-400' : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <img
+                          src={image || `https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`}
+                          alt={`${product.name} ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
                   </div>
                 )}
-
               </div>
 
               {/* Product Info */}
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                  {product.name}
-                </h1>
-                
-                {product.subtitle && (
-                  <p className="text-lg text-gray-600 mb-4">{product.subtitle}</p>
-                )}
-
-                {/* Rating */}
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-5 w-5 ${
-                          i < Math.floor(product.rating)
-                          ? 'fill-current text-yellow-400'
-                            : 'text-gray-300'
-                        }`}
-                      style={{ color: i < Math.floor(product.rating) ? '#F59E0B' : undefined }}
-                      />
-                    ))}
+                <div className="mb-8">
+                  <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
+                  <p className="text-lg text-gray-600 mb-6 leading-relaxed">{product.shortDescription}</p>
+                  
+                  {/* Rating */}
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="flex items-center gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(product.rating)
+                              ? 'fill-current text-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-600">({product.reviewCount} reviews)</span>
                   </div>
-                  <span className="text-sm text-gray-600">
-                    {product.rating} ({product.reviewCount} reviews)
-                  </span>
+
+                  {/* Price */}
+                  <div className="flex items-baseline gap-4 mb-3">
+                    <span className="text-4xl font-bold text-gray-900">{formatPrice(product.price)}</span>
+                    {product.compareAtPrice && (
+                      <span className="text-xl text-gray-400 line-through">{formatPrice(product.compareAtPrice)}</span>
+                    )}
+                  </div>
+
+                  {/* Stock Status */}
+                  <div className="inline-flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full mb-8">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="text-green-700 font-medium text-sm">{product.stock}</span>
+                  </div>
                 </div>
 
-                {/* Price */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3">
-                  {product.price === -1 ? (
-                    <span className="text-3xl font-bold text-gray-600">Coming Soon</span>
-                  ) : (
-                    <>
-                      <span className="text-3xl font-bold text-gray-900">
-                        R{getCurrentPrice().toFixed(2)}
-                      </span>
-                      {product.comparePrice && (
-                        <span className="text-xl text-gray-500 line-through">
-                          R{product.comparePrice.toFixed(2)}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
-                {product.comparePrice && product.price !== -1 && (
-                  <div className="text-sm text-green-600 font-medium">
-                    Save R{(product.comparePrice - getCurrentPrice()).toFixed(2)}
-                  </div>
-                )}
-              </div>
-
-                {/* Variant Selection */}
+                {/* Scent/Variants */}
                 {product.variants.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {product.price === -1 ? 'Available Variants (Coming Soon)' : 'Options'}
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      {product.slug === 'cuticle-oil' ? 'Scent' : 'Options'}
                     </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {product.variants.map((variant) => (
+                    <div className="flex flex-wrap gap-3">
+                      {product.variants.map((variant: string) => (
                         <button
-                          key={variant.id}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleVariantSelect(variant.id);
-                          }}
-                          className={`px-4 py-2 rounded-full border transition-all ${
-                            selectedVariant === variant.id
-                              ? 'bg-pink-400 text-white border-pink-400'
-                              : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
+                          key={variant}
+                          onClick={() => setSelectedVariant(variant)}
+                          className={`px-6 py-3 rounded-full font-medium text-sm transition-all duration-200 border-2 ${
+                            selectedVariant === variant
+                              ? 'bg-pink-400 text-white border-pink-400 shadow-md'
+                              : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400 hover:text-pink-400'
                           }`}
                         >
-                          <span className="text-sm font-medium">{variant.name}</span>
+                          {variant}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                {/* Description */}
-                <p className="text-gray-700 mb-6">{product.description}</p>
-
-                {/* Stock Status */}
-                <div className="flex items-center gap-2 mb-6">
-                  {product.price === -1 ? (
-                    <>
-                      <X className="h-5 w-5 text-blue-600" />
-                      <span className="text-blue-600 font-medium">Coming Soon - Browse variants and details</span>
-                    </>
-                  ) : product.inStock ? (
-                    <>
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                      <span className="text-green-600 font-medium">In Stock ({product.stockCount} available)</span>
-                    </>
-                  ) : (
-                    <>
-                      <X className="h-5 w-5 text-red-600" />
-                      <span className="text-red-600 font-medium">Out of Stock</span>
-                    </>
-                  )}
-                </div>
-
-                {/* Quantity Selector */}
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-900 mb-2">Quantity</label>
-                  <div className="flex items-center gap-3">
+                {/* Quantity */}
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
+                  <div className="flex items-center border-2 border-gray-200 rounded-full bg-white inline-flex overflow-hidden">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      disabled={!product.inStock || product.price === -1}
+                      className="p-4 hover:bg-gray-50 transition-colors"
+                      aria-label="Decrease quantity"
                     >
-                      <Minus className="h-4 w-4" />
+                      <Minus className="h-5 w-5 text-gray-600" />
                     </button>
-                    <input
-                      type="number"
-                      min="1"
-                      max={product.stockCount}
-                      value={quantity}
-                      onChange={(e) => setQuantity(Math.max(1, Math.min(product.stockCount, parseInt(e.target.value) || 1)))}
-                      className="w-20 text-center border border-gray-300 rounded-lg py-2"
-                      disabled={!product.inStock || product.price === -1}
-                    />
+                    <span className="px-8 py-4 font-bold text-lg text-gray-900 min-w-[80px] text-center select-none">{quantity}</span>
                     <button
-                      onClick={() => setQuantity(Math.min(product.stockCount, quantity + 1))}
-                      className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      disabled={!product.inStock || product.price === -1}
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="p-4 hover:bg-gray-50 transition-colors"
+                      aria-label="Increase quantity"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-5 w-5 text-gray-600" />
                     </button>
                   </div>
                 </div>
 
-                {/* Add to Cart Button */}
-                <Button 
-                  size="lg" 
-                  className="w-full mb-4"
-                  onClick={handleAddToCart}
-                  disabled={!product.inStock || product.price === -1}
-                >
-                  <ShoppingCart className="h-5 w-5 mr-2" />
-                  {product.price === -1 ? 'Coming Soon' : 'Add to Cart'}
-                </Button>
-
-                {/* Product Benefits */}
-                <div className="space-y-3 pt-6 border-t border-gray-200">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="text-sm text-gray-700">Free shipping on orders over R500</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="text-sm text-gray-700">30-day return policy</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="h-5 w-5 text-green-600" />
-                    <span className="text-sm text-gray-700">Professional quality guarantee</span>
+                {/* Action Buttons */}
+                <div className="space-y-4 mb-8">
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-lg uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
+                  >
+                    ADD TO CART
+                  </button>
+                  <button
+                    onClick={handleBuyNow}
+                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-lg uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
+                  >
+                    BUY NOW
+                  </button>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={() => {}}
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors"
+                    >
+                      <Share2 className="h-5 w-5 text-gray-600" />
+                      <span className="text-sm font-medium">Share</span>
+                    </button>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Product Details Tabs */}
-            <div className="mt-16">
-              <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8">
-                  {[
-                    { id: 'overview', label: 'Overview' },
-                    { id: 'features', label: 'Features' },
-                    { id: 'how-to-use', label: 'How to Use' },
-                    { id: 'ingredients', label: 'Ingredients' },
-                    { id: 'reviews', label: 'Reviews' }
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                        activeTab === tab.id
-                          ? 'border-pink-400 text-pink-400'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </nav>
-              </div>
-
-              <div className="mt-8">
-                {activeTab === 'overview' && (
-                  <div className="prose max-w-none">
-                    <ul className="space-y-2">
-                      {product.overview.map((item, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                {/* Trust Badges */}
+                <div className="space-y-3 py-6 border-t border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <Truck className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">Free shipping on orders over R1500</span>
                   </div>
-                )}
-
-                {activeTab === 'features' && (
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {product.features.map((feature, index) => (
-                      <div key={index} className="p-6 bg-gray-50 rounded-lg">
-                        <h4 className="font-semibold text-gray-900 mb-2">{feature.title}</h4>
-                        <p className="text-gray-600">{feature.description}</p>
-                      </div>
-                    ))}
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">100% Authentic products</span>
                   </div>
-                )}
-
-                {activeTab === 'how-to-use' && (
-                  <div className="prose max-w-none">
-                    <ol className="space-y-3">
-                      {product.howToUse.map((step, index) => (
-                        <li key={index} className="flex gap-3">
-                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-pink-400 text-white flex items-center justify-center text-sm font-semibold">
-                            {index + 1}
-                          </span>
-                          <span>{step}</span>
-                        </li>
-                      ))}
-                    </ol>
+                  <div className="flex items-center gap-3">
+                    <RotateCcw className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">30-day hassle-free returns</span>
                   </div>
-                )}
+                </div>
 
-                {activeTab === 'ingredients' && (
-                  <div className="prose max-w-none">
-                    <p className="text-gray-700">{product.ingredients}</p>
-                    <div className="mt-6 p-6 bg-gray-50 rounded-lg">
-                      <h4 className="font-semibold text-gray-900 mb-4">Specifications</h4>
-                      <dl className="grid grid-cols-2 gap-4">
-                        {Object.entries(product.specifications).map(([key, value]) => (
-                          <div key={key}>
-                            <dt className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</dt>
-                            <dd className="text-sm font-medium text-gray-900">
-                              {Array.isArray(value) ? value.join(', ') : value}
-                            </dd>
-                          </div>
-                        ))}
-                      </dl>
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'reviews' && (
-                  <div>
-                    <ReviewSection
-                      productName={product.name}
-                      productImage={product.images[0]}
-                      productSlug={productSlug || 'cuticle-oil'}
-                      averageRating={product.rating}
-                      reviewCount={product.reviewCount}
-                      reviews={sampleReviews}
-                      onReviewSubmit={handleReviewSubmit}
-                    />
-                  </div>
-                )}
+                {/* Payment Methods */}
+                <div className="pt-6 border-t border-gray-200">
+                  <PaymentMethods />
+                </div>
               </div>
             </div>
           </Container>
         </section>
 
-        {/* Payment Methods */}
+        {/* Product Information Accordions */}
         <section className="section-padding bg-gray-50">
           <Container>
-            <PaymentMethods />
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
+              
+              <div className="space-y-4">
+                {/* Overview */}
+                <Card>
+                  <button
+                    onClick={() => toggleAccordion('overview')}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <h3 className="font-semibold text-lg">Overview</h3>
+                    {expandedAccordion === 'overview' ? (
+                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {expandedAccordion === 'overview' && (
+                    <div className="px-6 pb-6">
+                      <p className="text-gray-600 leading-relaxed">{product.overview}</p>
+                    </div>
+                  )}
+                </Card>
+
+                {/* Features */}
+                <Card>
+                  <button
+                    onClick={() => toggleAccordion('features')}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <h3 className="font-semibold text-lg">Features & Benefits</h3>
+                    {expandedAccordion === 'features' ? (
+                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {expandedAccordion === 'features' && (
+                    <div className="px-6 pb-6">
+                      <ul className="space-y-3">
+                        {product.features.map((feature: string, index: number) => (
+                          <li key={index} className="flex items-center gap-3">
+                            <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </Card>
+
+                {/* How to Use */}
+                <Card>
+                  <button
+                    onClick={() => toggleAccordion('how-to-use')}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <h3 className="font-semibold text-lg">How to Use</h3>
+                    {expandedAccordion === 'how-to-use' ? (
+                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {expandedAccordion === 'how-to-use' && (
+                    <div className="px-6 pb-6">
+                      <ol className="space-y-3">
+                        {product.howToUse.map((step: string, index: number) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <span className="w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                              {index + 1}
+                            </span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </Card>
+
+                {/* Ingredients */}
+                <Card>
+                  <button
+                    onClick={() => toggleAccordion('ingredients')}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <h3 className="font-semibold text-lg">Ingredients</h3>
+                    {expandedAccordion === 'ingredients' ? (
+                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {expandedAccordion === 'ingredients' && (
+                    <div className="px-6 pb-6">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="font-medium mb-3">INCI Names:</h4>
+                          <ul className="space-y-2">
+                            {product.ingredients.inci.map((ingredient: string, index: number) => (
+                              <li key={index} className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                <span className="text-sm">{ingredient}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-3">Key Ingredients:</h4>
+                          <ul className="space-y-2">
+                            {product.ingredients.key.map((ingredient: string, index: number) => (
+                              <li key={index} className="text-sm text-gray-600">
+                                {ingredient}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Card>
+
+                {/* Details */}
+                <Card>
+                  <button
+                    onClick={() => toggleAccordion('details')}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <h3 className="font-semibold text-lg">Product Details</h3>
+                    {expandedAccordion === 'details' ? (
+                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                    )}
+                  </button>
+                  {expandedAccordion === 'details' && (
+                    <div className="px-6 pb-6">
+                      <div className="space-y-3 text-sm">
+                        <div className="flex justify-between">
+                          <span className="font-medium">Size:</span>
+                          <span>{product.details.size}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">Shelf Life:</span>
+                          <span>{product.details.shelfLife}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium">Claims:</span>
+                          <div className="flex gap-2">
+                            {product.details.claims.map((claim: string, index: number) => (
+                              <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                {claim}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </Card>
+              </div>
+            </div>
           </Container>
         </section>
 
-        {/* You May Also Like */}
+        {/* Related Products */}
         <section className="section-padding">
           <Container>
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">You May Also Like</h2>
-              <p className="text-gray-600">Discover more products from our collection</p>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl w-full mx-auto">
-              {recommendedProducts.map((recProduct) => (
-                <Card key={recProduct.id} className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
+            <h2 className="text-3xl font-bold text-center mb-12">You Might Also Like</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {relatedProducts.map((relatedProduct) => (
+                <Card key={relatedProduct.id} className="group cursor-pointer" onClick={() => window.location.href = `/products/${relatedProduct.slug}`}>
                   <div className="aspect-square overflow-hidden">
                     <img
-                      src={recProduct.image}
-                      alt={recProduct.name}
+                      src={relatedProduct.image}
+                      alt={relatedProduct.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  <CardContent className="p-3 md:p-4">
+                  <CardContent className="p-6">
                     <div className="flex items-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`h-3 w-3 sm:h-4 sm:w-4 ${
-                            i < Math.floor(recProduct.rating)
-                              ? 'fill-current'
+                          className={`h-4 w-4 ${
+                            i < Math.floor(relatedProduct.rating)
+                              ? 'fill-current text-yellow-400'
                               : 'text-gray-300'
                           }`}
-                          style={{ color: i < Math.floor(recProduct.rating) ? '#F59E0B' : undefined }}
                         />
                       ))}
                     </div>
-                    <h3 className="font-semibold text-sm md:text-base mb-2 line-clamp-2 group-hover:text-pink-400 transition-colors">
-                      {recProduct.name}
-                    </h3>
+                    <h3 className="font-semibold text-lg mb-2 group-hover:text-pink-400 transition-colors">{relatedProduct.name}</h3>
                     <div className="flex items-center justify-between">
-                      <span className="text-lg md:text-xl font-bold text-gray-900">
-                        R{recProduct.price.toFixed(2)}
-                      </span>
-                      <Button
-                        size="sm"
-                        className="text-xs md:text-sm px-2 py-1 md:px-3 md:py-2"
-                        onClick={() => window.location.href = `/products/${recProduct.slug}`}
-                      >
-                        View
+                      <span className="text-2xl font-bold text-pink-400">{formatPrice(relatedProduct.price)}</span>
+                      <Button size="sm" onClick={(e) => {
+                        e.stopPropagation();
+                        // Add to cart logic here
+                      }}>
+                        Add to Cart
                       </Button>
                     </div>
                   </CardContent>
@@ -1343,6 +1094,54 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
             </div>
           </Container>
         </section>
+
+        {/* Need Help Section */}
+        <section className="section-padding bg-gradient-to-r from-pink-50 to-blue-50">
+          <Container>
+            <div className="text-center max-w-2xl mx-auto">
+              <MessageCircle className="h-12 w-12 text-pink-400 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold mb-4">Need Help?</h2>
+              <p className="text-gray-600 mb-6">
+                Have questions about this product? Our nail experts are here to help you choose the perfect products for your needs.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" className="bg-green-500 hover:bg-green-600">
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  WhatsApp Support
+                </Button>
+                <Button size="lg" variant="outline">
+                  <Phone className="h-5 w-5 mr-2" />
+                  Call Us
+                </Button>
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        {/* Reviews Section */}
+        <ReviewSection
+          productName={product.name}
+          productImage={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+          productSlug={product.slug}
+          averageRating={product.rating}
+          reviewCount={product.reviewCount}
+          reviews={product.reviews}
+          onReviewSubmit={(reviewData) => {
+            console.log('New review submitted:', reviewData);
+            showNotification('Thank you for your review! It will be published after moderation.');
+          }}
+        />
+
+        {/* Sticky Cart */}
+        <StickyCart
+          productName={product.name}
+          productImage={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+          productPrice={product.price}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+          onAddToCart={handleAddToCart}
+          isVisible={true}
+        />
       </main>
 
       <Footer />
