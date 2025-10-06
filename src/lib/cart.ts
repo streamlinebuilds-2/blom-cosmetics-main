@@ -201,6 +201,11 @@ export const formatPrice = (price: number): string => {
 };
 
 export const showNotification = (message: string, type: 'success' | 'error' | 'info' = 'success'): void => {
+  // Don't show notification on mobile
+  if (window.innerWidth < 768) {
+    return;
+  }
+
   // Create notification element
   const notification = document.createElement('div');
   notification.className = `cart-notification ${type === 'success' ? 'show' : ''}`;

@@ -192,7 +192,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               {/* Product Media */}
               <div>
                 {/* Main Image */}
-                <div className="relative aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100">
+                <div className="relative aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100 shadow-md">
                   <img
                     src={product.images[selectedImage] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'}
                     alt={product.name}
@@ -330,16 +330,16 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-4 mb-8">
+                <div className="space-y-3 mb-8">
                   <button
                     onClick={handleAddToCart}
-                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-lg uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
+                    className="w-full bg-pink-400 text-white rounded-full py-3 md:py-4 px-6 md:px-8 font-bold text-sm md:text-lg uppercase tracking-wide hover:bg-transparent hover:text-black hover:border-2 hover:border-black transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
                   >
                     ADD TO CART
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-lg uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
+                    className="w-full bg-white text-gray-700 border-2 border-gray-300 rounded-full py-3 md:py-4 px-6 md:px-8 font-bold text-sm md:text-lg uppercase tracking-wide hover:bg-blue-200 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
                   >
                     BUY NOW
                   </button>
@@ -383,7 +383,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
         </section>
 
         {/* Product Information Accordions */}
-        <section className="section-padding bg-gray-50">
+        <section className="section-padding bg-pink-50">
           <Container>
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
@@ -397,9 +397,9 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   >
                     <h3 className="font-semibold text-lg">Overview</h3>
                     {expandedAccordion === 'overview' ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-pink-400" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-pink-400" />
                     )}
                   </button>
                   {expandedAccordion === 'overview' && (
@@ -417,18 +417,18 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   >
                     <h3 className="font-semibold text-lg">Features & Benefits</h3>
                     {expandedAccordion === 'features' ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-pink-400" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-pink-400" />
                     )}
                   </button>
                   {expandedAccordion === 'features' && (
                     <div className="px-6 pb-6">
-                      <ul className="space-y-2">
+                      <ul className="space-y-3">
                         {product.features.map((feature, index) => (
-                          <li key={index} className="flex items-center gap-2">
-                            <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span>{feature}</span>
+                          <li key={index} className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                            <span className="text-gray-700">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -444,9 +444,9 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   >
                     <h3 className="font-semibold text-lg">How to Use</h3>
                     {expandedAccordion === 'how-to-use' ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-pink-400" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-pink-400" />
                     )}
                   </button>
                   {expandedAccordion === 'how-to-use' && (
@@ -473,9 +473,9 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   >
                     <h3 className="font-semibold text-lg">Ingredients</h3>
                     {expandedAccordion === 'ingredients' ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-pink-400" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-pink-400" />
                     )}
                   </button>
                   {expandedAccordion === 'ingredients' && (
@@ -515,9 +515,9 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   >
                     <h3 className="font-semibold text-lg">Product Details</h3>
                     {expandedAccordion === 'details' ? (
-                      <ChevronUp className="h-5 w-5 text-gray-400" />
+                      <ChevronUp className="h-5 w-5 text-pink-400" />
                     ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-400" />
+                      <ChevronDown className="h-5 w-5 text-pink-400" />
                     )}
                   </button>
                   {expandedAccordion === 'details' && (
@@ -594,13 +594,13 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 Have questions about this product? Our nail experts are here to help you choose the perfect products for your needs.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-green-500 hover:bg-green-600">
-                  <MessageCircle className="h-5 w-5 mr-2" />
-                  WhatsApp Support
+                <Button size="lg" className="bg-pink-400 hover:bg-pink-500">
+                  <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  <span className="text-sm sm:text-base">WhatsApp Support</span>
                 </Button>
                 <Button size="lg" variant="outline">
-                  <Phone className="h-5 w-5 mr-2" />
-                  Call Us
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  <span className="text-sm sm:text-base">Call Us</span>
                 </Button>
               </div>
             </div>
