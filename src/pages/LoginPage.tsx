@@ -76,9 +76,12 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    setStatus({ type: 'success', message: 'Login successful! Redirecting...' });
+    setStatus({ type: 'success', message: 'Log in successful! Redirecting…' });
     setIsSubmitting(false);
-    setTimeout(() => { window.location.href = '/account'; }, 400);
+    // Respect redirect query if present (e.g. /login?redirect=/account)
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get('redirect') || '/account';
+    setTimeout(() => { window.location.href = next; }, 300);
   };
 
   const handleForgotPassword = async () => {
@@ -118,7 +121,7 @@ export const LoginPage: React.FC = () => {
             {/* Login Form */}
             <Card>
               <CardHeader>
-                <h2 className="text-2xl font-bold text-center">Sign In</h2>
+                <h2 className="text-2xl font-bold text-center">Log In</h2>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -240,7 +243,7 @@ export const LoginPage: React.FC = () => {
                       href="/signup" 
                       className="text-pink-400 hover:text-pink-500 font-medium transition-colors"
                     >
-                      Sign up
+                      Create account
                     </a>
                   </p>
                 </div>

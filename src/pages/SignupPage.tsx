@@ -122,9 +122,10 @@ export const SignupPage: React.FC = () => {
         }, { onConflict: 'id' });
       }
 
-      setStatus({ type: 'success', message: 'Account created successfully! Redirecting...' });
+      setStatus({ type: 'success', message: 'Account created successfully! Please log in to continue…' });
       setIsSubmitting(false);
-      setTimeout(() => { window.location.href = '/account'; }, 600);
+      // Send new users to Log in, then back to account after auth
+      setTimeout(() => { window.location.href = '/login?redirect=/account'; }, 600);
     } catch (err: any) {
       setStatus({ type: 'error', message: err?.message || 'Something went wrong' });
       setIsSubmitting(false);
@@ -161,7 +162,7 @@ export const SignupPage: React.FC = () => {
             {/* Signup Form */}
             <Card>
               <CardHeader>
-                <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+                <h2 className="text-2xl font-bold text-center">Create Account</h2>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -401,7 +402,7 @@ export const SignupPage: React.FC = () => {
                       href="/login" 
                       className="text-pink-400 hover:text-pink-500 font-medium transition-colors"
                     >
-                      Log in
+                      Log In
                     </a>
                   </p>
                 </div>
