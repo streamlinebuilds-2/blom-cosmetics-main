@@ -11,6 +11,8 @@ interface StickyCartProps {
   isVisible: boolean;
 }
 
+const formatPrice = (price: number) => `R${price.toFixed(2)}`;
+
 export const StickyCart: React.FC<StickyCartProps> = ({
   productName,
   productImage,
