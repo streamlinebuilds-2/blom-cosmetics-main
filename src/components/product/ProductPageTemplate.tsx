@@ -248,72 +248,56 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               </div>
 
               {/* Product Buy Box */}
-              <div className="bg-white rounded-2xl p-6 shadow-lg">
+              <div>
                 <div className="mb-6">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
-                  <p className="text-base text-gray-600 mb-4 leading-relaxed">{product.shortDescription}</p>
+                  <h1 className="text-4xl font-bold text-gray-900 mb-3">{product.name}</h1>
+                  <p className="text-lg text-gray-600 mb-6 leading-relaxed">{product.shortDescription}</p>
                   
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="flex items-center gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`h-5 w-5 ${
                             i < Math.floor(product.rating || 4.8)
-                              ? 'fill-current'
+                              ? 'fill-current text-yellow-400'
                               : 'text-gray-300'
                           }`}
-                          style={{ color: i < Math.floor(product.rating || 4.8) ? '#F59E0B' : undefined }}
                         />
                       ))}
                     </div>
-                    <span className="text-base font-semibold text-gray-900">
-                      {(product.rating || 4.8).toFixed(1)} out of 5
-                    </span>
-                    <span className="text-gray-500 text-sm">({product.reviewCount || 124} reviews)</span>
+                    <span className="text-gray-600 text-sm">({product.reviewCount || 124} reviews)</span>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-center gap-4 mb-4">
-                    <span className="text-3xl font-bold text-pink-500">{product.price}</span>
+                  <div className="flex items-baseline gap-3 mb-2">
+                    <span className="text-4xl font-bold text-gray-900">{product.price}</span>
                     {product.compareAtPrice && (
                       <span className="text-xl text-gray-400 line-through">{product.compareAtPrice}</span>
-                    )}
-                    {product.compareAtPrice && (
-                      <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-semibold">
-                        {Math.round(((parseFloat(product.compareAtPrice.replace('R', '')) - parseFloat(product.price.replace('R', ''))) / parseFloat(product.compareAtPrice.replace('R', '')) * 100))}% OFF
-                      </span>
                     )}
                   </div>
 
                   {/* Stock Status */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <Check className="h-5 w-5 text-green-500" />
-                    <span className="text-green-600 font-semibold">{product.stock}</span>
-                  </div>
-
-                  {/* Product Benefits */}
-                  <div className="bg-gray-50 rounded-xl p-3 mb-4">
-                    <p className="text-gray-700 leading-relaxed text-sm">
-                      {product.overview || "High-quality, professional-grade product designed for optimal results."}
-                    </p>
+                  <div className="inline-flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-full mb-8">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="text-green-700 font-medium text-sm">{product.stock}</span>
                   </div>
                 </div>
 
                 {/* Variants */}
                 {product.variants.length > 1 && (
-                  <div className="mb-6">
-                    <h3 className="text-base font-semibold text-gray-900 mb-3">Scent:</h3>
-                    <div className="flex flex-wrap gap-2">
+                  <div className="mb-8">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Scent</h3>
+                    <div className="flex flex-wrap gap-3">
                       {product.variants.map((variant) => (
                         <button
                           key={variant}
                           onClick={() => setSelectedVariant(variant)}
-                          className={`px-4 py-2 border-2 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                          className={`px-6 py-3 rounded-full font-medium text-sm transition-all duration-200 ${
                             selectedVariant === variant
-                              ? 'border-pink-400 bg-pink-400 text-white shadow-lg'
-                              : 'border-gray-300 bg-white text-gray-700 hover:border-pink-300 hover:bg-pink-50'
+                              ? 'bg-pink-400 text-white border-2 border-pink-400 shadow-md'
+                              : 'bg-white text-gray-700 border-2 border-gray-300 hover:border-gray-400'
                           }`}
                         >
                           {variant}
@@ -324,88 +308,74 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 )}
 
                 {/* Quantity */}
-                <div className="mb-6">
-                  <h3 className="text-base font-semibold text-gray-900 mb-3">Quantity:</h3>
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center border-2 border-gray-200 rounded-xl bg-white">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="p-2 hover:bg-gray-50 transition-colors rounded-l-xl"
-                      >
-                        <Minus className="h-4 w-4 text-gray-600" />
-                      </button>
-                      <span className="px-4 py-2 font-bold text-base text-gray-900 min-w-[50px] text-center">{quantity}</span>
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="p-2 hover:bg-gray-50 transition-colors rounded-r-xl"
-                      >
-                        <Plus className="h-4 w-4 text-gray-600" />
-                      </button>
-                    </div>
-                    <div className="text-base font-semibold text-gray-900">
-                      Total: <span className="text-pink-500">R{(parseFloat(product.price.replace('R', '')) * quantity).toFixed(2)}</span>
-                    </div>
+                <div className="mb-8">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quantity</h3>
+                  <div className="flex items-center border-2 border-gray-200 rounded-full bg-white inline-flex">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="p-3 hover:bg-gray-50 transition-colors rounded-l-full"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="h-5 w-5 text-gray-600" />
+                    </button>
+                    <span className="px-8 py-3 font-bold text-lg text-gray-900 min-w-[60px] text-center select-none">{quantity}</span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="p-3 hover:bg-gray-50 transition-colors rounded-r-full"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="h-5 w-5 text-gray-600" />
+                    </button>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="space-y-3 mb-6">
+                <div className="space-y-4 mb-8">
                   <button
                     onClick={handleAddToCart}
-                    className="w-full btn btn-primary btn-lg flex items-center justify-center gap-3"
+                    className="w-full bg-pink-400 text-white rounded-full py-4 px-8 font-bold text-base uppercase tracking-wide hover:bg-pink-500 transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95"
                   >
-                    <ShoppingCart className="h-5 w-5" />
                     ADD TO CART
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full btn btn-pink btn-lg"
+                    className="w-full bg-white text-pink-400 border-2 border-pink-400 rounded-full py-4 px-8 font-bold text-base uppercase tracking-wide hover:bg-pink-50 transition-all duration-200 active:scale-95"
                   >
                     BUY NOW
                   </button>
-                  <div className="flex gap-2">
-                    <button 
+                  <div className="flex gap-3 pt-2">
+                    <button
                       onClick={() => setIsWishlisted(!isWishlisted)}
-                      className="flex-1 btn btn-outline flex items-center justify-center gap-2 text-sm"
+                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors"
                     >
-                      <Heart className={`h-4 w-4 ${isWishlisted ? 'fill-current text-pink-400' : ''}`} />
-                      {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
+                      <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : 'text-gray-600'}`} />
                     </button>
-                    <button className="flex-1 btn btn-outline flex items-center justify-center gap-2 text-sm">
-                      <Share2 className="h-4 w-4" />
-                      Share
+                    <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors">
+                      <Share2 className="h-5 w-5 text-gray-600" />
                     </button>
                   </div>
                 </div>
 
-                {/* Trust Row */}
-                <div className="grid grid-cols-3 gap-2 mb-6 text-center">
-                  <div className="flex flex-col items-center gap-1 p-3 bg-green-50 rounded-xl">
-                    <Truck className="h-5 w-5 text-green-500" />
-                    <span className="font-semibold text-green-700 text-xs">Free shipping over R1500</span>
+                {/* Trust Badges */}
+                <div className="space-y-3 py-6 border-t border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <Truck className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">Free shipping on orders over R1500</span>
                   </div>
-                  <div className="flex flex-col items-center gap-1 p-3 bg-blue-50 rounded-xl">
-                    <Shield className="h-5 w-5 text-blue-500" />
-                    <span className="font-semibold text-blue-700 text-xs">100% authentic</span>
+                  <div className="flex items-center gap-3">
+                    <Shield className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">100% Authentic products</span>
                   </div>
-                  <div className="flex flex-col items-center gap-1 p-3 bg-purple-50 rounded-xl">
-                    <RotateCcw className="h-5 w-5 text-purple-500" />
-                    <span className="font-semibold text-purple-700 text-xs">30-day returns</span>
+                  <div className="flex items-center gap-3">
+                    <RotateCcw className="h-5 w-5 text-gray-600 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">30-day hassle-free returns</span>
                   </div>
-                </div>
-
-                {/* Claims */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {product.details.claims.map((claim, index) => (
-                    <div key={index} className="flex items-center gap-1 px-3 py-1 bg-pink-50 border border-pink-200 rounded-full">
-                      {getClaimIcon(claim)}
-                      <span className="text-xs font-semibold text-pink-700">{claim}</span>
-                    </div>
-                  ))}
                 </div>
 
                 {/* Payment Methods */}
-                <PaymentMethods />
+                <div className="pt-6 border-t border-gray-200">
+                  <PaymentMethods />
+                </div>
               </div>
             </div>
           </Container>
@@ -636,42 +606,6 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           </Container>
         </section>
 
-        {/* Mobile Sticky Cart */}
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-40">
-          <div className="p-4">
-            <div className="flex items-center gap-4">
-              <img
-                src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=60&h=60&fit=crop'}
-                alt={product.name}
-                className="w-12 h-12 object-cover rounded"
-              />
-              <div className="flex-1">
-                <h4 className="font-medium text-sm">{product.name}</h4>
-                <p className="text-pink-400 font-bold">{product.price}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center border rounded">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-1"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="px-2 text-sm">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="p-1"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
-                <Button size="sm" onClick={handleAddToCart}>
-                  Add to Cart
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Reviews Section */}
         <ReviewSection
