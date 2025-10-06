@@ -66,12 +66,25 @@ export const AccountPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       if (!authState.user) return;
+      const user = authState.user;
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', authState.user.id)
+        .eq('id', user.id)
         .maybeSingle();
-      if (!error && data) setProfile(data as any);
+
+      if (data) {
+        setProfile(data as any);
+        return;
+      }
+
+      // If no row or RLS error, attempt to ensure a profile row exists, then set a minimal profile to unblock UI
+      try {
+        await supabase
+          .from('profiles')
+          .upsert({ id: user.id, email: user.email ?? null, name: user.user_metadata?.name ?? null, phone: user.user_metadata?.phone ?? null }, { onConflict: 'id' });
+      } catch {}
+      setProfile({ id: user.id, email: user.email ?? null, name: user.user_metadata?.name ?? null, phone: user.user_metadata?.phone ?? null });
     })();
   }, [authState.user]);
 

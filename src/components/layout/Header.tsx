@@ -212,7 +212,20 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
               <a
                 href="/account"
                 className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
-                onClick={(e) => handleNavClick(e, '/account')}
+                onClick={(e) => {
+                  e.preventDefault();
+                  // If no session cookie present, go straight to login to avoid blank state
+                  try {
+                    const hasAuth = document.cookie.includes('sb-');
+                    if (!hasAuth) {
+                      window.location.assign('/login?redirect=/account');
+                    } else {
+                      window.location.assign('/account');
+                    }
+                  } catch {
+                    window.location.assign('/account');
+                  }
+                }}
                 aria-label="Account"
               >
                 <User className="h-5 w-5" />
