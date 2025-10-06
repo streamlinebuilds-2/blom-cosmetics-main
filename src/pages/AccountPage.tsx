@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle, LogOut, AlertCircle } from 'lucide-react';
 import { authService, AuthState } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import { wishlistStore } from '../lib/wishlist';
 
 export const AccountPage: React.FC = () => {
@@ -20,6 +21,8 @@ export const AccountPage: React.FC = () => {
     }
   }, []);
   const [authState, setAuthState] = useState<AuthState>({ user: null, loading: true, error: null });
+  const [profile, setProfile] = useState<{ id: string; email: string | null; name: string | null; phone: string | null } | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
 
@@ -58,6 +61,30 @@ export const AccountPage: React.FC = () => {
 
     return unsubscribe;
   }, []);
+
+  // Load profile when user is present
+  useEffect(() => {
+    (async () => {
+      if (!authState.user) return;
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', authState.user.id)
+        .maybeSingle();
+      if (!error && data) setProfile(data as any);
+    })();
+  }, [authState.user]);
+
+  const saveProfile = async () => {
+    if (!profile) return;
+    setSavingProfile(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ name: profile.name, phone: profile.phone, email: profile.email })
+      .eq('id', profile.id);
+    setSavingProfile(false);
+    if (!error) alert('Profile updated');
+  };
 
   // Handle sign out
   const handleSignOut = async () => {
@@ -141,14 +168,14 @@ export const AccountPage: React.FC = () => {
 
   // User data from auth state
   const userData = {
-    name: authState.user?.user_metadata?.full_name || authState.user?.email?.split('@')[0] || 'User',
-    email: authState.user?.email || '',
-    phone: '+27 79 123 4567',
-    address: '123 Beauty Street, Cape Town, 8001',
+    name: profile?.name || authState.user?.user_metadata?.full_name || authState.user?.email?.split('@')[0] || 'User',
+    email: profile?.email || authState.user?.email || '',
+    phone: profile?.phone || '',
+    address: '—',
     memberSince: authService.formatMemberSince(authState.user?.created_at || ''),
-    totalOrders: 12,
-    totalSpent: 3450,
-    loyaltyPoints: 345
+    totalOrders: 0,
+    totalSpent: 0,
+    loyaltyPoints: 0
   };
 
   const recentOrders = [
@@ -313,7 +340,7 @@ export const AccountPage: React.FC = () => {
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <h2 className="text-2xl font-bold">Personal Information</h2>
-                        <Button variant="outline" size="sm">
+                        <Button variant="outline" size="sm" onClick={() => setActiveTab('profile')}>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Profile
                         </Button>
@@ -341,7 +368,7 @@ export const AccountPage: React.FC = () => {
                           <div className="flex items-center gap-3">
                             <Phone className="h-5 w-5 text-gray-400" />
                             <div>
-                              <div className="font-medium">{userData.phone}</div>
+                              <div className="font-medium">{userData.phone || '—'}</div>
                               <div className="text-sm text-gray-500">Phone Number</div>
                             </div>
                           </div>
@@ -507,6 +534,35 @@ export const AccountPage: React.FC = () => {
               {/* Settings Tab */}
               {activeTab === 'settings' && (
                 <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <h2 className="text-2xl font-bold">Edit Profile</h2>
+                    </CardHeader>
+                    <CardContent>
+                      {profile ? (
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                            <input className="input-field" value={profile.name ?? ''} onChange={e => setProfile(p => ({ ...p!, name: e.target.value }))} />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                            <input className="input-field" value={profile.phone ?? ''} onChange={e => setProfile(p => ({ ...p!, phone: e.target.value }))} />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input className="input-field" value={profile.email ?? ''} onChange={e => setProfile(p => ({ ...p!, email: e.target.value }))} />
+                          </div>
+                          <div className="flex items-end">
+                            <Button onClick={saveProfile} disabled={savingProfile}>{savingProfile ? 'Saving...' : 'Save Profile'}</Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-gray-500">Loading profile…</div>
+                      )}
+                    </CardContent>
+                  </Card>
+
                   <Card>
                     <CardHeader>
                       <h2 className="text-2xl font-bold">Account Settings</h2>
