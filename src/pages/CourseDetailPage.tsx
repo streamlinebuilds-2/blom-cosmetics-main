@@ -413,7 +413,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           
           <div className="relative h-full flex items-center justify-center">
             <div className="text-center text-white max-w-4xl mx-auto px-4">
-              <h1 className="text-4xl md:text-6xl font-bold mb-4 uppercase tracking-wider" style={{ textShadow: '0 4px 8px rgba(0,0,0,0.3)' }}>
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 uppercase tracking-wider text-white" style={{ textShadow: '0 6px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3)' }}>
                 {course.title}
               </h1>
               <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
@@ -451,23 +451,28 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         </section>
 
         {/* Meet Your Instructor */}
-        <section className="py-20 bg-white">
+        <section className="py-20" style={{ background: 'linear-gradient(135deg, #FFE8F0 0%, #FFF0F6 50%, #FFE8F0 100%)' }}>
           <Container>
-            <div className="max-w-4xl mx-auto">
-              <h2 className="heading-with-stripe">Meet Your Instructor</h2>
-              
-              <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <div className="flex flex-col md:flex-row gap-8 items-center">
+            <div className="max-w-5xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 uppercase tracking-wide text-gray-900">
+                MEET YOUR INSTRUCTOR
+              </h2>
+              <div className="w-20 h-1 bg-pink-400 mx-auto mb-12 rounded-full"></div>
+
+              <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl">
+                <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
                   <div className="w-48 h-48 flex-shrink-0">
-                    <img
-                      src={course.instructor.image}
-                      alt={course.instructor.name}
-                      className="w-full h-full object-cover rounded-xl shadow-lg"
-                    />
+                    <div className="w-full h-full rounded-full overflow-hidden border-4 border-pink-400 shadow-lg">
+                      <img
+                        src={course.instructor.image}
+                        alt={course.instructor.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{course.instructor.name}</h3>
-                    <p className="text-lg text-gray-600 leading-relaxed">
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-3xl font-bold text-gray-900 mb-4">{course.instructor.name}</h3>
+                    <p className="text-lg text-gray-700 leading-relaxed">
                       {course.instructor.bio}
                     </p>
                   </div>
@@ -478,16 +483,17 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
         </section>
 
         {/* About This Course */}
-        <section className="py-20 bg-white">
+        <section className="py-20" style={{ background: 'linear-gradient(135deg, #FFE8F0 0%, #FFF0F6 50%, #FFE8F0 100%)' }}>
           <Container>
-            <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-3xl md:text-4xl font-bold mb-12 uppercase tracking-wide text-gray-900">
-                About This Course
+            <div className="max-w-5xl mx-auto">
+              <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 uppercase tracking-wide text-gray-900">
+                ABOUT THIS COURSE
               </h2>
-              
-              <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
+              <div className="w-20 h-1 bg-pink-400 mx-auto mb-12 rounded-full"></div>
+
+              <div className="space-y-6 text-lg text-gray-700 leading-relaxed text-center md:text-left">
                 {course.about.map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
+                  <p key={index} className="max-w-4xl mx-auto">{paragraph}</p>
                 ))}
               </div>
             </div>
