@@ -534,8 +534,8 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                           ))}
                         </ul>
                         {item.note && (
-                          <div className="mt-4 p-4 bg-blue-100 rounded-lg">
-                            <p className="text-blue-800 text-sm font-medium">{item.note}</p>
+                          <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#CEE5FF' }}>
+                            <p className="text-sm font-medium" style={{ color: '#1a5a9a' }}>{item.note}</p>
                       </div>
                     )}
                       </div>
@@ -558,7 +558,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                   <div key={index} className={`bg-white border-2 ${pkg.popular ? 'border-pink-400' : 'border-gray-200'} rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full ${pkg.popular ? 'shadow-xl' : ''}`} style={pkg.popular ? { boxShadow: '0 8px 30px rgba(255,116,164,0.2)' } : {}}>
                     {pkg.popular && (
                       <div className="absolute -top-1 left-1/2 -translate-x-1/2">
-                        <div className="bg-blue-400 text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide">
+                        <div className="text-white px-6 py-2 rounded-b-2xl text-sm font-bold uppercase tracking-wide" style={{ backgroundColor: '#CEE5FF', color: '#1a1a1a' }}>
                           Most Popular
                         </div>
                       </div>
@@ -575,8 +575,8 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                     
                     <ul className="space-y-4 mb-8 flex-grow">
                       {pkg.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="flex items-center gap-3">
-                          <CheckCircle className="h-5 w-5 text-blue-400 flex-shrink-0" />
+                        <li key={featureIndex} className="flex items-center gap-3 transition-all duration-300 hover:bg-pink-50 hover:translate-x-2 rounded-lg py-2 px-3 -mx-3 cursor-pointer">
+                          <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#CEE5FF', stroke: '#4A9FFF' }} />
                           <span className="text-gray-700">{feature}</span>
                         </li>
                       ))}
@@ -604,7 +604,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
               
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Location */}
-                <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <MapPin className="h-8 w-8 text-pink-400" />
                   </div>
@@ -616,7 +616,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 </div>
 
                 {/* Payment Info */}
-                <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <CreditCard className="h-8 w-8 text-pink-400" />
                   </div>
@@ -628,7 +628,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 </div>
 
                 {/* Available Dates */}
-                <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Calendar className="h-8 w-8 text-pink-400" />
                   </div>
@@ -638,11 +638,26 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                       <button
                         key={index}
                         onClick={() => selectDate(date)}
-                        className={`block w-full px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-1 ${
-                          selectedDate === date
-                            ? 'bg-pink-400 text-white'
-                            : 'bg-blue-200 text-gray-900 hover:bg-pink-400 hover:text-white'
-                        }`}
+                        className={`block w-full px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-1`}
+                        style={selectedDate === date ? {
+                          backgroundColor: '#FF74A4',
+                          color: 'white'
+                        } : {
+                          backgroundColor: '#CEE5FF',
+                          color: '#1a1a1a'
+                        }}
+                        onMouseEnter={(e) => {
+                          if (selectedDate !== date) {
+                            e.currentTarget.style.backgroundColor = '#FF74A4';
+                            e.currentTarget.style.color = 'white';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (selectedDate !== date) {
+                            e.currentTarget.style.backgroundColor = '#CEE5FF';
+                            e.currentTarget.style.color = '#1a1a1a';
+                          }
+                        }}
                       >
                         {date}
                       </button>
@@ -651,7 +666,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 </div>
 
                 {/* Contact */}
-                <div className="bg-blue-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center">
+                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Phone className="h-8 w-8 text-pink-400" />
                   </div>
