@@ -680,9 +680,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         certifications: ['Professional Grade']
       }
     },
-    'acrylic-sculpture-brush': {
+    'crystal-kolinsky-sculpting-brush': {
       id: '15',
-      name: 'Acrylic Sculpture Brush',
+      name: 'Crystal Kolinsky Sculpting Brush',
       subtitle: 'Coming Soon',
       price: -1,
       comparePrice: null,
@@ -691,7 +691,49 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       inStock: false,
       stockCount: 50,
       description: 'Professional acrylic brush for sculpting and shaping.',
-      images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-white-2.webp'],
+      images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-colorful.webp'],
+      variants: [],
+      overview: [
+        'Professional quality bristles',
+        'Perfect for sculpting',
+        'Ergonomic handle',
+        'Easy to clean',
+        'Long-lasting'
+      ],
+      features: [
+        { title: 'Quality Bristles', description: 'Professional-grade bristles for smooth application' },
+        { title: 'Ergonomic', description: 'Comfortable grip for extended use' },
+        { title: 'Versatile', description: 'Perfect for all acrylic techniques' },
+        { title: 'Durable', description: 'Long-lasting construction' }
+      ],
+      howToUse: [
+        'Dip brush in monomer',
+        'Pick up acrylic powder',
+        'Apply to nail or form',
+        'Clean thoroughly after use'
+      ],
+      ingredients: 'Professional bristles, ergonomic handle',
+      specifications: {
+        size: 'Professional',
+        type: 'Acrylic Brush',
+        bristles: 'Synthetic',
+        handle: 'Ergonomic',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
+      }
+    },
+    'diamond-precision-nail-art-brush': {
+      id: '16',
+      name: 'Diamond Precision Nail Art Brush',
+      subtitle: 'Coming Soon',
+      price: -1,
+      comparePrice: null,
+      rating: 4.9,
+      reviewCount: 178,
+      inStock: false,
+      stockCount: 50,
+      description: 'Professional acrylic brush for sculpting and shaping.',
+      images: ['/acrylic-sculpture-brush-white-2.webp', '/acrylic-sculpture-brush-colorful-2.webp'],
       variants: [],
       overview: [
         'Professional quality bristles',
