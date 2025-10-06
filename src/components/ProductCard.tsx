@@ -196,40 +196,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   // Grid view layout
   return (
-    <article 
+    <article
       className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
       onClick={handleCardClick}
     >
-      {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-gray-50">
-        {/* Default white background image */}
-        <img
-          src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-          alt={name}
-          className="w-full h-full object-cover transition-all duration-300 ease-out group-hover:opacity-0 group-hover:scale-[1.02]"
-          loading="lazy"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-          }}
-        />
-        {/* Hover colorful image */}
-        {images[1] && (
-          <img
-            src={images[1]}
-            alt={name}
-            className="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-[1.02]"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-            }}
-          />
-        )}
-        
-        {/* Shimmer Effect */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="shimmer"></div>
+      {/* Image Container with 3D Flip Effect */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
+        <div className="product-card-flip-inner">
+          {/* Front Face - White Background Image */}
+          <div className="product-card-flip-front">
+            <img
+              src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+              alt={name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+              }}
+            />
+          </div>
+
+          {/* Back Face - Colorful Image */}
+          {images[1] && (
+            <div className="product-card-flip-back">
+              <img
+                src={images[1]}
+                alt={name}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Bestseller Badge */}
