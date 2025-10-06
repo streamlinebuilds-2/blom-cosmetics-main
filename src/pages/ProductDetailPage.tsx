@@ -1030,7 +1030,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {/* Variant Selection */}
                 {product.variants.length > 0 && (
                   <div className="mb-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Options</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                      {product.price === -1 ? 'Available Variants (Coming Soon)' : 'Options'}
+                    </h3>
                     <div className="flex flex-wrap gap-2">
                       {product.variants.map((variant) => (
                         <button
@@ -1040,12 +1042,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                             e.stopPropagation();
                             handleVariantSelect(variant.id);
                           }}
-                          disabled={!variant.inStock}
                           className={`px-4 py-2 rounded-full border transition-all ${
                             selectedVariant === variant.id
                               ? 'bg-pink-400 text-white border-pink-400'
                               : 'bg-white text-gray-600 border-gray-300 hover:border-gray-400'
-                          } ${!variant.inStock ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          }`}
                         >
                           <span className="text-sm font-medium">{variant.name}</span>
                         </button>
@@ -1059,7 +1060,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
                 {/* Stock Status */}
                 <div className="flex items-center gap-2 mb-6">
-                  {product.inStock ? (
+                  {product.price === -1 ? (
+                    <>
+                      <X className="h-5 w-5 text-blue-600" />
+                      <span className="text-blue-600 font-medium">Coming Soon - Browse variants and details</span>
+                    </>
+                  ) : product.inStock ? (
                     <>
                       <CheckCircle className="h-5 w-5 text-green-600" />
                       <span className="text-green-600 font-medium">In Stock ({product.stockCount} available)</span>
