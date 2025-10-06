@@ -41,21 +41,22 @@ export const WishlistButton: React.FC = () => {
     <a
       href="/wishlist"
       onClick={handleClick}
-      className="relative p-2 text-gray-700 hover:text-pink-500 transition-colors group"
+      className="relative p-2.5 text-gray-700 hover:text-pink-400 transition-all duration-200 group"
       aria-label={`Wishlist (${itemCount} items)`}
     >
-      <Heart 
-        className={`h-5 w-5 transition-all duration-200 ${
-          itemCount > 0 
-            ? 'fill-current text-pink-400 group-hover:text-pink-500' 
-            : 'group-hover:text-pink-500'
-        } ${isAnimating ? 'scale-125' : ''}`} 
+      <Heart
+        className={`h-6 w-6 transition-all duration-200 ${
+          itemCount > 0
+            ? 'fill-current text-pink-400 group-hover:text-pink-500'
+            : 'group-hover:text-pink-400'
+        } ${isAnimating ? 'scale-110' : ''}`}
+        strokeWidth={2}
       />
-      
+
       {itemCount > 0 && (
-        <span 
-          className={`absolute -top-1 -right-1 bg-pink-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transition-all duration-200 ${
-            isAnimating ? 'scale-125' : ''
+        <span
+          className={`absolute -top-0.5 -right-0.5 bg-pink-400 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transition-all duration-200 ${
+            isAnimating ? 'scale-110' : ''
           }`}
         >
           {itemCount > 99 ? '99+' : itemCount}

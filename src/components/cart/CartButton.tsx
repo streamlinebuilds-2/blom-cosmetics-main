@@ -33,26 +33,26 @@ export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' 
   }, [itemCount]);
 
   return (
-    <button 
+    <button
       onClick={(e) => {
         if (onClick) return onClick();
         // Fallback: open the global cart drawer if present
         const trigger = document.getElementById('cart-drawer-trigger');
         if (trigger) (trigger as HTMLDivElement).click();
       }}
-      className={`p-2 text-gray-700 hover:text-gray-900 transition-colors duration-200 relative ${className}`}
+      className={`p-2.5 text-gray-700 hover:text-pink-400 transition-all duration-200 relative ${className}`}
     >
-      <ShoppingCart 
-        className={`h-5 w-5 transition-all duration-200 ${
-          isAnimating ? 'scale-125' : ''
-        }`} 
+      <ShoppingCart
+        className={`h-6 w-6 transition-all duration-200 ${
+          isAnimating ? 'scale-110' : ''
+        }`}
+        strokeWidth={2}
       />
       {itemCount > 0 && (
-        <span 
-          className={`absolute -top-1 -right-1 text-gray-800 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold transition-all duration-200 ${
-            isAnimating ? 'scale-125' : ''
-          }`} 
-          style={{ backgroundColor: '#CEE5FF' }}
+        <span
+          className={`absolute -top-0.5 -right-0.5 bg-pink-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold transition-all duration-200 ${
+            isAnimating ? 'scale-110' : ''
+          }`}
         >
           {itemCount > 99 ? '99+' : itemCount}
         </span>

@@ -216,13 +216,13 @@ html, body {
 
 .footer-socials {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 20px;
 }
 
 .social-link {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 9999px;
   background: #FF74A4;
   color: #ffffff;
@@ -230,18 +230,19 @@ html, body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  border: 2px solid transparent;
-  transition: background .25s ease, color .25s ease, border-color .25s ease, transform .2s ease, box-shadow .2s ease;
+  border: none;
+  transition: all .25s ease;
+  box-shadow: 0 4px 12px rgba(255, 116, 164, 0.3);
 }
 
-.social-link .icon { stroke-width: 2.2; }
+.social-link svg {
+  stroke-width: 2;
+}
 
 .social-link:hover {
-  background: transparent;
-  color: #111827;
-  border-color: #111827;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(17,24,39,.10);
+  background: #FF5A8E;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(255, 116, 164, 0.4);
 }
 
 .newsletter {
