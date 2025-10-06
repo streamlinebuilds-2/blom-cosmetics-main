@@ -4,14 +4,16 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-// import { authService } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, UserPlus } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     passwordConfirm: '',
+    phone: '',
     agreeToTerms: false
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -95,13 +97,38 @@ export const SignupPage: React.FC = () => {
 
     setIsSubmitting(true);
     setStatus({ type: null, message: '' });
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: { name: formData.name, phone: formData.phone }
+        }
+      });
 
-    // Simulate account creation while testing (no backend)
-    setTimeout(() => {
+      if (error) {
+        setStatus({ type: 'error', message: error.message });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const user = data.user;
+      if (user) {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          email: user.email,
+          name: formData.name,
+          phone: formData.phone
+        }, { onConflict: 'id' });
+      }
+
       setStatus({ type: 'success', message: 'Account created successfully! Redirecting...' });
       setIsSubmitting(false);
       setTimeout(() => { window.location.href = '/account'; }, 600);
-    }, 400);
+    } catch (err: any) {
+      setStatus({ type: 'error', message: err?.message || 'Something went wrong' });
+      setIsSubmitting(false);
+    }
   };
 
   const getPasswordStrength = (password: string): { strength: number; label: string; color: string } => {
@@ -138,6 +165,23 @@ export const SignupPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Name Field */}
+                  <div>
+                    <label htmlFor="signupName" className="block text-sm font-medium text-gray-700 mb-2">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      id="signupName"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="input-field"
+                      placeholder="e.g. Sarah Mitchell"
+                      autoComplete="name"
+                    />
+                  </div>
                   {/* Email Field */}
                   <div>
                     <label htmlFor="signupEmail" className="block text-sm font-medium text-gray-700 mb-2">
@@ -253,6 +297,23 @@ export const SignupPage: React.FC = () => {
                         )}
                       </div>
                     )}
+                  </div>
+
+                  {/* Phone Field */}
+                  <div>
+                    <label htmlFor="signupPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      id="signupPhone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="input-field"
+                      placeholder="e.g. 082 123 4567"
+                      autoComplete="tel"
+                    />
                   </div>
 
                   {/* Terms Agreement */}

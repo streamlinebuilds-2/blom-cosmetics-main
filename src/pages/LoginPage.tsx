@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-// import { authService } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
@@ -65,13 +65,20 @@ export const LoginPage: React.FC = () => {
 
     setIsSubmitting(true);
     setStatus({ type: null, message: '' });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: formData.email,
+      password: formData.password
+    });
 
-    // Simulate successful login without backend while testing
-    setTimeout(() => {
-      setStatus({ type: 'success', message: 'Login successful! Redirecting...' });
+    if (error) {
+      setStatus({ type: 'error', message: error.message });
       setIsSubmitting(false);
-      setTimeout(() => { window.location.href = '/account'; }, 600);
-    }, 400);
+      return;
+    }
+
+    setStatus({ type: 'success', message: 'Login successful! Redirecting...' });
+    setIsSubmitting(false);
+    setTimeout(() => { window.location.href = '/account'; }, 400);
   };
 
   const handleForgotPassword = async () => {
@@ -83,24 +90,13 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    try {
-      const result = await authService.resetPassword(formData.email);
-      if (result.success) {
-        setStatus({ 
-          type: 'success', 
-          message: 'Password reset email sent! Check your inbox.' 
-        });
-      } else {
-        setStatus({ 
-          type: 'error', 
-          message: result.error || 'Failed to send reset email.' 
-        });
-      }
-    } catch (error) {
-      setStatus({ 
-        type: 'error', 
-        message: 'An error occurred. Please try again.' 
-      });
+    const { error } = await supabase.auth.resetPasswordForEmail(formData.email, {
+      redirectTo: `${window.location.origin}/account/reset-password`
+    });
+    if (error) {
+      setStatus({ type: 'error', message: error.message });
+    } else {
+      setStatus({ type: 'success', message: 'Password reset email sent! Check your inbox.' });
     }
   };
 
