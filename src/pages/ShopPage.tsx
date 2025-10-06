@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/Button';
-import { Search, Filter, Grid3X3, Grid2X2, List, X, ChevronDown } from 'lucide-react';
+import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, X, ChevronDown } from 'lucide-react';
 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
