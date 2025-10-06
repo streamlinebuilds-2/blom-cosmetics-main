@@ -265,23 +265,23 @@ export const ShopPage: React.FC = () => {
     //   inStock: false,
     //   variants: []
     // },
-    {
-      id: '13',
-      name: 'Glitter Acrylics',
-      slug: 'glitter-acrylics',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'Sparkle acrylics for encapsulated effects.',
-      shortDescription: 'Sparkle acrylics for encapsulated effects.',
-      description: 'Sparkle acrylic powders for creating encapsulated glitter effects.',
-      images: ['/glitter-acrylics-white.webp', '/glitter-acrylics-colorful.webp'],
-      category: 'acrylic-system',
-      rating: 4.6,
-      reviews: 45,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: []
-    },
+    // {
+    //   id: '13',
+    //   name: 'Glitter Acrylics',
+    //   slug: 'glitter-acrylics',
+    //   price: -1,
+    //   compareAtPrice: undefined,
+    //   short_description: 'Sparkle acrylics for encapsulated effects.',
+    //   shortDescription: 'Sparkle acrylics for encapsulated effects.',
+    //   description: 'Sparkle acrylic powders for creating encapsulated glitter effects.',
+    //   images: ['/glitter-acrylics-white.webp', '/glitter-acrylics-colorful.webp'],
+    //   category: 'acrylic-system',
+    //   rating: 4.6,
+    //   reviews: 45,
+    //   badges: ['Coming Soon'],
+    //   inStock: false,
+    //   variants: []
+    // },
     {
       id: '14',
       name: 'Nail Liquid (Monomer)',
@@ -424,9 +424,9 @@ export const ShopPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #FFE4F1 0%, #E0F2FE 100%)' }}>
       <Header showMobileMenu={true} />
-      
+
       <main className="section-padding">
         <Container>
           {/* Page Header */}
@@ -622,7 +622,7 @@ export const ShopPage: React.FC = () => {
           </div>
 
           {/* Products Grid */}
-          <section className="section-padding" style={{ background: 'linear-gradient(135deg, #FFE4F1 0%, #E0F2FE 100%)' }}>
+          <section className="section-padding">
             <div className={`grid ${getGridClasses()} gap-6`}>
               {sortedProducts.map((product) => (
                 <ProductCard
