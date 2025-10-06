@@ -59,9 +59,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       stock: 'In Stock',
       images: [
         '/cuticle-oil-white.webp',
-        '/cuticle-oil-colorful.webp',
-        '/cuticle-oil-cotton-candy.webp',
-        '/cuticle-oil-vanilla.webp'
+        '/cuticle-oil-colorful.webp'
       ],
       features: [
         'Enriched with Vitamin E for nail health',
@@ -94,7 +92,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         shelfLife: '24 months',
         claims: ['Vegan', 'Cruelty-Free', 'HEMA-Free']
       },
-      variants: ['Cotton Candy', 'Vanilla', 'Tiny Touch', 'Dragon Fruit Lotus', 'Watermelon'],
+      variants: [
+        { name: 'Cotton Candy', image: '/cuticle-oil-cotton-candy.webp' },
+        { name: 'Vanilla', image: '/cuticle-oil-vanilla.webp' },
+        { name: 'Tiny Touch', image: '/cuticle-oil-tiny-touch.webp' },
+        { name: 'Dragon Fruit Lotus', image: '/cuticle-oil-dragon-fruit-lotus.webp' },
+        { name: 'Watermelon', image: '/cuticle-oil-watermelon.webp' }
+      ],
       rating: 4.9,
       reviewCount: 156,
       reviews: [
@@ -352,7 +356,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         shelfLife: 'Indefinite with proper care',
         claims: ['Professional Grade', 'Washable', 'Durable']
       },
-      variants: ['Single File', '5-Pack Bundle'],
+      variants: [
+        { name: 'Single File', image: '/nail-file-colorful.webp' },
+        { name: '5-Pack Bundle', image: '/nail-file-white.webp' }
+      ],
       rating: 4.5,
       reviewCount: 67,
       reviews: []
@@ -500,12 +507,75 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         claims: ['Professional Grade', '13 Colors', 'Self-Leveling']
       },
       variants: [
-        'Baby Blue', 'Lilac Mist', 'Blush Pink', 'Ballet Pink', 'Fuchsia Pink',
-        'Cloud Grey', 'Mint Mist', 'Rose Pink', 'Fresh Mint', 'Soft Nude',
-        'Petal Pink', 'Sky Blue', 'Lemon Glow'
+        { name: 'Baby Blue', image: '/acrylic-powder-baby-blue.webp' },
+        { name: 'Lilac Mist', image: '/core-acrylics-colorful.webp' },
+        { name: 'Blush Pink', image: '/core-acrylics-colorful.webp' },
+        { name: 'Ballet Pink', image: '/core-acrylics-colorful.webp' },
+        { name: 'Fuchsia Pink', image: '/core-acrylics-colorful.webp' },
+        { name: 'Cloud Grey', image: '/core-acrylics-colorful.webp' },
+        { name: 'Mint Mist', image: '/core-acrylics-colorful.webp' },
+        { name: 'Rose Pink', image: '/core-acrylics-colorful.webp' },
+        { name: 'Fresh Mint', image: '/core-acrylics-colorful.webp' },
+        { name: 'Soft Nude', image: '/core-acrylics-colorful.webp' },
+        { name: 'Petal Pink', image: '/core-acrylics-colorful.webp' },
+        { name: 'Sky Blue', image: '/core-acrylics-colorful.webp' },
+        { name: 'Lemon Glow', image: '/core-acrylics-colorful.webp' }
       ],
       rating: 4.9,
       reviewCount: 156,
+      reviews: []
+    },
+    'nail-liquid-monomer': {
+      id: '10',
+      name: 'Nail Liquid (Monomer)',
+      slug: 'nail-liquid-monomer',
+      category: 'Acrylic System',
+      shortDescription: 'Professional monomer for acrylic applications.',
+      overview: 'Premium quality monomer formulated for optimal acrylic application. Low odor formula with superior clarity and strength. Essential for creating durable, beautiful acrylic enhancements.',
+      price: 350,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/nail-liquid-monomer-white.webp',
+        '/nail-liquid-monomer-colorful.webp'
+      ],
+      features: [
+        'Low odor formula',
+        'Superior clarity and strength',
+        'Professional grade quality',
+        'Optimal working time',
+        'Creates durable enhancements'
+      ],
+      howToUse: [
+        'Pour into dappen dish',
+        'Dip acrylic brush into liquid',
+        'Pick up acrylic powder to form bead',
+        'Apply to nail and sculpt',
+        'Allow to air dry completely'
+      ],
+      ingredients: {
+        inci: [
+          'Ethyl Methacrylate',
+          'Polymethyl Methacrylate',
+          'Catalyst'
+        ],
+        key: [
+          'Ethyl Methacrylate – creates strong bond',
+          'Low odor formula – comfortable application',
+          'Professional grade – salon quality results'
+        ]
+      },
+      details: {
+        size: '250ml / 500ml',
+        shelfLife: '24 months',
+        claims: ['Professional Grade', 'Low Odor', 'High Quality']
+      },
+      variants: [
+        { name: '250ml', image: '/nail-liquid-monomer-colorful.webp', price: 350 },
+        { name: '500ml', image: '/nail-liquid-monomer-white.webp', price: 550 }
+      ],
+      rating: 4.8,
+      reviewCount: 94,
       reviews: []
     }
   };
@@ -513,11 +583,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   useEffect(() => {
     // Find product by slug
     const foundProduct = productDatabase[productSlug as keyof typeof productDatabase];
-    
+
     if (foundProduct) {
       setProduct(foundProduct);
-      setSelectedVariant(foundProduct.variants[0] || '');
-      
+      const firstVariant = foundProduct.variants[0];
+      setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
+
       // Set page title and meta description
       document.title = `${foundProduct.name} - BLOM Cosmetics`;
       const metaDescription = document.querySelector('meta[name="description"]');
@@ -525,7 +596,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         metaDescription.setAttribute('content', foundProduct.shortDescription);
       }
     }
-    
+
     setLoading(false);
   }, [productSlug]);
 
@@ -542,14 +613,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   const handleAddToCart = () => {
     if (!product) return;
-    
+
+    const currentVariant = product.variants.find((v: any) =>
+      typeof v === 'object' ? v.name === selectedVariant : v === selectedVariant
+    );
+    const variantPrice = typeof currentVariant === 'object' && currentVariant?.price ? currentVariant.price : product.price;
+    const variantImage = typeof currentVariant === 'object' && currentVariant?.image ? currentVariant.image : product.images[selectedImage];
+
     cartStore.addItem({
       id: `item_${Date.now()}`,
       productId: product.slug,
       variantId: selectedVariant,
       name: product.name,
-      price: product.price,
-      image: product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      price: variantPrice,
+      image: variantImage || product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
       variant: selectedVariant ? { title: selectedVariant } : undefined
     }, quantity);
 
@@ -774,7 +851,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
                   {/* Price */}
                   <div className="flex items-baseline gap-4 mb-3">
-                    <span className="text-4xl font-bold text-gray-900">{formatPrice(product.price)}</span>
+                    <span className="text-4xl font-bold text-gray-900">
+                      {(() => {
+                        const currentVariant = product.variants.find((v: any) =>
+                          (typeof v === 'object' && v.name === selectedVariant)
+                        );
+                        const displayPrice = currentVariant?.price || product.price;
+                        return formatPrice(displayPrice);
+                      })()}
+                    </span>
                     {product.compareAtPrice && (
                       <span className="text-xl text-gray-400 line-through">{formatPrice(product.compareAtPrice)}</span>
                     )}
@@ -791,22 +876,40 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {product.variants.length > 0 && (
                   <div className="mb-8">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      {product.slug === 'cuticle-oil' ? 'Scent' : 'Options'}
+                      {product.slug === 'cuticle-oil' ? 'Scent' : product.slug === 'nail-liquid-monomer' ? 'Size' : 'Options'}
                     </h3>
                     <div className="flex flex-wrap gap-3">
-                      {product.variants.map((variant: string) => (
-                        <button
-                          key={variant}
-                          onClick={() => setSelectedVariant(variant)}
-                          className={`px-6 py-3 rounded-full font-medium text-sm transition-all duration-200 border-2 ${
-                            selectedVariant === variant
-                              ? 'bg-pink-400 text-white border-pink-400 shadow-md'
-                              : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400 hover:text-pink-400'
-                          }`}
-                        >
-                          {variant}
-                        </button>
-                      ))}
+                      {product.variants.map((variant: any) => {
+                        const variantName = typeof variant === 'string' ? variant : variant.name;
+                        const variantImage = typeof variant === 'object' && variant.image ? variant.image : null;
+                        const variantPrice = typeof variant === 'object' && variant.price ? variant.price : null;
+
+                        return (
+                          <button
+                            key={variantName}
+                            onClick={() => {
+                              setSelectedVariant(variantName);
+                              if (variantImage) {
+                                const imageIndex = product.images.indexOf(variantImage);
+                                if (imageIndex !== -1) {
+                                  setSelectedImage(imageIndex);
+                                } else {
+                                  product.images.push(variantImage);
+                                  setSelectedImage(product.images.length - 1);
+                                }
+                              }
+                            }}
+                            className={`px-6 py-3 rounded-full font-medium text-sm transition-all duration-200 border-2 ${
+                              selectedVariant === variantName
+                                ? 'bg-pink-400 text-white border-pink-400 shadow-md'
+                                : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400 hover:text-pink-400'
+                            }`}
+                          >
+                            {variantName}
+                            {variantPrice && <span className="ml-2 text-xs">({formatPrice(variantPrice)})</span>}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
