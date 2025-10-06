@@ -84,33 +84,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         { title: 'Fast Absorbing', description: 'Non-greasy formula absorbs quickly' }
       ],
       howToUse: [
-        'Clean hands and nails thoroughly',
-        'Apply 1-2 drops to each cuticle area',
-        'Massage gently in circular motions',
-        'Use twice daily for best results'
+        'Apply a small amount to each cuticle',
+        'Massage gently into cuticle and nail',
+        'Use daily for best results',
+        'Can be used on hands and feet'
       ],
-      ingredients: [
-        'Vitamin E (Tocopherol)',
-        'Soybean Oil (Glycine Soja)',
-        'Jojoba Oil (Simmondsia Chinensis)',
-        'Sweet Almond Oil',
-        'Natural Fragrance'
-      ],
+      ingredients: 'Vitamin E, Jojoba Oil, Soybean Oil, Sweet Almond Oil, Fragrance',
       specifications: {
-        size: '30ml',
-        shelfLife: '24 months',
-        origin: 'Handmade in South Africa',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '30ml',
+        type: 'Cuticle Treatment',
+        finish: 'Non-greasy',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['Cruelty-Free', 'Handmade']
       }
     },
     'vitamin-primer': {
       id: '2',
       name: 'Vitamin Primer',
-      subtitle: 'Acid-free primer for adhesion, vitamin-enriched',
-      price: 210,
+      subtitle: 'Acid-free primer with vitamins',
+      price: 180,
       comparePrice: null,
       rating: 4.8,
-      reviewCount: 124,
+      reviewCount: 132,
       inStock: true,
       stockCount: 30,
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
@@ -126,36 +122,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
         { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
-        { title: 'Strong Bond', description: 'Creates long-lasting adhesion for gels and acrylics' },
-        { title: 'Professional Grade', description: 'High-quality formula trusted by professionals' }
+        { title: 'Long-Lasting', description: 'Creates a durable bond for extended wear' },
+        { title: 'Professional Grade', description: 'Salon-quality results at home' }
       ],
       howToUse: [
-        'Apply to clean, dry nails',
-        'Allow to dry completely',
-        'Apply gel or acrylic immediately',
-        'Do not touch the nail surface after application'
+        'Apply a thin layer to prepared nails',
+        'Allow to air dry completely',
+        'Proceed with your nail enhancement',
+        'Do not cure in lamp'
       ],
-      ingredients: [
-        'Vitamin Complex',
-        'Adhesion Promoters',
-        'Solvents',
-        'Preservatives'
-      ],
+      ingredients: 'Proprietary vitamin-enriched formula',
       specifications: {
-        size: '15ml',
-        shelfLife: '18 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Nail Primer',
+        finish: 'Matte',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade', 'Acid-Free']
       }
     },
     'prep-solution': {
       id: '3',
-      name: 'Prep Solution (Nail Dehydrator)',
-      subtitle: 'Removes oils & moisture for better adhesion',
-      price: 200,
+      name: 'Prep Solution',
+      subtitle: 'Dehydrates and preps the nail plate',
+      price: 150,
       comparePrice: null,
       rating: 4.7,
-      reviewCount: 89,
+      reviewCount: 98,
       inStock: true,
       stockCount: 20,
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
@@ -171,35 +164,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
         { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
-        { title: 'Quick Drying', description: 'Fast-drying formula saves time' },
-        { title: 'Prevents Lifting', description: 'Reduces risk of enhancement lifting' }
+        { title: 'Quick Drying', description: 'Fast-acting formula saves time' },
+        { title: 'Professional Results', description: 'Ensures long-lasting nail enhancements' }
       ],
       howToUse: [
-        'Apply to clean nails',
-        'Allow to air dry',
-        'Do not rinse',
-        'Apply primer immediately after'
+        'Apply to clean, dry nails',
+        'Allow to air dry completely',
+        'Proceed with primer and enhancement',
+        'Use before each application'
       ],
-      ingredients: [
-        'Isopropyl Alcohol',
-        'Dehydrating Agents',
-        'Preservatives'
-      ],
+      ingredients: 'Isopropyl Alcohol, Proprietary blend',
       specifications: {
-        size: '120ml',
-        shelfLife: '24 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Nail Prep',
+        finish: 'Clear',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
     'top-coat': {
       id: '4',
       name: 'Top Coat',
-      subtitle: 'Mirror shine, chip-resistant, professional finish',
-      price: 190,
+      subtitle: 'High-gloss, chip-resistant finish',
+      price: 160,
       comparePrice: null,
       rating: 4.9,
-      reviewCount: 201,
+      reviewCount: 145,
       inStock: true,
       stockCount: 35,
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
@@ -215,36 +206,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'High-Gloss Finish', description: 'Mirror-like shine that lasts' },
         { title: 'Chip Resistant', description: 'Strong protection against chipping' },
-        { title: 'UV Protection', description: 'Protects against UV damage' },
-        { title: 'Easy Application', description: 'Smooth, even application' }
+        { title: 'UV Protection', description: 'Prevents yellowing and fading' },
+        { title: 'Quick Dry', description: 'Fast-drying formula for convenience' }
       ],
       howToUse: [
-        'Apply over cured gel or acrylic',
-        'Cure under UV/LED lamp',
-        'Wipe off inhibition layer',
-        'Enjoy glossy finish'
+        'Apply thin layer over cured color',
+        'Cure in LED lamp for 60 seconds',
+        'Wipe with alcohol if needed',
+        'Apply cuticle oil to finish'
       ],
-      ingredients: [
-        'Acrylic Resins',
-        'UV Photoinitiators',
-        'Gloss Enhancers',
-        'Preservatives'
-      ],
+      ingredients: 'UV-resistant polymer blend',
       specifications: {
-        size: '15ml',
-        shelfLife: '18 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Top Coat',
+        finish: 'High-Gloss',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['UV Protection', 'Professional Grade']
       }
     },
     'fairy-dust-top-coat': {
       id: '5',
       name: 'Fairy Dust Top Coat',
-      subtitle: 'Subtle glitter-infused top coat with smooth shine',
-      price: 195,
+      subtitle: 'Sparkling glitter finish',
+      price: 170,
       comparePrice: null,
-      rating: 4.6,
-      reviewCount: 73,
+      rating: 4.8,
+      reviewCount: 89,
       inStock: true,
       stockCount: 15,
       description: 'Adds a sparkling finish to any gel or acrylic set.',
@@ -260,36 +248,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Fine Glitter', description: 'Beautiful sparkle without roughness' },
         { title: 'Smooth Finish', description: 'Glossy surface with embedded glitter' },
-        { title: 'Versatile', description: 'Works with any nail enhancement' },
-        { title: 'Long-Lasting', description: 'Sparkle that lasts' }
+        { title: 'Versatile', description: 'Use over any color or clear' },
+        { title: 'Long-Lasting', description: 'Sparkle stays brilliant' }
       ],
       howToUse: [
-        'Apply over cured gel or acrylic',
-        'Cure under UV/LED lamp',
-        'Wipe off inhibition layer',
-        'Enjoy sparkling finish'
+        'Apply over cured color coat',
+        'Use thin to thick layers as desired',
+        'Cure in LED lamp for 60 seconds',
+        'Seal with clear top coat if desired'
       ],
-      ingredients: [
-        'Acrylic Resins',
-        'Fine Glitter',
-        'UV Photoinitiators',
-        'Gloss Enhancers'
-      ],
+      ingredients: 'UV polymer, fine glitter particles',
       specifications: {
-        size: '15ml',
-        shelfLife: '18 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Glitter Top Coat',
+        finish: 'Sparkle',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
     'nail-file': {
       id: '6',
       name: 'Nail File (80/80 Grit)',
-      subtitle: 'Durable pro file with floral design',
+      subtitle: 'Professional nail file',
       price: 35,
       comparePrice: null,
-      rating: 4.5,
-      reviewCount: 67,
+      rating: 4.7,
+      reviewCount: 201,
       inStock: true,
       stockCount: 50,
       description: 'Professional nail file with 80/80 grit for shaping and finishing.',
@@ -306,36 +291,35 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         'Long-lasting quality'
       ],
       features: [
-        { title: 'Professional Grit', description: '80/80 grit for perfect shaping' },
+        { title: '80/80 Grit', description: 'Perfect grit for acrylic shaping' },
         { title: 'Durable', description: 'Long-lasting construction' },
-        { title: 'Floral Design', description: 'Beautiful aesthetic design' },
-        { title: 'Bundle Option', description: '5-pack bundle available' }
+        { title: 'Professional Quality', description: 'Salon-grade performance' },
+        { title: 'Ergonomic', description: 'Comfortable to hold and use' }
       ],
       howToUse: [
-        'Use for shaping nails',
-        'File in one direction',
-        'Clean after use',
-        'Store in dry place'
+        'File in one direction for best results',
+        'Use for shaping and refining',
+        'Clean after each use',
+        'Replace when worn'
       ],
-      ingredients: [
-        'High-grade emery',
-        'Durable backing'
-      ],
+      ingredients: 'Abrasive paper, wooden core',
       specifications: {
-        size: 'Single or 5-pack',
-        shelfLife: 'N/A',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        grit: '80/80',
+        type: 'Nail File',
+        length: 'Standard',
+        material: 'Paper/Wood',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
     'nail-forms': {
       id: '7',
       name: 'Nail Forms',
-      subtitle: 'Holographic guide, strong adhesive, 300 forms per roll',
-      price: 290,
+      subtitle: 'Professional nail forms with holographic guide',
+      price: 220,
       comparePrice: null,
-      rating: 4.5,
-      reviewCount: 67,
+      rating: 4.9,
+      reviewCount: 178,
       inStock: true,
       stockCount: 50,
       description: 'Professional nail forms for creating perfect extensions and overlays.',
@@ -351,35 +335,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Holographic Guide', description: 'Clear visual guide for perfect placement' },
         { title: 'Strong Adhesive', description: 'Secure hold during application' },
-        { title: '300 Forms', description: 'Value pack with 300 forms' },
-        { title: 'Professional Quality', description: 'Durable material for professional use' }
+        { title: 'Durable Paper', description: 'High-quality construction' },
+        { title: 'Easy Removal', description: 'Tears away cleanly' }
       ],
       howToUse: [
-        'Select appropriate size',
-        'Apply to natural nail',
-        'Sculpt with acrylic or gel',
-        'Remove after curing',
-        'Clean and reuse'
+        'Fit form to natural nail',
+        'Ensure snug fit at apex',
+        'Apply product over form',
+        'Remove when cured'
       ],
-      ingredients: [
-        'Medical-grade adhesive',
-        'Flexible plastic'
-      ],
+      ingredients: 'Paper, adhesive backing',
       specifications: {
-        size: '300 forms per roll',
-        shelfLife: 'N/A',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        quantity: '300 forms',
+        type: 'Nail Forms',
+        material: 'Paper',
+        adhesive: 'Strong hold',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
     'acetone-remover': {
       id: '8',
       name: 'Acetone (Remover)',
-      subtitle: 'Professional-grade, fast acting nail remover',
-      price: 60,
+      subtitle: 'Professional-grade acetone for removal',
+      price: 120,
       comparePrice: null,
-      rating: 4.8,
-      reviewCount: 112,
+      rating: 4.6,
+      reviewCount: 87,
       inStock: true,
       stockCount: 25,
       description: 'Professional-grade acetone for fast and effective nail polish removal.',
@@ -395,36 +377,33 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Professional Grade', description: 'High-quality formula for professionals' },
         { title: 'Fast Acting', description: 'Quick and effective removal' },
-        { title: '1L Size', description: 'Large size for professional use' },
-        { title: 'Effective', description: 'Removes all types of nail polish' }
+        { title: 'Large Size', description: '1L bottle for extended use' },
+        { title: 'Versatile', description: 'Works on all nail products' }
       ],
       howToUse: [
-        'Apply to cotton pad',
-        'Press on nail for 30 seconds',
-        'Wipe away polish',
-        'Repeat if necessary',
+        'Soak cotton pad with acetone',
+        'Place on nail for 10-15 minutes',
+        'Gently remove product',
         'Moisturize after use'
       ],
-      ingredients: [
-        'Acetone',
-        'Moisturizing agents',
-        'Preservatives'
-      ],
+      ingredients: '100% Pure Acetone',
       specifications: {
-        size: '1L',
-        shelfLife: '24 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '1L',
+        type: 'Nail Remover',
+        concentration: '100% Acetone',
+        application: 'Soak-off',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
     'core-acrylics': {
       id: '9',
       name: 'Core Acrylics (56 g)',
-      subtitle: 'Strength powders in clear, white & natural tones',
+      subtitle: 'Professional strength acrylic powders',
       price: 280,
       comparePrice: null,
       rating: 4.9,
-      reviewCount: 156,
+      reviewCount: 167,
       inStock: true,
       stockCount: 20,
       description: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art.',
@@ -446,45 +425,42 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       ],
       overview: [
         'Professional strength formula',
-        '13 beautiful color variants',
-        '56g size',
+        'Smooth application',
         'Excellent coverage',
-        'Professional results'
+        'Available in 13 beautiful color variants',
+        '56g jar'
       ],
       features: [
-        { title: 'Professional Strength', description: 'High-quality formula for professional use' },
-        { title: '13 Color Variants', description: 'Beautiful range of colors for creative nail art' },
-        { title: '56g Size', description: 'Professional size for salon use' },
-        { title: 'Excellent Coverage', description: 'Strong coverage with smooth application' }
+        { title: 'Professional Strength', description: 'High-quality formula for professionals' },
+        { title: 'Smooth Application', description: 'Easy to work with' },
+        { title: 'Excellent Coverage', description: 'Vibrant, opaque colors' },
+        { title: 'Versatile', description: 'Perfect for nail art and full sets' }
       ],
       howToUse: [
-        'Prep nails with primer and dehydrator',
-        'Pick up bead with monomer using size 8 brush',
-        'Sculpt and refine the enhancement',
-        'File, buff and finish with top coat'
+        'Pick up product with brush',
+        'Apply to prepared nail',
+        'Shape and file when dry',
+        'Finish with top coat'
       ],
-      ingredients: [
-        'PMMA (Polymethyl Methacrylate)',
-        'Benzoyl Peroxide',
-        'Cosmetic-grade pigments',
-        'UV stabilizers'
-      ],
+      ingredients: 'Acrylic polymer, pigments',
       specifications: {
-        size: '56g',
-        shelfLife: '24 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        weight: '56g',
+        type: 'Acrylic Powder',
+        colors: '13 variants',
+        application: 'Brush application',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
     'crystal-clear-acrylic': {
-      id: '8',
+      id: '10',
       name: 'Crystal Clear Acrylic',
-      subtitle: 'Professional grade acrylic powder in 13 beautiful colors',
-      price: 450,
+      subtitle: 'Professional grade acrylic powder',
+      price: -1,
       comparePrice: null,
       rating: 4.9,
-      reviewCount: 156,
-      inStock: true,
+      reviewCount: 203,
+      inStock: false,
       stockCount: 20,
       description: 'High-quality acrylic powder perfect for creating stunning nail enhancements. Available in 13 gorgeous colors with excellent coverage and smooth application.',
       images: ['/crystal-clear-acrylic-colorful.webp', '/crystal-clear-acrylic-white.webp'],
@@ -504,46 +480,43 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         { id: 'lemon-glow', name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
       ],
       overview: [
-        'Professional-grade acrylic powder',
-        '13 beautiful color options',
-        'Excellent coverage and smooth application',
-        'Perfect for nail enhancements and overlays',
-        'High-quality pigments for vibrant results'
+        'Professional grade formula',
+        'Smooth, easy application',
+        '13 beautiful color variants',
+        'Excellent coverage',
+        'Long-lasting results'
       ],
       features: [
-        { title: 'Professional Quality', description: 'High-grade acrylic powder for salon-quality results' },
-        { title: '13 Colors', description: 'Wide range of beautiful colors to choose from' },
-        { title: 'Excellent Coverage', description: 'Strong coverage with smooth, even application' },
-        { title: 'Vibrant Pigments', description: 'Rich, consistent colors that maintain their vibrancy' }
+        { title: 'Professional Grade', description: 'Salon-quality formula' },
+        { title: 'Smooth Application', description: 'Easy to work with' },
+        { title: 'Vibrant Colors', description: 'Rich, pigmented hues' },
+        { title: 'Durable', description: 'Long-lasting wear' }
       ],
       howToUse: [
-        'Prep nails with primer and dehydrator',
-        'Pick up bead with monomer using size 8 brush',
-        'Sculpt and refine the enhancement',
-        'File, buff and finish with top coat'
+        'Select your desired color',
+        'Pick up product with wet brush',
+        'Apply to prepared nail or form',
+        'Shape and file when dry'
       ],
-      ingredients: [
-        'PMMA (Polymethyl Methacrylate)',
-        'Benzoyl Peroxide',
-        'Cosmetic-grade pigments',
-        'UV stabilizers'
-      ],
+      ingredients: 'Acrylic polymer, pigments',
       specifications: {
-        size: '56g',
-        shelfLife: '24 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        weight: '56g',
+        type: 'Acrylic Powder',
+        colors: '13 variants',
+        application: 'Brush application',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
-    'vitamin-primer': {
-      id: '2',
-      name: 'Vitamin Primer',
-      subtitle: 'Vitamin-infused, acid-free primer for strong adhesion',
-      price: 140,
+    'snow-white-acrylic': {
+      id: '11',
+      name: 'Snow White Acrylic',
+      subtitle: 'Coming Soon',
+      price: -1,
       comparePrice: null,
       rating: 4.8,
-      reviewCount: 124,
-      inStock: true,
+      reviewCount: 134,
+      inStock: false,
       stockCount: 30,
       description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
       images: ['/vitamin-primer-colorful.webp', '/vitamin-primer-white.webp'],
@@ -558,37 +531,34 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Acid-Free', description: 'Gentle formula that protects your natural nails' },
         { title: 'Vitamin Enriched', description: 'Nourishes nails while providing strong adhesion' },
-        { title: 'Strong Bond', description: 'Creates long-lasting adhesion for gels and acrylics' },
-        { title: 'Professional Grade', description: 'High-quality formula trusted by professionals' }
+        { title: 'Long-Lasting', description: 'Creates a durable bond for extended wear' },
+        { title: 'Professional Grade', description: 'Salon-quality results at home' }
       ],
       howToUse: [
-        'Apply to clean, dry nails',
-        'Allow to dry completely',
-        'Apply gel or acrylic immediately',
-        'Do not touch the nail surface after application'
+        'Apply a thin layer to prepared nails',
+        'Allow to air dry completely',
+        'Proceed with your nail enhancement',
+        'Do not cure in lamp'
       ],
-      ingredients: [
-        'Vitamin Complex',
-        'Adhesion Promoters',
-        'Solvents',
-        'Preservatives'
-      ],
+      ingredients: 'Proprietary vitamin-enriched formula',
       specifications: {
-        size: '15ml',
-        shelfLife: '18 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Nail Primer',
+        finish: 'Matte',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade', 'Acid-Free']
       }
     },
-    'prep-solution': {
-      id: '3',
-      name: 'Prep Solution (Nail Dehydrator)',
-      subtitle: 'Removes oils & moisture for better adhesion',
-      price: 120,
+    'colour-acrylics': {
+      id: '12',
+      name: 'Colour Acrylics',
+      subtitle: 'Coming Soon',
+      price: -1,
       comparePrice: null,
       rating: 4.7,
-      reviewCount: 89,
-      inStock: true,
+      reviewCount: 99,
+      inStock: false,
       stockCount: 20,
       description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
       images: ['/prep-solution-colorful.webp', '/prep-solution-white.webp'],
@@ -603,36 +573,34 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'Oil Removal', description: 'Effectively removes surface oils from nail plate' },
         { title: 'Moisture Control', description: 'Dehydrates nail plate for better adhesion' },
-        { title: 'Quick Drying', description: 'Fast-drying formula saves time' },
-        { title: 'Prevents Lifting', description: 'Reduces risk of enhancement lifting' }
+        { title: 'Quick Drying', description: 'Fast-acting formula saves time' },
+        { title: 'Professional Results', description: 'Ensures long-lasting nail enhancements' }
       ],
       howToUse: [
-        'Apply to clean nails',
-        'Allow to air dry',
-        'Do not rinse',
-        'Apply primer immediately after'
+        'Apply to clean, dry nails',
+        'Allow to air dry completely',
+        'Proceed with primer and enhancement',
+        'Use before each application'
       ],
-      ingredients: [
-        'Isopropyl Alcohol',
-        'Dehydrating Agents',
-        'Preservatives'
-      ],
+      ingredients: 'Isopropyl Alcohol, Proprietary blend',
       specifications: {
-        size: '120ml',
-        shelfLife: '24 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Nail Prep',
+        finish: 'Clear',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     },
-    'top-coat': {
-      id: '4',
-      name: 'Top Coat',
-      subtitle: 'Strong, protective top coat with mirror shine',
-      price: 160,
+    'glitter-acrylics': {
+      id: '13',
+      name: 'Glitter Acrylics',
+      subtitle: 'Coming Soon',
+      price: -1,
       comparePrice: null,
       rating: 4.9,
-      reviewCount: 201,
-      inStock: true,
+      reviewCount: 146,
+      inStock: false,
       stockCount: 35,
       description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
       images: ['/top-coat-colorful.webp', '/top-coat-white.webp'],
@@ -647,159 +615,110 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         { title: 'High-Gloss Finish', description: 'Mirror-like shine that lasts' },
         { title: 'Chip Resistant', description: 'Strong protection against chipping' },
-        { title: 'UV Protection', description: 'Protects against UV damage' },
-        { title: 'Easy Application', description: 'Smooth, even application' }
+        { title: 'UV Protection', description: 'Prevents yellowing and fading' },
+        { title: 'Quick Dry', description: 'Fast-drying formula for convenience' }
       ],
       howToUse: [
-        'Apply over cured gel or acrylic',
-        'Cure under UV/LED lamp',
-        'Wipe off inhibition layer',
-        'Enjoy glossy finish'
+        'Apply thin layer over cured color',
+        'Cure in LED lamp for 60 seconds',
+        'Wipe with alcohol if needed',
+        'Apply cuticle oil to finish'
       ],
-      ingredients: [
-        'Acrylic Resins',
-        'UV Photoinitiators',
-        'Gloss Enhancers',
-        'Preservatives'
-      ],
+      ingredients: 'UV-resistant polymer blend',
       specifications: {
-        size: '15ml',
-        shelfLife: '18 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '15ml',
+        type: 'Top Coat',
+        finish: 'High-Gloss',
+        application: 'Brush applicator',
+        madeIn: 'South Africa',
+        certifications: ['UV Protection', 'Professional Grade']
       }
     },
-    'fairy-dust-top-coat': {
-      id: '5',
-      name: 'Fairy Dust Top Coat',
-      subtitle: 'Glitter-infused top coat with smooth shine',
-      price: 180,
-      comparePrice: null,
-      rating: 4.6,
-      reviewCount: 73,
-      inStock: true,
-      stockCount: 15,
-      description: 'Adds a sparkling finish to any gel or acrylic set.',
-      images: ['/fairy-dust-top-coat-colorful.webp', '/fairy-dust-top-coat-white.webp'],
-      variants: [],
-      overview: [
-        'Fine glitter particles for sparkle',
-        'Smooth application',
-        'High-shine finish',
-        'Versatile use',
-        'Long-lasting sparkle'
-      ],
-      features: [
-        { title: 'Fine Glitter', description: 'Beautiful sparkle without roughness' },
-        { title: 'Smooth Finish', description: 'Glossy surface with embedded glitter' },
-        { title: 'Versatile', description: 'Works with any nail enhancement' },
-        { title: 'Long-Lasting', description: 'Sparkle that lasts' }
-      ],
-      howToUse: [
-        'Apply over cured gel or acrylic',
-        'Cure under UV/LED lamp',
-        'Wipe off inhibition layer',
-        'Enjoy sparkling finish'
-      ],
-      ingredients: [
-        'Acrylic Resins',
-        'Fine Glitter',
-        'UV Photoinitiators',
-        'Gloss Enhancers'
-      ],
-      specifications: {
-        size: '15ml',
-        shelfLife: '18 months',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
-      }
-    },
-    'nail-forms': {
-      id: '6',
-      name: 'Nail Forms',
-      subtitle: 'Reusable forms for sculpting extensions',
-      price: 45,
-      comparePrice: null,
-      rating: 4.5,
-      reviewCount: 67,
-      inStock: true,
-      stockCount: 50,
-      description: 'Professional nail forms for creating perfect extensions and overlays.',
-      images: ['/nail-forms-colorful.webp', '/nail-forms-white.webp'],
-      variants: [],
-      overview: [
-        'Reusable design',
-        'Easy to apply',
-        'Perfect fit',
-        'Professional results',
-        'Durable material'
-      ],
-      features: [
-        { title: 'Reusable', description: 'Clean and reuse multiple times' },
-        { title: 'Perfect Fit', description: 'Multiple sizes for perfect fit' },
-        { title: 'Easy Application', description: 'Simple to apply and remove' },
-        { title: 'Professional Quality', description: 'Durable material for professional use' }
-      ],
-      howToUse: [
-        'Select appropriate size',
-        'Apply to natural nail',
-        'Sculpt with acrylic or gel',
-        'Remove after curing',
-        'Clean and reuse'
-      ],
-      ingredients: [
-        'Medical-grade adhesive',
-        'Flexible plastic'
-      ],
-      specifications: {
-        size: '50 forms',
-        shelfLife: 'N/A',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
-      }
-    },
-    'designer-file-set': {
-      id: '7',
-      name: 'Designer File Set',
-      subtitle: 'Professional file set for shaping & finishing',
-      price: 85,
+    'nail-liquid-monomer': {
+      id: '14',
+      name: 'Nail Liquid (Monomer)',
+      subtitle: 'Coming Soon',
+      price: -1,
       comparePrice: null,
       rating: 4.8,
-      reviewCount: 112,
-      inStock: true,
+      reviewCount: 87,
+      inStock: false,
       stockCount: 25,
-      description: 'Complete set of professional files for shaping, refining, and finishing nail enhancements.',
-      images: ['/designer-file-01.webp'],
-      variants: [],
+      description: 'Professional-grade monomer for acrylic nail application.',
+      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
+      variants: [
+        { id: '250ml', name: '250ml', inStock: false, price: -1 },
+        { id: '500ml', name: '500ml', inStock: false, price: -1 }
+      ],
       overview: [
-        'Multiple grit options',
-        'Professional quality',
-        'Durable construction',
-        'Precise shaping',
-        'Complete set'
+        'Professional-grade formula',
+        'Fast acting',
+        'Effective removal',
+        'Available in 250ml and 500ml',
+        'Professional results'
       ],
       features: [
-        { title: 'Multiple Grits', description: 'Range from coarse to fine for all needs' },
-        { title: 'Professional Quality', description: 'High-grade materials for professional results' },
-        { title: 'Durable', description: 'Long-lasting construction' },
-        { title: 'Complete Set', description: 'Everything needed for shaping and finishing' }
+        { title: 'Professional Grade', description: 'High-quality formula for professionals' },
+        { title: 'Fast Acting', description: 'Quick and effective removal' },
+        { title: 'Large Size', description: '1L bottle for extended use' },
+        { title: 'Versatile', description: 'Works on all nail products' }
       ],
       howToUse: [
-        'Use coarse file for shaping',
-        'Medium file for refining',
-        'Fine file for finishing',
-        'Buff for smooth surface',
-        'Clean between uses'
+        'Soak cotton pad with acetone',
+        'Place on nail for 10-15 minutes',
+        'Gently remove product',
+        'Moisturize after use'
       ],
-      ingredients: [
-        'High-grade emery',
-        'Durable backing'
-      ],
+      ingredients: '100% Pure Acetone',
       specifications: {
-        size: '5 files',
-        shelfLife: 'N/A',
-        origin: 'Professional Grade',
-        certifications: ['Vegan', 'Cruelty-Free']
+        volume: '250ml/500ml',
+        type: 'Monomer',
+        concentration: '100% Pure',
+        application: 'Acrylic application',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
+      }
+    },
+    'acrylic-sculpture-brush': {
+      id: '15',
+      name: 'Acrylic Sculpture Brush',
+      subtitle: 'Coming Soon',
+      price: -1,
+      comparePrice: null,
+      rating: 4.9,
+      reviewCount: 178,
+      inStock: false,
+      stockCount: 50,
+      description: 'Professional acrylic brush for sculpting and shaping.',
+      images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-white-2.webp'],
+      variants: [],
+      overview: [
+        'Professional quality bristles',
+        'Perfect for sculpting',
+        'Ergonomic handle',
+        'Easy to clean',
+        'Long-lasting'
+      ],
+      features: [
+        { title: 'Quality Bristles', description: 'Professional-grade bristles for smooth application' },
+        { title: 'Ergonomic', description: 'Comfortable grip for extended use' },
+        { title: 'Versatile', description: 'Perfect for all acrylic techniques' },
+        { title: 'Durable', description: 'Long-lasting construction' }
+      ],
+      howToUse: [
+        'Dip brush in monomer',
+        'Pick up acrylic powder',
+        'Apply to nail or form',
+        'Clean thoroughly after use'
+      ],
+      ingredients: 'Professional bristles, ergonomic handle',
+      specifications: {
+        size: 'Professional',
+        type: 'Acrylic Brush',
+        bristles: 'Synthetic',
+        handle: 'Ergonomic',
+        madeIn: 'South Africa',
+        certifications: ['Professional Grade']
       }
     }
   };
@@ -820,47 +739,26 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     },
     {
       id: '2',
-      name: 'Jessica Chen',
+      name: 'Emma Johnson',
       rating: 4,
       title: 'Great product',
-      comment: 'Very happy with this purchase. Good value for money and fast delivery. Will definitely order again.',
+      comment: 'Very happy with this purchase. Does exactly what it says. Would buy again.',
       date: '2024-01-10',
       verified: true,
       helpful: 8
     },
     {
       id: '3',
-      name: 'Michelle Adams',
-      rating: 5,
-      title: 'Perfect!',
-      comment: 'Exactly what I was looking for. The quality is professional grade and the results are amazing.',
-      date: '2024-01-08',
-      verified: true,
-      helpful: 15
-    },
-    {
-      id: '4',
-      name: 'Amanda Wilson',
-      rating: 4,
-      title: 'Very good',
-      comment: 'Good product overall. Minor issues with packaging but the product itself is great.',
-      date: '2024-01-05',
-      verified: false,
-      helpful: 3
-    },
-    {
-      id: '5',
-      name: 'Lisa Thompson',
+      name: 'Jessica Williams',
       rating: 5,
       title: 'Love it!',
-      comment: 'This has become my go-to product. The quality is consistent and the results are always perfect.',
-      date: '2024-01-03',
-      verified: true,
-      helpful: 9
+      comment: 'Absolutely love this product! The quality is amazing and it lasts so long. Worth every penny.',
+      date: '2024-01-05',
+      verified: false,
+      helpful: 6
     }
   ];
 
-  // Recommended products data
   const recommendedProducts = [
     {
       id: 'rec1',
@@ -881,16 +779,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     {
       id: 'rec3',
       name: 'Top Coat',
-      price: 120,
+      price: 160,
       image: '/top-coat-01.webp',
-      rating: 4.6,
+      rating: 4.9,
       slug: 'top-coat'
     },
     {
       id: 'rec4',
-      name: 'Nail File (80/80 Grit)',
+      name: 'Nail File',
       price: 35,
-      image: '/nail-file-colorful.webp',
+      image: '/nail-file-01.webp',
       rating: 4.5,
       slug: 'nail-file'
     }
@@ -955,27 +853,23 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     return product.price;
   };
 
+  const handleWishlistToggle = () => {
+    setIsWishlisted(!isWishlisted);
+    // TODO: Add actual wishlist functionality
+  };
+
   const handleAddToCart = () => {
-    // Add to cart logic here
-    console.log('Added to cart:', {
-      product: product.name,
-      variant: selectedVariant,
-      price: getCurrentPrice(),
-      quantity
+    // TODO: Add actual cart functionality
+    console.log('Adding to cart:', { 
+      product: product.name, 
+      quantity,
+      variant: selectedVariant 
     });
   };
 
-  const handleWishlistToggle = () => {
-    setIsWishlisted(!isWishlisted);
-  };
-
-  const handleReviewSubmit = (reviewData: any) => {
-    console.log('Review submitted:', reviewData);
-    // In a real app, this would save to a database
-  };
-
-  const toggleAccordion = (tab: string) => {
-    setExpandedAccordion(expandedAccordion === tab ? null : tab);
+  const handleReviewSubmit = (review: any) => {
+    console.log('New review:', review);
+    // TODO: Add actual review submission functionality
   };
 
   useEffect(() => {
@@ -988,28 +882,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   }, [product]);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
 
-      <main className="flex-1">
-        {/* Breadcrumb */}
-        <section className="py-4 border-b">
-          <Container>
-            <nav className="text-sm text-gray-500">
-              <a href="/" className="hover:text-pink-400">Home</a>
-              <span className="mx-2">/</span>
-              <a href="/shop" className="hover:text-pink-400">Shop</a>
-              <span className="mx-2">/</span>
-              <a href={`/shop#acrylic-system`} className="hover:text-pink-400">
-                Acrylic System
-              </a>
-              <span className="mx-2">/</span>
-              <span className="text-gray-900">{product.name}</span>
-            </nav>
-          </Container>
-        </section>
-
-        {/* Product Detail */}
+      <main>
         <section className="section-padding">
           <Container>
             <div className="grid lg:grid-cols-2 gap-12">
@@ -1031,13 +907,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   {product.images.length > 1 && (
                     <>
                       <button
-                        onClick={prevImage}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          prevImage();
+                        }}
                         className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
                       >
                         <ChevronLeft className="h-5 w-5" />
                       </button>
                       <button
-                        onClick={nextImage}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          nextImage();
+                        }}
                         className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white bg-opacity-80 rounded-full hover:bg-opacity-100 transition-all"
                       >
                         <ChevronRight className="h-5 w-5" />
@@ -1056,11 +940,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
                 {/* Thumbnail Images */}
                 {product.images.length > 1 && (
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-6 gap-1">
                   {product.images.map((image, index) => (
                     <button
                       key={index}
-                      onClick={() => setSelectedImage(index)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSelectedImage(index);
+                        syncVariantWithImage(index);
+                      }}
                         className={`aspect-square overflow-hidden rounded-lg border-2 transition-all ${
                         selectedImage === index ? 'border-pink-400' : 'border-gray-200'
                       }`}
@@ -1086,48 +975,51 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
                   {product.name}
                 </h1>
+                
+                {product.subtitle && (
                   <p className="text-lg text-gray-600 mb-4">{product.subtitle}</p>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
-                  <div className="flex items-center">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${
-                            i < Math.floor(product.rating)
-                            ? 'fill-current text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                        style={{ color: i < Math.floor(product.rating) ? '#F59E0B' : undefined }}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      {product.rating} ({product.reviewCount} reviews)
-                    </span>
-                  </div>
+                )}
 
-                  {/* Price */}
-                <div className="mb-6">
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl font-bold text-gray-900">
-                      R{getCurrentPrice().toFixed(2)}
-                    </span>
-                    {product.comparePrice && (
-                      <span className="text-xl text-gray-500 line-through">
-                        R{product.comparePrice.toFixed(2)}
-                      </span>
-                    )}
+                {/* Rating */}
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`h-5 w-5 ${
+                          i < Math.floor(product.rating)
+                          ? 'fill-current text-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      style={{ color: i < Math.floor(product.rating) ? '#F59E0B' : undefined }}
+                      />
+                    ))}
                   </div>
-                  {product.comparePrice && (
-                    <div className="text-sm text-green-600 font-medium">
-                      Save R{(product.comparePrice - getCurrentPrice()).toFixed(2)}
-                    </div>
-                  )}
+                  <span className="text-sm text-gray-600">
+                    {product.rating} ({product.reviewCount} reviews)
+                  </span>
                 </div>
 
-                {/* Variants */}
+                {/* Price */}
+              <div className="mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl font-bold text-gray-900">
+                    R{getCurrentPrice().toFixed(2)}
+                  </span>
+                  {product.comparePrice && (
+                    <span className="text-xl text-gray-500 line-through">
+                      R{product.comparePrice.toFixed(2)}
+                    </span>
+                  )}
+                </div>
+                {product.comparePrice && (
+                  <div className="text-sm text-green-600 font-medium">
+                    Save R{(product.comparePrice - getCurrentPrice()).toFixed(2)}
+                  </div>
+                )}
+              </div>
+
+                {/* Variant Selection */}
                 {product.variants.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">Options</h3>
@@ -1135,7 +1027,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       {product.variants.map((variant) => (
                         <button
                           key={variant.id}
-                          onClick={() => handleVariantSelect(variant.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleVariantSelect(variant.id);
+                          }}
                           disabled={!variant.inStock}
                           className={`px-4 py-2 rounded-full border transition-all ${
                             selectedVariant === variant.id
@@ -1150,60 +1046,87 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   </div>
                 )}
 
-                {/* Quantity */}
+                {/* Description */}
+                <p className="text-gray-700 mb-6">{product.description}</p>
+
+                {/* Stock Status */}
+                <div className="flex items-center gap-2 mb-6">
+                  {product.inStock ? (
+                    <>
+                      <CheckCircle className="h-5 w-5 text-green-600" />
+                      <span className="text-green-600 font-medium">In Stock ({product.stockCount} available)</span>
+                    </>
+                  ) : (
+                    <>
+                      <X className="h-5 w-5 text-red-600" />
+                      <span className="text-red-600 font-medium">Out of Stock</span>
+                    </>
+                  )}
+                </div>
+
+                {/* Quantity Selector */}
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Quantity</h3>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Quantity</label>
                   <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                    <span className="text-lg font-medium px-4">{quantity}</span>
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
+                      disabled={!product.inStock || product.price === -1}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max={product.stockCount}
+                      value={quantity}
+                      onChange={(e) => setQuantity(Math.max(1, Math.min(product.stockCount, parseInt(e.target.value) || 1)))}
+                      className="w-20 text-center border border-gray-300 rounded-lg py-2"
+                      disabled={!product.inStock || product.price === -1}
+                    />
+                    <button
+                      onClick={() => setQuantity(Math.min(product.stockCount, quantity + 1))}
                       className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
+                      disabled={!product.inStock || product.price === -1}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
 
-                {/* Add to Cart */}
-                <div className="mb-8">
-                  <Button
-                    onClick={handleAddToCart}
-                    className="w-full bg-pink-400 hover:bg-pink-500 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 flex items-center justify-center gap-2"
-                    disabled={!product.inStock}
-                  >
-                    <ShoppingCart className="h-5 w-5" />
-                    {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-                    </Button>
-                </div>
+                {/* Add to Cart Button */}
+                <Button 
+                  size="lg" 
+                  className="w-full mb-4"
+                  onClick={handleAddToCart}
+                  disabled={!product.inStock || product.price === -1}
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  {product.price === -1 ? 'Coming Soon' : 'Add to Cart'}
+                </Button>
 
-                {/* Product Details */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-600">Free shipping on orders over R500</span>
+                {/* Product Benefits */}
+                <div className="space-y-3 pt-6 border-t border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm text-gray-700">Free shipping on orders over R500</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-600">30-day return policy</span>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm text-gray-700">30-day return policy</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span className="text-sm text-gray-600">Professional quality guarantee</span>
-                  </div>
-                </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-sm text-gray-700">Professional quality guarantee</span>
                   </div>
                 </div>
+              </div>
+            </div>
 
-            {/* Product Information Tabs */}
+            {/* Product Details Tabs */}
             <div className="mt-16">
-              <div className="border-b border-gray-200 mb-8">
-                <nav className="flex space-x-8">
+              <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8">
                   {[
                     { id: 'overview', label: 'Overview' },
                     { id: 'features', label: 'Features' },
@@ -1211,79 +1134,79 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     { id: 'ingredients', label: 'Ingredients' },
                     { id: 'reviews', label: 'Reviews' }
                   ].map((tab) => (
-                  <button
+                    <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                         activeTab === tab.id
                           ? 'border-pink-400 text-pink-400'
-                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       {tab.label}
-                  </button>
+                    </button>
                   ))}
                 </nav>
               </div>
 
-              <div className="max-w-4xl">
+              <div className="mt-8">
                 {activeTab === 'overview' && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Product Overview</h3>
-                      <ul className="space-y-2">
-                        {product.overview.map((item, index) => (
+                  <div className="prose max-w-none">
+                    <ul className="space-y-2">
+                      {product.overview.map((item, index) => (
                         <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="h-5 w-5 text-pink-400 mt-0.5 flex-shrink-0" />
-                          <span className="text-gray-700">{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                          <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {activeTab === 'features' && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Key Features</h3>
-                    <div className="grid md:grid-cols-2 gap-6">
-                        {product.features.map((feature, index) => (
-                          <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                          <h4 className="font-semibold text-gray-900 mb-2">{feature.title}</h4>
-                          <p className="text-gray-600">{feature.description}</p>
-                          </div>
-                        ))}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {product.features.map((feature, index) => (
+                      <div key={index} className="p-6 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-900 mb-2">{feature.title}</h4>
+                        <p className="text-gray-600">{feature.description}</p>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                )}
 
                 {activeTab === 'how-to-use' && (
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">How to Use</h3>
-                      <ol className="space-y-3">
-                        {product.howToUse.map((step, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                          <span className="flex-shrink-0 w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-                              {index + 1}
-                            </span>
-                          <span className="text-gray-700">{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
+                  <div className="prose max-w-none">
+                    <ol className="space-y-3">
+                      {product.howToUse.map((step, index) => (
+                        <li key={index} className="flex gap-3">
+                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-pink-400 text-white flex items-center justify-center text-sm font-semibold">
+                            {index + 1}
+                          </span>
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
 
                 {activeTab === 'ingredients' && (
-                        <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Ingredients</h3>
-                          <ul className="space-y-2">
-                            {product.ingredients.map((ingredient, index) => (
-                              <li key={index} className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                          <span className="text-gray-700">{ingredient}</span>
-                              </li>
-                            ))}
-                          </ul>
+                  <div className="prose max-w-none">
+                    <p className="text-gray-700">{product.ingredients}</p>
+                    <div className="mt-6 p-6 bg-gray-50 rounded-lg">
+                      <h4 className="font-semibold text-gray-900 mb-4">Specifications</h4>
+                      <dl className="grid grid-cols-2 gap-4">
+                        {Object.entries(product.specifications).map(([key, value]) => (
+                          <div key={key}>
+                            <dt className="text-sm text-gray-600 capitalize">{key.replace(/([A-Z])/g, ' $1').trim()}</dt>
+                            <dd className="text-sm font-medium text-gray-900">
+                              {Array.isArray(value) ? value.join(', ') : value}
+                            </dd>
+                          </div>
+                        ))}
+                      </dl>
                     </div>
-                  )}
+                  </div>
+                )}
 
                 {activeTab === 'reviews' && (
                   <div>
@@ -1317,7 +1240,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
               <h2 className="text-3xl font-bold text-gray-900 mb-4">You May Also Like</h2>
               <p className="text-gray-600">Discover more products from our collection</p>
             </div>
-            
+
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6 max-w-6xl w-full mx-auto">
               {recommendedProducts.map((recProduct) => (
                 <Card key={recProduct.id} className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden">
@@ -1349,8 +1272,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       <span className="text-lg md:text-xl font-bold text-gray-900">
                         R{recProduct.price.toFixed(2)}
                       </span>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="text-xs md:text-sm px-2 py-1 md:px-3 md:py-2"
                         onClick={() => window.location.href = `/products/${recProduct.slug}`}
                       >
