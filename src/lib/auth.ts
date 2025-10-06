@@ -1,14 +1,5 @@
 // Authentication utilities for BLOM Cosmetics
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Create Supabase client if environment variables are available
-let supabase: any = null;
-if (supabaseUrl && supabaseAnonKey) {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
-}
+import { supabase } from './supabase';
 
 export interface User {
   id: string;
@@ -44,11 +35,6 @@ class AuthService {
   }
 
   private async initializeAuth() {
-    if (!supabase) {
-      this.setState({ user: null, loading: false, error: null });
-      return;
-    }
-
     try {
       // Get initial session
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -65,8 +51,8 @@ class AuthService {
         error: null
       });
 
-      // Listen for auth changes
-      supabase.auth.onAuthStateChange((event: string, session: any) => {
+      // Listen for auth changes including email confirmation redirects
+      supabase.auth.onAuthStateChange((_event: string, session: any) => {
         this.setState({
           user: session?.user || null,
           loading: false,

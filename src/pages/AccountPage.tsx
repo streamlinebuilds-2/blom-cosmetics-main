@@ -103,8 +103,8 @@ export const AccountPage: React.FC = () => {
     }
   };
 
-  // Show loading state
-  if (authState.loading) {
+  // Show loading state (and also show if user exists but profile not fetched yet)
+  if (authState.loading || (authState.user && profile === null)) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header showMobileMenu={true} />
