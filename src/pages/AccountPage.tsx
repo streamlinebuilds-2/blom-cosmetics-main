@@ -75,6 +75,17 @@ export const AccountPage: React.FC = () => {
     })();
   }, [authState.user]);
 
+  // Hard fallback: if we keep loading too long without a user, redirect to login
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const state = authService.getState();
+      if (!state.user) {
+        window.location.href = '/login?redirect=/account';
+      }
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const saveProfile = async () => {
     if (!profile) return;
     setSavingProfile(true);
