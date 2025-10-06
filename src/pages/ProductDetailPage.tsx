@@ -946,7 +946,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full bg-white text-gray-700 border-2 border-gray-300 rounded-full py-3 md:py-4 px-6 md:px-8 font-bold text-sm md:text-lg uppercase tracking-wide hover:bg-blue-200 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                    className="w-full bg-white text-black border-2 border-black rounded-full py-3 md:py-4 px-6 md:px-8 font-bold text-sm md:text-lg uppercase tracking-wide hover:bg-blue-200 hover:border-blue-200 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
                   >
                     BUY NOW
                   </button>
@@ -1160,15 +1160,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
             <h2 className="text-3xl font-bold text-center mb-12">You Might Also Like</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {relatedProducts.map((relatedProduct) => (
-                <Card key={relatedProduct.id} className="group cursor-pointer" onClick={() => window.location.href = `/products/${relatedProduct.slug}`}>
-                  <div className="aspect-square overflow-hidden border border-gray-900">
+                <div
+                  key={relatedProduct.id}
+                  className="group cursor-pointer bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                  onClick={() => window.location.href = `/products/${relatedProduct.slug}`}
+                >
+                  <div className="relative aspect-square overflow-hidden bg-gray-50">
+                    <div className="absolute inset-0 border-2 border-gray-900 rounded-lg m-4 group-hover:rotate-3 transition-transform duration-300"></div>
                     <img
                       src={relatedProduct.image}
                       alt={relatedProduct.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover relative z-10"
                     />
                   </div>
-                  <CardContent className="p-6">
+                  <div className="p-6">
                     <div className="flex items-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -1191,8 +1196,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                         Add to Cart
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           </Container>

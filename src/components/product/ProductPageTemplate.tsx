@@ -339,7 +339,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="w-full bg-white text-gray-700 border-2 border-gray-300 rounded-full py-3 md:py-4 px-6 md:px-8 font-bold text-sm md:text-lg uppercase tracking-wide hover:bg-blue-200 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
+                    className="w-full bg-white text-black border-2 border-black rounded-full py-3 md:py-4 px-6 md:px-8 font-bold text-sm md:text-lg uppercase tracking-wide hover:bg-blue-200 hover:border-blue-200 transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
                   >
                     BUY NOW
                   </button>
