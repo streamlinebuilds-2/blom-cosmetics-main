@@ -12,6 +12,9 @@ import { wishlistStore } from '../lib/wishlist';
 export const AccountPage: React.FC = () => {
   console.log('AccountPage component rendering...');
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
+  // Staged rendering: enable sections incrementally with ?stage=1..5
+  const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+  const stage = Math.max(1, Math.min(5, Number(params.get('stage')) || 5));
 
   // Check URL parameters for initial tab
   React.useEffect(() => {
@@ -273,14 +276,14 @@ export const AccountPage: React.FC = () => {
     }
   ];
 
-  // Subscribe to wishlist changes
+  // Subscribe to wishlist changes (stage >= 4 to avoid extra effects during debugging)
   useEffect(() => {
+    if (stage < 4) return;
     const unsubscribe = wishlistStore.subscribe(() => {
       setWishlistItems(wishlistStore.getItems());
     });
-
     return unsubscribe;
-  }, []);
+  }, [stage]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -317,7 +320,7 @@ export const AccountPage: React.FC = () => {
               <strong>Debug Info:</strong> {debugInfo} | 
               User: {authState.user ? 'YES' : 'NO'} | 
               Profile: {profile ? 'YES' : 'NO'} | 
-              Loading: {authState.loading ? 'YES' : 'NO'}
+              Loading: {authState.loading ? 'YES' : 'NO'} | Stage: {stage}
             </p>
           </div>
           
@@ -329,7 +332,7 @@ export const AccountPage: React.FC = () => {
               Profile: {profile ? 'EXISTS' : 'NULL'}
             </p>
           </div>
-          {/* Account Header */}
+          {/* Account Header (always on) */}
           <div className="bg-gradient-to-r from-pink-400 to-blue-300 rounded-2xl p-8 text-white mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
               <div className="flex items-center gap-6 mb-6 md:mb-0">
@@ -341,84 +344,87 @@ export const AccountPage: React.FC = () => {
                   <p className="text-pink-100">Member since {userData.memberSince}</p>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-3 gap-6 text-center">
-                <div>
-                  <div className="text-2xl font-bold">{userData.totalOrders}</div>
-                  <div className="text-pink-100 text-sm">Orders</div>
+              {stage >= 2 && (
+                <div className="grid grid-cols-3 gap-6 text-center">
+                  <div>
+                    <div className="text-2xl font-bold">{userData.totalOrders}</div>
+                    <div className="text-pink-100 text-sm">Orders</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{formatPrice(userData.totalSpent)}</div>
+                    <div className="text-pink-100 text-sm">Total Spent</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{userData.loyaltyPoints}</div>
+                    <div className="text-pink-100 text-sm">Points</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold">{formatPrice(userData.totalSpent)}</div>
-                  <div className="text-pink-100 text-sm">Total Spent</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{userData.loyaltyPoints}</div>
-                  <div className="text-pink-100 text-sm">Points</div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">
-            {/* Sidebar Navigation */}
-            <div className="lg:col-span-1">
-              <Card>
-                <CardContent className="p-0">
-                  <nav className="space-y-1">
-                    {tabItems.map((item) => (
-                      item.action ? (
-                        <button
+            {/* Sidebar Navigation (stage >= 2) */}
+            {stage >= 2 && (
+              <div className="lg:col-span-1">
+                <Card>
+                  <CardContent className="p-0">
+                    <nav className="space-y-1">
+                      {tabItems.map((item) => (
+                        item.action ? (
+                          <button
+                            key={item.id}
+                            onClick={item.action}
+                            disabled={isSigningOut}
+                            className="w-full flex items-center gap-3 px-6 py-4 text-left transition-colors text-red-600 hover:bg-red-50 disabled:opacity-50"
+                          >
+                            <item.icon className="h-5 w-5" />
+                            {isSigningOut ? 'Signing Out...' : item.label}
+                          </button>
+                        ) : (
+                          <button
                           key={item.id}
-                          onClick={item.action}
-                          disabled={isSigningOut}
-                          className="w-full flex items-center gap-3 px-6 py-4 text-left transition-colors text-red-600 hover:bg-red-50 disabled:opacity-50"
+                          onClick={() => setActiveTab(item.id as any)}
+                          className={`w-full flex items-center gap-3 px-6 py-4 text-left transition-colors ${
+                            activeTab === item.id
+                              ? 'bg-pink-50 text-pink-600 border-r-2 border-pink-400'
+                              : 'text-gray-600 hover:bg-gray-50'
+                          }`}
                         >
                           <item.icon className="h-5 w-5" />
-                          {isSigningOut ? 'Signing Out...' : item.label}
+                          {item.label}
                         </button>
-                      ) : (
-                        <button
-                        key={item.id}
-                        onClick={() => setActiveTab(item.id as any)}
-                        className={`w-full flex items-center gap-3 px-6 py-4 text-left transition-colors ${
-                          activeTab === item.id
-                            ? 'bg-pink-50 text-pink-600 border-r-2 border-pink-400'
-                            : 'text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        <item.icon className="h-5 w-5" />
-                        {item.label}
-                      </button>
-                      )
-                    ))}
-                  </nav>
-                </CardContent>
-              </Card>
+                        )
+                      ))}
+                    </nav>
+                  </CardContent>
+                </Card>
 
-              {/* Quick Actions */}
-              <Card className="mt-6">
-                <CardHeader>
-                  <h3 className="font-bold">Quick Actions</h3>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="outline" className="w-full justify-start">
-                    <ShoppingBag className="h-4 w-4 mr-2" />
-                    Continue Shopping
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <Award className="h-4 w-4 mr-2" />
-                    View Courses
-                  </Button>
-                  <Button variant="outline" className="w-full justify-start">
-                    <HelpCircle className="h-4 w-4 mr-2" />
-                    Contact Support
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+                {/* Quick Actions */}
+                <Card className="mt-6">
+                  <CardHeader>
+                    <h3 className="font-bold">Quick Actions</h3>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button variant="outline" className="w-full justify-start">
+                      <ShoppingBag className="h-4 w-4 mr-2" />
+                      Continue Shopping
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Award className="h-4 w-4 mr-2" />
+                      View Courses
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <HelpCircle className="h-4 w-4 mr-2" />
+                      Contact Support
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
             {/* Main Content */}
-            <div className="lg:col-span-3">
+            <div className={stage >= 2 ? "lg:col-span-3" : "lg:col-span-4"}>
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
@@ -481,37 +487,38 @@ export const AccountPage: React.FC = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Account Stats */}
-                  <div className="grid md:grid-cols-3 gap-6">
-                    <Card className="text-center">
-                      <CardContent className="p-6">
-                        <Package className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-                        <div className="text-3xl font-bold text-blue-600 mb-2">{userData.totalOrders}</div>
-                        <div className="text-gray-600">Total Orders</div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="text-center">
-                      <CardContent className="p-6">
-                        <CreditCard className="h-12 w-12 text-green-400 mx-auto mb-4" />
-                        <div className="text-3xl font-bold text-green-600 mb-2">{formatPrice(userData.totalSpent)}</div>
-                        <div className="text-gray-600">Total Spent</div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card className="text-center">
-                      <CardContent className="p-6">
-                        <Star className="h-12 w-12 text-primary-blue mx-auto mb-4" />
-                        <div className="text-3xl font-bold text-yellow-600 mb-2">{userData.loyaltyPoints}</div>
-                        <div className="text-gray-600">Loyalty Points</div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                  {stage >= 3 && (
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <Card className="text-center">
+                        <CardContent className="p-6">
+                          <Package className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                          <div className="text-3xl font-bold text-blue-600 mb-2">{userData.totalOrders}</div>
+                          <div className="text-gray-600">Total Orders</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card className="text-center">
+                        <CardContent className="p-6">
+                          <CreditCard className="h-12 w-12 text-green-400 mx-auto mb-4" />
+                          <div className="text-3xl font-bold text-green-600 mb-2">{formatPrice(userData.totalSpent)}</div>
+                          <div className="text-gray-600">Total Spent</div>
+                        </CardContent>
+                      </Card>
+                      
+                      <Card className="text-center">
+                        <CardContent className="p-6">
+                          <Star className="h-12 w-12 text-primary-blue mx-auto mb-4" />
+                          <div className="text-3xl font-bold text-yellow-600 mb-2">{userData.loyaltyPoints}</div>
+                          <div className="text-gray-600">Loyalty Points</div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Orders Tab */}
-              {activeTab === 'orders' && (
+              {stage >= 2 && activeTab === 'orders' && (
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
@@ -566,7 +573,7 @@ export const AccountPage: React.FC = () => {
               )}
 
               {/* Wishlist Tab */}
-              {activeTab === 'wishlist' && (
+              {stage >= 4 && activeTab === 'wishlist' && (
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
@@ -618,7 +625,7 @@ export const AccountPage: React.FC = () => {
               )}
 
               {/* Settings Tab */}
-              {activeTab === 'settings' && (
+              {stage >= 2 && activeTab === 'settings' && (
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
