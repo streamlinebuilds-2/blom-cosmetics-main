@@ -85,8 +85,27 @@ export default function AccountPageFullCore() {
       <main className="section-padding">
         <Container>
           <div className="bg-gradient-to-r from-pink-400 to-blue-300 rounded-2xl p-8 text-white mb-8">
-            <h1 className="text-3xl font-bold">Welcome back, {name}!</h1>
-            <p className="text-pink-100">Member since {memberSince}</p>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h1 className="text-3xl font-bold">Welcome back, {name}!</h1>
+                <p className="text-pink-100">Member since {memberSince}</p>
+              </div>
+              {/* Stats strip (static placeholders for now) */}
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-pink-100 text-sm">Orders</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">R0.00</div>
+                  <div className="text-pink-100 text-sm">Total Spent</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-pink-100 text-sm">Points</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">
