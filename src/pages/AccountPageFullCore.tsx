@@ -3,11 +3,12 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
-import { User, Mail, Phone, Calendar } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Package, Heart, Settings } from 'lucide-react';
 import { authService, AuthState } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 
 export default function AccountPageFullCore() {
+  const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
   const [authState, setAuthState] = useState<AuthState>({ user: null, loading: true, error: null });
   const [profile, setProfile] = useState<{ id: string; email: string | null; name: string | null; phone: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,45 +89,103 @@ export default function AccountPageFullCore() {
             <p className="text-pink-100">Member since {memberSince}</p>
           </div>
 
-          <div className="rounded-xl border p-6 bg-white max-w-3xl">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold">Personal Information</h2>
-            </div>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <User className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <div className="font-medium">{name}</div>
-                    <div className="text-sm text-gray-500">Full Name</div>
+          <div className="grid lg:grid-cols-4 gap-8">
+            {/* Sidebar (plain divs, no effects) */}
+            <aside className="lg:col-span-1">
+              <nav className="rounded-xl border bg-white divide-y">
+                <button
+                  className={`w-full text-left px-5 py-4 flex items-center gap-3 ${activeTab==='profile' ? 'bg-pink-50 text-pink-600' : 'hover:bg-gray-50'}`}
+                  onClick={() => setActiveTab('profile')}
+                >
+                  <User className="h-5 w-5" /> Profile
+                </button>
+                <button
+                  className={`w-full text-left px-5 py-4 flex items-center gap-3 ${activeTab==='orders' ? 'bg-pink-50 text-pink-600' : 'hover:bg-gray-50'}`}
+                  onClick={() => setActiveTab('orders')}
+                >
+                  <Package className="h-5 w-5" /> Orders
+                </button>
+                <button
+                  className={`w-full text-left px-5 py-4 flex items-center gap-3 ${activeTab==='wishlist' ? 'bg-pink-50 text-pink-600' : 'hover:bg-gray-50'}`}
+                  onClick={() => setActiveTab('wishlist')}
+                >
+                  <Heart className="h-5 w-5" /> Wishlist
+                </button>
+                <button
+                  className={`w-full text-left px-5 py-4 flex items-center gap-3 ${activeTab==='settings' ? 'bg-pink-50 text-pink-600' : 'hover:bg-gray-50'}`}
+                  onClick={() => setActiveTab('settings')}
+                >
+                  <Settings className="h-5 w-5" /> Settings
+                </button>
+              </nav>
+            </aside>
+
+            {/* Main content */}
+            <section className="lg:col-span-3 space-y-8">
+              {activeTab === 'profile' && (
+                <div className="rounded-xl border p-6 bg-white">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold">Personal Information</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <User className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium">{name}</div>
+                          <div className="text-sm text-gray-500">Full Name</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium">{email}</div>
+                          <div className="text-sm text-gray-500">Email Address</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium">{phone}</div>
+                          <div className="text-sm text-gray-500">Phone Number</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Calendar className="h-5 w-5 text-gray-400" />
+                        <div>
+                          <div className="font-medium">{memberSince}</div>
+                          <div className="text-sm text-gray-500">Member Since</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <Button onClick={async () => { await authService.signOut(); window.location.href = '/'; }}>Log Out</Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <div className="font-medium">{email}</div>
-                    <div className="text-sm text-gray-500">Email Address</div>
-                  </div>
+              )}
+
+              {activeTab === 'orders' && (
+                <div className="rounded-xl border p-6 bg-white">
+                  <h2 className="text-2xl font-bold mb-4">Order History</h2>
+                  <p className="text-gray-600">Your orders will appear here.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <div className="font-medium">{phone}</div>
-                    <div className="text-sm text-gray-500">Phone Number</div>
-                  </div>
+              )}
+
+              {activeTab === 'wishlist' && (
+                <div className="rounded-xl border p-6 bg-white">
+                  <h2 className="text-2xl font-bold mb-4">My Wishlist</h2>
+                  <p className="text-gray-600">Wishlist items will appear here.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <Calendar className="h-5 w-5 text-gray-400" />
-                  <div>
-                    <div className="font-medium">{memberSince}</div>
-                    <div className="text-sm text-gray-500">Member Since</div>
-                  </div>
+              )}
+
+              {activeTab === 'settings' && (
+                <div className="rounded-xl border p-6 bg-white">
+                  <h2 className="text-2xl font-bold mb-4">Settings</h2>
+                  <p className="text-gray-600">Profile and account settings will appear here.</p>
                 </div>
-              </div>
-            </div>
-            <div className="mt-6">
-              <Button onClick={async () => { await authService.signOut(); window.location.href = '/'; }}>Log Out</Button>
-            </div>
+              )}
+            </section>
           </div>
         </Container>
       </main>
