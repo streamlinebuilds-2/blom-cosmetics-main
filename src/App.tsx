@@ -20,6 +20,8 @@ import AccountPageMinimal from './pages/AccountPageMinimal';
 import AccountPageFullCore from './pages/AccountPageFullCore';
 import ErrorBoundary from './components/ErrorBoundary';
 import OrderDetailPage from './pages/OrderDetailPage';
+import PaymentSuccess from './pages/PaymentSuccess';
+import PaymentCancelled from './pages/PaymentCancelled';
 import { WishlistPage } from './pages/WishlistPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
@@ -99,6 +101,9 @@ function App() {
   if (path === '/checkout/cancel') { return <><CheckoutCancel /><CartWidget /></>; }
   
   if (path === '/auth-test') { return <><AuthTestPage /></>; }
+
+  if (path === '/payment-success') { return <><PaymentSuccess /><CartWidget /></>; }
+  if (path === '/payment-cancelled') { return <><PaymentCancelled /><CartWidget /></>; }
   
   if (path === '/product-template-example') { return <><ProductTemplateExample /><CartWidget /></>; }
   

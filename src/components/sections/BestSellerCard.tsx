@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Heart } from 'lucide-react';
 import { cartStore } from '../../lib/cart';
+import { wishlistStore } from '../../lib/wishlist';
 
 interface BestSellerCardProps {
   id: string;
@@ -78,6 +79,14 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    wishlistStore.toggleItem({
+      id: `wl_${id}`,
+      productId: slug,
+      name,
+      price,
+      image,
+      slug
+    } as any);
   };
 
   const handleCardClick = () => {
@@ -120,8 +129,8 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
           </div>
         )}
 
-        {/* Wishlist Button */}
-        <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {/* Wishlist Button - always visible (mobile & desktop) */}
+        <div className="absolute top-3 right-3 z-10">
           <button
             onClick={handleWishlistToggle}
             className="relative p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all duration-300 group/btn"
