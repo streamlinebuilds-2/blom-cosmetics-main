@@ -135,16 +135,16 @@ export const AccountPage: React.FC = () => {
     })();
   }, [authState.user?.id]); // Only depend on user ID, not the entire user object
 
-  // Hard fallback: if we keep loading too long without a user, redirect to login
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const state = authService.getState();
-      if (!state.user) {
-        window.location.href = '/login?redirect=/account';
-      }
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
+  // TEMP: Disable 3-second redirect while isolating crash
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     const state = authService.getState();
+  //     if (!state.user) {
+  //       window.location.href = '/login?redirect=/account';
+  //     }
+  //   }, 3000);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   const saveProfile = async () => {
     if (!profile) return;
@@ -238,7 +238,7 @@ export const AccountPage: React.FC = () => {
   }
 
   // User data from auth state
-  const userData = {
+  const userData = React.useMemo(() => ({
     name: profile?.name || authState.user?.user_metadata?.full_name || authState.user?.email?.split('@')[0] || 'User',
     email: profile?.email || authState.user?.email || '',
     phone: profile?.phone || '',
@@ -247,7 +247,7 @@ export const AccountPage: React.FC = () => {
     totalOrders: 0,
     totalSpent: 0,
     loyaltyPoints: 0
-  };
+  }), [profile?.name, profile?.email, profile?.phone, authState.user?.user_metadata?.full_name, authState.user?.email, authState.user?.created_at]);
 
   const recentOrders = [
     {
@@ -428,18 +428,15 @@ export const AccountPage: React.FC = () => {
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold">Personal Information</h2>
-                        <Button variant="outline" size="sm" onClick={() => setActiveTab('profile')}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Profile
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid md:grid-cols-2 gap-6">
+                  <div className="rounded-xl border p-6 bg-white">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-2xl font-bold">Personal Information</h2>
+                      <Button variant="outline" size="sm" onClick={() => setActiveTab('profile')}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Profile
+                      </Button>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                           <div className="flex items-center gap-3">
                             <User className="h-5 w-5 text-gray-400" />
@@ -484,8 +481,7 @@ export const AccountPage: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                  </div>
 
                   {stage >= 3 && (
                     <div className="grid md:grid-cols-3 gap-6">
