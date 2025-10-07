@@ -12,6 +12,8 @@ export default function AccountPageFullCore() {
   const [authState, setAuthState] = useState<AuthState>({ user: null, loading: true, error: null });
   const [profile, setProfile] = useState<{ id: string; email: string | null; name: string | null; phone: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'My Account - BLOM Cosmetics';
@@ -233,8 +235,48 @@ export default function AccountPageFullCore() {
 
               {activeTab === 'settings' && (
                 <div className="rounded-xl border p-6 bg-white">
-                  <h2 className="text-2xl font-bold mb-4">Settings</h2>
-                  <p className="text-gray-600">Profile and account settings will appear here.</p>
+                  <h2 className="text-2xl font-bold mb-6">Settings</h2>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                      <input
+                        className="w-full border rounded-md px-3 py-2"
+                        value={profile?.name ?? ''}
+                        onChange={(e) => setProfile(p => p ? { ...p, name: e.target.value } : p)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                      <input
+                        className="w-full border rounded-md px-3 py-2"
+                        value={profile?.phone ?? ''}
+                        onChange={(e) => setProfile(p => p ? { ...p, phone: e.target.value } : p)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                      <input className="w-full border rounded-md px-3 py-2 bg-gray-100" value={profile?.email ?? email} disabled />
+                      <p className="text-xs text-gray-500 mt-1">Email changes require re-verification (coming soon).</p>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex items-center gap-3">
+                    <Button
+                      onClick={async () => {
+                        if (!authState.user || !profile) return;
+                        setSaving(true); setStatus(null);
+                        const { error } = await supabase
+                          .from('profiles')
+                          .update({ name: profile.name, phone: profile.phone })
+                          .eq('id', authState.user.id);
+                        setSaving(false);
+                        setStatus(error ? `Error: ${error.message}` : 'Saved');
+                      }}
+                      disabled={saving}
+                    >
+                      {saving ? 'Saving…' : 'Save Changes'}
+                    </Button>
+                    {status && <span className="text-sm text-gray-600">{status}</span>}
+                  </div>
                 </div>
               )}
             </section>
