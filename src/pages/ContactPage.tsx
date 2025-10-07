@@ -232,26 +232,65 @@ export const ContactPage: React.FC = () => {
     }
     
     setIsSubmitting(true);
-    
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      countryCode: '+27',
-      subject: '',
-      message: '',
-      inquiryType: 'general'
-    });
-    setAttachedFiles([]);
-    setValidationErrors({});
-    setAgreedToTerms(false);
-    
-    setIsSubmitting(false);
-    alert('Thank you for your message! We\'ll get back to you within 24 hours.');
+
+    try {
+      // Build multipart/form-data payload
+      const fd = new FormData();
+      fd.set('source', 'contact_form');
+      fd.set('channel', 'website');
+      fd.set('full_name', formData.name);
+      fd.set('email', formData.email.toLowerCase());
+      fd.set('phone', `${formData.countryCode} ${formData.phone}`.trim());
+      fd.set('inquiry_type', inquiryTypes.find(i => i.value === formData.inquiryType)?.label || formData.inquiryType);
+      fd.set('subject', formData.subject);
+      fd.set('message', formData.message);
+      fd.set('consent_terms', agreedToTerms ? 'true' : 'false');
+      fd.set('user_agent', navigator.userAgent);
+
+      // Context
+      const params = new URLSearchParams(window.location.search);
+      fd.set('page_url', window.location.href);
+      fd.set('referrer', document.referrer || '');
+      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(k => fd.set(k, params.get(k) || ''));
+
+      // Attach files (10MB each)
+      for (const f of attachedFiles) {
+        if (f.size > 10 * 1024 * 1024) {
+          alert(`"${f.name}" is over 10MB. Please upload smaller files.`);
+          setIsSubmitting(false);
+          return;
+        }
+        fd.append('attachments', f, f.name);
+      }
+
+      const WEBHOOK = 'https://dockerfile-1n82.onrender.com/webhook/contact-us-capture';
+      const res = await fetch(WEBHOOK, { method: 'POST', body: fd });
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`Webhook ${res.status}: ${text || 'failed'}`);
+      }
+
+      // Reset form
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        countryCode: '+27',
+        subject: '',
+        message: '',
+        inquiryType: 'general'
+      });
+      setAttachedFiles([]);
+      setValidationErrors({});
+      setAgreedToTerms(false);
+
+      alert("Thanks! We’ll get back to you within 1 business day.");
+    } catch (err) {
+      console.error(err);
+      alert('Couldn’t send right now. Please try again in a minute.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleFaq = (index: number) => {
