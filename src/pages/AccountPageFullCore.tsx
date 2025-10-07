@@ -254,7 +254,7 @@ export default function AccountPageFullCore() {
                             </div>
                           </div>
                           <div className="mt-4 flex flex-wrap gap-2">
-                            <Button variant="outline" size="sm">View Details</Button>
+                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `/orders/${o.id}`)}>View Details</Button>
                             <Button variant="outline" size="sm">Download Invoice</Button>
                           </div>
                         </div>

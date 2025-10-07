@@ -19,6 +19,7 @@ import { AccountPage } from './pages/AccountPage';
 import AccountPageMinimal from './pages/AccountPageMinimal';
 import AccountPageFullCore from './pages/AccountPageFullCore';
 import ErrorBoundary from './components/ErrorBoundary';
+import OrderDetailPage from './pages/OrderDetailPage';
 import { WishlistPage } from './pages/WishlistPage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
@@ -75,6 +76,11 @@ function App() {
     ) : (
       <AccountPageMinimal />
     )}<CartWidget /></>;
+  }
+
+  if (path.startsWith('/orders/')) {
+    const id = path.split('/orders/')[1];
+    return <><OrderDetailPage orderId={id} /><CartWidget /></>;
   }
   
   if (path === '/simple-account') { return <><SimpleAccountPage /></>; }
