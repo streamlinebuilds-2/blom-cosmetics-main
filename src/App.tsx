@@ -30,7 +30,7 @@ function App() {
   // Simple routing based on URL path
   const path = window.location.pathname;
   const params = new URLSearchParams(window.location.search);
-  const accountMinimal = params.get('minimal') === '1';
+  const accountFull = params.get('full') === '1';
   
   if (path === '/shop') {
     return <><ShopPage /><CartWidget /></>;
@@ -64,9 +64,9 @@ function App() {
 
   if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
-  // Default to full account page; use ?minimal=1 to force minimal fallback
+  // Default to minimal page for stability; use ?full=1 to load full account page
   if (path === '/account') {
-    return <>{accountMinimal ? <AccountPageMinimal /> : <AccountPage />}<CartWidget /></>;
+    return <>{accountFull ? <AccountPage /> : <AccountPageMinimal />}<CartWidget /></>;
   }
   
   if (path === '/simple-account') { return <><SimpleAccountPage /></>; }
