@@ -23,6 +23,7 @@ import CheckoutSuccess from './pages/CheckoutSuccess';
 import CheckoutCancel from './pages/CheckoutCancel';
 import AuthTestPage from './pages/AuthTestPage';
 import SimpleAccountPage from './pages/SimpleAccountPage';
+import DebugAccountPage from './pages/DebugAccountPage';
 
 function App() {
   // Simple routing based on URL path
@@ -63,6 +64,8 @@ function App() {
   if (path === '/account') { return <><AccountPage /><CartWidget /></>; }
   
   if (path === '/simple-account') { return <><SimpleAccountPage /></>; }
+  
+  if (path === '/debug-account') { return <><DebugAccountPage /></>; }
 
   if (path === '/wishlist') { return <><WishlistPage /><CartWidget /></>; }
   
