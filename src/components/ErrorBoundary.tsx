@@ -21,6 +21,12 @@ export default class ErrorBoundary extends React.Component<Props, State> {
         <div style={{ padding: 24 }}>
           <h1 style={{ fontWeight: 700, marginBottom: 12 }}>Account page crashed</h1>
           <pre style={{ whiteSpace: 'pre-wrap', color: '#b91c1c' }}>{String(this.state.error)}</pre>
+          {this.state.error?.stack && (
+            <details style={{ marginTop: 12 }} open>
+              <summary style={{ cursor: 'pointer' }}>Stack trace</summary>
+              <pre style={{ whiteSpace: 'pre-wrap' }}>{this.state.error.stack}</pre>
+            </details>
+          )}
         </div>
       );
     }
