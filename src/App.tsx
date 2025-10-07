@@ -29,6 +29,8 @@ import DebugAccountPage from './pages/DebugAccountPage';
 function App() {
   // Simple routing based on URL path
   const path = window.location.pathname;
+  const params = new URLSearchParams(window.location.search);
+  const accountFull = params.get('full') === '1';
   
   if (path === '/shop') {
     return <><ShopPage /><CartWidget /></>;
@@ -62,8 +64,10 @@ function App() {
 
   if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
-  // Temporarily route /account to minimal page to restore UX while we isolate crash
-  if (path === '/account') { return <><AccountPageMinimal /><CartWidget /></>; }
+  // Toggle between minimal and full account page with ?full=1
+  if (path === '/account') {
+    return <>{accountFull ? <AccountPage /> : <AccountPageMinimal />}<CartWidget /></>;
+  }
   
   if (path === '/simple-account') { return <><SimpleAccountPage /></>; }
   
