@@ -15,7 +15,16 @@ export const supabase = createClient(
   {
     auth: {
       persistSession: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: true,
+      autoRefreshToken: true,
+      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+      storageKey: 'sb-yvmnedjybrpvlupygusf-auth-token',
+      flowType: 'pkce'
+    },
+    global: {
+      headers: {
+        'X-Client-Info': 'blom-cosmetics'
+      }
     }
   }
 );

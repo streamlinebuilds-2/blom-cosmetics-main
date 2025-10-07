@@ -38,10 +38,12 @@ export const AccountPage: React.FC = () => {
     // Debug: Check for Supabase cookies and env vars
     const cookies = document.cookie.split('; ').filter(row => row.startsWith('sb-'));
     const hasSessionCookie = cookies.length > 0;
+    const localStorageKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'));
+    const hasLocalStorageSession = localStorageKeys.length > 0;
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     const hasEnvVars = !!(supabaseUrl && supabaseKey);
-    setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'}) | Env: ${hasEnvVars ? 'YES' : 'NO'} | URL: ${supabaseUrl ? 'SET' : 'MISSING'}`);
+    setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'}) | LocalStorage: ${localStorageKeys.length} (${hasLocalStorageSession ? 'YES' : 'NO'}) | Env: ${hasEnvVars ? 'YES' : 'NO'}`);
 
     // Subscribe to auth state changes
     const unsubscribe = authService.subscribe((newState) => {

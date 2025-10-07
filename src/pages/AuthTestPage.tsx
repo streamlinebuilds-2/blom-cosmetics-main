@@ -66,9 +66,14 @@ export default function AuthTestPage() {
         addResult(`❌ Login failed: ${error.message}`);
       } else {
         addResult(`✅ Login successful: ${data.user?.email}`);
-        // Check cookies after login
+        // Check cookies and localStorage after login
         const cookies = document.cookie.split('; ').filter(row => row.startsWith('sb-'));
+        const localStorageKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'));
         addResult(`Cookies after login: ${cookies.length} sb- cookies found`);
+        addResult(`LocalStorage after login: ${localStorageKeys.length} sb- keys found`);
+        if (localStorageKeys.length > 0) {
+          addResult(`LocalStorage keys: ${localStorageKeys.join(', ')}`);
+        }
       }
     } catch (err) {
       addResult(`❌ Login exception: ${err}`);
@@ -85,9 +90,11 @@ export default function AuthTestPage() {
         addResult(`❌ Logout failed: ${error.message}`);
       } else {
         addResult('✅ Logout successful');
-        // Check cookies after logout
+        // Check cookies and localStorage after logout
         const cookies = document.cookie.split('; ').filter(row => row.startsWith('sb-'));
+        const localStorageKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'));
         addResult(`Cookies after logout: ${cookies.length} sb- cookies found`);
+        addResult(`LocalStorage after logout: ${localStorageKeys.length} sb- keys found`);
       }
     } catch (err) {
       addResult(`❌ Logout exception: ${err}`);
