@@ -186,8 +186,27 @@ export default function AccountPageFullCore() {
 
               {activeTab === 'orders' && (
                 <div className="rounded-xl border p-6 bg-white">
-                  <h2 className="text-2xl font-bold mb-4">Order History</h2>
-                  <p className="text-gray-600">Your orders will appear here.</p>
+                  <h2 className="text-2xl font-bold mb-6">Order History</h2>
+                  <div className="space-y-4">
+                    {[1,2,3].map((i) => (
+                      <div key={i} className="border rounded-lg p-5">
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                          <div>
+                            <div className="font-semibold">Order BLOM-2024-00{i}</div>
+                            <div className="text-sm text-gray-500">Placed on 2024-01-0{i}</div>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold">R{(i*199).toFixed(2)}</div>
+                            <div className="text-sm text-gray-500">{i+1} items</div>
+                          </div>
+                        </div>
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          <Button variant="outline" size="sm">View Details</Button>
+                          <Button variant="outline" size="sm">Download Invoice</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
