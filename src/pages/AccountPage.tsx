@@ -48,7 +48,14 @@ export const AccountPage: React.FC = () => {
     setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'}) | LocalStorage: ${localStorageKeys.length} (${hasLocalStorageSession ? 'YES' : 'NO'}) | Env: ${hasEnvVars ? 'YES' : 'NO'}`);
 
     // Subscribe to auth state changes
+    let lastUserId: string | null = null;
     const unsubscribe = authService.subscribe((newState) => {
+      // Guard: avoid redundant state updates that can cause render loops
+      const nextUserId = newState.user?.id ?? null;
+      const sameUser = lastUserId === nextUserId && authState.loading === newState.loading && authState.error === newState.error;
+      if (sameUser) return;
+      lastUserId = nextUserId;
+
       console.log('Auth state changed:', newState); // Debug log
       setAuthState(newState);
       
