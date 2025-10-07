@@ -212,8 +212,22 @@ export default function AccountPageFullCore() {
 
               {activeTab === 'wishlist' && (
                 <div className="rounded-xl border p-6 bg-white">
-                  <h2 className="text-2xl font-bold mb-4">My Wishlist</h2>
-                  <p className="text-gray-600">Wishlist items will appear here.</p>
+                  <h2 className="text-2xl font-bold mb-6">My Wishlist</h2>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1,2,3].map(i => (
+                      <div key={i} className="border rounded-lg overflow-hidden">
+                        <div className="aspect-square bg-gray-100" />
+                        <div className="p-4">
+                          <div className="font-medium">Sample item {i}</div>
+                          <div className="text-sm text-gray-500">R{(i*149).toFixed(2)}</div>
+                          <div className="mt-3 flex gap-2">
+                            <Button size="sm" className="flex-1">Add to Cart</Button>
+                            <Button size="sm" variant="outline">Remove</Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
