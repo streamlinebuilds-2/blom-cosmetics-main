@@ -80,6 +80,9 @@ export const AccountPage: React.FC = () => {
     (async () => {
       if (!authState.user) return;
       
+      // Don't fetch if we already have a profile for this user
+      if (profile && profile.id === authState.user.id) return;
+      
       // Test Supabase connection first
       try {
         const { data: testData, error: testError } = await supabase
@@ -120,7 +123,7 @@ export const AccountPage: React.FC = () => {
       } catch {}
       setProfile({ id: user.id, email: user.email ?? null, name: user.user_metadata?.name ?? null, phone: user.user_metadata?.phone ?? null });
     })();
-  }, [authState.user]);
+  }, [authState.user?.id]); // Only depend on user ID, not the entire user object
 
   // Hard fallback: if we keep loading too long without a user, redirect to login
   useEffect(() => {
