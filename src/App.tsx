@@ -22,6 +22,7 @@ import { SignupPage } from './pages/SignupPage';
 import CheckoutSuccess from './pages/CheckoutSuccess';
 import CheckoutCancel from './pages/CheckoutCancel';
 import AuthTestPage from './pages/AuthTestPage';
+import SimpleAccountPage from './pages/SimpleAccountPage';
 
 function App() {
   // Simple routing based on URL path
@@ -60,6 +61,8 @@ function App() {
   if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
   if (path === '/account') { return <><AccountPage /><CartWidget /></>; }
+  
+  if (path === '/simple-account') { return <><SimpleAccountPage /></>; }
 
   if (path === '/wishlist') { return <><WishlistPage /><CartWidget /></>; }
   
