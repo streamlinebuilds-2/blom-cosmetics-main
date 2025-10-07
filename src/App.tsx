@@ -21,6 +21,7 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import CheckoutSuccess from './pages/CheckoutSuccess';
 import CheckoutCancel from './pages/CheckoutCancel';
+import AuthTestPage from './pages/AuthTestPage';
 
 function App() {
   // Simple routing based on URL path
@@ -70,6 +71,8 @@ function App() {
 
   if (path === '/checkout/success') { return <><CheckoutSuccess /><CartWidget /></>; }
   if (path === '/checkout/cancel') { return <><CheckoutCancel /><CartWidget /></>; }
+  
+  if (path === '/auth-test') { return <><AuthTestPage /></>; }
   
   if (path === '/product-template-example') { return <><ProductTemplateExample /><CartWidget /></>; }
   

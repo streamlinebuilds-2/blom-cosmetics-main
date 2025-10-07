@@ -35,10 +35,13 @@ export const AccountPage: React.FC = () => {
     }
     window.scrollTo({ top: 0 });
 
-    // Debug: Check for Supabase cookies
+    // Debug: Check for Supabase cookies and env vars
     const cookies = document.cookie.split('; ').filter(row => row.startsWith('sb-'));
     const hasSessionCookie = cookies.length > 0;
-    setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'})`);
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const hasEnvVars = !!(supabaseUrl && supabaseKey);
+    setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'}) | Env: ${hasEnvVars ? 'YES' : 'NO'} | URL: ${supabaseUrl ? 'SET' : 'MISSING'}`);
 
     // Subscribe to auth state changes
     const unsubscribe = authService.subscribe((newState) => {
@@ -72,6 +75,27 @@ export const AccountPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       if (!authState.user) return;
+      
+      // Test Supabase connection first
+      try {
+        const { data: testData, error: testError } = await supabase
+          .from('profiles')
+          .select('count')
+          .limit(1);
+        
+        if (testError) {
+          console.error('Supabase connection test failed:', testError);
+          setDebugInfo(prev => prev + ` | DB Error: ${testError.message}`);
+          return;
+        }
+        
+        console.log('Supabase connection test successful');
+      } catch (err) {
+        console.error('Supabase connection test exception:', err);
+        setDebugInfo(prev => prev + ` | DB Exception: ${err}`);
+        return;
+      }
+      
       const user = authState.user;
       const { data, error } = await supabase
         .from('profiles')
