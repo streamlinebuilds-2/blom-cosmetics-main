@@ -17,6 +17,7 @@ import { ReturnsPage } from './pages/ReturnsPage';
 import { CookiePolicyPage } from './pages/CookiePolicyPage';
 import { AccountPage } from './pages/AccountPage';
 import AccountPageMinimal from './pages/AccountPageMinimal';
+import AccountPageFullCore from './pages/AccountPageFullCore';
 import ErrorBoundary from './components/ErrorBoundary';
 import { WishlistPage } from './pages/WishlistPage';
 import { LoginPage } from './pages/LoginPage';
@@ -65,11 +66,11 @@ function App() {
 
   if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
 
-  // Default to minimal page for stability; use ?full=1 to load full account page (wrapped in ErrorBoundary)
+  // Default to minimal page; ?full=1 loads the Core full page (stable), later we re-add features
   if (path === '/account') {
     return <>{accountFull ? (
       <ErrorBoundary>
-        <AccountPage />
+        <AccountPageFullCore />
       </ErrorBoundary>
     ) : (
       <AccountPageMinimal />
