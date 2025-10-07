@@ -35,6 +35,7 @@ class AuthService {
   }
 
   private async initializeAuth() {
+    console.log('AuthService: Initializing auth...');
     try {
       // Check if Supabase is properly configured
       if (!supabase || supabase.supabaseUrl === 'https://placeholder.supabase.co') {
@@ -43,6 +44,7 @@ class AuthService {
         return;
       }
 
+      console.log('AuthService: Supabase configured, getting session...');
       // Get initial session
       const { data: { session }, error } = await supabase.auth.getSession();
       
@@ -52,6 +54,7 @@ class AuthService {
         return;
       }
 
+      console.log('AuthService: Session retrieved:', session ? 'User found' : 'No user');
       this.setState({
         user: session?.user || null,
         loading: false,
@@ -60,6 +63,7 @@ class AuthService {
 
       // Listen for auth changes including email confirmation redirects
       supabase.auth.onAuthStateChange((_event: string, session: any) => {
+        console.log('AuthService: Auth state changed:', session ? 'User found' : 'No user');
         this.setState({
           user: session?.user || null,
           loading: false,

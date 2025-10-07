@@ -10,6 +10,7 @@ import { supabase } from '../lib/supabase';
 import { wishlistStore } from '../lib/wishlist';
 
 export const AccountPage: React.FC = () => {
+  console.log('AccountPage component rendering...');
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
 
   // Check URL parameters for initial tab
@@ -28,6 +29,7 @@ export const AccountPage: React.FC = () => {
   const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
+    console.log('AccountPage useEffect running...');
     document.title = 'My Account - BLOM Cosmetics';
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
@@ -306,6 +308,15 @@ export const AccountPage: React.FC = () => {
               User: {authState.user ? 'YES' : 'NO'} | 
               Profile: {profile ? 'YES' : 'NO'} | 
               Loading: {authState.loading ? 'YES' : 'NO'}
+            </p>
+          </div>
+          
+          {/* Emergency Fallback */}
+          <div className="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded mb-6">
+            <p className="text-sm">
+              <strong>Emergency Debug:</strong> If you can see this, the component is rendering. 
+              Auth State: {JSON.stringify(authState)} | 
+              Profile: {profile ? 'EXISTS' : 'NULL'}
             </p>
           </div>
           {/* Account Header */}
