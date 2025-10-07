@@ -4,17 +4,21 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  // Fail fast so developers know to configure env vars
-  // eslint-disable-next-line no-throw-literal
-  throw new Error('Missing Supabase environment variables (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)');
+  console.warn('Missing Supabase environment variables (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY)');
+  // Use placeholder values to prevent the app from crashing
+  // In production, these should be set in Netlify
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    detectSessionInUrl: true
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseAnonKey || 'placeholder-key', 
+  {
+    auth: {
+      persistSession: true,
+      detectSessionInUrl: true
+    }
   }
-});
+);
 
 // Types for our database schema
 export interface Category {

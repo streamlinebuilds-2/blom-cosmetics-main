@@ -25,6 +25,7 @@ export const AccountPage: React.FC = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
     document.title = 'My Account - BLOM Cosmetics';
@@ -33,6 +34,11 @@ export const AccountPage: React.FC = () => {
       metaDescription.setAttribute('content', 'Manage your BLOM Cosmetics account, view orders, update profile, and track your nail artistry journey.');
     }
     window.scrollTo({ top: 0 });
+
+    // Debug: Check for Supabase cookies
+    const cookies = document.cookie.split('; ').filter(row => row.startsWith('sb-'));
+    const hasSessionCookie = cookies.length > 0;
+    setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'})`);
 
     // Subscribe to auth state changes
     const unsubscribe = authService.subscribe((newState) => {
@@ -267,6 +273,15 @@ export const AccountPage: React.FC = () => {
 
       <main className="section-padding">
         <Container>
+          {/* Debug Banner */}
+          <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-6">
+            <p className="text-sm">
+              <strong>Debug Info:</strong> {debugInfo} | 
+              User: {authState.user ? 'YES' : 'NO'} | 
+              Profile: {profile ? 'YES' : 'NO'} | 
+              Loading: {authState.loading ? 'YES' : 'NO'}
+            </p>
+          </div>
           {/* Account Header */}
           <div className="bg-gradient-to-r from-pink-400 to-blue-300 rounded-2xl p-8 text-white mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between">

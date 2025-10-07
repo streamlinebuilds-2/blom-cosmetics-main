@@ -36,6 +36,13 @@ class AuthService {
 
   private async initializeAuth() {
     try {
+      // Check if Supabase is properly configured
+      if (!supabase || supabase.supabaseUrl === 'https://placeholder.supabase.co') {
+        console.warn('Supabase not properly configured, authentication disabled');
+        this.setState({ user: null, loading: false, error: 'Authentication service not configured' });
+        return;
+      }
+
       // Get initial session
       const { data: { session }, error } = await supabase.auth.getSession();
       
