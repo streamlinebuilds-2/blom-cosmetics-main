@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { User, Mail, Phone, Calendar, Package, Heart, Settings } from 'lucide-react';
 import { authService, AuthState } from '../lib/auth';
 import { supabase } from '../lib/supabase';
+import { wishlistStore } from '../lib/wishlist';
 
 export default function AccountPageFullCore() {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
@@ -17,6 +18,7 @@ export default function AccountPageFullCore() {
   const [orders, setOrders] = useState<Array<{ id: string; status: string; total: number; created_at: string }>>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
+  const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
 
   useEffect(() => {
     document.title = 'My Account - BLOM Cosmetics';
@@ -72,6 +74,14 @@ export default function AccountPageFullCore() {
       setOrdersLoading(false);
     })();
   }, [authState.user?.id]);
+
+  // Subscribe to wishlist changes (local store)
+  useEffect(() => {
+    const unsub = wishlistStore.subscribe(() => {
+      setWishlistItems(wishlistStore.getItems());
+    });
+    return unsub;
+  }, []);
 
   if (authState.loading || loading) {
     return (
@@ -257,21 +267,29 @@ export default function AccountPageFullCore() {
               {activeTab === 'wishlist' && (
                 <div className="rounded-xl border p-6 bg-white">
                   <h2 className="text-2xl font-bold mb-6">My Wishlist</h2>
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {[1,2,3].map(i => (
-                      <div key={i} className="border rounded-lg overflow-hidden">
-                        <div className="aspect-square bg-gray-100" />
-                        <div className="p-4">
-                          <div className="font-medium">Sample item {i}</div>
-                          <div className="text-sm text-gray-500">R{(i*149).toFixed(2)}</div>
-                          <div className="mt-3 flex gap-2">
-                            <Button size="sm" className="flex-1">Add to Cart</Button>
-                            <Button size="sm" variant="outline">Remove</Button>
+                  {wishlistItems.length === 0 ? (
+                    <div className="text-gray-600">Your wishlist is empty.</div>
+                  ) : (
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {wishlistItems.map(item => (
+                        <div key={item.id} className="border rounded-lg overflow-hidden">
+                          <div className="aspect-square bg-gray-100">
+                            {item.image && (
+                              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            )}
+                          </div>
+                          <div className="p-4">
+                            <div className="font-medium line-clamp-2">{item.name}</div>
+                            <div className="text-sm text-gray-500">R{item.price.toFixed(2)}</div>
+                            <div className="mt-3 flex gap-2">
+                              <Button size="sm" className="flex-1" onClick={() => (window.location.href = `/products/${item.slug}`)}>View</Button>
+                              <Button size="sm" variant="outline" onClick={() => wishlistStore.removeItem(item.productId)}>Remove</Button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
