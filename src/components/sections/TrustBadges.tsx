@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Shield, Award, Heart, Leaf, Users } from 'lucide-react';
 
 export const TrustBadges: React.FC = () => {
+  const ref = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) el.classList.add('reveal-on-scroll');
+        else el.classList.remove('reveal-on-scroll');
+      });
+    }, { threshold: 0.15 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
   const badges = [
     {
       icon: Shield,
@@ -31,7 +44,7 @@ export const TrustBadges: React.FC = () => {
   ];
 
   return (
-    <section className="section-padding bg-white">
+    <section ref={ref} className="section-padding bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-6 md:gap-8">
           {badges.map((badge, index) => (

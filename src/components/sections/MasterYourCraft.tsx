@@ -5,6 +5,7 @@ import { Award, Computer, User } from 'lucide-react';
 
 export const MasterYourCraft: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const sectionRef = useRef<HTMLElement | null>(null);
 
   const handleNavigation = (e: React.MouseEvent<HTMLElement>, section: string) => {
     e.preventDefault();
@@ -46,8 +47,24 @@ export const MasterYourCraft: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          el.classList.add('reveal-on-scroll');
+        } else {
+          el.classList.remove('reveal-on-scroll');
+        }
+      });
+    }, { threshold: 0.15 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className="master" aria-label="Master Your Craft">
+    <section ref={sectionRef} className="master" aria-label="Master Your Craft">
       <Container>
         <div className="master__container">
           {/* Left copy */}
