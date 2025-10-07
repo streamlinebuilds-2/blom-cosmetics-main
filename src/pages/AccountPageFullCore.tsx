@@ -14,6 +14,9 @@ export default function AccountPageFullCore() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const [orders, setOrders] = useState<Array<{ id: string; status: string; total: number; created_at: string }>>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'My Account - BLOM Cosmetics';
@@ -39,6 +42,34 @@ export default function AccountPageFullCore() {
       } finally {
         setLoading(false);
       }
+    })();
+  }, [authState.user?.id]);
+
+  // Fetch orders for stats and Orders tab
+  useEffect(() => {
+    (async () => {
+      if (!authState.user) return;
+      setOrdersLoading(true);
+      setOrdersError(null);
+      const { data, error } = await supabase
+        .from('orders')
+        .select('id,status,total,created_at')
+        .eq('user_id', authState.user.id)
+        .order('created_at', { ascending: false });
+      if (error) {
+        setOrdersError(error.message);
+        setOrders([]);
+      } else {
+        // Normalize totals to numbers
+        const normalized = (data || []).map((o: any) => ({
+          id: String(o.id),
+          status: String(o.status || 'unknown'),
+          total: Number(o.total || 0),
+          created_at: String(o.created_at || new Date().toISOString())
+        }));
+        setOrders(normalized);
+      }
+      setOrdersLoading(false);
     })();
   }, [authState.user?.id]);
 
@@ -80,6 +111,9 @@ export default function AccountPageFullCore() {
   const email = profile?.email || authState.user.email || '—';
   const phone = profile?.phone || '—';
   const memberSince = authService.formatMemberSince(authState.user.created_at || '');
+  const totalOrders = orders.length;
+  const totalSpent = orders.reduce((sum, o) => sum + (Number.isFinite(o.total) ? o.total : 0), 0);
+  const points = Math.floor(totalSpent / 10);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -92,18 +126,18 @@ export default function AccountPageFullCore() {
                 <h1 className="text-3xl font-bold">Welcome back, {name}!</h1>
                 <p className="text-pink-100">Member since {memberSince}</p>
               </div>
-              {/* Stats strip (static placeholders for now) */}
+              {/* Stats strip (live from orders) */}
               <div className="grid grid-cols-3 gap-6 text-center">
                 <div>
-                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-2xl font-bold">{totalOrders}</div>
                   <div className="text-pink-100 text-sm">Orders</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">R0.00</div>
+                  <div className="text-2xl font-bold">R{totalSpent.toFixed(2)}</div>
                   <div className="text-pink-100 text-sm">Total Spent</div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold">0</div>
+                  <div className="text-2xl font-bold">{points}</div>
                   <div className="text-pink-100 text-sm">Points</div>
                 </div>
               </div>
@@ -189,26 +223,34 @@ export default function AccountPageFullCore() {
               {activeTab === 'orders' && (
                 <div className="rounded-xl border p-6 bg-white">
                   <h2 className="text-2xl font-bold mb-6">Order History</h2>
-                  <div className="space-y-4">
-                    {[1,2,3].map((i) => (
-                      <div key={i} className="border rounded-lg p-5">
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                          <div>
-                            <div className="font-semibold">Order BLOM-2024-00{i}</div>
-                            <div className="text-sm text-gray-500">Placed on 2024-01-0{i}</div>
+                  {ordersLoading ? (
+                    <div className="text-gray-600">Loading orders…</div>
+                  ) : ordersError ? (
+                    <div className="text-red-600">{ordersError}</div>
+                  ) : orders.length === 0 ? (
+                    <div className="text-gray-600">No orders yet.</div>
+                  ) : (
+                    <div className="space-y-4">
+                      {orders.map((o) => (
+                        <div key={o.id} className="border rounded-lg p-5">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                            <div>
+                              <div className="font-semibold">Order {o.id}</div>
+                              <div className="text-sm text-gray-500">Placed on {new Date(o.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-bold">R{o.total.toFixed(2)}</div>
+                              <div className="text-sm text-gray-500 capitalize">{o.status}</div>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <div className="font-bold">R{(i*199).toFixed(2)}</div>
-                            <div className="text-sm text-gray-500">{i+1} items</div>
+                          <div className="mt-4 flex flex-wrap gap-2">
+                            <Button variant="outline" size="sm">View Details</Button>
+                            <Button variant="outline" size="sm">Download Invoice</Button>
                           </div>
                         </div>
-                        <div className="mt-4 flex flex-wrap gap-2">
-                          <Button variant="outline" size="sm">View Details</Button>
-                          <Button variant="outline" size="sm">Download Invoice</Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
 
