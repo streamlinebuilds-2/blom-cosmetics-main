@@ -222,8 +222,127 @@ export const ContactPage: React.FC = () => {
   };
 
 
-  // Listen for success signal from the script
+  // Add the Cloudinary script and listen for success
   useEffect(() => {
+    // Add the script to handle form submission
+    const script = document.createElement('script');
+    script.textContent = `
+      const CLOUD_NAME = "dd89enrjz";
+      const UPLOAD_PRESET = "blom_unsigned";
+      const WEBHOOK = "https://dockerfile-1n82.onrender.com/webhook/contact-us-capture";
+
+      // --- upload one file to Cloudinary (unsigned) ---
+      async function uploadToCloudinary(file){
+        console.log('Uploading file:', file.name);
+        if (file.size > 10 * 1024 * 1024) throw new Error(\`"\${file.name}" is over 10MB\`);
+
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("upload_preset", UPLOAD_PRESET);
+        fd.append("folder", "blom/enquiries");
+
+        const res = await fetch(\`https://api.cloudinary.com/v1_1/\${CLOUD_NAME}/auto/upload\`, {
+          method: "POST",
+          body: fd
+        });
+        const j = await res.json();
+        console.log('Cloudinary response:', j);
+        if (!res.ok || j.error) throw new Error(j.error?.message || "Upload failed");
+        return j.secure_url;
+      }
+
+      // --- build payload and send to your webhook ---
+      async function submitContactForm(e){
+        e.preventDefault();
+        console.log('Form submitted, starting Cloudinary upload...');
+        const form = e.target;
+
+        // collect fields
+        const fd = new FormData(form);
+        const qs = new URLSearchParams(location.search);
+
+        const payload = {
+          source: "contact_form",
+          channel: "website",
+          full_name: fd.get("full_name")?.toString().trim(),
+          email: fd.get("email")?.toString().trim().toLowerCase(),
+          phone: fd.get("phone")?.toString().trim(),
+          inquiry_type: fd.get("inquiry_type") || "General Inquiry",
+          subject: fd.get("subject")?.toString().trim(),
+          message: fd.get("message")?.toString().trim(),
+          consent_terms: !!fd.get("agree_terms"),
+
+          page_url: location.href,
+          referrer: document.referrer || "",
+          utm_source: qs.get("utm_source") || "",
+          utm_medium: qs.get("utm_medium") || "",
+          utm_campaign: qs.get("utm_campaign") || "",
+          utm_term: qs.get("utm_term") || "",
+          utm_content: qs.get("utm_content") || "",
+
+          attachments: []
+        };
+
+        console.log('Payload before file upload:', payload);
+
+        // upload files → gather URLs
+        const fileInput = document.getElementById("attachments");
+        const urls = [];
+        if (fileInput && fileInput.files?.length) {
+          console.log('Files to upload:', fileInput.files.length);
+          for (const f of fileInput.files) {
+            const url = await uploadToCloudinary(f);
+            urls.push({ url });
+          }
+        }
+        payload.attachments = urls;
+
+        console.log('Final payload:', payload);
+
+        // UX lock
+        const btn = form.querySelector('[type="submit"]');
+        const txt = btn.textContent;
+        btn.disabled = true; btn.textContent = "Sending…";
+
+        try {
+          console.log('Sending to webhook:', WEBHOOK);
+          const r = await fetch(WEBHOOK, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+          });
+          console.log('Webhook response:', r.status, r.statusText);
+          if (!r.ok) {
+            const errorText = await r.text();
+            console.error('Webhook error:', errorText);
+            throw new Error(\`Webhook failed: \${r.status} \${errorText}\`);
+          }
+          
+          // Show success modal
+          console.log('Success! Showing modal...');
+          window.showSuccessModal = true;
+          form.reset();
+        } catch (err) {
+          console.error('Submission error:', err);
+          alert("Couldn't send right now — please try again. Error: " + err.message);
+        } finally {
+          btn.disabled = false; btn.textContent = txt;
+        }
+      }
+
+      // Override the form submission
+      const form = document.getElementById("contact-form");
+      if (form) {
+        console.log('Adding submit listener to form');
+        form.addEventListener("submit", submitContactForm);
+      } else {
+        console.error('Form not found!');
+      }
+    `;
+    
+    document.head.appendChild(script);
+
+    // Listen for success signal from the script
     const checkSuccess = () => {
       if (window.showSuccessModal) {
         setShowSuccessModal(true);
@@ -245,7 +364,13 @@ export const ContactPage: React.FC = () => {
     };
 
     const interval = setInterval(checkSuccess, 100);
-    return () => clearInterval(interval);
+    
+    return () => {
+      clearInterval(interval);
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, []);
 
   const toggleFaq = (index: number) => {
@@ -615,101 +740,6 @@ export const ContactPage: React.FC = () => {
                 </Card>
               </div>
 
-              {/* Cloudinary Upload Script */}
-              <script dangerouslySetInnerHTML={{
-                __html: `
-const CLOUD_NAME = "dd89enrjz";
-const UPLOAD_PRESET = "blom_unsigned";
-const WEBHOOK = "https://dockerfile-1n82.onrender.com/webhook/contact-us-capture";
-
-// --- upload one file to Cloudinary (unsigned) ---
-async function uploadToCloudinary(file){
-  if (file.size > 10 * 1024 * 1024) throw new Error(\`"\${file.name}" is over 10MB\`);
-
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("upload_preset", UPLOAD_PRESET);
-  fd.append("folder", "blom/enquiries");
-
-  const res = await fetch(\`https://api.cloudinary.com/v1_1/\${CLOUD_NAME}/auto/upload\`, {
-    method: "POST",
-    body: fd
-  });
-  const j = await res.json();
-  if (!res.ok || j.error) throw new Error(j.error?.message || "Upload failed");
-  return j.secure_url;
-}
-
-// --- build payload and send to your webhook ---
-async function submitContactForm(e){
-  e.preventDefault();
-  const form = e.target;
-
-  // collect fields
-  const fd = new FormData(form);
-  const qs = new URLSearchParams(location.search);
-
-  const payload = {
-    source: "contact_form",
-    channel: "website",
-    full_name: fd.get("full_name")?.toString().trim(),
-    email: fd.get("email")?.toString().trim().toLowerCase(),
-    phone: fd.get("phone")?.toString().trim(),
-    inquiry_type: fd.get("inquiry_type") || "General Inquiry",
-    subject: fd.get("subject")?.toString().trim(),
-    message: fd.get("message")?.toString().trim(),
-    consent_terms: !!fd.get("agree_terms"),
-
-    page_url: location.href,
-    referrer: document.referrer || "",
-    utm_source: qs.get("utm_source") || "",
-    utm_medium: qs.get("utm_medium") || "",
-    utm_campaign: qs.get("utm_campaign") || "",
-    utm_term: qs.get("utm_term") || "",
-    utm_content: qs.get("utm_content") || "",
-
-    attachments: []
-  };
-
-  // upload files → gather URLs
-  const fileInput = document.getElementById("attachments");
-  const urls = [];
-  if (fileInput && fileInput.files?.length) {
-    for (const f of fileInput.files) {
-      const url = await uploadToCloudinary(f);
-      urls.push({ url });
-    }
-  }
-  payload.attachments = urls;
-
-  // UX lock
-  const btn = form.querySelector('[type="submit"]');
-  const txt = btn.textContent;
-  btn.disabled = true; btn.textContent = "Sending…";
-
-  try {
-    const r = await fetch(WEBHOOK, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(payload)
-    });
-    if (!r.ok) throw new Error("Webhook failed");
-    
-    // Show success modal
-    window.showSuccessModal = true;
-    form.reset();
-  } catch (err) {
-    console.error(err);
-    alert("Couldn't send right now — please try again.");
-  } finally {
-    btn.disabled = false; btn.textContent = txt;
-  }
-}
-
-// Override the form submission
-document.getElementById("contact-form").addEventListener("submit", submitContactForm);
-                `
-              }} />
 
             </div>
           </Container>
