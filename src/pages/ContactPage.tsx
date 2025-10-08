@@ -1,4 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+// Extend window interface for script communication
+declare global {
+  interface Window {
+    showSuccessModal?: boolean;
+  }
+}
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -224,114 +231,37 @@ export const ContactPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate form before submission
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-
-    try {
-      const CLOUD_NAME = "dd89enrjz";
-      const UPLOAD_PRESET = "blom_unsigned"; // Make sure this exists in your Cloudinary settings
-      const WEBHOOK = 'https://dockerfile-1n82.onrender.com/webhook/contact-us-capture';
-
-      // --- Upload files to Cloudinary first ---
-      const attachmentUrls: { url: string; filename: string }[] = [];
-      
-      for (const file of attachedFiles) {
-        if (file.size > 10 * 1024 * 1024) {
-          alert(`"${file.name}" is over 10MB. Please upload smaller files.`);
-          setIsSubmitting(false);
-          return;
-        }
-
-        const fd = new FormData();
-        fd.append("file", file);
-        fd.append("upload_preset", UPLOAD_PRESET);
-        fd.append("folder", "blom/enquiries");
-
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
-          method: "POST",
-          body: fd
-        });
-        
-        const json = await res.json();
-        
-        if (!res.ok || json.error) {
-          throw new Error(`Failed to upload "${file.name}": ${json.error?.message || 'Upload failed'}`);
-        }
-        
-        attachmentUrls.push({ 
-          url: json.secure_url,
-          filename: file.name
-        });
-      }
-
-      // --- Build payload for webhook ---
-      const params = new URLSearchParams(window.location.search);
-      const payload = {
-        source: 'contact_form',
-        channel: 'website',
-        full_name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-        phone: `${formData.countryCode} ${formData.phone}`.trim(),
-        inquiry_type: inquiryTypes.find(i => i.value === formData.inquiryType)?.label || formData.inquiryType,
-        subject: formData.subject.trim(),
-        message: formData.message.trim(),
-        consent_terms: agreedToTerms,
-        
-        // Context
-        page_url: window.location.href,
-        referrer: document.referrer || '',
-        utm_source: params.get('utm_source') || '',
-        utm_medium: params.get('utm_medium') || '',
-        utm_campaign: params.get('utm_campaign') || '',
-        utm_term: params.get('utm_term') || '',
-        utm_content: params.get('utm_content') || '',
-        user_agent: navigator.userAgent,
-        
-        // Cloudinary URLs (Airtable-ready format)
-        attachments: attachmentUrls
-      };
-
-      // --- Send to webhook ---
-      const webhookRes = await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!webhookRes.ok) {
-        const text = await webhookRes.text().catch(() => '');
-        throw new Error(`Webhook ${webhookRes.status}: ${text || 'failed'}`);
-      }
-
-      // Reset form
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        countryCode: '+27',
-        subject: '',
-        message: '',
-        inquiryType: 'general'
-      });
-      setAttachedFiles([]);
-      setValidationErrors({});
-      setAgreedToTerms(false);
-
-      setShowSuccessModal(true);
-    } catch (err) {
-      console.error(err);
-      alert(`Error: ${err instanceof Error ? err.message : 'Couldn't send right now. Please try again.'}`);
-    } finally {
-      setIsSubmitting(false);
-    }
+  // Form submission is now handled by the script, but we keep this for validation
+  const handleSubmit = (e: React.FormEvent) => {
+    // Let the script handle the submission
+    // This function is kept for any React-specific validation if needed
   };
+
+  // Listen for success signal from the script
+  useEffect(() => {
+    const checkSuccess = () => {
+      if (window.showSuccessModal) {
+        setShowSuccessModal(true);
+        window.showSuccessModal = false;
+        // Reset form state
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          countryCode: '+27',
+          subject: '',
+          message: '',
+          inquiryType: 'general'
+        });
+        setAttachedFiles([]);
+        setValidationErrors({});
+        setAgreedToTerms(false);
+      }
+    };
+
+    const interval = setInterval(checkSuccess, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   const toggleFaq = (index: number) => {
     setExpandedFaq(expandedFaq === index ? null : index);
@@ -427,7 +357,7 @@ export const ContactPage: React.FC = () => {
                       </p>
                     </div>
                     
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                    <form id="contact-form" onSubmit={handleSubmit} className="space-y-8">
                       <div className="grid md:grid-cols-2 gap-6">
                         <div>
                           <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
@@ -436,7 +366,7 @@ export const ContactPage: React.FC = () => {
                           <input
                             type="text"
                             id="name"
-                            name="name"
+                            name="full_name"
                             value={formData.name}
                             onChange={handleInputChange}
                             required
@@ -506,7 +436,7 @@ export const ContactPage: React.FC = () => {
                           </label>
                           <select
                             id="inquiryType"
-                            name="inquiryType"
+                            name="inquiry_type"
                             value={formData.inquiryType}
                             onChange={handleInputChange}
                             required
@@ -575,6 +505,8 @@ export const ContactPage: React.FC = () => {
                             <label className="text-pink-500 hover:text-pink-600 cursor-pointer ml-1">
                               browse
                               <input
+                                id="attachments"
+                                name="attachments"
                                 type="file"
                                 multiple
                                 onChange={handleFileUpload}
@@ -617,28 +549,29 @@ export const ContactPage: React.FC = () => {
                       {/* Terms and Conditions Checkbox */}
                       <div className="flex items-start gap-3">
                         <div className="flex items-center h-5">
-                          <input
-                            id="terms"
-                            type="checkbox"
-                            checked={agreedToTerms}
-                            onChange={(e) => {
-                              setAgreedToTerms(e.target.checked);
-                              if (validationErrors.terms) {
-                                setValidationErrors(prev => ({
-                                  ...prev,
-                                  terms: ''
-                                }));
-                              }
-                            }}
-                            className={`w-4 h-4 rounded-md border-2 focus:ring-2 focus:ring-primary-pink transition-colors ${
-                              agreedToTerms 
-                                ? 'bg-primary-pink border-primary-pink text-white' 
-                                : 'border-gray-300 hover:border-primary-pink'
-                            } ${validationErrors.terms ? 'border-red-500' : ''}`}
-                            style={{
-                              accentColor: '#FF74A4'
-                            }}
-                          />
+                            <input
+                              id="terms"
+                              name="agree_terms"
+                              type="checkbox"
+                              checked={agreedToTerms}
+                              onChange={(e) => {
+                                setAgreedToTerms(e.target.checked);
+                                if (validationErrors.terms) {
+                                  setValidationErrors(prev => ({
+                                    ...prev,
+                                    terms: ''
+                                  }));
+                                }
+                              }}
+                              className={`w-4 h-4 rounded-md border-2 focus:ring-2 focus:ring-primary-pink transition-colors ${
+                                agreedToTerms 
+                                  ? 'bg-primary-pink border-primary-pink text-white' 
+                                  : 'border-gray-300 hover:border-primary-pink'
+                              } ${validationErrors.terms ? 'border-red-500' : ''}`}
+                              style={{
+                                accentColor: '#FF74A4'
+                              }}
+                            />
                         </div>
                         <div className="text-sm">
                           <label htmlFor="terms" className="text-gray-700 cursor-pointer">
@@ -673,6 +606,102 @@ export const ContactPage: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Cloudinary Upload Script */}
+              <script dangerouslySetInnerHTML={{
+                __html: `
+const CLOUD_NAME = "dd89enrjz";
+const UPLOAD_PRESET = "blom_unsigned";
+const WEBHOOK = "https://dockerfile-1n82.onrender.com/webhook/contact-us-capture";
+
+// --- upload one file to Cloudinary (unsigned) ---
+async function uploadToCloudinary(file){
+  if (file.size > 10 * 1024 * 1024) throw new Error(\`"\${file.name}" is over 10MB\`);
+
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", UPLOAD_PRESET);
+  fd.append("folder", "blom/enquiries");
+
+  const res = await fetch(\`https://api.cloudinary.com/v1_1/\${CLOUD_NAME}/auto/upload\`, {
+    method: "POST",
+    body: fd
+  });
+  const j = await res.json();
+  if (!res.ok || j.error) throw new Error(j.error?.message || "Upload failed");
+  return j.secure_url;
+}
+
+// --- build payload and send to your webhook ---
+async function submitContactForm(e){
+  e.preventDefault();
+  const form = e.target;
+
+  // collect fields
+  const fd = new FormData(form);
+  const qs = new URLSearchParams(location.search);
+
+  const payload = {
+    source: "contact_form",
+    channel: "website",
+    full_name: fd.get("full_name")?.toString().trim(),
+    email: fd.get("email")?.toString().trim().toLowerCase(),
+    phone: fd.get("phone")?.toString().trim(),
+    inquiry_type: fd.get("inquiry_type") || "General Inquiry",
+    subject: fd.get("subject")?.toString().trim(),
+    message: fd.get("message")?.toString().trim(),
+    consent_terms: !!fd.get("agree_terms"),
+
+    page_url: location.href,
+    referrer: document.referrer || "",
+    utm_source: qs.get("utm_source") || "",
+    utm_medium: qs.get("utm_medium") || "",
+    utm_campaign: qs.get("utm_campaign") || "",
+    utm_term: qs.get("utm_term") || "",
+    utm_content: qs.get("utm_content") || "",
+
+    attachments: []
+  };
+
+  // upload files → gather URLs
+  const fileInput = document.getElementById("attachments");
+  const urls = [];
+  if (fileInput && fileInput.files?.length) {
+    for (const f of fileInput.files) {
+      const url = await uploadToCloudinary(f);
+      urls.push({ url });
+    }
+  }
+  payload.attachments = urls;
+
+  // UX lock
+  const btn = form.querySelector('[type="submit"]');
+  const txt = btn.textContent;
+  btn.disabled = true; btn.textContent = "Sending…";
+
+  try {
+    const r = await fetch(WEBHOOK, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(payload)
+    });
+    if (!r.ok) throw new Error("Webhook failed");
+    
+    // Show success modal
+    window.showSuccessModal = true;
+    form.reset();
+  } catch (err) {
+    console.error(err);
+    alert("Couldn't send right now — please try again.");
+  } finally {
+    btn.disabled = false; btn.textContent = txt;
+  }
+}
+
+// Override the form submission
+document.getElementById("contact-form").addEventListener("submit", submitContactForm);
+                `
+              }} />
 
             </div>
           </Container>
