@@ -164,22 +164,6 @@ export const ContactPage: React.FC = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // Clear validation error when user starts typing
-    if (validationErrors[name]) {
-      setValidationErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
-  };
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setAttachedFiles(prev => [...prev, ...files]);
@@ -236,6 +220,7 @@ export const ContactPage: React.FC = () => {
     // Let the script handle the submission
     // This function is kept for any React-specific validation if needed
   };
+
 
   // Listen for success signal from the script
   useEffect(() => {
@@ -368,7 +353,12 @@ export const ContactPage: React.FC = () => {
                             id="name"
                             name="full_name"
                             value={formData.name}
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              setFormData(prev => ({ ...prev, name: e.target.value }));
+                              if (validationErrors.name) {
+                                setValidationErrors(prev => ({ ...prev, name: '' }));
+                              }
+                            }}
                             required
                             className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                             placeholder="Enter your full name"
@@ -383,7 +373,12 @@ export const ContactPage: React.FC = () => {
                             id="email"
                             name="email"
                             value={formData.email}
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              setFormData(prev => ({ ...prev, email: e.target.value }));
+                              if (validationErrors.email) {
+                                setValidationErrors(prev => ({ ...prev, email: '' }));
+                              }
+                            }}
                             required
                             className={`input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all ${
                               validationErrors.email ? 'border-red-500' : ''
@@ -405,7 +400,9 @@ export const ContactPage: React.FC = () => {
                             <select
                               name="countryCode"
                               value={formData.countryCode}
-                              onChange={handleInputChange}
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, countryCode: e.target.value }));
+                              }}
                               className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all w-32 flex-shrink-0"
                             >
                               {countryCodes.map((country) => (
@@ -419,7 +416,12 @@ export const ContactPage: React.FC = () => {
                               id="phone"
                               name="phone"
                               value={formData.phone}
-                              onChange={handleInputChange}
+                              onChange={(e) => {
+                                setFormData(prev => ({ ...prev, phone: e.target.value }));
+                                if (validationErrors.phone) {
+                                  setValidationErrors(prev => ({ ...prev, phone: '' }));
+                                }
+                              }}
                               className={`input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all flex-1 ${
                                 validationErrors.phone ? 'border-red-500' : ''
                               }`}
@@ -438,7 +440,9 @@ export const ContactPage: React.FC = () => {
                             id="inquiryType"
                             name="inquiry_type"
                             value={formData.inquiryType}
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              setFormData(prev => ({ ...prev, inquiryType: e.target.value }));
+                            }}
                             required
                             className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                           >
@@ -460,7 +464,9 @@ export const ContactPage: React.FC = () => {
                           id="subject"
                           name="subject"
                           value={formData.subject}
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, subject: e.target.value }));
+                          }}
                           required
                           className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
                           placeholder="Brief description of your inquiry"
@@ -475,7 +481,9 @@ export const ContactPage: React.FC = () => {
                           id="message"
                           name="message"
                           value={formData.message}
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, message: e.target.value }));
+                          }}
                           required
                           rows={6}
                           className="input-field resize-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
