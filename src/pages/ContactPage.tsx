@@ -45,6 +45,7 @@ export const ContactPage: React.FC = () => {
   const [isMapHovered, setIsMapHovered] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showAllFaqs, setShowAllFaqs] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
 
   const inquiryTypes = [
@@ -323,7 +324,7 @@ export const ContactPage: React.FC = () => {
       setValidationErrors({});
       setAgreedToTerms(false);
 
-      alert("Thanks! We'll get back to you within 1 business day.");
+      setShowSuccessModal(true);
     } catch (err) {
       console.error(err);
       alert(`Error: ${err instanceof Error ? err.message : 'Couldn't send right now. Please try again.'}`);
@@ -866,6 +867,46 @@ export const ContactPage: React.FC = () => {
       </main>
 
       <Footer />
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
+            <div className="p-8 text-center">
+              {/* Success Icon */}
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              
+              {/* Success Message */}
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Thank You!</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                Thank you for submitting your message. One of our team members will contact you shortly.
+              </p>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    window.location.href = '/shop';
+                  }}
+                  variant="outline"
+                  className="flex-1 border-pink-300 text-pink-600 hover:bg-pink-50 px-6 py-3 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Continue Shopping
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
