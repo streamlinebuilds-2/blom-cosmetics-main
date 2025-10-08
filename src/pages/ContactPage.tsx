@@ -234,40 +234,79 @@ export const ContactPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      // Build multipart/form-data payload
-      const fd = new FormData();
-      fd.set('source', 'contact_form');
-      fd.set('channel', 'website');
-      fd.set('full_name', formData.name);
-      fd.set('email', formData.email.toLowerCase());
-      fd.set('phone', `${formData.countryCode} ${formData.phone}`.trim());
-      fd.set('inquiry_type', inquiryTypes.find(i => i.value === formData.inquiryType)?.label || formData.inquiryType);
-      fd.set('subject', formData.subject);
-      fd.set('message', formData.message);
-      fd.set('consent_terms', agreedToTerms ? 'true' : 'false');
-      fd.set('user_agent', navigator.userAgent);
+      const CLOUD_NAME = "dd89enrjz";
+      const UPLOAD_PRESET = "blom_unsigned"; // Make sure this exists in your Cloudinary settings
+      const WEBHOOK = 'https://dockerfile-1n82.onrender.com/webhook/contact-us-capture';
 
-      // Context
-      const params = new URLSearchParams(window.location.search);
-      fd.set('page_url', window.location.href);
-      fd.set('referrer', document.referrer || '');
-      ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'].forEach(k => fd.set(k, params.get(k) || ''));
-
-      // Attach files (10MB each)
-      for (const f of attachedFiles) {
-        if (f.size > 10 * 1024 * 1024) {
-          alert(`"${f.name}" is over 10MB. Please upload smaller files.`);
+      // --- Upload files to Cloudinary first ---
+      const attachmentUrls: { url: string; filename: string }[] = [];
+      
+      for (const file of attachedFiles) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert(`"${file.name}" is over 10MB. Please upload smaller files.`);
           setIsSubmitting(false);
           return;
         }
-        fd.append('attachments', f, f.name);
+
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("upload_preset", UPLOAD_PRESET);
+        fd.append("folder", "blom/enquiries");
+
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, {
+          method: "POST",
+          body: fd
+        });
+        
+        const json = await res.json();
+        
+        if (!res.ok || json.error) {
+          throw new Error(`Failed to upload "${file.name}": ${json.error?.message || 'Upload failed'}`);
+        }
+        
+        attachmentUrls.push({ 
+          url: json.secure_url,
+          filename: file.name
+        });
       }
 
-      const WEBHOOK = 'https://dockerfile-1n82.onrender.com/webhook/contact-us-capture';
-      const res = await fetch(WEBHOOK, { method: 'POST', body: fd });
-      if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        throw new Error(`Webhook ${res.status}: ${text || 'failed'}`);
+      // --- Build payload for webhook ---
+      const params = new URLSearchParams(window.location.search);
+      const payload = {
+        source: 'contact_form',
+        channel: 'website',
+        full_name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: `${formData.countryCode} ${formData.phone}`.trim(),
+        inquiry_type: inquiryTypes.find(i => i.value === formData.inquiryType)?.label || formData.inquiryType,
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        consent_terms: agreedToTerms,
+        
+        // Context
+        page_url: window.location.href,
+        referrer: document.referrer || '',
+        utm_source: params.get('utm_source') || '',
+        utm_medium: params.get('utm_medium') || '',
+        utm_campaign: params.get('utm_campaign') || '',
+        utm_term: params.get('utm_term') || '',
+        utm_content: params.get('utm_content') || '',
+        user_agent: navigator.userAgent,
+        
+        // Cloudinary URLs (Airtable-ready format)
+        attachments: attachmentUrls
+      };
+
+      // --- Send to webhook ---
+      const webhookRes = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!webhookRes.ok) {
+        const text = await webhookRes.text().catch(() => '');
+        throw new Error(`Webhook ${webhookRes.status}: ${text || 'failed'}`);
       }
 
       // Reset form
@@ -284,10 +323,10 @@ export const ContactPage: React.FC = () => {
       setValidationErrors({});
       setAgreedToTerms(false);
 
-      alert("Thanks! We’ll get back to you within 1 business day.");
+      alert("Thanks! We'll get back to you within 1 business day.");
     } catch (err) {
       console.error(err);
-      alert('Couldn’t send right now. Please try again in a minute.');
+      alert(`Error: ${err instanceof Error ? err.message : 'Couldn't send right now. Please try again.'}`);
     } finally {
       setIsSubmitting(false);
     }
