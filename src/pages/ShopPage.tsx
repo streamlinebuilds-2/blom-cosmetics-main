@@ -6,7 +6,23 @@ import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/Button';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, X, ChevronDown } from 'lucide-react';
 
+type ProductSummary = {
+  slug: string;
+  title: string;
+  price: number;
+  thumbnail: string;
+  badges?: string[];
+  status?: "active" | "draft" | "archived";
+  rating?: number;
+  reviews?: number;
+  compareAt?: number;
+  stockStatus?: string;
+  category?: string;
+  shortDescription?: string;
+};
+
 export const ShopPage: React.FC = () => {
+  const [products, setProducts] = useState<ProductSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
@@ -20,330 +36,13 @@ export const ShopPage: React.FC = () => {
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  // All BLOM products with detailed information - Final Product List
-  const allProducts = [
-    // Live Products (with Prices)
-    {
-      id: '1',
-      name: 'Cuticle Oil',
-      slug: 'cuticle-oil',
-      price: 140,
-      compareAtPrice: undefined,
-      short_description: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
-      shortDescription: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
-      description: 'Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use.',
-      images: ['/cuticle-oil-white.webp', '/cuticle-oil-colorful.webp'],
-      category: 'prep-finishing',
-      rating: 4.9,
-      reviews: 156,
-      badges: ['Bestseller'],
-      inStock: true,
-      variants: [
-        { name: 'Cotton Candy', inStock: true },
-        { name: 'Vanilla', inStock: true },
-        { name: 'Tiny Touch', inStock: true },
-        { name: 'Dragon Fruit Lotus', inStock: true },
-        { name: 'Watermelon', inStock: true }
-      ]
-    },
-    {
-      id: '2',
-      name: 'Vitamin Primer',
-      slug: 'vitamin-primer',
-      price: 210,
-      compareAtPrice: undefined,
-      short_description: 'Acid-free primer for adhesion, vitamin-enriched.',
-      shortDescription: 'Acid-free primer for adhesion, vitamin-enriched.',
-      description: 'Creates a long-lasting bond for gels and acrylics while protecting the natural nail.',
-      images: ['/vitamin-primer-white.webp', '/vitamin-primer-colorful.webp'],
-      category: 'prep-finishing',
-      rating: 4.8,
-      reviews: 124,
-      badges: ['New'],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '3',
-      name: 'Prep Solution (Nail Dehydrator)',
-      slug: 'prep-solution',
-      price: 200,
-      compareAtPrice: undefined,
-      short_description: 'Removes oils & moisture for better adhesion.',
-      shortDescription: 'Removes oils & moisture for better adhesion.',
-      description: 'Prepares natural nails by dehydrating the plate, preventing lifting.',
-      images: ['/prep-solution-white.webp', '/prep-solution-colorful.webp'],
-      category: 'prep-finishing',
-      rating: 4.7,
-      reviews: 89,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '4',
-      name: 'Top Coat',
-      slug: 'top-coat',
-      price: 190,
-      compareAtPrice: undefined,
-      short_description: 'Mirror shine, chip-resistant, professional finish.',
-      shortDescription: 'Mirror shine, chip-resistant, professional finish.',
-      description: 'High-gloss, chip-resistant finish for both gels and acrylics.',
-      images: ['/top-coat-white.webp', '/top-coat-colorful.webp'],
-      category: 'gel-system',
-      rating: 4.9,
-      reviews: 201,
-      badges: ['Bestseller'],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '5',
-      name: 'Fairy Dust Top Coat',
-      slug: 'fairy-dust-top-coat',
-      price: 195,
-      compareAtPrice: undefined,
-      short_description: 'Subtle glitter-infused top coat with smooth shine.',
-      shortDescription: 'Subtle glitter-infused top coat with smooth shine.',
-      description: 'Adds a sparkling finish to any gel or acrylic set.',
-      images: ['/fairy-dust-top-coat-white.webp', '/fairy-dust-top-coat-colorful.webp'],
-      category: 'gel-system',
-      rating: 4.6,
-      reviews: 73,
-      badges: ['New'],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '6',
-      name: 'Nail File (80/80 Grit)',
-      slug: 'nail-file',
-      price: 35,
-      compareAtPrice: undefined,
-      short_description: 'Durable pro file with floral design.',
-      shortDescription: 'Durable pro file with floral design.',
-      description: 'Professional nail file with 80/80 grit for shaping and finishing.',
-      images: ['/nail-file-white.webp', '/nail-file-colorful.webp'],
-      category: 'tools-essentials',
-      rating: 4.5,
-      reviews: 67,
-      badges: [],
-      inStock: true,
-      variants: [
-        { name: 'Single File', inStock: true, price: 35 },
-        { name: '5-Pack Bundle', inStock: true, price: 160 }
-      ]
-    },
-    {
-      id: '7',
-      name: 'Nail Forms',
-      slug: 'nail-forms',
-      price: 290,
-      compareAtPrice: undefined,
-      short_description: 'Holographic guide, strong adhesive, 300 forms per roll.',
-      shortDescription: 'Holographic guide, strong adhesive, 300 forms per roll.',
-      description: 'Professional nail forms for creating perfect extensions and overlays.',
-      images: ['/nail-forms-white.webp', '/nail-forms-colorful.webp'],
-      category: 'tools-essentials',
-      rating: 4.5,
-      reviews: 67,
-      badges: [],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '8',
-      name: 'Acetone (Remover)',
-      slug: 'acetone-remover',
-      price: 60,
-      compareAtPrice: undefined,
-      short_description: 'Professional-grade, fast acting nail remover.',
-      shortDescription: 'Professional-grade, fast acting nail remover.',
-      description: 'Professional-grade acetone for fast and effective nail polish removal.',
-      images: ['/acetone-remover-white.webp', '/acetone-remover-colorful.webp'],
-      category: 'tools-essentials',
-      rating: 4.8,
-      reviews: 112,
-      badges: ['Bestseller'],
-      inStock: true,
-      variants: []
-    },
-    {
-      id: '9',
-      name: 'Core Acrylics (56 g)',
-      slug: 'core-acrylics',
-      price: 280,
-      compareAtPrice: undefined,
-      short_description: 'Professional acrylic powders in 13 beautiful colors.',
-      shortDescription: 'Professional acrylic powders in 13 beautiful colors.',
-      description: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art.',
-      images: ['/core-acrylics-white.webp', '/core-acrylics-colorful.webp'],
-      category: 'acrylic-system',
-      rating: 4.9,
-      reviews: 156,
-      badges: ['Bestseller'],
-      inStock: true,
-      variants: [
-        { name: 'Baby Blue', inStock: true },
-        { name: 'Lilac Mist', inStock: true },
-        { name: 'Blush Pink', inStock: true },
-        { name: 'Ballet Pink', inStock: true },
-        { name: 'Fuchsia Pink', inStock: true },
-        { name: 'Cloud Grey', inStock: true },
-        { name: 'Mint Mist', inStock: true },
-        { name: 'Rose Pink', inStock: true },
-        { name: 'Fresh Mint', inStock: true },
-        { name: 'Soft Nude', inStock: true },
-        { name: 'Petal Pink', inStock: true },
-        { name: 'Sky Blue', inStock: true },
-        { name: 'Lemon Glow', inStock: true }
-      ]
-    },
-    // Coming Soon Products (Prices TBA) - HIDDEN
-    // {
-    //   id: '10',
-    //   name: 'Crystal Clear Acrylic',
-    //   slug: 'crystal-clear-acrylic',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'Glass-like powder for encapsulation & overlays.',
-    //   shortDescription: 'Glass-like powder for encapsulation & overlays.',
-    //   description: 'Professional grade acrylic powder for encapsulation and overlays.',
-    //   images: ['/crystal-clear-acrylic-white.webp', '/crystal-clear-acrylic-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.9,
-    //   reviews: 156,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: [
-    //     { name: 'Baby Blue', inStock: false, image: '/acrylic-powder-baby-blue.webp' },
-    //     { name: 'Lilac Mist', inStock: false, image: '/acrylic-powder-baby-ligt-purple.webp' },
-    //     { name: 'Blush Pink', inStock: false, image: '/acrylic-powder-baby-pink.webp' },
-    //     { name: 'Ballet Pink', inStock: false, image: '/acrylic-powder-ballet-pink.webp' },
-    //     { name: 'Fuchsia Pink', inStock: false, image: '/acrylic-powder-hot-pink.webp' },
-    //     { name: 'Cloud Grey', inStock: false, image: '/acrylic-powder-light-grey.webp' },
-    //     { name: 'Mint Mist', inStock: false, image: '/acrylic-powder-light-mint.webp' },
-    //     { name: 'Rose Pink', inStock: false, image: '/acrylic-powder-light-pink.webp' },
-    //     { name: 'Fresh Mint', inStock: false, image: '/acrylic-powder-mint.webp' },
-    //     { name: 'Soft Nude', inStock: false, image: '/acrylic-powder-nude.webp' },
-    //     { name: 'Petal Pink', inStock: false, image: '/acrylic-powder-pink.webp' },
-    //     { name: 'Sky Blue', inStock: false, image: '/acrylic-powder-sky-blue.webp' },
-    //     { name: 'Lemon Glow', inStock: false, image: '/acrylic-powder-yellow.webp' }
-    //   ]
-    // },
-    // {
-    //   id: '11',
-    //   name: 'Snow White Acrylic',
-    //   slug: 'snow-white-acrylic',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'Bright opaque white acrylic for French designs.',
-    //   shortDescription: 'Bright opaque white acrylic for French designs.',
-    //   description: 'Bright opaque white acrylic powder perfect for French designs and nail art.',
-    //   images: ['/snow-white-acrylic-white.webp', '/snow-white-acrylic-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.8,
-    //   reviews: 89,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: []
-    // },
-    // {
-    //   id: '12',
-    //   name: 'Colour Acrylics',
-    //   slug: 'colour-acrylics',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'High-pigment powders for creative nail art.',
-    //   shortDescription: 'High-pigment powders for creative nail art.',
-    //   description: 'High-pigment acrylic powders in vibrant colors for creative nail art.',
-    //   images: ['/colour-acrylics-white.webp', '/colour-acrylics-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.7,
-    //   reviews: 73,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: []
-    // },
-    // {
-    //   id: '13',
-    //   name: 'Glitter Acrylics',
-    //   slug: 'glitter-acrylics',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'Sparkle acrylics for encapsulated effects.',
-    //   shortDescription: 'Sparkle acrylics for encapsulated effects.',
-    //   description: 'Sparkle acrylic powders for creating encapsulated glitter effects.',
-    //   images: ['/glitter-acrylics-white.webp', '/glitter-acrylics-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.6,
-    //   reviews: 45,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: []
-    // },
-    {
-      id: '14',
-      name: 'Nail Liquid (Monomer)',
-      slug: 'nail-liquid-monomer',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'Low-odor EMA formula, MMA/HEMA-free.',
-      shortDescription: 'Low-odor EMA formula, MMA/HEMA-free.',
-      description: 'Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application.',
-      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
-      category: 'acrylic-system',
-      rating: 4.8,
-      reviews: 87,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: [
-        { name: '250ml', inStock: false, price: -1 },
-        { name: '500ml', inStock: false, price: -1 }
-      ]
-    },
-    {
-      id: '15',
-      name: 'Crystal Kolinsky Sculpting Brush',
-      slug: 'crystal-kolinsky-sculpting-brush',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'Premium Kolinsky brush with floating glitter handle.',
-      shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
-      description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
-      images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-colorful.webp'],
-      category: 'tools-essentials',
-      rating: 4.9,
-      reviews: 23,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: []
-    },
-    {
-      id: '16',
-      name: 'Diamond Precision Nail Art Brush',
-      slug: 'diamond-precision-nail-art-brush',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'Premium Kolinsky brush with floating glitter handle.',
-      shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
-      description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
-      images: ['/acrylic-sculpture-brush-white-2.webp', '/acrylic-sculpture-brush-colorful-2.webp'],
-      category: 'tools-essentials',
-      rating: 4.9,
-      reviews: 23,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: []
-    }
-  ];
 
   const productCategories = [
-    { name: 'All Products', slug: 'all', count: allProducts.length },
-    { name: 'Acrylic System', slug: 'acrylic-system', count: allProducts.filter(p => p.category === 'acrylic-system').length },
-    { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
-    { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
-    { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length }
+    { name: 'All Products', slug: 'all', count: products.length },
+    { name: 'Acrylic System', slug: 'acrylic-system', count: products.filter(p => p.category === 'acrylic-system').length },
+    { name: 'Prep & Finish', slug: 'prep-finishing', count: products.filter(p => p.category === 'prep-finishing').length },
+    { name: 'Gel System', slug: 'gel-system', count: products.filter(p => p.category === 'gel-system').length },
+    { name: 'Tools & Essentials', slug: 'tools-essentials', count: products.filter(p => p.category === 'tools-essentials').length }
   ];
 
   const sortOptions = [
@@ -362,10 +61,18 @@ export const ShopPage: React.FC = () => {
     }
     window.scrollTo({ top: 0 });
 
-    // Simulate loading
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    // Load products from JSON
+    fetch("/content/products/index.json", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((list: ProductSummary[]) => {
+        // Keep compatibility: only show active (same as your current logic)
+        setProducts(list.filter(p => p.status !== "archived"));
+      })
+      .catch((error) => {
+        console.error('Failed to load products:', error);
+        setProducts([]);
+      })
+      .finally(() => setLoading(false));
 
     // If navigated with hash to a category (e.g., #acrylic-system), preselect it
     const hash = window.location.hash.replace('#', '');
@@ -376,14 +83,14 @@ export const ShopPage: React.FC = () => {
     }
   }, []);
 
-  const filteredProducts = allProducts.filter(product => {
+  const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'all' ||
       product.category === selectedCategory;
     
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.shortDescription && product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
+    const matchesStock = !showInStockOnly || (product.stockStatus === 'In Stock' && product.price !== -1);
     
     return matchesCategory && matchesSearch && matchesStock;
   });
@@ -391,13 +98,13 @@ export const ShopPage: React.FC = () => {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
       case 'name':
-        return a.name.localeCompare(b.name);
+        return a.title.localeCompare(b.title);
       case 'price-low':
         return a.price - b.price;
       case 'price-high':
         return b.price - a.price;
       case 'rating':
-        return b.rating - a.rating;
+        return (b.rating || 0) - (a.rating || 0);
       default:
         return 0;
     }
@@ -634,7 +341,7 @@ export const ShopPage: React.FC = () => {
           {/* Results Count */}
           <div className="mb-6">
             <p className="text-gray-600">
-              Showing {sortedProducts.length} of {allProducts.length} products
+              Showing {sortedProducts.length} of {products.length} products
             </p>
           </div>
 
@@ -643,15 +350,15 @@ export const ShopPage: React.FC = () => {
             <div className={`grid ${getGridClasses()} gap-6`}>
               {sortedProducts.map((product) => (
                 <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
+                  key={product.slug}
+                  id={product.slug}
+                  title={product.title}
                   slug={product.slug}
                   price={product.price}
-                  compareAtPrice={product.compareAtPrice}
+                  compareAt={product.compareAt}
                   shortDescription={product.shortDescription}
-                  images={product.images}
-                  inStock={product.inStock}
+                  images={[product.thumbnail]}
+                  inStock={product.stockStatus === 'In Stock'}
                   badges={product.badges}
                   isListView={viewMode === 'list'}
                 />

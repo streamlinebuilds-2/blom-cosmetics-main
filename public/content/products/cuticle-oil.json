@@ -1,0 +1,69 @@
+{
+  "id": "cuticle-oil",
+  "slug": "cuticle-oil",
+  "title": "Cuticle Oil",
+  "subtitle": "Nourishing oil with Vitamin E, Jojoba & Soybean Oil",
+  "price": 140,
+  "currency": "ZAR",
+  "sku": "CUT-OIL-001",
+  "status": "active",
+  "stock": 45,
+  "category": "Prep & Finishing",
+  "tags": ["cuticle", "oil", "vitamin-e"],
+  "badges": ["Bestseller"],
+  "thumbnail": "/products/cuticle-oil/cuticle-oil-white.webp",
+  "images": [
+    "/products/cuticle-oil/cuticle-oil-white.webp",
+    "/products/cuticle-oil/cuticle-oil-colorful.webp"
+  ],
+  "shortDescription": "Nourishing oil with Vitamin E, Jojoba & Soybean Oil.",
+  "descriptionHtml": "<p>Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use. Enriched with Vitamin E, Jojoba Oil, and Soybean Oil for maximum nourishment.</p>",
+  "seo": {
+    "title": "Cuticle Oil | BLOM Cosmetics",
+    "description": "Professional cuticle oil with Vitamin E, Jojoba & Soybean Oil. Fast-absorbing, non-greasy formula for daily nail care."
+  },
+  "rating": 4.9,
+  "reviews": 156,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Enriched with Vitamin E for nail health",
+    "Fast-absorbing, non-greasy formula",
+    "Strengthens and nourishes cuticles",
+    "Available in 5 beautiful scents",
+    "Professional salon quality"
+  ],
+  "howToUse": [
+    "Apply a small amount to clean cuticles",
+    "Gently massage into cuticle area",
+    "Use daily for best results",
+    "Can be used before or after manicure"
+  ],
+  "ingredients": {
+    "inci": [
+      "Simmondsia Chinensis (Jojoba) Seed Oil",
+      "Glycine Soja (Soybean) Oil",
+      "Tocopheryl Acetate (Vitamin E)",
+      "Fragrance"
+    ],
+    "key": [
+      "Jojoba Oil – deeply moisturizes and conditions",
+      "Vitamin E – antioxidant protection",
+      "Soybean Oil – strengthens nail structure"
+    ]
+  },
+  "details": {
+    "size": "15ml",
+    "shelfLife": "24 months",
+    "claims": ["Vegan", "Cruelty-Free", "HEMA-Free"]
+  },
+  "variants": [
+    { "name": "Cotton Candy", "image": "/products/cuticle-oil/cuticle-oil-cotton-candy.webp" },
+    { "name": "Vanilla", "image": "/products/cuticle-oil/cuticle-oil-vanilla.webp" },
+    { "name": "Tiny Touch", "image": "/products/cuticle-oil/cuticle-oil-tiny-touch.webp" },
+    { "name": "Dragon Fruit Lotus", "image": "/products/cuticle-oil/cuticle-oil-dragon-fruit-lotus.webp" },
+    { "name": "Watermelon", "image": "/products/cuticle-oil/cuticle-oil-watermelon.webp" }
+  ],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

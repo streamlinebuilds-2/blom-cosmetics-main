@@ -5,10 +5,10 @@ import { wishlistStore } from '../lib/wishlist';
 
 interface ProductCardProps {
   id: string;
-  name: string;
+  title: string;
   slug: string;
   price: number;
-  compareAtPrice?: number;
+  compareAt?: number;
   shortDescription?: string;
   images: string[];
   inStock?: boolean;
@@ -19,10 +19,10 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   id,
-  name,
+  title,
   slug,
   price,
-  compareAtPrice,
+  compareAt,
   shortDescription,
   images,
   inStock = true,
@@ -51,7 +51,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     cartStore.addItem({
       id: `item_${Date.now()}`,
       productId: slug,
-      name,
+      name: title,
       price,
       image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
     });
@@ -65,7 +65,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     const wishlistItem = {
       id: slug,
       productId: slug,
-      name,
+      name: title,
       price,
       image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
       slug
@@ -94,7 +94,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* Default white background image */}
           <img
             src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-            alt={name}
+            alt={title}
             className="w-full h-full object-cover transition-all duration-300 ease-out group-hover:opacity-0 group-hover:scale-[1.02]"
             loading="lazy"
             onError={(e) => {
@@ -106,7 +106,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {images[1] && (
             <img
               src={images[1]}
-              alt={name}
+              alt={title}
               className="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-[1.02]"
               loading="lazy"
               onError={(e) => {
@@ -160,7 +160,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className="p-6 md:p-0 md:flex-1 md:flex md:items-center md:justify-between">
           <div className="md:flex-1">
             <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-pink-400 transition-colors duration-[800ms] ease-out md:text-base md:mb-1">
-              {name}
+              {title}
             </h3>
             
             {shortDescription && (
@@ -173,9 +173,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <span className="text-xl font-bold text-gray-900 md:text-lg">
                 {price === -1 ? 'Coming Soon' : formatPrice(price)}
               </span>
-              {compareAtPrice && price !== -1 && (
+              {compareAt && price !== -1 && (
                 <span className="text-sm text-gray-500 line-through md:text-xs">
-                  {formatPrice(compareAtPrice)}
+                  {formatPrice(compareAt)}
                 </span>
               )}
             </div>
@@ -207,7 +207,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <div className="product-card-flip-front">
             <img
               src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-              alt={name}
+              alt={title}
               className="w-full h-full object-cover"
               loading="lazy"
               onError={(e) => {
@@ -222,7 +222,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <div className="product-card-flip-back">
               <img
                 src={images[1]}
-                alt={name}
+                alt={title}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
@@ -275,7 +275,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       <div className="p-3 sm:p-4 md:p-6">
         {/* Product Name */}
         <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem]">
-          {name}
+          {title}
         </h3>
 
         {/* Short Description */}
@@ -291,13 +291,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
               {price === -1 ? 'Coming Soon' : formatPrice(price)}
             </span>
-            {compareAtPrice && (
+            {compareAt && (
               <>
                 <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
-                  {formatPrice(compareAtPrice)}
+                  {formatPrice(compareAt)}
                 </span>
                 <span className="text-[10px] sm:text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
-                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+                  {Math.round(((compareAt - price) / compareAt) * 100)}% OFF
                 </span>
               </>
             )}
