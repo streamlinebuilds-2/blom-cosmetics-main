@@ -221,28 +221,59 @@ html, body {
 }
 
 .social-link {
-  width: 52px;
-  height: 52px;
-  border-radius: 9999px;
-  background: #FF74A4;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FF74A4 0%, #FF5A8E 100%);
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
-  border: none;
-  transition: all .25s ease;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 12px rgba(255, 116, 164, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.social-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .social-link svg {
-  stroke-width: 2;
+  stroke-width: 2.5;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.3s ease;
 }
 
 .social-link:hover {
-  background: #FF5A8E;
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(255, 116, 164, 0.4);
+  background: linear-gradient(135deg, #FF5A8E 0%, #FF4081 100%);
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 8px 25px rgba(255, 116, 164, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.social-link:hover::before {
+  opacity: 1;
+}
+
+.social-link:hover svg {
+  transform: scale(1.1);
+}
+
+.social-link:active {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 15px rgba(255, 116, 164, 0.3);
 }
 
 .newsletter {

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Instagram, Facebook, MessageCircle, Music } from 'lucide-react';
+import { Instagram, Facebook, MessageSquare, Music2 } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   useEffect(() => {
@@ -62,10 +62,10 @@ export const Footer: React.FC = () => {
               <Facebook className="h-6 w-6" strokeWidth={2} />
             </a>
             <a aria-label="WhatsApp" href="https://wa.me/yourwhatsapp" target="_blank" rel="noopener" className="social-link">
-              <MessageCircle className="h-6 w-6" strokeWidth={2} />
+              <MessageSquare className="h-6 w-6" strokeWidth={2} />
             </a>
             <a aria-label="TikTok" href="https://tiktok.com/@yourhandle" target="_blank" rel="noopener" className="social-link">
-              <Music className="h-6 w-6" strokeWidth={2} />
+              <Music2 className="h-6 w-6" strokeWidth={2} />
             </a>
           </div>
 
