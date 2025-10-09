@@ -11,6 +11,7 @@ type ProductSummary = {
   title: string;
   price: number;
   thumbnail: string;
+  images?: string[];
   badges?: string[];
   status?: "active" | "draft" | "archived";
   rating?: number;
@@ -357,7 +358,7 @@ export const ShopPage: React.FC = () => {
                   price={product.price}
                   compareAt={product.compareAt}
                   shortDescription={product.shortDescription}
-                  images={[product.thumbnail]}
+                  images={product.images || [product.thumbnail]}
                   inStock={product.stockStatus === 'In Stock'}
                   badges={product.badges}
                   isListView={viewMode === 'list'}
