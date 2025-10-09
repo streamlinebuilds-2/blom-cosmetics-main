@@ -11,10 +11,10 @@
   "category": "Prep & Finishing",
   "tags": ["cuticle", "oil", "vitamin-e"],
   "badges": ["Bestseller"],
-  "thumbnail": "/products/cuticle-oil/cuticle-oil-white.webp",
+  "thumbnail": "/cuticle-oil-white.webp",
   "images": [
-    "/products/cuticle-oil/cuticle-oil-white.webp",
-    "/products/cuticle-oil/cuticle-oil-colorful.webp"
+    "/cuticle-oil-white.webp",
+    "/cuticle-oil-colorful.webp"
   ],
   "shortDescription": "Nourishing oil with Vitamin E, Jojoba & Soybean Oil.",
   "descriptionHtml": "<p>Luxurious oil blend that hydrates cuticles and strengthens nails. Fast-absorbing and non-greasy, perfect for daily use. Enriched with Vitamin E, Jojoba Oil, and Soybean Oil for maximum nourishment.</p>",
@@ -58,11 +58,11 @@
     "claims": ["Vegan", "Cruelty-Free", "HEMA-Free"]
   },
   "variants": [
-    { "name": "Cotton Candy", "image": "/products/cuticle-oil/cuticle-oil-cotton-candy.webp" },
-    { "name": "Vanilla", "image": "/products/cuticle-oil/cuticle-oil-vanilla.webp" },
-    { "name": "Tiny Touch", "image": "/products/cuticle-oil/cuticle-oil-tiny-touch.webp" },
-    { "name": "Dragon Fruit Lotus", "image": "/products/cuticle-oil/cuticle-oil-dragon-fruit-lotus.webp" },
-    { "name": "Watermelon", "image": "/products/cuticle-oil/cuticle-oil-watermelon.webp" }
+    { "name": "Cotton Candy", "image": "/cuticle-oil-cotton-candy.webp" },
+    { "name": "Vanilla", "image": "/cuticle-oil-vanilla.webp" },
+    { "name": "Tiny Touch", "image": "/cuticle-oil-tiny-touch.webp" },
+    { "name": "Dragon Fruit Lotus", "image": "/cuticle-oil-dragon-fruit-lotus.webp" },
+    { "name": "Watermelon", "image": "/cuticle-oil-watermelon.webp" }
   ],
   "createdAt": "2024-01-01T10:00:00Z",
   "updatedAt": "2024-01-01T10:00:00Z"
