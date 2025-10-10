@@ -610,7 +610,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-gray-900">{formatPrice(relatedProduct.price)}</span>
                         <Button
-                          onClick={() => window.location.href = `/product/${relatedProduct.slug}`}
+                          onClick={() => window.location.href = `/products/${relatedProduct.slug}`}
                           className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                         >
                           View Details
