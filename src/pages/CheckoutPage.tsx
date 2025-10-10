@@ -12,6 +12,8 @@ export const CheckoutPage: React.FC = () => {
   const [step, setStep] = useState<'shipping' | 'payment' | 'review'>('shipping');
   const [isProcessing, setIsProcessing] = useState(false);
   
+  const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'locker' | 'door-to-door'>('door-to-door');
+  
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
     lastName: '',
@@ -21,7 +23,8 @@ export const CheckoutPage: React.FC = () => {
     city: '',
     province: '',
     postalCode: '',
-    country: 'South Africa'
+    country: 'South Africa',
+    lockerLocation: ''
   });
 
   const [paymentInfo, setPaymentInfo] = useState({
@@ -77,6 +80,17 @@ export const CheckoutPage: React.FC = () => {
       setIsProcessing(false);
     }
   };
+
+  // Calculate shipping cost
+  const calculateShipping = () => {
+    if (shippingMethod === 'store-pickup') return 0;
+    if (shippingMethod === 'locker') return 50;
+    // Door-to-door: Free over R1500, otherwise R75
+    return cartState.total >= 1500 ? 0 : 75;
+  };
+
+  const shippingCost = calculateShipping();
+  const orderTotal = cartState.total + shippingCost;
 
   const provinces = [
     'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
@@ -146,6 +160,137 @@ export const CheckoutPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleShippingSubmit} className="space-y-6">
+                      
+                      {/* Shipping Method Selection */}
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                          <Truck className="h-5 w-5 text-pink-500" />
+                          Choose Your Delivery Option
+                        </h3>
+                        <div className="space-y-3">
+                          
+                          {/* Store Pickup */}
+                          <label 
+                            className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                              shippingMethod === 'store-pickup' 
+                                ? 'border-pink-500 bg-pink-50' 
+                                : 'border-gray-200 hover:border-pink-300'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <input
+                                type="radio"
+                                name="shippingMethod"
+                                value="store-pickup"
+                                checked={shippingMethod === 'store-pickup'}
+                                onChange={(e) => setShippingMethod(e.target.value as any)}
+                                className="mt-1"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-semibold text-gray-900">💅 Collect from BLOM HQ, Randfontein</span>
+                                  <span className="text-lg font-bold text-pink-500">FREE</span>
+                                </div>
+                                <p className="text-sm text-gray-600">Ready within 24 hours. We'll WhatsApp you when it's ready.</p>
+                                <span className="inline-block mt-2 px-2 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">💗 Free Pickup</span>
+                              </div>
+                            </div>
+                          </label>
+
+                          {/* Locker/Kiosk */}
+                          <label 
+                            className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                              shippingMethod === 'locker' 
+                                ? 'border-pink-500 bg-pink-50' 
+                                : 'border-gray-200 hover:border-pink-300'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <input
+                                type="radio"
+                                name="shippingMethod"
+                                value="locker"
+                                checked={shippingMethod === 'locker'}
+                                onChange={(e) => setShippingMethod(e.target.value as any)}
+                                className="mt-1"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-semibold text-gray-900">📦 Collect from Locker / Kiosk</span>
+                                  <span className="text-lg font-bold text-gray-900">R50</span>
+                                </div>
+                                <p className="text-sm text-gray-600">Choose your nearest Courier Guy Locker or Kiosk (2–4 business days).</p>
+                                <p className="text-xs text-gray-500 mt-1">Your parcel will be safely stored — you'll get an SMS with a PIN when it's ready.</p>
+                                <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">💸 Most Affordable</span>
+                              </div>
+                            </div>
+                          </label>
+
+                          {/* Door-to-Door */}
+                          <label 
+                            className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                              shippingMethod === 'door-to-door' 
+                                ? 'border-pink-500 bg-pink-50' 
+                                : 'border-gray-200 hover:border-pink-300'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <input
+                                type="radio"
+                                name="shippingMethod"
+                                value="door-to-door"
+                                checked={shippingMethod === 'door-to-door'}
+                                onChange={(e) => setShippingMethod(e.target.value as any)}
+                                className="mt-1"
+                              />
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-semibold text-gray-900">🚚 Door-to-Door Delivery</span>
+                                  <span className="text-lg font-bold text-gray-900">
+                                    {cartState.total >= 1500 ? 'FREE' : 'R75'}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
+                                {cartState.total >= 1500 && (
+                                  <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">⭐ Free over R1500</span>
+                                )}
+                                {cartState.total < 1500 && (
+                                  <p className="text-xs text-gray-500 mt-1">Add R{(1500 - cartState.total).toFixed(2)} more for free delivery!</p>
+                                )}
+                              </div>
+                            </div>
+                          </label>
+                          
+                        </div>
+                      </div>
+
+                      {/* Locker Location (only show if locker selected) */}
+                      {shippingMethod === 'locker' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Your Nearest Locker/Kiosk Location *
+                          </label>
+                          <select
+                            required
+                            value={shippingInfo.lockerLocation}
+                            onChange={(e) => setShippingInfo({...shippingInfo, lockerLocation: e.target.value})}
+                            className="input-field"
+                          >
+                            <option value="">Choose a location...</option>
+                            <option value="Johannesburg CBD">Johannesburg CBD</option>
+                            <option value="Sandton">Sandton</option>
+                            <option value="Pretoria Central">Pretoria Central</option>
+                            <option value="Centurion">Centurion</option>
+                            <option value="Cape Town CBD">Cape Town CBD</option>
+                            <option value="Durban CBD">Durban CBD</option>
+                            <option value="Bloemfontein">Bloemfontein</option>
+                            <option value="Port Elizabeth">Port Elizabeth</option>
+                          </select>
+                          <p className="text-xs text-gray-500 mt-1">More locations available at checkout confirmation</p>
+                        </div>
+                      )}
+                      
+
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -204,66 +349,71 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Street Address *
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={shippingInfo.address}
-                          onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})}
-                          className="input-field"
-                          placeholder="123 Main Street"
-                        />
-                      </div>
+                      {/* Address fields (hidden for store pickup) */}
+                      {shippingMethod !== 'store-pickup' && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Street Address *
+                          </label>
+                          <input
+                            type="text"
+                            required={shippingMethod !== 'store-pickup'}
+                            value={shippingInfo.address}
+                            onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})}
+                            className="input-field"
+                            placeholder="123 Main Street"
+                          />
+                        </div>
+                      )}
 
-                      <div className="grid md:grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            City *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={shippingInfo.city}
-                            onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})}
-                            className="input-field"
-                            placeholder="Cape Town"
-                          />
+                      {shippingMethod !== 'store-pickup' && (
+                        <div className="grid md:grid-cols-3 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              City *
+                            </label>
+                            <input
+                              type="text"
+                              required={shippingMethod !== 'store-pickup'}
+                              value={shippingInfo.city}
+                              onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})}
+                              className="input-field"
+                              placeholder="Cape Town"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Province *
+                            </label>
+                            <select
+                              required={shippingMethod !== 'store-pickup'}
+                              value={shippingInfo.province}
+                              onChange={(e) => setShippingInfo({...shippingInfo, province: e.target.value})}
+                              className="input-field"
+                            >
+                              <option value="">Select Province</option>
+                              {provinces.map((province) => (
+                                <option key={province} value={province}>
+                                  {province}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Postal Code *
+                            </label>
+                            <input
+                              type="text"
+                              required={shippingMethod !== 'store-pickup'}
+                              value={shippingInfo.postalCode}
+                              onChange={(e) => setShippingInfo({...shippingInfo, postalCode: e.target.value})}
+                              className="input-field"
+                              placeholder="8001"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Province *
-                          </label>
-                          <select
-                            required
-                            value={shippingInfo.province}
-                            onChange={(e) => setShippingInfo({...shippingInfo, province: e.target.value})}
-                            className="input-field"
-                          >
-                            <option value="">Select Province</option>
-                            {provinces.map((province) => (
-                              <option key={province} value={province}>
-                                {province}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Postal Code *
-                          </label>
-                          <input
-                            type="text"
-                            required
-                            value={shippingInfo.postalCode}
-                            onChange={(e) => setShippingInfo({...shippingInfo, postalCode: e.target.value})}
-                            className="input-field"
-                            placeholder="8001"
-                          />
-                        </div>
-                      </div>
+                      )}
 
                       <div className="flex flex-col sm:flex-row justify-between gap-3">
                         <Button
@@ -500,19 +650,23 @@ export const CheckoutPage: React.FC = () => {
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Subtotal:</span>
-                      <span>{formatPrice(cartState.subtotal)}</span>
+                      <span>{formatPrice(cartState.total)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Shipping:</span>
-                      <span>{cartState.shipping === 0 ? 'Free' : formatPrice(cartState.shipping)}</span>
+                      <span className={shippingCost === 0 ? 'text-green-600 font-medium' : ''}>
+                        {shippingCost === 0 ? 'FREE' : formatPrice(shippingCost)}
+                      </span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Tax (VAT):</span>
-                      <span>{formatPrice(cartState.tax)}</span>
-                    </div>
+                    {shippingMethod === 'door-to-door' && cartState.total >= 1500 && (
+                      <div className="flex justify-between text-xs text-green-600">
+                        <span>✨ Free shipping applied!</span>
+                        <span>-R75</span>
+                      </div>
+                    )}
                     <div className="flex justify-between font-bold text-lg border-t pt-2">
                       <span>Total:</span>
-                      <span>{formatPrice(cartState.total)}</span>
+                      <span>{formatPrice(orderTotal)}</span>
                     </div>
                   </div>
 
