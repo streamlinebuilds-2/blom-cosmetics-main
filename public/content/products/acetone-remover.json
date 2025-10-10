@@ -1,0 +1,60 @@
+{
+  "id": "acetone-remover",
+  "slug": "acetone-remover",
+  "title": "Acetone (Remover)",
+  "subtitle": "Professional-grade, fast acting nail remover",
+  "price": 60,
+  "currency": "ZAR",
+  "sku": "ACE-REM-001",
+  "status": "active",
+  "stock": 89,
+  "category": "Tools & Essentials",
+  "tags": ["acetone", "remover", "removal"],
+  "badges": ["Bestseller"],
+  "thumbnail": "/acetone-remover-white.webp",
+  "images": [
+    "/acetone-remover-white.webp",
+    "/acetone-remover-colorful.webp"
+  ],
+  "shortDescription": "Professional-grade, fast acting nail remover.",
+  "descriptionHtml": "<p>Professional-grade acetone for fast and effective nail polish removal. Pure formula works quickly and efficiently.</p>",
+  "seo": {
+    "title": "Acetone Nail Remover | BLOM Cosmetics",
+    "description": "Professional-grade acetone for fast nail polish removal. Safe and effective for all nail enhancements."
+  },
+  "rating": 4.8,
+  "reviews": 112,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Professional grade",
+    "Fast acting",
+    "Effective removal",
+    "Pure acetone",
+    "Safe for nails"
+  ],
+  "howToUse": [
+    "Apply to cotton pad",
+    "Press on nail",
+    "Hold for 30 seconds",
+    "Wipe away polish"
+  ],
+  "ingredients": {
+    "inci": [
+      "Acetone",
+      "Water"
+    ],
+    "key": [
+      "Acetone – dissolves polish quickly",
+      "Water – dilutes for safe use"
+    ]
+  },
+  "details": {
+    "size": "500ml",
+    "shelfLife": "36 months",
+    "claims": ["Professional Grade", "Fast Acting"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

@@ -1,0 +1,54 @@
+{
+  "id": "diamond-precision-nail-art-brush",
+  "slug": "diamond-precision-nail-art-brush",
+  "title": "Diamond Precision Nail Art Brush",
+  "subtitle": "Premium Kolinsky brush with floating glitter handle",
+  "price": -1,
+  "currency": "ZAR",
+  "sku": "DIA-BRH-001",
+  "status": "active",
+  "stock": 0,
+  "category": "Tools & Essentials",
+  "tags": ["brush", "nail-art", "kolinsky"],
+  "badges": ["Coming Soon"],
+  "thumbnail": "/acrylic-sculpture-brush-white-2.webp",
+  "images": [
+    "/acrylic-sculpture-brush-white-2.webp",
+    "/acrylic-sculpture-brush-colorful-2.webp"
+  ],
+  "shortDescription": "Premium Kolinsky brush with floating glitter handle.",
+  "descriptionHtml": "<p>Premium 100% Kolinsky brush with floating glitter handle for professional nail art work. Perfect for detailed designs and fine lines. Coming soon!</p>",
+  "seo": {
+    "title": "Diamond Precision Nail Art Brush | BLOM Cosmetics",
+    "description": "Premium 100% Kolinsky nail art brush with glitter handle. Professional quality for intricate nail designs."
+  },
+  "rating": 4.9,
+  "reviews": 23,
+  "compareAt": null,
+  "stockStatus": "Coming Soon",
+  "features": [
+    "100% Kolinsky hair",
+    "Floating glitter handle",
+    "Professional grade",
+    "Durable construction",
+    "Precision application"
+  ],
+  "howToUse": [
+    "Load with gel or polish",
+    "Create detailed designs",
+    "Perfect for fine lines",
+    "Clean after each use"
+  ],
+  "ingredients": {
+    "inci": [],
+    "key": []
+  },
+  "details": {
+    "size": "Various sizes",
+    "shelfLife": "N/A",
+    "claims": ["100% Kolinsky", "Professional Grade"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

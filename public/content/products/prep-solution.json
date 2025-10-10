@@ -1,0 +1,62 @@
+{
+  "id": "prep-solution",
+  "slug": "prep-solution",
+  "title": "Prep Solution (Nail Dehydrator)",
+  "subtitle": "Removes oils & moisture for better adhesion",
+  "price": 200,
+  "currency": "ZAR",
+  "sku": "PREP-SOL-001",
+  "status": "active",
+  "stock": 52,
+  "category": "Prep & Finishing",
+  "tags": ["dehydrator", "prep", "adhesion"],
+  "badges": [],
+  "thumbnail": "/prep-solution-white.webp",
+  "images": [
+    "/prep-solution-white.webp",
+    "/prep-solution-colorful.webp"
+  ],
+  "shortDescription": "Removes oils & moisture for better adhesion.",
+  "descriptionHtml": "<p>Prepares natural nails by dehydrating the plate, preventing lifting. Essential first step for long-lasting gel and acrylic applications.</p>",
+  "seo": {
+    "title": "Prep Solution Nail Dehydrator | BLOM Cosmetics",
+    "description": "Professional nail dehydrator that removes oils and moisture for superior gel and acrylic adhesion."
+  },
+  "rating": 4.7,
+  "reviews": 89,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Removes oils and moisture",
+    "Improves adhesion",
+    "Prevents lifting",
+    "Professional grade",
+    "Fast-drying formula"
+  ],
+  "howToUse": [
+    "Apply to clean nail plate",
+    "Allow to dry completely",
+    "Apply primer if needed",
+    "Continue with gel or acrylic"
+  ],
+  "ingredients": {
+    "inci": [
+      "Isopropyl Alcohol",
+      "Ethyl Acetate",
+      "Acetone"
+    ],
+    "key": [
+      "Isopropyl Alcohol – removes oils",
+      "Acetone – fast evaporation",
+      "Ethyl Acetate – dehydrating agent"
+    ]
+  },
+  "details": {
+    "size": "120ml",
+    "shelfLife": "36 months",
+    "claims": ["Professional Grade"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

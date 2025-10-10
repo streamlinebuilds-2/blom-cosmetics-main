@@ -1,0 +1,63 @@
+{
+  "id": "vitamin-primer",
+  "slug": "vitamin-primer",
+  "title": "Vitamin Primer",
+  "subtitle": "Acid-free primer for adhesion, vitamin-enriched",
+  "price": 210,
+  "currency": "ZAR",
+  "sku": "VIT-PRM-001",
+  "status": "active",
+  "stock": 38,
+  "category": "Prep & Finishing",
+  "tags": ["primer", "vitamin", "acid-free"],
+  "badges": ["New"],
+  "thumbnail": "/vitamin-primer-white.webp",
+  "images": [
+    "/vitamin-primer-white.webp",
+    "/vitamin-primer-colorful.webp"
+  ],
+  "shortDescription": "Acid-free primer for adhesion, vitamin-enriched.",
+  "descriptionHtml": "<p>Creates a long-lasting bond for gels and acrylics while protecting the natural nail. Vitamin-enriched formula provides extra nourishment.</p>",
+  "seo": {
+    "title": "Vitamin Primer | BLOM Cosmetics",
+    "description": "Acid-free primer with vitamins for strong gel and acrylic adhesion. Professional salon quality."
+  },
+  "rating": 4.8,
+  "reviews": 124,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Acid-free formula",
+    "Vitamin-enriched",
+    "Creates strong adhesion",
+    "Protects natural nail",
+    "Professional grade"
+  ],
+  "howToUse": [
+    "Apply to clean, dehydrated nail",
+    "Allow to dry completely",
+    "Apply gel or acrylic",
+    "Do not over-apply"
+  ],
+  "ingredients": {
+    "inci": [
+      "Ethyl Acetate",
+      "Butyl Acetate",
+      "Nitrocellulose",
+      "Vitamin E"
+    ],
+    "key": [
+      "Ethyl Acetate – fast-drying base",
+      "Vitamin E – nourishes and protects",
+      "Nitrocellulose – creates adhesive bond"
+    ]
+  },
+  "details": {
+    "size": "15ml",
+    "shelfLife": "24 months",
+    "claims": ["Acid-Free", "Vitamin-Enriched"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

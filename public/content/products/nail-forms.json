@@ -1,0 +1,54 @@
+{
+  "id": "nail-forms",
+  "slug": "nail-forms",
+  "title": "Nail Forms",
+  "subtitle": "Holographic guide, strong adhesive, 300 forms per roll",
+  "price": 290,
+  "currency": "ZAR",
+  "sku": "NL-FORM-001",
+  "status": "active",
+  "stock": 28,
+  "category": "Tools & Essentials",
+  "tags": ["forms", "extensions", "tools"],
+  "badges": [],
+  "thumbnail": "/nail-forms-white.webp",
+  "images": [
+    "/nail-forms-white.webp",
+    "/nail-forms-colorful.webp"
+  ],
+  "shortDescription": "Holographic guide, strong adhesive, 300 forms per roll.",
+  "descriptionHtml": "<p>Professional nail forms for creating perfect extensions and overlays. Holographic guide lines and strong adhesive backing.</p>",
+  "seo": {
+    "title": "Nail Forms | BLOM Cosmetics",
+    "description": "Professional nail forms with holographic guide. 300 forms per roll with strong adhesive for perfect extensions."
+  },
+  "rating": 4.5,
+  "reviews": 67,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Holographic guide",
+    "Strong adhesive",
+    "300 forms per roll",
+    "Professional grade",
+    "Easy to use"
+  ],
+  "howToUse": [
+    "Peel off backing",
+    "Apply to nail",
+    "Shape as needed",
+    "Apply acrylic or gel"
+  ],
+  "ingredients": {
+    "inci": [],
+    "key": []
+  },
+  "details": {
+    "size": "300 forms",
+    "shelfLife": "N/A",
+    "claims": ["Professional Grade", "Holographic Guide"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

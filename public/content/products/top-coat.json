@@ -1,0 +1,63 @@
+{
+  "id": "top-coat",
+  "slug": "top-coat",
+  "title": "Top Coat",
+  "subtitle": "Mirror shine, chip-resistant, professional finish",
+  "price": 190,
+  "currency": "ZAR",
+  "sku": "TOP-COT-001",
+  "status": "active",
+  "stock": 67,
+  "category": "Gel System",
+  "tags": ["top-coat", "gel", "glossy"],
+  "badges": ["Bestseller"],
+  "thumbnail": "/top-coat-white.webp",
+  "images": [
+    "/top-coat-white.webp",
+    "/top-coat-colorful.webp"
+  ],
+  "shortDescription": "Mirror shine, chip-resistant, professional finish.",
+  "descriptionHtml": "<p>High-gloss, chip-resistant finish for both gels and acrylics. Creates a stunning mirror shine that lasts for weeks.</p>",
+  "seo": {
+    "title": "Top Coat | BLOM Cosmetics",
+    "description": "Professional gel top coat with mirror shine finish. Chip-resistant and long-lasting for perfect nails."
+  },
+  "rating": 4.9,
+  "reviews": 201,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Mirror shine finish",
+    "Chip-resistant",
+    "Professional grade",
+    "Long-lasting",
+    "Easy application"
+  ],
+  "howToUse": [
+    "Apply over cured gel or acrylic",
+    "Cure under LED lamp",
+    "Wipe off inhibition layer",
+    "Enjoy glossy finish"
+  ],
+  "ingredients": {
+    "inci": [
+      "Methacrylic Acid",
+      "Ethyl Acetate",
+      "Photoinitiator",
+      "UV Stabilizer"
+    ],
+    "key": [
+      "Methacrylic Acid – creates hard surface",
+      "Photoinitiator – activates under LED",
+      "UV Stabilizer – prevents yellowing"
+    ]
+  },
+  "details": {
+    "size": "15ml",
+    "shelfLife": "24 months",
+    "claims": ["Chip-Resistant", "Professional Grade"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

@@ -1,0 +1,65 @@
+{
+  "id": "nail-liquid-monomer",
+  "slug": "nail-liquid-monomer",
+  "title": "Nail Liquid (Monomer)",
+  "subtitle": "Low-odor EMA formula, MMA/HEMA-free",
+  "price": -1,
+  "currency": "ZAR",
+  "sku": "NL-LIQ-001",
+  "status": "active",
+  "stock": 0,
+  "category": "Acrylic System",
+  "tags": ["monomer", "liquid", "acrylic"],
+  "badges": ["Coming Soon"],
+  "thumbnail": "/nail-liquid-monomer-white.webp",
+  "images": [
+    "/nail-liquid-monomer-white.webp",
+    "/nail-liquid-monomer-colorful.webp"
+  ],
+  "shortDescription": "Low-odor EMA formula, MMA/HEMA-free.",
+  "descriptionHtml": "<p>Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application. Coming soon!</p>",
+  "seo": {
+    "title": "Nail Liquid Monomer | BLOM Cosmetics",
+    "description": "Low-odor EMA monomer, MMA and HEMA-free. Professional quality for acrylic nail applications."
+  },
+  "rating": 4.8,
+  "reviews": 87,
+  "compareAt": null,
+  "stockStatus": "Coming Soon",
+  "features": [
+    "Low odor formula",
+    "MMA-free",
+    "HEMA-free",
+    "Professional grade",
+    "Safe application"
+  ],
+  "howToUse": [
+    "Mix with acrylic powder",
+    "Apply to nail",
+    "Shape as desired",
+    "Allow to cure"
+  ],
+  "ingredients": {
+    "inci": [
+      "Ethyl Methacrylate",
+      "Stabilizers",
+      "Inhibitors"
+    ],
+    "key": [
+      "Ethyl Methacrylate – safe monomer",
+      "Stabilizers – prevents breakdown",
+      "Inhibitors – controls curing"
+    ]
+  },
+  "details": {
+    "size": "250ml/500ml",
+    "shelfLife": "24 months",
+    "claims": ["Low Odor", "MMA-Free", "HEMA-Free"]
+  },
+  "variants": [
+    { "name": "250ml", "inStock": false, "price": -1 },
+    { "name": "500ml", "inStock": false, "price": -1 }
+  ],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

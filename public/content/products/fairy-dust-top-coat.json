@@ -1,0 +1,63 @@
+{
+  "id": "fairy-dust-top-coat",
+  "slug": "fairy-dust-top-coat",
+  "title": "Fairy Dust Top Coat",
+  "subtitle": "Subtle glitter-infused top coat with smooth shine",
+  "price": 195,
+  "currency": "ZAR",
+  "sku": "FRY-TOP-001",
+  "status": "active",
+  "stock": 41,
+  "category": "Gel System",
+  "tags": ["top-coat", "glitter", "gel"],
+  "badges": ["New"],
+  "thumbnail": "/fairy-dust-top-coat-white.webp",
+  "images": [
+    "/fairy-dust-top-coat-white.webp",
+    "/fairy-dust-top-coat-colorful.webp"
+  ],
+  "shortDescription": "Subtle glitter-infused top coat with smooth shine.",
+  "descriptionHtml": "<p>Adds a sparkling finish to any gel or acrylic set. Subtle glitter particles create a magical shimmer effect.</p>",
+  "seo": {
+    "title": "Fairy Dust Top Coat | BLOM Cosmetics",
+    "description": "Glitter-infused gel top coat with subtle sparkle. Professional quality with smooth finish."
+  },
+  "rating": 4.6,
+  "reviews": 73,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "Subtle glitter effect",
+    "Smooth application",
+    "Professional finish",
+    "Long-lasting",
+    "Easy removal"
+  ],
+  "howToUse": [
+    "Apply over cured gel or acrylic",
+    "Cure under LED lamp",
+    "Wipe off inhibition layer",
+    "Enjoy sparkling finish"
+  ],
+  "ingredients": {
+    "inci": [
+      "Methacrylic Acid",
+      "Ethyl Acetate",
+      "Glitter Particles",
+      "Photoinitiator"
+    ],
+    "key": [
+      "Methacrylic Acid – creates durable finish",
+      "Glitter Particles – adds sparkle",
+      "Photoinitiator – LED curing"
+    ]
+  },
+  "details": {
+    "size": "15ml",
+    "shelfLife": "24 months",
+    "claims": ["Glitter-Infused", "Professional Grade"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

@@ -1,0 +1,54 @@
+{
+  "id": "crystal-kolinsky-sculpting-brush",
+  "slug": "crystal-kolinsky-sculpting-brush",
+  "title": "Crystal Kolinsky Sculpting Brush",
+  "subtitle": "Premium Kolinsky brush with floating glitter handle",
+  "price": -1,
+  "currency": "ZAR",
+  "sku": "KOL-BRH-001",
+  "status": "active",
+  "stock": 0,
+  "category": "Tools & Essentials",
+  "tags": ["brush", "kolinsky", "tools"],
+  "badges": ["Coming Soon"],
+  "thumbnail": "/acrylic-sculpture-brush-white.webp",
+  "images": [
+    "/acrylic-sculpture-brush-white.webp",
+    "/acrylic-sculpture-brush-colorful.webp"
+  ],
+  "shortDescription": "Premium Kolinsky brush with floating glitter handle.",
+  "descriptionHtml": "<p>Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work. Perfect for sculpting and detailed work. Coming soon!</p>",
+  "seo": {
+    "title": "Crystal Kolinsky Sculpting Brush | BLOM Cosmetics",
+    "description": "Premium 100% Kolinsky acrylic brush with glitter handle. Professional quality for perfect nail sculpting."
+  },
+  "rating": 4.9,
+  "reviews": 23,
+  "compareAt": null,
+  "stockStatus": "Coming Soon",
+  "features": [
+    "100% Kolinsky hair",
+    "Floating glitter handle",
+    "Professional grade",
+    "Durable construction",
+    "Precision application"
+  ],
+  "howToUse": [
+    "Load with monomer",
+    "Pick up acrylic powder",
+    "Apply to nail",
+    "Shape as desired"
+  ],
+  "ingredients": {
+    "inci": [],
+    "key": []
+  },
+  "details": {
+    "size": "Various sizes",
+    "shelfLife": "N/A",
+    "claims": ["100% Kolinsky", "Professional Grade"]
+  },
+  "variants": [],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}

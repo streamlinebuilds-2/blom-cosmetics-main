@@ -1,0 +1,57 @@
+{
+  "id": "nail-file",
+  "slug": "nail-file",
+  "title": "Nail File (80/80 Grit)",
+  "subtitle": "Durable pro file with floral design",
+  "price": 35,
+  "currency": "ZAR",
+  "sku": "NL-FILE-001",
+  "status": "active",
+  "stock": 124,
+  "category": "Tools & Essentials",
+  "tags": ["file", "tools", "shaping"],
+  "badges": [],
+  "thumbnail": "/nail-file-white.webp",
+  "images": [
+    "/nail-file-white.webp",
+    "/nail-file-colorful.webp"
+  ],
+  "shortDescription": "Durable pro file with floral design.",
+  "descriptionHtml": "<p>Professional nail file with 80/80 grit for shaping and finishing. Durable construction with beautiful floral design.</p>",
+  "seo": {
+    "title": "Nail File 80/80 Grit | BLOM Cosmetics",
+    "description": "Professional 80/80 grit nail file with floral design. Durable and long-lasting for salon quality results."
+  },
+  "rating": 4.5,
+  "reviews": 67,
+  "compareAt": null,
+  "stockStatus": "In Stock",
+  "features": [
+    "80/80 grit",
+    "Durable construction",
+    "Floral design",
+    "Professional grade",
+    "Long-lasting"
+  ],
+  "howToUse": [
+    "Use for shaping nails",
+    "File in one direction",
+    "Finish with lighter grit",
+    "Clean after use"
+  ],
+  "ingredients": {
+    "inci": [],
+    "key": []
+  },
+  "details": {
+    "size": "15cm",
+    "shelfLife": "N/A",
+    "claims": ["Professional Grade", "Durable"]
+  },
+  "variants": [
+    { "name": "Single File", "inStock": true, "price": 35 },
+    { "name": "5-Pack Bundle", "inStock": true, "price": 160 }
+  ],
+  "createdAt": "2024-01-01T10:00:00Z",
+  "updatedAt": "2024-01-01T10:00:00Z"
+}
