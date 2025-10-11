@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
+import { cartStore } from '../lib/cart';
 
 export default function PaymentSuccess() {
+  const [orderInfo, setOrderInfo] = useState<any>(null);
+
+  useEffect(() => {
+    // Get pending order from localStorage
+    const pendingOrder = localStorage.getItem('blom_pending_order');
+    if (pendingOrder) {
+      setOrderInfo(JSON.parse(pendingOrder));
+      localStorage.removeItem('blom_pending_order');
+    }
+    
+    // Clear cart on successful payment
+    cartStore.clearCart();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50">
       <Header showMobileMenu={true} />
@@ -24,15 +39,19 @@ export default function PaymentSuccess() {
                 <h1 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Payment Successful</h1>
                 <p className="text-gray-600 mb-6">Thank you for your order! A confirmation email has been sent to you.</p>
 
-                {/* Order summary placeholder */}
-                <div className="text-left bg-gray-50 border rounded-xl p-4 sm:p-5 mb-6">
-                  <h2 className="font-semibold text-gray-900 mb-3">Order Summary</h2>
-                  <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                    <span>Order ID</span><span className="text-right">#BLOM-TEST</span>
-                    <span>Total</span><span className="text-right">R0.00</span>
-                    <span>Status</span><span className="text-right">Paid</span>
+                {/* Order summary */}
+                {orderInfo && (
+                  <div className="text-left bg-gray-50 border rounded-xl p-4 sm:p-5 mb-6">
+                    <h2 className="font-semibold text-gray-900 mb-3">Order Summary</h2>
+                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                      <span>Order ID</span><span className="text-right font-mono">#{orderInfo.orderId}</span>
+                      <span>Subtotal</span><span className="text-right">R{(orderInfo.total - orderInfo.shipping).toFixed(2)}</span>
+                      <span>Shipping</span><span className="text-right">{orderInfo.shipping === 0 ? 'FREE' : `R${orderInfo.shipping.toFixed(2)}`}</span>
+                      <span className="font-semibold">Total</span><span className="text-right font-semibold">R{orderInfo.total.toFixed(2)}</span>
+                      <span>Status</span><span className="text-right text-green-600 font-medium">✅ Paid</span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <a href="/track-order" className="inline-flex justify-center rounded-full bg-pink-500 px-6 py-3 text-white font-semibold shadow hover:bg-pink-600 transition-colors">Track My Order</a>

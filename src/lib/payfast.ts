@@ -1,4 +1,6 @@
 // PayFast integration utilities
+import MD5 from 'crypto-js/md5';
+
 export interface PayFastPaymentData {
   merchant_id: string;
   merchant_key: string;
@@ -87,19 +89,22 @@ class PayFastService {
     // Remove signature and hash from data
     const { ...signatureData } = data;
     
-    // Create parameter string
+    // Create parameter string - PayFast specific encoding
     const paramString = Object.keys(signatureData)
       .sort()
-      .map(key => `${key}=${encodeURIComponent(signatureData[key as keyof PayFastPaymentData] || '')}`)
+      .map(key => {
+        const value = signatureData[key as keyof PayFastPaymentData] || '';
+        return `${key}=${encodeURIComponent(value).replace(/%20/g, '+')}`;
+      })
       .join('&');
 
     // Add passphrase if provided
     const stringToHash = this.config.passphrase 
-      ? `${paramString}&passphrase=${encodeURIComponent(this.config.passphrase)}`
+      ? `${paramString}&passphrase=${encodeURIComponent(this.config.passphrase).replace(/%20/g, '+')}`
       : paramString;
 
-    // Generate MD5 hash (Note: In production, use a proper crypto library)
-    return this.md5(stringToHash);
+    // Generate MD5 hash using crypto-js
+    return MD5(stringToHash).toString();
   }
 
   /**
@@ -205,11 +210,6 @@ class PayFastService {
       .join(', ');
   }
 
-  private md5(str: string): string {
-    // Simple MD5 implementation for demo purposes
-    // In production, use a proper crypto library like crypto-js
-    return btoa(str).replace(/[^a-zA-Z0-9]/g, '').toLowerCase().substring(0, 32);
-  }
 }
 
 // PayFast configuration

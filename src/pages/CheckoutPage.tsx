@@ -69,14 +69,61 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      // Simulate order processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Generate order ID
+      const orderId = `BLOM-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
       
-      // Clear cart and redirect to confirmation
-      cartStore.clearCart();
-      window.location.href = '/order-confirmation';
-    } catch (error) {
+      // Prepare payment data
+      const paymentData = {
+        m_payment_id: orderId,
+        amount: orderTotal,
+        item_name: `BLOM Order (${cartState.items.length} items)`,
+        name_first: shippingInfo.firstName,
+        name_last: shippingInfo.lastName,
+        email_address: shippingInfo.email,
+        cell_number: shippingInfo.phone,
+        items: cartState.items.map(item => ({
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price
+        })),
+        shippingInfo: {
+          ...shippingInfo,
+          method: shippingMethod,
+          cost: shippingCost
+        }
+      };
+
+      // Call Netlify function to get PayFast redirect URL
+      const response = await fetch('/.netlify/functions/payfast-redirect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paymentData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Payment initiation failed');
+      }
+
+      const { redirectUrl } = await response.json();
+      
+      // Store order locally before redirecting
+      localStorage.setItem('blom_pending_order', JSON.stringify({
+        orderId,
+        cartItems: cartState.items,
+        total: orderTotal,
+        shipping: shippingCost,
+        shippingMethod,
+        shippingInfo,
+        timestamp: new Date().toISOString()
+      }));
+      
+      // Redirect to PayFast
+      window.location.href = redirectUrl;
+      
+    } catch (error: any) {
       console.error('Order processing failed:', error);
+      alert(error.message || 'Payment initiation failed. Please try again.');
       setIsProcessing(false);
     }
   };
