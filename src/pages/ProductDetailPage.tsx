@@ -577,6 +577,89 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       rating: 4.8,
       reviewCount: 94,
       reviews: []
+    },
+    'crystal-kolinsky-sculpting-brush': {
+      id: '11',
+      name: 'Crystal Kolinsky Sculpting Brush',
+      slug: 'crystal-kolinsky-sculpting-brush',
+      category: 'Tools & Essentials',
+      shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
+      overview: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work. Perfect precision and control for sculpting beautiful acrylic nails.',
+      price: -1,
+      compareAtPrice: null,
+      stock: 'Coming Soon',
+      images: [
+        '/acrylic-sculpture-brush-white.webp',
+        '/acrylic-sculpture-brush-colorful.webp'
+      ],
+      features: [
+        '100% Kolinsky hair',
+        'Floating glitter handle',
+        'Professional grade',
+        'Durable construction',
+        'Precision application'
+      ],
+      howToUse: [
+        'Load with monomer',
+        'Pick up acrylic powder',
+        'Apply to nail',
+        'Shape as desired',
+        'Clean thoroughly after use'
+      ],
+      ingredients: {
+        inci: [],
+        key: []
+      },
+      details: {
+        size: 'Size #12',
+        shelfLife: 'N/A',
+        claims: ['100% Kolinsky', 'Professional Grade']
+      },
+      variants: [],
+      rating: 4.9,
+      reviewCount: 23,
+      reviews: []
+    },
+    'diamond-precision-nail-art-brush': {
+      id: '12',
+      name: 'Diamond Precision Nail Art Brush',
+      slug: 'diamond-precision-nail-art-brush',
+      category: 'Tools & Essentials',
+      shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
+      overview: 'Premium 100% Kolinsky brush with floating glitter handle for professional nail art work. Perfect for detailed designs and fine lines.',
+      price: -1,
+      compareAtPrice: null,
+      stock: 'Coming Soon',
+      images: [
+        '/acrylic-sculpture-brush-white-2.webp',
+        '/acrylic-sculpture-brush-colorful-2.webp'
+      ],
+      features: [
+        '100% Kolinsky hair',
+        'Floating glitter handle',
+        'Professional grade',
+        'Durable construction',
+        'Precision application'
+      ],
+      howToUse: [
+        'Load with gel or polish',
+        'Create detailed designs',
+        'Perfect for fine lines',
+        'Clean after each use'
+      ],
+      ingredients: {
+        inci: [],
+        key: []
+      },
+      details: {
+        size: 'Size #6',
+        shelfLife: 'N/A',
+        claims: ['100% Kolinsky', 'Professional Grade']
+      },
+      variants: [],
+      rating: 4.9,
+      reviewCount: 23,
+      reviews: []
     }
   };
 
