@@ -15,11 +15,20 @@ function encPF(v: unknown) {
 }
 
 // Build signature over sorted key=value and append &passphrase=...
-function payfastSignature(params: Record<string, any>, passphrase?: string) {
-  const keys = Object.keys(params).sort();
+function signPayfast(params: Record<string, any>, passphrase?: string) {
+  // Include only fields that have a non-empty value (PayFast requirement)
+  const entries = Object.entries(params).filter(([, v]) => v !== undefined && v !== null && String(v) !== '');
+  const keys = entries.map(([k]) => k).sort();
   const qs = keys.map(k => `${k}=${encPF(params[k])}`).join('&');
   const base = passphrase ? `${qs}&passphrase=${encPF(passphrase)}` : qs;
-  return crypto.createHash('md5').update(base).digest('hex');
+  
+  // Uncomment to debug in logs if needed:
+  // console.log('PF baseString:', base);
+  
+  return { 
+    signature: crypto.createHash('md5').update(base).digest('hex'), 
+    base 
+  };
 }
 
 async function upsertOrder({ 
@@ -135,7 +144,7 @@ export const handler: Handler = async (event) => {
       // Continue anyway - we can create order via ITN webhook
     }
 
-    // 2) Build PayFast params
+    // 2) Build PayFast params - only include non-empty values
     const params: Record<string, any> = {
       merchant_id: process.env.PAYFAST_MERCHANT_ID,
       merchant_key: process.env.PAYFAST_MERCHANT_KEY,
@@ -143,25 +152,24 @@ export const handler: Handler = async (event) => {
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
       m_payment_id,
-      amount: amount.toFixed(2),
+      amount: amount.toFixed(2),  // Use 'amount' for the form (not amount_gross)
       item_name,
+      // Optional customer fields - only include if not empty
       email_address: email,
       name_first: body.name_first,
-      name_last: body.name_last
+      name_last: body.name_last,
+      cell_number: body.cell_number
     };
 
-    // Remove undefined/null values
-    Object.keys(params).forEach(key => {
-      if (params[key] === undefined || params[key] === null) {
-        delete params[key];
-      }
-    });
+    // 3) Compute signature (only includes non-empty fields)
+    const { signature } = signPayfast(params, process.env.PAYFAST_PASSPHRASE);
 
-    // 3) Compute signature
-    const signature = payfastSignature(params, process.env.PAYFAST_PASSPHRASE);
-
-    // 4) Build redirect URL
-    const qs = Object.keys(params).sort().map(k => `${k}=${encPF(params[k])}`).join('&');
+    // 4) Build redirect URL with filtered params matching signature
+    const filteredParams = Object.entries(params)
+      .filter(([, v]) => v !== undefined && v !== null && String(v) !== '')
+      .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+    
+    const qs = Object.keys(filteredParams).sort().map(k => `${k}=${encPF(filteredParams[k])}`).join('&');
     const redirectUrl = `${PF_BASE}/eng/process?${qs}&signature=${signature}`;
 
     return {
