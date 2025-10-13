@@ -121,9 +121,9 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
       isOnline: true,
       location: 'Online',
       instructor: {
-        name: 'BLOM Academy Team',
-        image: '/blom-academy-favicon.webp',
-        bio: 'Our experienced team of nail artists and educators bring years of expertise in watercolor nail art techniques, helping you master this beautiful and versatile art form.'
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.'
       },
       about: [
         'This comprehensive online workshop teaches you the fundamentals of watercolor nail art. You\'ll learn how to create soft, dreamy designs that are perfect for any occasion.',
@@ -193,9 +193,9 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
       isOnline: true,
       location: 'Online',
       instructor: {
-        name: 'BLOM Academy Team',
-        image: '/blom-academy-favicon.webp',
-        bio: 'Our experienced team specializes in seasonal nail art, bringing you the most festive and beautiful holiday designs to celebrate the Christmas season.'
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané brings festive creativity to seasonal nail art and ensures you master techniques with confidence.'
       },
       about: [
         'Get into the holiday spirit with this special Christmas watercolor workshop! Learn to create stunning festive designs including Christmas trees, snowflakes, and winter wonderland scenes.',
