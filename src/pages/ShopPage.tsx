@@ -574,235 +574,185 @@ export const ShopPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #FFE4F1 0%, #E0F2FE 100%)' }}>
+    <div className="min-h-screen bg-gray-50">
       <Header showMobileMenu={true} />
 
-      <main className="section-padding">
+      <main className="pt-8 pb-16">
         <Container>
-          {/* Page Header */}
-          <div className="text-center mb-12">
-            <h1 className="heading-with-stripe">SHOP</h1>
-            <p className="section-subheader">
-              High-quality products trusted by nail artists and beauty professionals.
+          {/* Page Header - Clean & Modern */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Shop</h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Professional nail products and furniture trusted by beauty professionals
             </p>
           </div>
 
-          {/* Search and Filter Bar */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
-            <div className="flex flex-col lg:flex-row gap-4 items-center">
-              {/* Search Bar */}
-              <div className="flex-1 w-full lg:w-auto">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Filter Button (Mobile) */}
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden flex items-center gap-2 px-4 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors"
-              >
-                <Filter className="h-5 w-5" />
-                Filters
-                <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* View Mode Toggle */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setViewMode('grid-3')}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid-3' ? 'bg-pink-400 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  <Grid3X3 className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('grid-2')}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'grid-2' ? 'bg-pink-400 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  <Grid2X2 className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-colors ${
-                    viewMode === 'list' ? 'bg-pink-400 text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                  }`}
-                >
-                  <List className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Mobile Filter Sheet */}
-            {showFilters && (
-              <div className="lg:hidden mt-6 pt-6 border-t border-gray-200">
-                <div className="space-y-4">
-                  {/* Categories */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Category</label>
-                    <select
-                      value={selectedCategory}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
-                    >
-                      {productCategories.map((category) => (
-                        <option key={category.slug} value={category.slug}>
-                          {category.name} ({category.count})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Sort */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-800 mb-2">Sort by</label>
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
-                    >
-                      {sortOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* In Stock Only */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="inStockOnly"
-                      checked={showInStockOnly}
-                      onChange={(e) => setShowInStockOnly(e.target.checked)}
-                      className="rounded border-gray-300 text-pink-400 focus:ring-pink-300"
-                    />
-                    <label htmlFor="inStockOnly" className="text-sm text-gray-700">
-                      In Stock Only
-                    </label>
-                  </div>
-
-                  {/* Clear Filters */}
-                  <button
-                    onClick={clearFilters}
-                    className="w-full px-4 py-2 text-pink-400 border border-pink-400 rounded-lg hover:bg-pink-50 transition-colors"
-                  >
-                    Clear Filters
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Desktop Filters */}
-          <div className="hidden lg:flex items-center justify-between mb-8">
-            {/* Categories */}
-            <div className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-gray-800">Category:</span>
-              <div className="flex gap-2">
-                {productCategories.map((category) => (
-                  <button
-                    key={category.slug}
-                    onClick={() => setSelectedCategory(category.slug)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      selectedCategory === category.slug
-                        ? 'bg-pink-400 text-white'
-                        : 'bg-white text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {category.name} ({category.count})
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Sort and Filters */}
-            <div className="flex items-center gap-4">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="inStockOnlyDesktop"
-                  checked={showInStockOnly}
-                  onChange={(e) => setShowInStockOnly(e.target.checked)}
-                  className="rounded border-gray-300 text-pink-400 focus:ring-pink-300"
-                />
-                <label htmlFor="inStockOnlyDesktop" className="text-sm text-gray-700">
-                  In Stock Only
-                </label>
-              </div>
-
-              <button
-                onClick={clearFilters}
-                className="flex items-center gap-2 px-3 py-2 text-pink-400 border border-pink-400 rounded-lg hover:bg-pink-50 transition-colors"
-              >
-                <X className="h-4 w-4" />
-                Clear
-              </button>
+          {/* Modern Search Bar */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 border-0 bg-gray-50 rounded-xl focus:ring-2 focus:ring-pink-300 focus:bg-white outline-none transition-all"
+              />
             </div>
           </div>
 
-          {/* Results Count */}
+          {/* Category Pills - Modern Design */}
           <div className="mb-6">
-            <p className="text-gray-600">
-              Showing {sortedProducts.length} of {allProducts.length} products
-            </p>
-          </div>
-
-          {/* Products Grid */}
-          <section className="section-padding">
-            <div className={`grid ${getGridClasses()} gap-6`}>
-              {sortedProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  slug={product.slug}
-                  price={product.price}
-                  compareAtPrice={product.compareAtPrice}
-                  shortDescription={product.shortDescription}
-                  images={product.images}
-                  inStock={product.inStock}
-                  badges={product.badges}
-                  isListView={viewMode === 'list'}
-                />
+            <div className="flex flex-wrap gap-2">
+              {productCategories.map((category) => (
+                <button
+                  key={category.slug}
+                  onClick={() => setSelectedCategory(category.slug)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    selectedCategory === category.slug
+                      ? 'bg-pink-400 text-white shadow-md'
+                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  {category.name}
+                  <span className="ml-2 text-xs opacity-75">({category.count})</span>
+                </button>
               ))}
             </div>
+          </div>
 
-            {sortedProducts.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-gray-600 text-lg">No products found matching your criteria.</p>
+          {/* Sticky Filter Bar - Modern E-commerce Style */}
+          <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-4">
+            <div className="flex items-center justify-between">
+              {/* Left: Sort & Filter */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  <Filter className="h-4 w-4" />
+                  <span className="text-sm font-medium">Filters</span>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
+                </button>
+                
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      Sort: {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Right: View Toggle & Count */}
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500 hidden sm:block">
+                  {sortedProducts.length} of {allProducts.length} products
+                </span>
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('grid-3')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Grid3X3 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('grid-2')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <Grid2X2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                    }`}
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Modern Mobile Filter Sheet */}
+          {showFilters && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+              <div className="space-y-6">
+                {/* In Stock Only */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-medium text-gray-900">Availability</h3>
+                    <p className="text-sm text-gray-500">Show only in-stock items</p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={showInStockOnly}
+                      onChange={(e) => setShowInStockOnly(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-400"></div>
+                  </label>
+                </div>
+
+                {/* Clear Filters */}
                 <button
                   onClick={clearFilters}
-                  className="mt-4 px-6 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors"
+                  className="w-full px-4 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                 >
-                  Clear Filters
+                  Clear All Filters
                 </button>
               </div>
-            )}
-          </section>
+            </div>
+          )}
+          </div>
+
+          {/* Products Grid - Clean Modern Layout */}
+          <div className={`grid ${getGridClasses()} gap-6`}>
+            {sortedProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                slug={product.slug}
+                price={product.price}
+                compareAtPrice={product.compareAtPrice}
+                shortDescription={product.shortDescription}
+                images={product.images}
+                inStock={product.inStock}
+                badges={product.badges}
+                isListView={viewMode === 'list'}
+              />
+            ))}
+          </div>
+
+          {/* Empty State */}
+          {sortedProducts.length === 0 && (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
+                <p className="text-gray-500 mb-6">Try adjusting your filters or search terms</p>
+                <button
+                  onClick={clearFilters}
+                  className="px-6 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors font-medium"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            </div>
+          )}
         </Container>
       </main>
 
