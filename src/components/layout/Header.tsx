@@ -5,6 +5,7 @@ import { User, Menu, X, ShoppingBag, Heart } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 import { WishlistButton } from '../wishlist/WishlistButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
+import { ClickableContact } from '../ui/ClickableContact';
 import { AnnouncementBar } from './AnnouncementBar';
 
 interface HeaderProps {
@@ -296,14 +297,16 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 <div className="pt-6 border-t mt-6 bg-gray-50 -mx-4 px-4 py-4 rounded-lg">
                   <h4 className="font-semibold text-gray-900 mb-3">Contact Info</h4>
                   <div className="space-y-2">
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
-                      shopblomcosmetics@gmail.com
-                    </p>
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <span className="w-2 h-2 bg-pink-400 rounded-full mr-3"></span>
-                      +27 79 548 3317
-                    </p>
+                    <ClickableContact 
+                      type="email" 
+                      value="shopblomcosmetics@gmail.com" 
+                      className="text-sm text-gray-600"
+                    />
+                    <ClickableContact 
+                      type="phone" 
+                      value="+27 79 548 3317" 
+                      className="text-sm text-gray-600"
+                    />
                   </div>
                 </div>
               </div>

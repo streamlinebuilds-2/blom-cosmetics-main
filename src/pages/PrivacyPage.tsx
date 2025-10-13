@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
+import { ClickableContact } from '../components/ui/ClickableContact';
 
 export const PrivacyPage: React.FC = () => {
   useEffect(() => {
@@ -77,9 +78,28 @@ export const PrivacyPage: React.FC = () => {
               
               <h2 className="text-2xl font-semibold mb-4">8. Contact Us</h2>
               <p className="mb-4">If you have any questions about this privacy policy, please contact us at:</p>
-              <p className="mb-2">Email: shopblomcosmetics@gmail.com</p>
-              <p className="mb-2">Phone: +27 79 548 3317</p>
-              <p>Address: 34 Horingbek St, Randfontein 1759, South Africa</p>
+              <div className="space-y-2">
+                <ClickableContact 
+                  type="email" 
+                  value="shopblomcosmetics@gmail.com" 
+                  className="mb-2"
+                >
+                  Email: shopblomcosmetics@gmail.com
+                </ClickableContact>
+                <ClickableContact 
+                  type="phone" 
+                  value="+27 79 548 3317" 
+                  className="mb-2"
+                >
+                  Phone: +27 79 548 3317
+                </ClickableContact>
+                <ClickableContact 
+                  type="address" 
+                  value="34 Horingbek St, Randfontein 1759, South Africa"
+                >
+                  Address: 34 Horingbek St, Randfontein 1759, South Africa
+                </ClickableContact>
+              </div>
             </div>
           </div>
         </Container>

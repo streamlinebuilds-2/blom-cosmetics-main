@@ -11,6 +11,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { ClickableContact } from '../components/ui/ClickableContact';
 import {
   Mail,
   Phone,
@@ -423,13 +424,14 @@ export const ContactPage: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Email</h3>
                 <p className="text-gray-600 mb-6">We reply within 1 business day</p>
-                <a 
-                  href="mailto:shopblomcosmetics@gmail.com"
+                <ClickableContact 
+                  type="email" 
+                  value="shopblomcosmetics@gmail.com"
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <Mail className="h-4 w-4" />
                   SEND EMAIL
-                </a>
+                </ClickableContact>
               </Card>
 
               {/* Phone Card */}
@@ -439,13 +441,14 @@ export const ContactPage: React.FC = () => {
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">Phone</h3>
                 <p className="text-gray-600 mb-6">Mon-Fri 08:00-17:00, Sat 09:00-14:00</p>
-                <a 
-                  href="tel:+27795483317"
+                <ClickableContact 
+                  type="phone" 
+                  value="+27 79 548 3317"
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <Phone className="h-4 w-4" />
                   CALL NOW
-                </a>
+                </ClickableContact>
               </Card>
             </div>
           </Container>

@@ -3,6 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
+import { ClickableContact } from '../components/ui/ClickableContact';
 import { 
   Clock, 
   MapPin, 
@@ -671,10 +672,22 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                     <Phone className="h-8 w-8 text-pink-400" />
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Contact</h3>
-                  <p className="text-gray-600">
-                    WhatsApp: +27 79 548 3317<br />
-                    <span className="text-sm text-gray-500">Email: shopblomcosmetics@gmail.com</span>
-                  </p>
+                  <div className="space-y-2">
+                    <ClickableContact 
+                      type="phone" 
+                      value="+27 79 548 3317" 
+                      className="text-gray-600"
+                    >
+                      WhatsApp: +27 79 548 3317
+                    </ClickableContact>
+                    <ClickableContact 
+                      type="email" 
+                      value="shopblomcosmetics@gmail.com" 
+                      className="text-sm text-gray-500"
+                    >
+                      Email: shopblomcosmetics@gmail.com
+                    </ClickableContact>
+                  </div>
                 </div>
               </div>
             </div>

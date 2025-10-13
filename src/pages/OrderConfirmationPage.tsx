@@ -4,6 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { ClickableContact } from '../components/ui/ClickableContact';
 import { 
   CheckCircle, 
   Mail, 
@@ -323,20 +324,22 @@ export const OrderConfirmationPage: React.FC = () => {
                     If you have any questions about your order, we're here to help.
                   </p>
                   <div className="space-y-3">
-                    <a
-                      href="mailto:shopblomcosmetics@gmail.com"
+                    <ClickableContact
+                      type="email"
+                      value="shopblomcosmetics@gmail.com"
                       className="flex items-center gap-2 text-sm text-pink-400 hover:text-pink-500"
                     >
                       <Mail className="h-4 w-4" />
                       shopblomcosmetics@gmail.com
-                    </a>
-                    <a
-                      href="tel:+27795483317"
+                    </ClickableContact>
+                    <ClickableContact
+                      type="phone"
+                      value="+27 79 548 3317"
                       className="flex items-center gap-2 text-sm text-pink-400 hover:text-pink-500"
                     >
                       <Phone className="h-4 w-4" />
                       +27 79 548 3317
-                    </a>
+                    </ClickableContact>
                   </div>
                   <Button variant="outline" className="w-full">
                     Contact Support
