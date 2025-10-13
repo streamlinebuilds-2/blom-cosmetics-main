@@ -660,6 +660,359 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       rating: 4.9,
       reviewCount: 23,
       reviews: []
+    },
+    'rose-petal-manicure-table': {
+      id: '13',
+      name: 'Rose Petal Manicure Tabel',
+      slug: 'rose-petal-manicure-table',
+      category: 'Furniture',
+      shortDescription: '120cm x 50cm x 80cm. Custom built to order.',
+      overview: 'Beautiful manicure table perfect for professional salons and home studios. Custom built with attention to detail and quality craftsmanship. Features elegant design and sturdy construction for daily professional use.',
+      price: 2590,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/rose-petal-manicure-table.webp'],
+      features: [
+        'Sturdy professional-grade construction',
+        'Elegant Rose Petal design',
+        'Perfect height for comfortable working (80cm)',
+        'Spacious work surface (120cm x 50cm)',
+        'Custom built for you'
+      ],
+      howToUse: [
+        'Dimensions: 120cm (L) x 50cm (W) x 80cm (H)',
+        'Material: Quality wood construction',
+        'Assembly: Minimal assembly required',
+        'Weight capacity: Suitable for professional use',
+        'Finish: Smooth, easy-to-clean surface'
+      ],
+      ingredients: {
+        inci: [
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Lead time: Up to 14 days to build',
+          'Randfontein area courier: R350',
+          'Outside Randfontein: Quote provided after order placement'
+        ]
+      },
+      details: {
+        size: '120cm x 50cm x 80cm',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Professional Grade', 'Handcrafted']
+      },
+      variants: [
+        { name: 'Standard', price: 2590, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 12,
+      reviews: []
+    },
+    'iris-manicure-table': {
+      id: '14',
+      name: 'Iris Manicure Tabel',
+      slug: 'iris-manicure-table',
+      category: 'Furniture',
+      shortDescription: '124cm x 50cm x 80cm (shelf 180cm total).',
+      overview: 'Professional manicure table with integrated shelf system. Choose between wooden or glass top to match your salon aesthetic. Combines workspace and storage in one elegant unit.',
+      price: 3490,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/iris-manicure-table.webp'],
+      features: [
+        'Integrated shelf system (180cm total height)',
+        'Choice of wooden or glass top',
+        'Spacious work surface (124cm x 50cm)',
+        'Ample storage on shelf',
+        'Professional salon quality'
+      ],
+      howToUse: [
+        'Table dimensions: 124cm (L) x 50cm (W) x 80cm (H)',
+        'Shelf total height: 180cm',
+        'Material options: Wood or glass top',
+        'Storage: Multiple shelf levels',
+        'Assembly: Basic assembly required'
+      ],
+      ingredients: {
+        inci: [
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Lead time: Up to 14 days to build',
+          'Randfontein area courier: R350',
+          'Outside Randfontein: Quote provided after order'
+        ]
+      },
+      details: {
+        size: '124cm x 50cm x 80cm (shelf 180cm)',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Professional Grade', 'Storage Included']
+      },
+      variants: [
+        { name: 'With wooden top', price: 3490, inStock: true },
+        { name: 'With glass top', price: 3700, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 8,
+      reviews: []
+    },
+    'blom-manicure-workstation': {
+      id: '15',
+      name: 'Blom Manicure Tabel & Work Station',
+      slug: 'blom-manicure-workstation',
+      category: 'Furniture',
+      shortDescription: 'Table: 120cm x 45cm x 80cm | Shelf: 120cm x 32cm x 120cm.',
+      overview: 'Complete professional workstation combining manicure table and shelf unit. Perfect for salons needing a comprehensive setup. Choose between wooden or glass tops for a custom look.',
+      price: 4500,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/blom-manicure-workstation.webp'],
+      features: [
+        'Complete workstation with table and shelf',
+        'Generous work surface and storage',
+        'Professional salon quality',
+        'Choice of wooden or glass tops',
+        'Coordinated design'
+      ],
+      howToUse: [
+        'Table: 120cm (L) x 45cm (W) x 80cm (H)',
+        'Shelf: 120cm (L) x 32cm (W) x 120cm (H)',
+        'Material: Quality wood with optional glass',
+        'Configuration: Table and shelf unit',
+        'Assembly: Some assembly required'
+      ],
+      ingredients: {
+        inci: [
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Lead time: Up to 14 days to build',
+          'Randfontein area courier: R350',
+          'Outside Randfontein: Quote provided after order'
+        ]
+      },
+      details: {
+        size: 'Table: 120x45x80cm | Shelf: 120x32x120cm',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Complete Set', 'Professional Grade']
+      },
+      variants: [
+        { name: 'With wooden tops', price: 4500, inStock: true },
+        { name: 'With glass top shelf & workstation', price: 5100, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 15,
+      reviews: []
+    },
+    'daisy-manicure-table': {
+      id: '16',
+      name: 'Daisy Manicure Tabel',
+      slug: 'daisy-manicure-table',
+      category: 'Furniture',
+      shortDescription: '120cm x 45cm x 78cm. Elegant and functional.',
+      overview: 'Classic manicure table with timeless design. Perfect balance of elegance and functionality. Suitable for both home studios and professional salons.',
+      price: 2700,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/daisy-manicure-table.webp'],
+      features: [
+        'Classic elegant design',
+        'Quality wood construction',
+        'Optional glass top upgrade',
+        'Comfortable working height',
+        'Compact yet spacious surface'
+      ],
+      howToUse: [
+        'Dimensions: 120cm (L) x 45cm (W) x 78cm (H)',
+        'Material: Wood base with optional glass top',
+        'Surface: Smooth, easy-to-clean finish',
+        'Style: Classic design',
+        'Assembly: Minimal assembly required'
+      ],
+      ingredients: {
+        inci: [
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Lead time: Up to 14 days to build',
+          'Randfontein area courier: R350',
+          'Outside Randfontein: Quote provided after order'
+        ]
+      },
+      details: {
+        size: '120cm x 45cm x 78cm',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Professional Grade', 'Elegant Design']
+      },
+      variants: [
+        { name: 'Wooden top', price: 2700, inStock: true },
+        { name: 'Wooden base & glass top', price: 3100, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 10,
+      reviews: []
+    },
+    'polish-garden-rack': {
+      id: '17',
+      name: 'Polish Garden (Gel Polish Rack)',
+      slug: 'polish-garden-rack',
+      category: 'Furniture',
+      shortDescription: '120cm x 11cm x 70cm. Perfect storage solution.',
+      overview: 'Wall-mounted gel polish rack for organized, professional display and storage. Keeps your polish collection organized and easily accessible. Perfect for salons and nail technicians.',
+      price: 1150,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/polish-garden-rack.webp'],
+      features: [
+        'Wall-mounted design saves space',
+        'Holds multiple polish bottles',
+        'Professional display',
+        'Easy access organization',
+        'Sturdy construction'
+      ],
+      howToUse: [
+        'Dimensions: 120cm (L) x 11cm (W) x 70cm (H)',
+        'Type: Wall-mounted rack',
+        'Installation: Wall mounting hardware included',
+        'Capacity: Holds numerous polish bottles',
+        'Material: Quality wood construction'
+      ],
+      ingredients: {
+        inci: [
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Lead time: Up to 14 days to build',
+          'Randfontein area courier: R350',
+          'Outside Randfontein: Quote provided after order'
+        ]
+      },
+      details: {
+        size: '120cm x 11cm x 70cm',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Space Saver', 'Wall Mount']
+      },
+      variants: [
+        { name: 'Standard', price: 1150, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 18,
+      reviews: []
+    },
+    'blossom-manicure-table': {
+      id: '18',
+      name: 'Blossom Manicure Tabel',
+      slug: 'blossom-manicure-table',
+      category: 'Furniture',
+      shortDescription: 'Premium design. Multiple top options available.',
+      overview: 'Our premium manicure table with elegant Blossom design and superior build quality. Choose from three top configurations to perfectly match your salon aesthetic and functional needs.',
+      price: 5200,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/blossom-manicure-table.webp'],
+      features: [
+        'Premium quality construction',
+        'Three top configuration options',
+        'Elegant Blossom design',
+        'Superior build quality',
+        'Professional salon grade'
+      ],
+      howToUse: [
+        'Dimensions: Professional standard sizing',
+        'Top options: Wooden, wooden & glass, or glass only',
+        'Construction: Premium materials throughout',
+        'Finish: High-quality, durable surface',
+        'Assembly: Professional assembly recommended'
+      ],
+      ingredients: {
+        inci: [
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Lead time: Up to 14 days to build',
+          'Randfontein area courier: R350',
+          'Outside Randfontein: Quote provided after order'
+        ]
+      },
+      details: {
+        size: 'Professional standard dimensions',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Premium Quality', 'Multiple Options']
+      },
+      variants: [
+        { name: 'Wooden top', price: 5200, inStock: true },
+        { name: 'Wooden & glass top', price: 5550, inStock: true },
+        { name: 'Glass top only', price: 6200, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 6,
+      reviews: []
+    },
+    'pearly-pedicure-station': {
+      id: '19',
+      name: 'Pearly Pedicure Station',
+      slug: 'pearly-pedicure-station',
+      category: 'Furniture',
+      shortDescription: '1.2m x 1.2m x 72cm. Platform, step & 3 drawers included.',
+      overview: 'Complete pedicure station with integrated platform, step, and three storage drawers. Professional quality construction perfect for salon pedicure services. Note: Stools, sink, and table top not included.',
+      price: 4800,
+      compareAtPrice: null,
+      stock: 'Made to Order',
+      images: ['/pearly-pedicure-station.webp'],
+      features: [
+        'Platform and step included',
+        'Three storage drawers',
+        'Professional quality construction',
+        'Spacious 1.2m x 1.2m platform',
+        'Perfect for salon pedicure services'
+      ],
+      howToUse: [
+        'Platform size: 1.2m x 1.2m x 72cm height',
+        'Includes: Platform, step, 3 drawers',
+        'Not included: Stools, sink, table top',
+        'Material: Quality wood construction',
+        'Assembly: Some assembly required'
+      ],
+      ingredients: {
+        inci: [
+          'Platform, step and 3 drawers included.',
+          'No stools, or sink included (or table on top).',
+          'Size: 1.2m x 1.2m x 72cm Hight',
+          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
+          'Courier na my in Randfontein Area: R350.',
+          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
+        ],
+        key: [
+          'Includes: Platform, step, 3 drawers',
+          'Excludes: Stools, sink, table top',
+          'Lead time: Up to 14 days to build',
+          'Randfontein courier: R350',
+          'Outside Randfontein: Quote on request'
+        ]
+      },
+      details: {
+        size: '1.2m x 1.2m x 72cm',
+        shelfLife: 'N/A',
+        claims: ['Custom Built', 'Complete Station', 'Professional Grade']
+      },
+      variants: [
+        { name: 'Standard', price: 4800, inStock: true }
+      ],
+      rating: 5.0,
+      reviewCount: 9,
+      reviews: []
     }
   };
 

@@ -335,6 +335,138 @@ export const ShopPage: React.FC = () => {
       badges: ['Coming Soon'],
       inStock: false,
       variants: []
+    },
+    // Furniture Products
+    {
+      id: '13',
+      name: 'Rose Petal Manicure Tabel',
+      slug: 'rose-petal-manicure-table',
+      price: 2590,
+      compareAtPrice: undefined,
+      shortDescription: '120cm x 50cm x 80cm. Custom built to order.',
+      description: 'Beautiful manicure table perfect for salons and home studios.',
+      images: ['/rose-petal-manicure-table.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 12,
+      badges: ['Custom Built'],
+      inStock: true,
+      variants: [
+        { name: 'Standard', price: 2590, inStock: true }
+      ]
+    },
+    {
+      id: '14',
+      name: 'Iris Manicure Tabel',
+      slug: 'iris-manicure-table',
+      price: 3490,
+      compareAtPrice: undefined,
+      shortDescription: '124cm x 50cm x 80cm (shelf 180cm total).',
+      description: 'Professional manicure table with shelf. Choice of wooden or glass top.',
+      images: ['/iris-manicure-table.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 8,
+      badges: ['Custom Built'],
+      inStock: true,
+      variants: [
+        { name: 'With wooden top', price: 3490, inStock: true },
+        { name: 'With glass top', price: 3700, inStock: true }
+      ]
+    },
+    {
+      id: '15',
+      name: 'Blom Manicure Tabel & Work Station',
+      slug: 'blom-manicure-workstation',
+      price: 4500,
+      compareAtPrice: undefined,
+      shortDescription: 'Table: 120cm x 45cm x 80cm | Shelf: 120cm x 32cm x 120cm.',
+      description: 'Complete workstation with table and shelf. Premium quality construction.',
+      images: ['/blom-manicure-workstation.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 15,
+      badges: ['Custom Built', 'Popular'],
+      inStock: true,
+      variants: [
+        { name: 'With wooden tops', price: 4500, inStock: true },
+        { name: 'With glass top shelf & workstation', price: 5100, inStock: true }
+      ]
+    },
+    {
+      id: '16',
+      name: 'Daisy Manicure Tabel',
+      slug: 'daisy-manicure-table',
+      price: 2700,
+      compareAtPrice: undefined,
+      shortDescription: '120cm x 45cm x 78cm. Elegant and functional.',
+      description: 'Classic manicure table design with quality construction.',
+      images: ['/daisy-manicure-table.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 10,
+      badges: ['Custom Built'],
+      inStock: true,
+      variants: [
+        { name: 'Wooden top', price: 2700, inStock: true },
+        { name: 'Wooden base & glass top', price: 3100, inStock: true }
+      ]
+    },
+    {
+      id: '17',
+      name: 'Polish Garden (Gel Polish Rack)',
+      slug: 'polish-garden-rack',
+      price: 1150,
+      compareAtPrice: undefined,
+      shortDescription: '120cm x 11cm x 70cm. Perfect storage solution.',
+      description: 'Wall-mounted gel polish rack for organized storage.',
+      images: ['/polish-garden-rack.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 18,
+      badges: ['Space Saver'],
+      inStock: true,
+      variants: [
+        { name: 'Standard', price: 1150, inStock: true }
+      ]
+    },
+    {
+      id: '18',
+      name: 'Blossom Manicure Tabel',
+      slug: 'blossom-manicure-table',
+      price: 5200,
+      compareAtPrice: undefined,
+      shortDescription: 'Premium design. Multiple top options available.',
+      description: 'Our premium manicure table with elegant design and superior build quality.',
+      images: ['/blossom-manicure-table.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 6,
+      badges: ['Custom Built', 'Premium'],
+      inStock: true,
+      variants: [
+        { name: 'Wooden top', price: 5200, inStock: true },
+        { name: 'Wooden & glass top', price: 5550, inStock: true },
+        { name: 'Glass top only', price: 6200, inStock: true }
+      ]
+    },
+    {
+      id: '19',
+      name: 'Pearly Pedicure Station',
+      slug: 'pearly-pedicure-station',
+      price: 4800,
+      compareAtPrice: undefined,
+      shortDescription: '1.2m x 1.2m x 72cm. Platform, step & 3 drawers included.',
+      description: 'Complete pedicure station with storage. Professional quality for salons.',
+      images: ['/pearly-pedicure-station.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 9,
+      badges: ['Custom Built', 'Complete Set'],
+      inStock: true,
+      variants: [
+        { name: 'Standard', price: 4800, inStock: true }
+      ]
     }
   ];
 
@@ -343,7 +475,8 @@ export const ShopPage: React.FC = () => {
     { name: 'Acrylic System', slug: 'acrylic-system', count: allProducts.filter(p => p.category === 'acrylic-system').length },
     { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
     { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
-    { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length }
+    { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length },
+    { name: 'Furniture', slug: 'furniture', count: allProducts.filter(p => p.category === 'furniture').length }
   ];
 
   const sortOptions = [
