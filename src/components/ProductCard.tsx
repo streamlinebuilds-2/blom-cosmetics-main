@@ -31,6 +31,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isListView = false
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
+  const cardRef = React.useRef<HTMLElement | null>(null);
+  const [isInView, setIsInView] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
     setIsWishlisted(wishlistStore.isInWishlist(slug));
@@ -41,6 +44,69 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
     return unsubscribe;
   }, [slug]);
+
+  // Detect mobile once on mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 768);
+    }
+  }, []);
+
+  // Mobile-only: Scroll-triggered reveal when card center is within a band around viewport center
+  React.useEffect(() => {
+    if (!isListView) return;
+    if (!isMobile) return;
+
+    const el = cardRef.current;
+    if (!el) return;
+
+    const lastYRef = { current: typeof window !== 'undefined' ? window.scrollY : 0 } as { current: number };
+    const lastTRef = { current: typeof performance !== 'undefined' ? performance.now() : 0 } as { current: number };
+    const velRef = { current: 0 } as { current: number };
+
+    const centerBandPct = 0.15; // ±15% around viewport center
+    const enterDwellMs = 160;
+    const exitDwellMs = 100;
+    const maxScrollPxPerMs = 1.2; // velocity guard
+    let timer: number | null = null;
+
+    const onScroll = () => {
+      const now = performance.now();
+      const y = window.scrollY;
+      const dy = Math.abs(y - lastYRef.current);
+      const dt = Math.max(1, now - lastTRef.current);
+      velRef.current = dy / dt; // px/ms
+      lastYRef.current = y;
+      lastTRef.current = now;
+
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const center = rect.top + rect.height / 2;
+      const bandTop = vh * 0.5 * (1 - centerBandPct);
+      const bandBot = vh * 0.5 * (1 + centerBandPct);
+
+      const isInBand = center >= bandTop && center <= bandBot;
+      const isSlow = velRef.current <= maxScrollPxPerMs;
+
+      if (timer) { window.clearTimeout(timer); timer = null; }
+
+      if (isInBand && isSlow) {
+        timer = window.setTimeout(() => setIsInView(true), enterDwellMs);
+      } else {
+        timer = window.setTimeout(() => setIsInView(false), exitDwellMs);
+      }
+    };
+
+    // initial compute
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [isListView, isMobile]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -85,6 +151,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   if (isListView) {
     return (
       <article 
+        ref={cardRef as any}
         className={`product-card group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] md:flex md:items-center md:gap-6 md:p-4 ${className}`}
         style={{ boxShadow: '0 10px 30px rgba(15,23,42,0.06)' }}
         onClick={handleCardClick}
@@ -95,7 +162,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <img
             src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
             alt={name}
-            className="w-full h-full object-cover transition-all duration-300 ease-out group-hover:opacity-0 group-hover:scale-[1.02]"
+            className={`w-full h-full object-cover transition-all duration-300 ease-out ${
+              isMobile ? (isInView ? 'opacity-0 scale-[1.02]' : 'opacity-100') : ''
+            } group-hover:opacity-0 group-hover:scale-[1.02]`}
             loading="lazy"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -107,7 +176,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <img
               src={images[1]}
               alt={name}
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out opacity-0 group-hover:opacity-100 group-hover:scale-[1.02]"
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out ${
+                isMobile ? (isInView ? 'opacity-100 scale-[1.02]' : 'opacity-0') : 'opacity-0'
+              } group-hover:opacity-100 group-hover:scale-[1.02]`}
               loading="lazy"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
