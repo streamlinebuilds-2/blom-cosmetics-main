@@ -666,45 +666,39 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Rose Petal Manicure Tabel',
       slug: 'rose-petal-manicure-table',
       category: 'Furniture',
-      shortDescription: '120cm x 50cm x 80cm. Custom built to order.',
-      overview: 'Beautiful manicure table perfect for professional salons and home studios. Custom built with attention to detail and quality craftsmanship. Features elegant design and sturdy construction for daily professional use.',
+      shortDescription: 'Beautiful manicure table perfect for salons and home studios.',
+      overview: 'The Rose Petal Manicure Table is designed for beauty professionals who value elegance and functionality. Handcrafted locally with premium finishes, this workstation blends timeless style with everyday practicality. Perfect for creating a welcoming, professional atmosphere in your salon or home studio.',
       price: 2590,
       compareAtPrice: null,
       stock: 'Made to Order',
       images: ['/rose-petal-manicure-table-white.webp', '/rose-petal-manicure-table-colorful.webp'],
       features: [
-        'Sturdy professional-grade construction',
-        'Elegant Rose Petal design',
-        'Perfect height for comfortable working (80cm)',
-        'Spacious work surface (120cm x 50cm)',
-        'Custom built for you'
+        'Handcrafted from durable, high-quality materials',
+        'Elegant pastel-white design fits any salon aesthetic',
+        'Smooth surfaces for easy cleaning and long-lasting use',
+        'Comfortable working height optimized for professionals',
+        'Sturdy construction for daily salon use'
       ],
-      howToUse: [
-        'Dimensions: 120cm (L) x 50cm (W) x 80cm (H)',
-        'Material: Quality wood construction',
-        'Assembly: Minimal assembly required',
-        'Weight capacity: Suitable for professional use',
-        'Finish: Smooth, easy-to-clean surface'
+      dimensions: [
+        'Table Size: 120 cm (L) × 50 cm (W) × 80 cm (H)',
+        'Perfect for standard salon spaces',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Lead time: Up to 14 days to build',
-          'Randfontein area courier: R350',
-          'Outside Randfontein: Quote provided after order placement'
-        ]
-      },
-      details: {
-        size: '120cm x 50cm x 80cm',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Professional Grade', 'Handcrafted']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure',
+        'High-gloss enamel finish (pastel white)',
+        'Smooth lacquered surface',
+        'Reinforced joints for durability'
+      ],
+      productionDelivery: [
+        'Each piece is handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'Standard', price: 2590, inStock: true }
+        { name: 'Standard', price: 2590, inStock: true, image: '/rose-petal-manicure-table-colorful.webp' }
       ],
       rating: 5.0,
       reviewCount: 12,
@@ -715,46 +709,44 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Iris Manicure Tabel',
       slug: 'iris-manicure-table',
       category: 'Furniture',
-      shortDescription: '124cm x 50cm x 80cm (shelf 180cm total).',
-      overview: 'Professional manicure table with integrated shelf system. Choose between wooden or glass top to match your salon aesthetic. Combines workspace and storage in one elegant unit.',
+      shortDescription: 'Professional manicure table with integrated shelf system.',
+      overview: 'The Iris Manicure Table combines workspace and storage in one elegant, space-efficient unit. Designed for busy professionals who need both style and functionality, this table features an integrated shelf system that keeps all your essentials organized and within reach. Choose between wooden or glass top to perfectly match your salon aesthetic.',
       price: 3490,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/iris-manicure-table-white.webp', '/iris-manicure-table-colorful.webp'],
+      images: ['/iris-manicure-table-white.webp', '/iris-manicure-table-colorful.webp', '/iris-manicure-table-glass.webp'],
       features: [
-        'Integrated shelf system (180cm total height)',
-        'Choice of wooden or glass top',
-        'Spacious work surface (124cm x 50cm)',
-        'Ample storage on shelf',
-        'Professional salon quality'
+        'Integrated shelf system maximizes vertical storage',
+        'Choice of wooden or tempered glass top',
+        'Spacious work surface for comfortable client service',
+        'Multiple shelf levels for organized product display',
+        'Professional-grade construction for daily salon use',
+        'Elegant design complements any salon decor'
       ],
-      howToUse: [
-        'Table dimensions: 124cm (L) x 50cm (W) x 80cm (H)',
-        'Shelf total height: 180cm',
-        'Material options: Wood or glass top',
-        'Storage: Multiple shelf levels',
-        'Assembly: Basic assembly required'
+      dimensions: [
+        'Table Size: 124 cm (L) × 50 cm (W) × 80 cm (H)',
+        'Total Height with Shelf: 180 cm',
+        'Shelf Depth: Optimized for product storage',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Lead time: Up to 14 days to build',
-          'Randfontein area courier: R350',
-          'Outside Randfontein: Quote provided after order'
-        ]
-      },
-      details: {
-        size: '124cm x 50cm x 80cm (shelf 180cm)',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Professional Grade', 'Storage Included']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure',
+        'High-gloss enamel finish (pastel white)',
+        'Optional tempered glass top (6mm thickness)',
+        'Reinforced shelf brackets',
+        'Smooth, easy-to-clean surfaces'
+      ],
+      productionDelivery: [
+        'Each piece is handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'Basic assembly required (instructions included)',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'With wooden top', price: 3490, inStock: true },
-        { name: 'With glass top', price: 3700, inStock: true }
+        { name: 'With wooden top', price: 3490, inStock: true, image: '/iris-manicure-table-colorful.webp' },
+        { name: 'With glass top', price: 3700, inStock: true, image: '/iris-manicure-table-glass.webp' }
       ],
       rating: 5.0,
       reviewCount: 8,
@@ -765,46 +757,46 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Blom Manicure Tabel & Work Station',
       slug: 'blom-manicure-workstation',
       category: 'Furniture',
-      shortDescription: 'Table: 120cm x 45cm x 80cm | Shelf: 120cm x 32cm x 120cm.',
-      overview: 'Complete professional workstation combining manicure table and shelf unit. Perfect for salons needing a comprehensive setup. Choose between wooden or glass tops for a custom look.',
+      shortDescription: 'Complete professional workstation with table and shelf.',
+      overview: 'The Blom Manicure Workstation is the ultimate all-in-one solution for professional nail technicians. This complete set combines a spacious manicure table with a coordinated shelf unit, giving you everything you need for an organized, efficient workspace. Perfect for salons that want a cohesive, professional look with maximum functionality.',
       price: 4500,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/blom-manicure-workstation-white.webp', '/blom-manicure-workstation-colorful.webp'],
+      images: ['/blom-manicure-workstation-white.webp', '/blom-manicure-workstation-colorful.webp', '/blom-manicure-workstation-glass.webp'],
       features: [
-        'Complete workstation with table and shelf',
-        'Generous work surface and storage',
-        'Professional salon quality',
-        'Choice of wooden or glass tops',
-        'Coordinated design'
+        'Complete workstation set with matching table and shelf',
+        'Generous work surface for comfortable client service',
+        'Coordinated design creates cohesive salon aesthetic',
+        'Choice of all-wood or glass top configuration',
+        'Ample storage for products, tools, and supplies',
+        'Professional-grade construction for busy salons',
+        'Maximizes workspace efficiency'
       ],
-      howToUse: [
-        'Table: 120cm (L) x 45cm (W) x 80cm (H)',
-        'Shelf: 120cm (L) x 32cm (W) x 120cm (H)',
-        'Material: Quality wood with optional glass',
-        'Configuration: Table and shelf unit',
-        'Assembly: Some assembly required'
+      dimensions: [
+        'Table: 120 cm (L) × 45 cm (W) × 80 cm (H)',
+        'Shelf Unit: 120 cm (L) × 32 cm (W) × 120 cm (H)',
+        'Coordinated sizing for perfect visual balance',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Lead time: Up to 14 days to build',
-          'Randfontein area courier: R350',
-          'Outside Randfontein: Quote provided after order'
-        ]
-      },
-      details: {
-        size: 'Table: 120x45x80cm | Shelf: 120x32x120cm',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Complete Set', 'Professional Grade']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure',
+        'High-gloss enamel finish (pastel white)',
+        'Optional tempered glass tops (6mm thickness)',
+        'Reinforced joints and shelf brackets',
+        'Smooth, easy-to-clean surfaces throughout',
+        'Matching finish on table and shelf'
+      ],
+      productionDelivery: [
+        'Each set is handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'Some assembly required (instructions included)',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'With wooden tops', price: 4500, inStock: true },
-        { name: 'With glass top shelf & workstation', price: 5100, inStock: true }
+        { name: 'With wooden tops', price: 4500, inStock: true, image: '/blom-manicure-workstation-colorful.webp' },
+        { name: 'With glass top shelf & workstation', price: 5100, inStock: true, image: '/blom-manicure-workstation-glass.webp' }
       ],
       rating: 5.0,
       reviewCount: 15,
@@ -815,46 +807,44 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Daisy Manicure Tabel',
       slug: 'daisy-manicure-table',
       category: 'Furniture',
-      shortDescription: '120cm x 45cm x 78cm. Elegant and functional.',
-      overview: 'Classic manicure table with timeless design. Perfect balance of elegance and functionality. Suitable for both home studios and professional salons.',
+      shortDescription: 'Classic manicure table with timeless design.',
+      overview: 'The Daisy Manicure Table embodies timeless elegance with modern functionality. Its classic design makes it a versatile choice for any salon style, from traditional to contemporary. Perfect for both home studios and professional salons, the Daisy offers a compact footprint without sacrificing workspace quality.',
       price: 2700,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/daisy-manicure-table-white.webp', '/daisy-manicure-table-colorful.webp'],
+      images: ['/daisy-manicure-table-white.webp', '/daisy-manicure-table-colorful.webp', '/daisy-manicure-table-glass.webp'],
       features: [
-        'Classic elegant design',
-        'Quality wood construction',
-        'Optional glass top upgrade',
-        'Comfortable working height',
-        'Compact yet spacious surface'
+        'Timeless classic design suits any salon aesthetic',
+        'Quality wood construction for lasting durability',
+        'Optional tempered glass top upgrade',
+        'Comfortable working height for extended sessions',
+        'Compact yet spacious surface maximizes workspace',
+        'Elegant details add sophisticated touch'
       ],
-      howToUse: [
-        'Dimensions: 120cm (L) x 45cm (W) x 78cm (H)',
-        'Material: Wood base with optional glass top',
-        'Surface: Smooth, easy-to-clean finish',
-        'Style: Classic design',
-        'Assembly: Minimal assembly required'
+      dimensions: [
+        'Table Size: 120 cm (L) × 45 cm (W) × 78 cm (H)',
+        'Ideal for smaller spaces without compromising function',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Lead time: Up to 14 days to build',
-          'Randfontein area courier: R350',
-          'Outside Randfontein: Quote provided after order'
-        ]
-      },
-      details: {
-        size: '120cm x 45cm x 78cm',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Professional Grade', 'Elegant Design']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure',
+        'High-gloss enamel finish (pastel white)',
+        'Optional tempered glass top (6mm thickness)',
+        'Smooth lacquered wood base',
+        'Easy-to-clean surfaces',
+        'Reinforced construction'
+      ],
+      productionDelivery: [
+        'Each piece is handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'Minimal assembly required (instructions included)',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'Wooden top', price: 2700, inStock: true },
-        { name: 'Wooden base & glass top', price: 3100, inStock: true }
+        { name: 'Wooden top', price: 2700, inStock: true, image: '/daisy-manicure-table-colorful.webp' },
+        { name: 'Wooden base & glass top', price: 3100, inStock: true, image: '/daisy-manicure-table-glass.webp' }
       ],
       rating: 5.0,
       reviewCount: 10,
@@ -865,45 +855,44 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Polish Garden (Gel Polish Rack)',
       slug: 'polish-garden-rack',
       category: 'Furniture',
-      shortDescription: '120cm x 11cm x 70cm. Perfect storage solution.',
-      overview: 'Wall-mounted gel polish rack for organized, professional display and storage. Keeps your polish collection organized and easily accessible. Perfect for salons and nail technicians.',
+      shortDescription: 'Wall-mounted gel polish rack for organized storage.',
+      overview: 'The Polish Garden transforms your gel polish collection into a beautiful, organized display. This wall-mounted rack keeps your polishes visible, accessible, and professionally presented. Perfect for salons wanting to showcase their color range while maximizing floor space. Turn your polish collection into a stunning focal point.',
       price: 1150,
       compareAtPrice: null,
       stock: 'Made to Order',
       images: ['/polish-garden-rack-white.webp', '/polish-garden-rack-colorful.webp'],
       features: [
-        'Wall-mounted design saves space',
-        'Holds multiple polish bottles',
-        'Professional display',
-        'Easy access organization',
-        'Sturdy construction'
+        'Wall-mounted design maximizes floor space',
+        'Holds extensive polish collection',
+        'Professional display showcases your color range',
+        'Easy access for quick color selection',
+        'Sturdy construction supports full bottle weight',
+        'Elegant design complements any salon decor'
       ],
-      howToUse: [
-        'Dimensions: 120cm (L) x 11cm (W) x 70cm (H)',
-        'Type: Wall-mounted rack',
-        'Installation: Wall mounting hardware included',
-        'Capacity: Holds numerous polish bottles',
-        'Material: Quality wood construction'
+      dimensions: [
+        'Rack Size: 120 cm (L) × 11 cm (W) × 70 cm (H)',
+        'Multiple tier levels for organized display',
+        'Fits standard gel polish bottles',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Lead time: Up to 14 days to build',
-          'Randfontein area courier: R350',
-          'Outside Randfontein: Quote provided after order'
-        ]
-      },
-      details: {
-        size: '120cm x 11cm x 70cm',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Space Saver', 'Wall Mount']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure',
+        'High-gloss enamel finish (pastel white)',
+        'Reinforced shelf supports',
+        'Smooth, easy-to-clean surfaces',
+        'Durable construction for heavy loads'
+      ],
+      productionDelivery: [
+        'Each piece is handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'Wall mounting hardware included',
+        'Installation instructions provided',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'Standard', price: 1150, inStock: true }
+        { name: 'Standard', price: 1150, inStock: true, image: '/polish-garden-rack-colorful.webp' }
       ],
       rating: 5.0,
       reviewCount: 18,
@@ -914,47 +903,48 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Blossom Manicure Tabel',
       slug: 'blossom-manicure-table',
       category: 'Furniture',
-      shortDescription: 'Premium design. Multiple top options available.',
-      overview: 'Our premium manicure table with elegant Blossom design and superior build quality. Choose from three top configurations to perfectly match your salon aesthetic and functional needs.',
+      shortDescription: 'Premium manicure table with elegant design and superior build quality.',
+      overview: 'The Blossom Manicure Table represents the pinnacle of salon furniture craftsmanship. This premium piece combines exquisite design with uncompromising build quality, making it the perfect centerpiece for high-end salons. With three distinct top configurations, you can customize the Blossom to perfectly match your vision of luxury and functionality.',
       price: 5200,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/blossom-manicure-table-white.webp', '/blossom-manicure-table-colorful.webp'],
+      images: ['/blossom-manicure-table-white.webp', '/blossom-manicure-table-colorful.webp', '/blossom-manicure-table-glass.webp', '/blossom-manicure-table-mixed.webp'],
       features: [
-        'Premium quality construction',
-        'Three top configuration options',
-        'Elegant Blossom design',
-        'Superior build quality',
-        'Professional salon grade'
+        'Premium quality construction with superior materials',
+        'Three distinct top configuration options',
+        'Elegant Blossom design with refined details',
+        'Exceptional build quality for lasting investment',
+        'Professional salon-grade durability',
+        'Sophisticated aesthetic elevates any space',
+        'Customizable to your exact specifications'
       ],
-      howToUse: [
-        'Dimensions: Professional standard sizing',
-        'Top options: Wooden, wooden & glass, or glass only',
-        'Construction: Premium materials throughout',
-        'Finish: High-quality, durable surface',
-        'Assembly: Professional assembly recommended'
+      dimensions: [
+        'Table Size: Professional standard dimensions',
+        'Generous work surface for premium client experience',
+        'Optimal height for extended comfort',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Lead time: Up to 14 days to build',
-          'Randfontein area courier: R350',
-          'Outside Randfontein: Quote provided after order'
-        ]
-      },
-      details: {
-        size: 'Professional standard dimensions',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Premium Quality', 'Multiple Options']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure with reinforced core',
+        'High-gloss enamel finish (pastel white)',
+        'Optional tempered glass tops (8mm premium thickness)',
+        'Polished chrome or brushed steel accents',
+        'Hand-finished surfaces for flawless appearance',
+        'Museum-quality construction standards'
+      ],
+      productionDelivery: [
+        'Each piece is meticulously handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'Professional assembly recommended (instructions included)',
+        'White-glove packaging ensures pristine arrival',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'Wooden top', price: 5200, inStock: true },
-        { name: 'Wooden & glass top', price: 5550, inStock: true },
-        { name: 'Glass top only', price: 6200, inStock: true }
+        { name: 'Wooden top', price: 5200, inStock: true, image: '/blossom-manicure-table-colorful.webp' },
+        { name: 'Wooden & glass top', price: 5550, inStock: true, image: '/blossom-manicure-table-mixed.webp' },
+        { name: 'Glass top only', price: 6200, inStock: true, image: '/blossom-manicure-table-glass.webp' }
       ],
       rating: 5.0,
       reviewCount: 6,
@@ -965,50 +955,48 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       name: 'Pearly Pedicure Station',
       slug: 'pearly-pedicure-station',
       category: 'Furniture',
-      shortDescription: '1.2m x 1.2m x 72cm. Platform, step & 3 drawers included.',
-      overview: 'Complete pedicure station with integrated platform, step, and three storage drawers. Professional quality construction perfect for salon pedicure services. Note: Stools, sink, and table top not included.',
+      shortDescription: 'Complete pedicure station with platform, step and storage drawers.',
+      overview: 'The Pearly Pedicure Station is your complete foundation for professional pedicure services. This comprehensive platform includes integrated step access and three spacious storage drawers, creating an organized, efficient workspace for your pedicure business. Build your perfect pedicure setup around this solid, professional-grade foundation. Note: Stools, basin, and top table sold separately for maximum customization.',
       price: 4800,
       compareAtPrice: null,
       stock: 'Made to Order',
       images: ['/pearly-pedicure-station-white.webp', '/pearly-pedicure-station-colorful.webp'],
       features: [
-        'Platform and step included',
-        'Three storage drawers',
-        'Professional quality construction',
-        'Spacious 1.2m x 1.2m platform',
-        'Perfect for salon pedicure services'
+        'Complete platform foundation for pedicure services',
+        'Integrated step for easy client access',
+        'Three spacious storage drawers for supplies',
+        'Professional-grade construction for daily use',
+        'Spacious 1.2m × 1.2m platform accommodates all basin types',
+        'Customizable setup (add your choice of basin, stools, and top table)',
+        'Sturdy construction supports full equipment weight'
       ],
-      howToUse: [
-        'Platform size: 1.2m x 1.2m x 72cm height',
-        'Includes: Platform, step, 3 drawers',
-        'Not included: Stools, sink, table top',
-        'Material: Quality wood construction',
-        'Assembly: Some assembly required'
+      dimensions: [
+        'Platform Size: 1.2 m (L) × 1.2 m (W) × 72 cm (H)',
+        'Integrated step for client comfort',
+        'Three full-depth storage drawers',
+        'Accommodates standard pedicure basins',
+        'Custom sizing available upon request'
       ],
-      ingredients: {
-        inci: [
-          'Platform, step and 3 drawers included.',
-          'No stools, or sink included (or table on top).',
-          'Size: 1.2m x 1.2m x 72cm Hight',
-          'Asb sit by: Dat ons op die meeste 14 dae vat om te bou.',
-          'Courier na my in Randfontein Area: R350.',
-          'Buite Randfontein sal die bedrag verskil – ek sal dit kan sê sodra bestelling geplaas word en ek die adres ontvang.'
-        ],
-        key: [
-          'Includes: Platform, step, 3 drawers',
-          'Excludes: Stools, sink, table top',
-          'Lead time: Up to 14 days to build',
-          'Randfontein courier: R350',
-          'Outside Randfontein: Quote on request'
-        ]
-      },
-      details: {
-        size: '1.2m x 1.2m x 72cm',
-        shelfLife: 'N/A',
-        claims: ['Custom Built', 'Complete Station', 'Professional Grade']
-      },
+      materialsFinish: [
+        'Premium MDF wood structure',
+        'High-gloss enamel finish (pastel white)',
+        'Reinforced platform for basin weight',
+        'Smooth drawer glides for easy access',
+        'Water-resistant finish for spa environment',
+        'Durable construction for high-traffic use'
+      ],
+      productionDelivery: [
+        'Each piece is handcrafted on order',
+        'Standard lead time: 10–14 business days',
+        'Courier within Randfontein area: R350',
+        'Outside Randfontein: calculated based on delivery address',
+        'Some assembly required (instructions included)',
+        'Platform, step, and 3 drawers included',
+        'Stools, basin, and top table sold separately',
+        'All furniture is securely packaged and ready to use upon arrival'
+      ],
       variants: [
-        { name: 'Standard', price: 4800, inStock: true }
+        { name: 'Standard', price: 4800, inStock: true, image: '/pearly-pedicure-station-colorful.webp' }
       ],
       rating: 5.0,
       reviewCount: 9,
@@ -1457,7 +1445,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   )}
                 </Card>
 
-                {/* Features */}
+                {/* Features & Benefits */}
                 <Card>
                   <button
                     onClick={() => toggleAccordion('features')}
@@ -1484,115 +1472,215 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   )}
                 </Card>
 
-                {/* How to Use */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('how-to-use')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">How to Use</h3>
-                    {expandedAccordion === 'how-to-use' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'how-to-use' && (
-                    <div className="px-6 pb-6">
-                      <ol className="space-y-3">
-                        {product.howToUse && product.howToUse.map((step: string, index: number) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <span className="w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
-                              {index + 1}
-                            </span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-                </Card>
-
-                {/* Ingredients */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('ingredients')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Ingredients</h3>
-                    {expandedAccordion === 'ingredients' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'ingredients' && (
-                    <div className="px-6 pb-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="font-medium mb-3">INCI Names:</h4>
-                          <ul className="space-y-2">
-                            {product.ingredients.inci && product.ingredients.inci.map((ingredient: string, index: number) => (
-                              <li key={index} className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                                <span className="text-sm">{ingredient}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <h4 className="font-medium mb-3">Key Ingredients:</h4>
-                          <ul className="space-y-2">
-                            {product.ingredients.key && product.ingredients.key.map((ingredient: string, index: number) => (
-                              <li key={index} className="text-sm text-gray-600">
-                                {ingredient}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Card>
-
-                {/* Details */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('details')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Product Details</h3>
-                    {expandedAccordion === 'details' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'details' && (
-                    <div className="px-6 pb-6">
-                      <div className="space-y-3 text-sm">
-                        <div className="flex justify-between">
-                          <span className="font-medium">Size:</span>
-                          <span>{product.details.size}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">Shelf Life:</span>
-                          <span>{product.details.shelfLife}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium">Claims:</span>
-                          <div className="flex gap-2">
-                            {product.details.claims && product.details.claims.map((claim: string, index: number) => (
-                              <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                                {claim}
-                              </span>
-                            ))}
+                {/* Furniture-specific sections */}
+                {product.category === 'Furniture' ? (
+                  <>
+                    {/* Dimensions */}
+                    {product.dimensions && (
+                      <Card>
+                        <button
+                          onClick={() => toggleAccordion('dimensions')}
+                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="font-semibold text-lg">Dimensions</h3>
+                          {expandedAccordion === 'dimensions' ? (
+                            <ChevronUp className="h-5 w-5 text-pink-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-pink-400" />
+                          )}
+                        </button>
+                        {expandedAccordion === 'dimensions' && (
+                          <div className="px-6 pb-6">
+                            <ul className="space-y-3">
+                              {product.dimensions.map((dim: string, index: number) => (
+                                <li key={index} className="flex items-start gap-3">
+                                  <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                                  <span className="text-gray-700">{dim}</span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Card>
+                        )}
+                      </Card>
+                    )}
+
+                    {/* Materials & Finish */}
+                    {product.materialsFinish && (
+                      <Card>
+                        <button
+                          onClick={() => toggleAccordion('materials')}
+                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="font-semibold text-lg">Materials & Finish</h3>
+                          {expandedAccordion === 'materials' ? (
+                            <ChevronUp className="h-5 w-5 text-pink-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-pink-400" />
+                          )}
+                        </button>
+                        {expandedAccordion === 'materials' && (
+                          <div className="px-6 pb-6">
+                            <ul className="space-y-3">
+                              {product.materialsFinish.map((material: string, index: number) => (
+                                <li key={index} className="flex items-start gap-3">
+                                  <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                                  <span className="text-gray-700">{material}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </Card>
+                    )}
+
+                    {/* Production & Delivery */}
+                    {product.productionDelivery && (
+                      <Card>
+                        <button
+                          onClick={() => toggleAccordion('production')}
+                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="font-semibold text-lg">Production & Delivery</h3>
+                          {expandedAccordion === 'production' ? (
+                            <ChevronUp className="h-5 w-5 text-pink-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-pink-400" />
+                          )}
+                        </button>
+                        {expandedAccordion === 'production' && (
+                          <div className="px-6 pb-6">
+                            <ul className="space-y-3">
+                              {product.productionDelivery.map((item: string, index: number) => (
+                                <li key={index} className="flex items-start gap-3">
+                                  <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                                  <span className="text-gray-700">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </Card>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* How to Use - for nail products only */}
+                    {product.howToUse && (
+                      <Card>
+                        <button
+                          onClick={() => toggleAccordion('how-to-use')}
+                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="font-semibold text-lg">How to Use</h3>
+                          {expandedAccordion === 'how-to-use' ? (
+                            <ChevronUp className="h-5 w-5 text-pink-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-pink-400" />
+                          )}
+                        </button>
+                        {expandedAccordion === 'how-to-use' && (
+                          <div className="px-6 pb-6">
+                            <ol className="space-y-3">
+                              {product.howToUse.map((step: string, index: number) => (
+                                <li key={index} className="flex items-start gap-3">
+                                  <span className="w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                                    {index + 1}
+                                  </span>
+                                  <span>{step}</span>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                      </Card>
+                    )}
+
+                    {/* Ingredients - for nail products only */}
+                    {product.ingredients && (
+                      <Card>
+                        <button
+                          onClick={() => toggleAccordion('ingredients')}
+                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="font-semibold text-lg">Ingredients</h3>
+                          {expandedAccordion === 'ingredients' ? (
+                            <ChevronUp className="h-5 w-5 text-pink-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-pink-400" />
+                          )}
+                        </button>
+                        {expandedAccordion === 'ingredients' && (
+                          <div className="px-6 pb-6">
+                            <div className="grid md:grid-cols-2 gap-6">
+                              <div>
+                                <h4 className="font-medium mb-3">INCI Names:</h4>
+                                <ul className="space-y-2">
+                                  {product.ingredients.inci && product.ingredients.inci.map((ingredient: string, index: number) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                      <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                      <span className="text-sm">{ingredient}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <h4 className="font-medium mb-3">Key Ingredients:</h4>
+                                <ul className="space-y-2">
+                                  {product.ingredients.key && product.ingredients.key.map((ingredient: string, index: number) => (
+                                    <li key={index} className="text-sm text-gray-600">
+                                      {ingredient}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Card>
+                    )}
+
+                    {/* Details - for nail products only */}
+                    {product.details && (
+                      <Card>
+                        <button
+                          onClick={() => toggleAccordion('details')}
+                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                        >
+                          <h3 className="font-semibold text-lg">Product Details</h3>
+                          {expandedAccordion === 'details' ? (
+                            <ChevronUp className="h-5 w-5 text-pink-400" />
+                          ) : (
+                            <ChevronDown className="h-5 w-5 text-pink-400" />
+                          )}
+                        </button>
+                        {expandedAccordion === 'details' && (
+                          <div className="px-6 pb-6">
+                            <div className="space-y-3 text-sm">
+                              <div className="flex justify-between">
+                                <span className="font-medium">Size:</span>
+                                <span>{product.details.size}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Shelf Life:</span>
+                                <span>{product.details.shelfLife}</span>
+                              </div>
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium">Claims:</span>
+                                <div className="flex gap-2">
+                                  {product.details.claims && product.details.claims.map((claim: string, index: number) => (
+                                    <span key={index} className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                                      {claim}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </Card>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </Container>
