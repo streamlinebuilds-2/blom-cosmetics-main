@@ -467,6 +467,69 @@ export const ShopPage: React.FC = () => {
       variants: [
         { name: 'Standard', price: 4800, inStock: true }
       ]
+    },
+    {
+      id: '20',
+      name: 'Princess Dresser',
+      slug: 'princess-dresser',
+      price: 7400,
+      compareAtPrice: undefined,
+      shortDescription: 'Elegant princess-style dresser with glass open top and LED lighting.',
+      description: 'Beautiful princess-style dresser featuring glass open top, LED lights, and mirror included. Perfect for creating a luxurious salon atmosphere.',
+      images: ['/princess-dresser-white.webp', '/princess-dresser-colorful.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 0,
+      badges: ['Custom Built', 'LED Lighting'],
+      inStock: true,
+      variants: [
+        { name: 'Standard with LED', price: 7400, inStock: true, image: '/princess-dresser-colorful.webp' }
+      ],
+      dimensions: '130cm x 45cm x 180cm',
+      materialsFinish: 'Premium wood construction with glass open top and integrated LED lighting system.',
+      productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
+    },
+    {
+      id: '21',
+      name: 'Floral Manicure Table',
+      slug: 'floral-manicure-table',
+      price: 4300,
+      compareAtPrice: undefined,
+      shortDescription: 'Beautiful floral-themed manicure table with glass top included.',
+      description: 'Elegant floral manicure table with glass top included. Features decorative floral details and professional construction.',
+      images: ['/floral-manicure-table-white.webp', '/floral-manicure-table-colorful.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 0,
+      badges: ['Custom Built', 'Glass Top'],
+      inStock: true,
+      variants: [
+        { name: 'With Glass Top', price: 4300, inStock: true, image: '/floral-manicure-table-colorful.webp' }
+      ],
+      dimensions: '120cm x 45cm x 80cm',
+      materialsFinish: 'High-quality wood construction with decorative floral accents and included glass top.',
+      productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Glass top included in price.'
+    },
+    {
+      id: '22',
+      name: 'Orchid Manicure Table',
+      slug: 'orchid-manicure-table',
+      price: 3700,
+      compareAtPrice: undefined,
+      shortDescription: 'Stylish orchid-themed manicure table with elegant design.',
+      description: 'Beautiful orchid manicure table featuring elegant orchid-inspired design elements and professional construction.',
+      images: ['/orchid-manicure-table-white.webp', '/orchid-manicure-table-colorful.webp'],
+      category: 'furniture',
+      rating: 5.0,
+      reviews: 0,
+      badges: ['Custom Built'],
+      inStock: true,
+      variants: [
+        { name: 'Standard', price: 3700, inStock: true, image: '/orchid-manicure-table-colorful.webp' }
+      ],
+      dimensions: '140cm x 50cm x 79cm',
+      materialsFinish: 'Premium wood construction with orchid-inspired decorative details.',
+      productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     }
   ];
 
