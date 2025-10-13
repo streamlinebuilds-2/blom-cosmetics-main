@@ -687,7 +687,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
             <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                 {/* Form Header */}
-                <div className="bg-pink-400 p-12 text-center text-white relative" style={{ background: 'linear-gradient(135deg, rgba(206,229,255,0.1) 0%, rgba(255,116,164,0.1) 100%)' }}>
+                <div className="bg-blue-400 p-12 text-center text-white relative" style={{ background: 'linear-gradient(135deg, rgba(142,197,255,0.8) 0%, rgba(142,197,255,0.9) 100%)' }}>
                   <h2 className="text-3xl md:text-4xl font-bold mb-3 uppercase tracking-wide" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
                     {course.isOnline ? 'Enroll Now' : 'Book Your Spot'}
                   </h2>
