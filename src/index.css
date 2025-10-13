@@ -500,7 +500,7 @@ html, body {
 
   /* Secondary outline (black) */
   .btn-outline, .btn-secondary { background: #fff; color: #000; border: 2px solid #000; border-radius: 9999px; }
-  .btn-outline:hover, .btn-secondary:hover { background: #8EC5FF; transform: translateY(-1px); }
+  .btn-outline:hover, .btn-secondary:hover { background: #8EC5FF; color: #fff; border: 2px solid #8EC5FF; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(142, 197, 255, 0.3); }
 
   .btn-ghost {
     @apply text-gray-600 hover:bg-gray-100 focus:ring-gray-200;
@@ -738,7 +738,7 @@ html, body {
   }
   .btn-pink{ background:#FF74A4; color:#fff; }
   .btn-outline{ background:#fff; color:#FF74A4; border:1px solid #FF74A4; }
-  .btn-outline:hover{ background:#8EC5FF; color:#000; border:1px solid #000; }
+  .btn-outline:hover{ background:#8EC5FF; color:#fff; border:1px solid #8EC5FF; box-shadow: 0 6px 20px rgba(142, 197, 255, 0.3); }
 
   .master__visual{ position:relative; }
   .aspect-9-16{ aspect-ratio: 9 / 16; width: min(420px, 100%); }
