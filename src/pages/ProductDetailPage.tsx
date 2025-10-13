@@ -1105,32 +1105,40 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
-  const relatedProducts = [
-    {
-      id: '1',
-      name: 'Vitamin Primer',
-      price: 210,
-      image: '/vitamin-primer-white.webp',
-      rating: 4.8,
-      slug: 'vitamin-primer'
-    },
-    {
-      id: '2',
-      name: 'Top Coat',
-      price: 190,
-      image: '/top-coat-white.webp',
-      rating: 4.9,
-      slug: 'top-coat'
-    },
-    {
-      id: '3',
-      name: 'Prep Solution',
-      price: 200,
-      image: '/prep-solution-white.webp',
-      rating: 4.7,
-      slug: 'prep-solution'
+  // Generate related products from the same category
+  const relatedProducts = React.useMemo(() => {
+    if (!product) return [];
+    
+    // Get all products in the same category
+    const sameCategory = Object.values(productDatabase)
+      .filter(p => p.category === product.category && p.slug !== product.slug)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        image: p.images[0],
+        rating: p.rating,
+        slug: p.slug
+      }));
+    
+    // If we have products in the same category, return up to 3
+    if (sameCategory.length > 0) {
+      return sameCategory.slice(0, 3);
     }
-  ];
+    
+    // Fallback: show any other products
+    return Object.values(productDatabase)
+      .filter(p => p.slug !== product.slug)
+      .map(p => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        image: p.images[0],
+        rating: p.rating,
+        slug: p.slug
+      }))
+      .slice(0, 3);
+  }, [product]);
 
   if (loading) {
     return (
