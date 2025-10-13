@@ -671,7 +671,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 2590,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/rose-petal-manicure-table.webp'],
+      images: ['/rose-petal-manicure-table-white.webp', '/rose-petal-manicure-table-colorful.webp'],
       features: [
         'Sturdy professional-grade construction',
         'Elegant Rose Petal design',
@@ -720,7 +720,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 3490,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/iris-manicure-table.webp'],
+      images: ['/iris-manicure-table-white.webp', '/iris-manicure-table-colorful.webp'],
       features: [
         'Integrated shelf system (180cm total height)',
         'Choice of wooden or glass top',
@@ -770,7 +770,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 4500,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/blom-manicure-workstation.webp'],
+      images: ['/blom-manicure-workstation-white.webp', '/blom-manicure-workstation-colorful.webp'],
       features: [
         'Complete workstation with table and shelf',
         'Generous work surface and storage',
@@ -820,7 +820,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 2700,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/daisy-manicure-table.webp'],
+      images: ['/daisy-manicure-table-white.webp', '/daisy-manicure-table-colorful.webp'],
       features: [
         'Classic elegant design',
         'Quality wood construction',
@@ -870,7 +870,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 1150,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/polish-garden-rack.webp'],
+      images: ['/polish-garden-rack-white.webp', '/polish-garden-rack-colorful.webp'],
       features: [
         'Wall-mounted design saves space',
         'Holds multiple polish bottles',
@@ -919,7 +919,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 5200,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/blossom-manicure-table.webp'],
+      images: ['/blossom-manicure-table-white.webp', '/blossom-manicure-table-colorful.webp'],
       features: [
         'Premium quality construction',
         'Three top configuration options',
@@ -970,7 +970,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       price: 4800,
       compareAtPrice: null,
       stock: 'Made to Order',
-      images: ['/pearly-pedicure-station.webp'],
+      images: ['/pearly-pedicure-station-white.webp', '/pearly-pedicure-station-colorful.webp'],
       features: [
         'Platform and step included',
         'Three storage drawers',
