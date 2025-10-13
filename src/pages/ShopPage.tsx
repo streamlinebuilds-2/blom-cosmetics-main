@@ -777,7 +777,6 @@ export const ShopPage: React.FC = () => {
               </div>
             </div>
           )}
-          </div>
 
           {/* Products Grid - Clean Modern Layout */}
           <div className={`grid ${getGridClasses()} gap-6`}>
