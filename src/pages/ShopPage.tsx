@@ -621,7 +621,7 @@ export const ShopPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-pink-100 to-blue-100">
         <Header showMobileMenu={true} />
         <main className="section-padding">
           <Container>
@@ -637,7 +637,7 @@ export const ShopPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-pink-100 to-blue-100">
       <Header showMobileMenu={true} />
 
       <main className="pt-8 pb-16">
