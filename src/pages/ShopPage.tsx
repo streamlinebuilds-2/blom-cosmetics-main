@@ -39,11 +39,11 @@ export const ShopPage: React.FC = () => {
       badges: ['Bestseller'],
       inStock: true,
       variants: [
-        { name: 'Cotton Candy', inStock: true },
-        { name: 'Vanilla', inStock: true },
-        { name: 'Tiny Touch', inStock: true },
-        { name: 'Dragon Fruit Lotus', inStock: true },
-        { name: 'Watermelon', inStock: true }
+        { name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
+        { name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
+        { name: 'Tiny Touch', inStock: true, image: '/cuticle-oil-tiny-touch.webp' },
+        { name: 'Dragon Fruit Lotus', inStock: true, image: '/cuticle-oil-dragon-fruit-lotus.webp' },
+        { name: 'Watermelon', inStock: true, image: '/cuticle-oil-watermelon.webp' }
       ]
     },
     {
@@ -130,8 +130,8 @@ export const ShopPage: React.FC = () => {
       badges: [],
       inStock: true,
       variants: [
-        { name: 'Single File', inStock: true, price: 35 },
-        { name: '5-Pack Bundle', inStock: true, price: 160 }
+        { name: 'Single File', inStock: true, price: 35, image: '/nail-file-white.webp' },
+        { name: '5-Pack Bundle', inStock: true, price: 160, image: '/nail-file-colorful.webp' }
       ]
     },
     {
@@ -184,19 +184,19 @@ export const ShopPage: React.FC = () => {
       badges: ['Bestseller'],
       inStock: true,
       variants: [
-        { name: 'Baby Blue', inStock: true },
-        { name: 'Lilac Mist', inStock: true },
-        { name: 'Blush Pink', inStock: true },
-        { name: 'Ballet Pink', inStock: true },
-        { name: 'Fuchsia Pink', inStock: true },
-        { name: 'Cloud Grey', inStock: true },
-        { name: 'Mint Mist', inStock: true },
-        { name: 'Rose Pink', inStock: true },
-        { name: 'Fresh Mint', inStock: true },
-        { name: 'Soft Nude', inStock: true },
-        { name: 'Petal Pink', inStock: true },
-        { name: 'Sky Blue', inStock: true },
-        { name: 'Lemon Glow', inStock: true }
+        { name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
+        { name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
+        { name: 'Blush Pink', inStock: true, image: '/acrylic-powder-baby-pink.webp' },
+        { name: 'Ballet Pink', inStock: true, image: '/acrylic-powder-ballet-pink.webp' },
+        { name: 'Fuchsia Pink', inStock: true, image: '/acrylic-powder-hot-pink.webp' },
+        { name: 'Cloud Grey', inStock: true, image: '/acrylic-powder-light-grey.webp' },
+        { name: 'Mint Mist', inStock: true, image: '/acrylic-powder-light-mint.webp' },
+        { name: 'Rose Pink', inStock: true, image: '/acrylic-powder-light-pink.webp' },
+        { name: 'Fresh Mint', inStock: true, image: '/acrylic-powder-mint.webp' },
+        { name: 'Soft Nude', inStock: true, image: '/acrylic-powder-nude.webp' },
+        { name: 'Petal Pink', inStock: true, image: '/acrylic-powder-pink.webp' },
+        { name: 'Sky Blue', inStock: true, image: '/acrylic-powder-sky-blue.webp' },
+        { name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
       ]
     },
     // Coming Soon Products (Prices TBA) - HIDDEN
@@ -298,8 +298,8 @@ export const ShopPage: React.FC = () => {
       badges: ['Coming Soon'],
       inStock: false,
       variants: [
-        { name: '250ml', inStock: false, price: -1 },
-        { name: '500ml', inStock: false, price: -1 }
+        { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
+        { name: '500ml', inStock: false, price: -1, image: '/nail-liquid-monomer-colorful.webp' }
       ]
     },
     {
