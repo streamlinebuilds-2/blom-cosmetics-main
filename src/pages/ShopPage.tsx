@@ -292,7 +292,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Low-odor EMA formula, MMA/HEMA-free.',
       description: 'Professional grade liquid monomer with low odor formula. MMA-free and HEMA-free for safe application.',
       images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
-      category: 'acrylic-system',
+      category: 'coming-soon',
       rating: 4.8,
       reviews: 87,
       badges: ['Coming Soon'],
@@ -312,7 +312,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
       description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
       images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-colorful.webp'],
-      category: 'tools-essentials',
+      category: 'coming-soon',
       rating: 4.9,
       reviews: 23,
       badges: ['Coming Soon'],
@@ -329,7 +329,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
       description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
       images: ['/acrylic-sculpture-brush-white-2.webp', '/acrylic-sculpture-brush-colorful-2.webp'],
-      category: 'tools-essentials',
+      category: 'coming-soon',
       rating: 4.9,
       reviews: 23,
       badges: ['Coming Soon'],
@@ -539,7 +539,8 @@ export const ShopPage: React.FC = () => {
     { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
     { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
     { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length },
-    { name: 'Furniture', slug: 'furniture', count: allProducts.filter(p => p.category === 'furniture').length }
+    { name: 'Furniture', slug: 'furniture', count: allProducts.filter(p => p.category === 'furniture').length },
+    { name: 'Coming Soon', slug: 'coming-soon', count: allProducts.filter(p => p.category === 'coming-soon').length }
   ];
 
   const sortOptions = [
@@ -585,6 +586,10 @@ export const ShopPage: React.FC = () => {
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    // Always put "Coming Soon" products at the bottom
+    if (a.category === 'coming-soon' && b.category !== 'coming-soon') return 1;
+    if (b.category === 'coming-soon' && a.category !== 'coming-soon') return -1;
+    
     switch (sortBy) {
       case 'name':
         return a.name.localeCompare(b.name);
