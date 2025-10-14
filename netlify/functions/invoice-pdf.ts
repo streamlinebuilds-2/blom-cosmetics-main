@@ -36,7 +36,7 @@ export const handler: Handler = async (event) => {
     const shipping = Number(order.shipping_total ?? 0);
     const grand = Number(order.total_amount ?? subtotal + shipping);
 
-    const { Document, Page, Text, View, StyleSheet, Font, renderToBuffer, Image } = await import('@react-pdf/renderer');
+    const { Document, Page, Text, View, StyleSheet, Font, renderToBuffer /*, Image*/ } = await import('@react-pdf/renderer');
 
     const styles = StyleSheet.create({
       page: { padding: 32 },
@@ -64,64 +64,64 @@ export const handler: Handler = async (event) => {
     const brandPhone = '+27 79 548 3317';
 
     const InvoiceDoc = () => (
-      <Document>
-        <Page size="A4" style={styles.page}>
-          <View style={styles.header}>
-            <View style={styles.brandRow}>
-              <View style={styles.brandLeft}>
-                {/* If you have a hosted logo, replace with its URL */}
-                {/* <Image src="/blom-logo.png" style={styles.logo} /> */}
-                <View>
-                  <Text style={styles.brand}>BLOM Cosmetics — Tax Invoice / Receipt</Text>
-                  <Text style={styles.addr}>{brandAddress}</Text>
-                  <Text style={styles.addr}>{brandEmail} · {brandPhone}</Text>
-                </View>
-              </View>
-            </View>
-            <Text style={styles.metaRow}>Order: {order.merchant_payment_id}</Text>
-            <Text style={styles.metaRow}>Date: {new Date(order.created_at || Date.now()).toLocaleString()}</Text>
-            <Text style={styles.metaRow}>Status: {(order.status || '').toUpperCase()}</Text>
-          </View>
+      React.createElement(Document, null,
+        React.createElement(Page, { size: 'A4' as any, style: styles.page },
+          React.createElement(View, { style: styles.header },
+            React.createElement(View, { style: styles.brandRow },
+              React.createElement(View, { style: styles.brandLeft },
+                // Logo placeholder (uncomment when available)
+                // React.createElement(Image, { src: '/blom-logo.png', style: styles.logo }),
+                React.createElement(View, null,
+                  React.createElement(Text, { style: styles.brand }, 'BLOM Cosmetics — Tax Invoice / Receipt'),
+                  React.createElement(Text, { style: styles.addr }, brandAddress),
+                  React.createElement(Text, { style: styles.addr }, `${brandEmail} · ${brandPhone}`)
+                )
+              )
+            ),
+            React.createElement(Text, { style: styles.metaRow }, `Order: ${order.merchant_payment_id}`),
+            React.createElement(Text, { style: styles.metaRow }, `Date: ${new Date(order.created_at || Date.now()).toLocaleString()}`),
+            React.createElement(Text, { style: styles.metaRow }, `Status: ${(order.status || '').toUpperCase()}`)
+          ),
 
-          <Text style={styles.sectionTitle}>Bill To</Text>
-          <Text style={styles.metaRow}>{order.customer_name || 'Customer'}</Text>
-          <Text style={styles.metaRow}>{order.customer_email || ''}</Text>
+          React.createElement(Text, { style: styles.sectionTitle }, 'Bill To'),
+          React.createElement(Text, { style: styles.metaRow }, order.customer_name || 'Customer'),
+          React.createElement(Text, { style: styles.metaRow }, order.customer_email || ''),
 
-          <Text style={styles.sectionTitle}>Items</Text>
-          <View style={styles.tableHeader}>
-            <Text style={styles.th}>Item</Text>
-            <Text style={[styles.th, styles.right]}>Qty</Text>
-            <Text style={[styles.th, styles.right]}>Unit</Text>
-            <Text style={[styles.th, styles.right]}>Total</Text>
-          </View>
-          {items.map((it: any, idx: number) => (
-            <View key={idx} style={styles.row}>
-              <Text style={styles.td}>{it.name}</Text>
-              <Text style={[styles.td, styles.right]}>{it.qty}</Text>
-              <Text style={[styles.td, styles.right]}>{ZAR(it.unit)}</Text>
-              <Text style={[styles.td, styles.right]}>{ZAR(it.total)}</Text>
-            </View>
-          ))}
+          React.createElement(Text, { style: styles.sectionTitle }, 'Items'),
+          React.createElement(View, { style: styles.tableHeader },
+            React.createElement(Text, { style: styles.th }, 'Item'),
+            React.createElement(Text, { style: [styles.th, styles.right] as any }, 'Qty'),
+            React.createElement(Text, { style: [styles.th, styles.right] as any }, 'Unit'),
+            React.createElement(Text, { style: [styles.th, styles.right] as any }, 'Total')
+          ),
+          ...items.map((it: any, idx: number) => (
+            React.createElement(View, { key: String(idx), style: styles.row },
+              React.createElement(Text, { style: styles.td }, it.name),
+              React.createElement(Text, { style: [styles.td, styles.right] as any }, String(it.qty)),
+              React.createElement(Text, { style: [styles.td, styles.right] as any }, ZAR(it.unit)),
+              React.createElement(Text, { style: [styles.td, styles.right] as any }, ZAR(it.total))
+            )
+          )),
 
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Subtotal</Text>
-            <Text style={styles.totalValue}>{ZAR(subtotal)}</Text>
-          </View>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Shipping</Text>
-            <Text style={styles.totalValue}>{ZAR(shipping)}</Text>
-          </View>
-          <View style={styles.totalRow}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>{ZAR(grand)}</Text>
-          </View>
+          React.createElement(View, { style: styles.totalRow },
+            React.createElement(Text, { style: styles.totalLabel }, 'Subtotal'),
+            React.createElement(Text, { style: styles.totalValue }, ZAR(subtotal))
+          ),
+          React.createElement(View, { style: styles.totalRow },
+            React.createElement(Text, { style: styles.totalLabel }, 'Shipping'),
+            React.createElement(Text, { style: styles.totalValue }, ZAR(shipping))
+          ),
+          React.createElement(View, { style: styles.totalRow },
+            React.createElement(Text, { style: styles.totalLabel }, 'Total'),
+            React.createElement(Text, { style: styles.totalValue }, ZAR(grand))
+          ),
 
-          <Text style={styles.footer}>Thank you for your purchase! This receipt was generated automatically by BLOM Cosmetics.</Text>
-        </Page>
-      </Document>
+          React.createElement(Text, { style: styles.footer }, 'Thank you for your purchase! This receipt was generated automatically by BLOM Cosmetics.')
+        )
+      )
     );
 
-    const buf = await renderToBuffer(<InvoiceDoc />);
+    const buf = await renderToBuffer(React.createElement(InvoiceDoc));
 
     return {
       statusCode: 200,
