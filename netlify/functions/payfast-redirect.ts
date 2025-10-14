@@ -164,18 +164,48 @@ export const handler: Handler = async (event) => {
     // 3) Compute signature (only includes non-empty fields)
     const { signature } = signPayfast(params, process.env.PAYFAST_PASSPHRASE);
 
-    // 4) Build redirect URL with filtered params matching signature
-    const filteredParams = Object.entries(params)
-      .filter(([, v]) => v !== undefined && v !== null && String(v) !== '')
-      .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
-    
-    const qs = Object.keys(filteredParams).sort().map(k => `${k}=${encPF(filteredParams[k])}`).join('&');
-    const redirectUrl = `${PF_BASE}/eng/process?${qs}&signature=${signature}`;
+    // 4) Build HTML auto-POST form (instead of JSON redirect)
+    function htmlAutoPost(action: string, fields: Record<string, any>) {
+      const inputs = Object.entries(fields)
+        .filter(([, v]) => v !== undefined && v !== null && String(v) !== '')
+        .map(([k, v]) => `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`)
+        .join('\n');
 
+      return `<!doctype html>
+<html><head><meta charset="utf-8"><title>Redirecting…</title></head>
+<body onload="document.forms[0].submit();">
+  <p>Redirecting to PayFast…</p>
+  <form action="${action}" method="post" accept-charset="utf-8">
+    ${inputs}
+  </form>
+</body></html>`;
+    }
+
+    // Include the same fields you signed (non-empty), plus signature
+    const formFields = {
+      merchant_id: process.env.PAYFAST_MERCHANT_ID,
+      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
+      return_url: RETURN_URL,
+      cancel_url: CANCEL_URL,
+      notify_url: NOTIFY_URL,
+      m_payment_id,
+      amount: amount.toFixed(2),
+      item_name,
+      email_address: email,
+      name_first: body.name_first,
+      name_last: body.name_last,
+      cell_number: body.cell_number,
+      signature  // ← your 32-char MD5 hex
+    };
+
+    // Respond with HTML (not JSON / not 303)
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify({ redirectUrl, orderId: m_payment_id })
+      headers: {
+        ...headers,
+        'Content-Type': 'text/html; charset=utf-8'
+      },
+      body: htmlAutoPost(`${PF_BASE}/eng/process`, formFields)
     };
 
   } catch (e: any) {

@@ -93,20 +93,6 @@ export const CheckoutPage: React.FC = () => {
         }
       };
 
-      // Call Netlify function to get PayFast redirect URL
-      const response = await fetch('/.netlify/functions/payfast-redirect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(paymentData)
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Payment initiation failed');
-      }
-
-      const { redirectUrl } = await response.json();
-      
       // Store order locally before redirecting
       localStorage.setItem('blom_pending_order', JSON.stringify({
         orderId,
@@ -117,9 +103,25 @@ export const CheckoutPage: React.FC = () => {
         shippingInfo,
         timestamp: new Date().toISOString()
       }));
+
+      // Call Netlify function - it will return HTML that auto-submits to PayFast
+      const response = await fetch('/.netlify/functions/payfast-redirect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(paymentData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Payment initiation failed');
+      }
+
+      // Get the HTML response and render it (it will auto-submit)
+      const html = await response.text();
       
-      // Redirect to PayFast
-      window.location.href = redirectUrl;
+      // Replace current page with the HTML that will auto-submit to PayFast
+      document.open();
+      document.write(html);
+      document.close();
       
     } catch (error: any) {
       console.error('Order processing failed:', error);
