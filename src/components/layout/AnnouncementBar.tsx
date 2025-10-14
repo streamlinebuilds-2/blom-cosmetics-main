@@ -6,7 +6,7 @@ export const AnnouncementBar: React.FC = () => {
     <div 
       className="py-2 px-4 relative z-50 w-full" 
       style={{ 
-        backgroundColor: '#8EC5FF',
+        backgroundColor: '#FF74A4',
         display: 'block',
         position: 'relative',
         width: '100%'
