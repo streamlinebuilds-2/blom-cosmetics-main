@@ -30,6 +30,7 @@ import CheckoutCancel from './pages/CheckoutCancel';
 import AuthTestPage from './pages/AuthTestPage';
 import SimpleAccountPage from './pages/SimpleAccountPage';
 import DebugAccountPage from './pages/DebugAccountPage';
+import { TrackOrderPage } from './pages/TrackOrderPage';
 
 function App() {
   // Simple routing based on URL path
@@ -96,6 +97,8 @@ function App() {
   if (path === '/signup') { return <><SignupPage /><CartWidget /></>; }
   
   if (path === '/order-confirmation') { return <><OrderConfirmationPage /><CartWidget /></>; }
+
+  if (path === '/track-order') { return <><TrackOrderPage /></>; }
 
   if (path === '/checkout/success') { return <><CheckoutSuccess /><CartWidget /></>; }
   if (path === '/checkout/cancel') { return <><CheckoutCancel /><CartWidget /></>; }

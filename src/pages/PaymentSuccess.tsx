@@ -69,12 +69,6 @@ export default function PaymentSuccess() {
                       >
                         Download PDF
                       </a>
-                      <button
-                        onClick={() => window.print()}
-                        className="inline-flex justify-center rounded-full border border-gray-300 px-6 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
-                      >
-                        Print Invoice
-                      </button>
                     </>
                   )}
                   <a href="/track-order" className="inline-flex justify-center rounded-full bg-pink-500 px-6 py-3 text-white font-semibold shadow hover:bg-pink-600 transition-colors">Track My Order</a>

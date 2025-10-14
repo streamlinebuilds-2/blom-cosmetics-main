@@ -19,7 +19,7 @@ export const handler: Handler = async (event) => {
     }
 
     const orderRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(*,products(name))&merchant_payment_id=eq.${encodeURIComponent(id)}&limit=1`,
+      `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,total_price,product_id)&merchant_payment_id=eq.${encodeURIComponent(id)}&limit=1`,
       { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } }
     );
     if (!orderRes.ok) return { statusCode: orderRes.status, body: await orderRes.text() };
@@ -28,7 +28,7 @@ export const handler: Handler = async (event) => {
     if (!order) return { statusCode: 404, body: 'Order not found' };
 
     const items = (order.order_items || []).map((it: any) => ({
-      name: it.products?.name ?? it.name ?? 'Item',
+      name: it.name || `Product ${it.product_id}` || 'Item',
       qty: Number(it.quantity ?? 1),
       unit: Number(it.unit_price ?? 0),
       total: Number(it.total_price ?? (Number(it.quantity ?? 1) * Number(it.unit_price ?? 0)))
@@ -70,8 +70,10 @@ export const handler: Handler = async (event) => {
           React.createElement(View, { style: styles.header },
             React.createElement(View, { style: styles.brandRow },
               React.createElement(View, { style: styles.brandLeft },
-                // Logo placeholder (uncomment when available)
-                // React.createElement(Image, { src: '/blom-logo.png', style: styles.logo }),
+                // Simple text-based logo for now
+                React.createElement(View, { style: { width: 64, height: 64, backgroundColor: '#ec4899', borderRadius: 8, justifyContent: 'center', alignItems: 'center' } },
+                  React.createElement(Text, { style: { color: 'white', fontSize: 24, fontWeight: 'bold' } }, 'B')
+                ),
                 React.createElement(View, null,
                   React.createElement(Text, { style: styles.brand }, 'BLOM Cosmetics — Tax Invoice / Receipt'),
                   React.createElement(Text, { style: styles.addr }, brandAddress),
