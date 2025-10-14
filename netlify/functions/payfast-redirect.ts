@@ -171,26 +171,41 @@ export const handler: Handler = async (event) => {
 </body>`;
     }
 
-    // 2) Build fields in documentation order, sign, and auto-POST
+    // 2) Minimal hosted-form fields and signing in documentation order (no sorting)
     const fields: Record<string, any> = {
       merchant_id: process.env.PAYFAST_MERCHANT_ID,
       merchant_key: process.env.PAYFAST_MERCHANT_KEY,
       return_url: RETURN_URL,
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
-
-      // Customer (optional)
-      name_first: payload.name_first,
-      name_last: payload.name_last,
-      email_address: payload.email_address,
-
-      // Transaction
       m_payment_id,
       amount: amountStr,
       item_name
     };
 
-    const { signature } = signPayfastInOrder(fields, process.env.PAYFAST_PASSPHRASE);
+    const order = [
+      'merchant_id','merchant_key','return_url','cancel_url','notify_url',
+      'm_payment_id','amount','item_name'
+    ];
+
+    const parts: string[] = [];
+    for (const key of order) {
+      const val = (fields as any)[key];
+      if (val !== undefined && val !== null && String(val) !== '') {
+        parts.push(`${key}=${encPF(val)}`);
+      }
+    }
+    let baseString = parts.join('&');
+    if (process.env.PAYFAST_PASSPHRASE) {
+      baseString += `&passphrase=${encPF(process.env.PAYFAST_PASSPHRASE)}`;
+    }
+    const signature = crypto.createHash('md5').update(baseString).digest('hex');
+
+    // TEMP debug logs
+    console.log('PF merchant:', process.env.PAYFAST_MERCHANT_ID);
+    console.log('Sig len:', signature.length);
+    console.log('PF baseString:', baseString);
+
     fields.signature = signature;
 
     return {
