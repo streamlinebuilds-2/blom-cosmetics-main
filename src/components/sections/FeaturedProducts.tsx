@@ -4,7 +4,7 @@ import { ProductCard } from '../ProductCard';
 import { BestSellerCard } from './BestSellerCard';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
-import { queries, Product, ProductImage } from '../../lib/supabase';
+import { Product, ProductImage } from '../../lib/supabase';
 import { cartStore, showNotification } from '../../lib/cart';
 
 interface ProductWithImages extends Product {
@@ -27,19 +27,56 @@ export const FeaturedProducts: React.FC = () => {
   };
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        const data = await queries.getFeaturedProducts();
-        setProducts(data as ProductWithImages[]);
-      } catch (err) {
-        console.error('Error fetching featured products:', err);
-        setError('Failed to load featured products');
-      } finally {
-        setLoading(false);
+    // Use hardcoded bestseller products instead of Supabase query
+    const bestsellerProducts = [
+      {
+        id: '1',
+        name: 'Cuticle Oil',
+        slug: 'cuticle-oil',
+        price: 140,
+        compare_at_price: null,
+        short_description: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
+        product_images: [
+          { image_url: '/cuticle-oil-colorful.webp', sort_order: 1 }
+        ]
+      },
+      {
+        id: '4',
+        name: 'Top Coat',
+        slug: 'top-coat',
+        price: 190,
+        compare_at_price: null,
+        short_description: 'Mirror shine, chip-resistant, professional finish.',
+        product_images: [
+          { image_url: '/top-coat-colorful.webp', sort_order: 1 }
+        ]
+      },
+      {
+        id: '8',
+        name: 'Acetone (Remover)',
+        slug: 'acetone-remover',
+        price: 60,
+        compare_at_price: null,
+        short_description: 'Professional-grade, fast acting nail remover.',
+        product_images: [
+          { image_url: '/acetone-remover-colorful.webp', sort_order: 1 }
+        ]
+      },
+      {
+        id: '9',
+        name: 'Core Acrylics (56 g)',
+        slug: 'core-acrylics',
+        price: 280,
+        compare_at_price: null,
+        short_description: 'Professional acrylic powders in 13 beautiful colors.',
+        product_images: [
+          { image_url: '/core-acrylics-colorful.webp', sort_order: 1 }
+        ]
       }
-    };
+    ];
 
-    fetchFeaturedProducts();
+    setProducts(bestsellerProducts as ProductWithImages[]);
+    setLoading(false);
   }, []);
 
   // Intersection Observer for mobile shimmer effect

@@ -90,7 +90,8 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
   };
 
   const handleCardClick = () => {
-    window.location.href = `/products/${slug}`;
+    // Use proper navigation that works with the routing system
+    window.location.assign(`/products/${slug}`);
   };
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
