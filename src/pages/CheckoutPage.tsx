@@ -655,7 +655,7 @@ export const CheckoutPage: React.FC = () => {
                         loading={isProcessing}
                       >
                         <Lock className="h-4 w-4 mr-2" />
-                        {isProcessing ? 'Processing...' : `Place Order - ${formatPrice(cartState.total)}`}
+                        {isProcessing ? 'Processing...' : `Place Order - ${formatPrice(orderTotal)}`}
                       </Button>
                     </div>
                   </CardContent>
@@ -707,7 +707,7 @@ export const CheckoutPage: React.FC = () => {
                         {shippingCost === 0 ? 'FREE' : formatPrice(shippingCost)}
                       </span>
                     </div>
-                    {shippingMethod === 'door-to-door' && cartState.total >= 1500 && (
+                    {shippingMethod === 'door-to-door' && cartState.subtotal >= 1500 && (
                       <div className="flex justify-between text-xs text-green-600">
                         <span>✨ Free shipping applied!</span>
                         <span>-R75</span>
