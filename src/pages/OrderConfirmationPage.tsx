@@ -265,10 +265,13 @@ export const OrderConfirmationPage: React.FC = () => {
               {/* Actions */}
               <Card>
                 <CardContent className="flex flex-wrap gap-4 justify-center">
-                  <Button variant="outline">
+                  <a
+                    href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderData.orderNumber)}`}
+                    className="btn-outline inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
                     <Download className="h-4 w-4 mr-2" />
-                    Download Invoice
-                  </Button>
+                    Download Receipt (PDF)
+                  </a>
                   <Button variant="outline">
                     <Share2 className="h-4 w-4 mr-2" />
                     Share Order

@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.3.1",
     "@supabase/supabase-js": "^2.57.4",
     "crypto-js": "^4.2.0",
     "lucide-react": "^0.344.0",
