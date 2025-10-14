@@ -102,8 +102,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       {/* Main Header */}
       <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${
         isScrolledDown 
-          ? 'bg-white/40 backdrop-blur-md shadow-lg' 
-          : 'bg-white shadow-sm'
+          ? 'bg-pink-400/40 backdrop-blur-md shadow-lg' 
+          : 'bg-pink-400 shadow-sm'
       }`}>
         <Container>
           <div className="flex items-center justify-between h-16">

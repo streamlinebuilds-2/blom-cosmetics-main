@@ -607,13 +607,13 @@ export const ShopPage: React.FC = () => {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'grid-3':
-        return 'grid-cols-3 lg:grid-cols-3';
+        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
       case 'grid-2':
-        return 'grid-cols-2 lg:grid-cols-2';
+        return 'grid-cols-1 sm:grid-cols-2';
       case 'list':
         return 'grid-cols-1';
       default:
-        return 'grid-cols-3 lg:grid-cols-3';
+        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
     }
   };
 
@@ -669,44 +669,44 @@ export const ShopPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Category Pills - Modern Design */}
-          <div className="mb-6">
-            <div className="flex flex-wrap gap-2">
+          {/* Category Pills - Mobile Optimized */}
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-1.5">
               {productCategories.map((category) => (
                 <button
                   key={category.slug}
                   onClick={() => setSelectedCategory(category.slug)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                     selectedCategory === category.slug
                       ? 'bg-pink-400 text-white shadow-md'
                       : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                   }`}
                 >
                   {category.name}
-                  <span className="ml-2 text-xs opacity-75">({category.count})</span>
+                  <span className="ml-1 text-xs opacity-75">({category.count})</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Sticky Filter Bar - Modern E-commerce Style */}
-          <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-4">
-            <div className="flex items-center justify-between">
+          {/* Sticky Filter Bar - Mobile Optimized */}
+          <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
+            <div className="flex items-center justify-between gap-2">
               {/* Left: Sort & Filter */}
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                 >
                   <Filter className="h-4 w-4" />
-                  <span className="text-sm font-medium">Filters</span>
+                  <span className="hidden sm:inline font-medium">Filters</span>
                   <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
                 </button>
                 
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                  className="px-2 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none min-w-0 flex-1"
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -717,34 +717,34 @@ export const ShopPage: React.FC = () => {
               </div>
 
               {/* Right: View Toggle & Count */}
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500 hidden sm:block">
-                  {sortedProducts.length} of {allProducts.length} products
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 hidden lg:block">
+                  {sortedProducts.length} of {allProducts.length}
                 </span>
                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                   <button
                     onClick={() => setViewMode('grid-3')}
-                    className={`p-2 rounded-md transition-colors ${
+                    className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
-                    <Grid3X3 className="h-4 w-4" />
+                    <Grid3X3 className="h-3 w-3" />
                   </button>
                   <button
                     onClick={() => setViewMode('grid-2')}
-                    className={`p-2 rounded-md transition-colors ${
+                    className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
-                    <Grid2X2 className="h-4 w-4" />
+                    <Grid2X2 className="h-3 w-3" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded-md transition-colors ${
+                    className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
-                    <List className="h-4 w-4" />
+                    <List className="h-3 w-3" />
                   </button>
                 </div>
               </div>
@@ -753,13 +753,13 @@ export const ShopPage: React.FC = () => {
 
           {/* Modern Mobile Filter Sheet */}
           {showFilters && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-              <div className="space-y-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
+              <div className="space-y-4">
                 {/* In Stock Only */}
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium text-gray-900">Availability</h3>
-                    <p className="text-sm text-gray-500">Show only in-stock items</p>
+                    <h3 className="font-medium text-gray-900 text-sm">Availability</h3>
+                    <p className="text-xs text-gray-500">Show only in-stock items</p>
                   </div>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
@@ -768,7 +768,7 @@ export const ShopPage: React.FC = () => {
                       onChange={(e) => setShowInStockOnly(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-pink-400"></div>
+                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
                   </label>
                 </div>
 
