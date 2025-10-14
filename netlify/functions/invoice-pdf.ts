@@ -138,6 +138,6 @@ export const handler: Handler = async (event) => {
   }
 };
 
-export { handler };
+// Single export already declared above
 
 
