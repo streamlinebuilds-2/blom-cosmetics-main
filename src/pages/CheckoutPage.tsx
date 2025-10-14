@@ -241,7 +241,7 @@ export const CheckoutPage: React.FC = () => {
                                   <span className="text-lg font-bold text-pink-500">FREE</span>
                                 </div>
                                 <p className="text-sm text-gray-600">Ready within 24 hours. We'll WhatsApp you when it's ready.</p>
-                                <span className="inline-block mt-2 px-2 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">💗 Free Pickup</span>
+                                <span className="inline-block mt-2 px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">💗 Free Pickup</span>
                               </div>
                             </div>
                           </label>
@@ -270,7 +270,7 @@ export const CheckoutPage: React.FC = () => {
                                 </div>
                                 <p className="text-sm text-gray-600">Choose your nearest Courier Guy Locker or Kiosk (2–4 business days).</p>
                                 <p className="text-xs text-gray-500 mt-1">Your parcel will be safely stored — you'll get an SMS with a PIN when it's ready.</p>
-                                <span className="inline-block mt-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">💸 Most Affordable</span>
+                                <span className="inline-block mt-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">💸 Most Affordable</span>
                               </div>
                             </div>
                           </label>
@@ -301,7 +301,7 @@ export const CheckoutPage: React.FC = () => {
                                 </div>
                                 <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
                                 {cartState.subtotal >= 1500 && (
-                                  <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">⭐ Free over R1500</span>
+                                  <span className="inline-block mt-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">⭐ Free over R1500</span>
                                 )}
                                 {cartState.subtotal < 1500 && (
                                   <p className="text-xs text-gray-500 mt-1">Add R{(1500 - cartState.subtotal).toFixed(2)} more for free delivery!</p>
