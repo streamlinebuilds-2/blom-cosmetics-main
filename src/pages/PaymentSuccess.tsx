@@ -56,16 +56,15 @@ export default function PaymentSuccess() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   {orderInfo && (
                     <>
-                      <a
-                        href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderInfo.orderId)}`}
-                        target="_blank" rel="noopener"
-                        className="inline-flex justify-center rounded-full border border-gray-300 px-6 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                      <button
+                        onClick={() => window.print()}
+                        className="inline-flex justify-center rounded-full bg-blue-500 px-6 py-3 text-white font-semibold shadow hover:bg-blue-600 transition-colors"
                       >
-                        View Invoice
-                      </a>
+                        Print / Save as PDF
+                      </button>
                       <a
                         href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderInfo.orderId)}`}
-                        className="inline-flex justify-center rounded-full border border-gray-300 px-6 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+                        className="inline-flex justify-center rounded-full border border-blue-500 px-6 py-3 text-blue-500 font-semibold hover:bg-blue-50 transition-colors"
                       >
                         Download PDF
                       </a>
