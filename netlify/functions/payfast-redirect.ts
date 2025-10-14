@@ -1,11 +1,11 @@
 import { Handler } from '@netlify/functions';
 import crypto from 'crypto';
 
-const PF_BASE = process.env.PAYFAST_MODE === 'live' 
-  ? 'https://www.payfast.co.za' 
-  : 'https://sandbox.payfast.co.za';
-const RETURN_URL = `${process.env.URL}/payment-success`;
-const CANCEL_URL = `${process.env.URL}/payment-cancelled`;
+// Env configuration per spec
+const PF_BASE = process.env.PAYFAST_BASE || 'https://sandbox.payfast.co.za';
+const SITE_BASE_URL = process.env.SITE_BASE_URL || process.env.URL || '';
+const RETURN_URL = `${SITE_BASE_URL}/payment-success`;
+const CANCEL_URL = `${SITE_BASE_URL}/payment-cancelled`;
 const NOTIFY_URL = process.env.N8N_ITN_URL || '';
 
 // PayFast encoding (space -> +, uppercase hex)
@@ -14,20 +14,39 @@ function encPF(v: unknown) {
   return enc.replace(/%20/g, '+').replace(/%[0-9a-f]{2}/g, m => m.toUpperCase());
 }
 
-// Build signature over sorted key=value and append &passphrase=...
-function signPayfast(filteredParams: Record<string, any>, passphrase?: string) {
-  const keys = Object.keys(filteredParams).sort();
-  const qs = keys.map(k => `${k}=${encPF(filteredParams[k])}`).join('&');
-  const base = passphrase ? `${qs}&passphrase=${encPF(passphrase)}` : qs;
-  const sig = crypto.createHash('md5').update(base).digest('hex');
+// Build signature using documentation order (not sorting)
+function signPayfastInOrder(fields: Record<string, any>, passphrase?: string) {
+  // Documentation order per spec
+  const order = [
+    'merchant_id','merchant_key','return_url','cancel_url','notify_url',
+    'name_first','name_last','email_address','cell_number',
+    'm_payment_id','amount','item_name','item_description',
+    'custom_int1','custom_int2','custom_int3','custom_int4','custom_int5',
+    'custom_str1','custom_str2','custom_str3','custom_str4','custom_str5',
+    'email_confirmation','confirmation_address','payment_method'
+  ];
+
+  const parts: string[] = [];
+  for (const key of order) {
+    const val = (fields as any)[key];
+    if (val !== undefined && val !== null && String(val) !== '') {
+      parts.push(`${key}=${encPF(val)}`);
+    }
+  }
+
+  let base = parts.join('&');
+  if (passphrase) {
+    base += `&passphrase=${encPF(passphrase)}`;
+  }
+
+  const signature = crypto.createHash('md5').update(base).digest('hex');
 
   // TEMP LOGS (remove after success)
   console.log('PF merchant:', process.env.PAYFAST_MERCHANT_ID);
-  console.log('PF passphrase length:', (process.env.PAYFAST_PASSPHRASE || '').length);
+  console.log('Sig len:', signature.length);
   console.log('PF baseString:', base);
-  console.log('PF signature length:', sig.length, 'signature:', sig);
 
-  return { signature: sig, base };
+  return { signature, base };
 }
 
 async function upsertOrder({ 
@@ -48,7 +67,7 @@ async function upsertOrder({
   shippingInfo?: any;
 }) {
   // Upsert order to Supabase using service_role key
-  const supabaseUrl = process.env.VITE_SUPABASE_URL;
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!supabaseUrl || !serviceKey) {
@@ -59,23 +78,20 @@ async function upsertOrder({
   const orderData = {
     merchant_payment_id,
     status: 'pending',
-    total: amount,
+    total_amount: Number(amount).toFixed(2),
     currency,
-    customer_email: email || null,
-    customer_name: name || null,
-    items: items || [],
-    shipping_info: shippingInfo || {},
-    created_at: new Date().toISOString(),
+    customer_email: email ?? null,
+    customer_name: name ?? null,
     updated_at: new Date().toISOString()
-  };
+  } as Record<string, any>;
 
-  const r = await fetch(`${supabaseUrl}/rest/v1/orders`, {
+  const r = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_payment_id`, {
     method: 'POST',
     headers: {
       apikey: serviceKey,
       Authorization: `Bearer ${serviceKey}`,
       'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates,return=representation'
+      'Prefer': 'resolution=merge-duplicates'
     },
     body: JSON.stringify(orderData)
   });
@@ -112,6 +128,7 @@ export const handler: Handler = async (event) => {
     const payload = JSON.parse(event.body || '{}');
     
     const amountNum = Number(payload.amount);
+    const amountStr = Number(payload.amount).toFixed(2);
     const item_name = String(payload.item_name || 'BLOM Order');
     const m_payment_id = String(payload.m_payment_id || `BLOM-${Date.now()}`);
     
@@ -154,37 +171,32 @@ export const handler: Handler = async (event) => {
 </body>`;
     }
 
-    // 2) Build ONE params object, filter empties, sign THAT exact set, and post THAT exact set
-    const params = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,      // 10042668
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,    // da7qpwl4xiggc
+    // 2) Build fields in documentation order, sign, and auto-POST
+    const fields: Record<string, any> = {
+      merchant_id: process.env.PAYFAST_MERCHANT_ID,
+      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
       return_url: RETURN_URL,
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
-      m_payment_id,                                      // from your payload
-      amount: amountNum.toFixed(2),                      // string with 2 decimals
-      item_name,
-      email_address: payload.email_address,
+
+      // Customer (optional)
       name_first: payload.name_first,
-      name_last: payload.name_last
+      name_last: payload.name_last,
+      email_address: payload.email_address,
+
+      // Transaction
+      m_payment_id,
+      amount: amountStr,
+      item_name
     };
 
-    // Remove empty/undefined ONLY ONCE, then reuse the same object for signing AND posting
-    const filtered = Object.fromEntries(
-      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && String(v) !== '')
-    );
+    const { signature } = signPayfastInOrder(fields, process.env.PAYFAST_PASSPHRASE);
+    fields.signature = signature;
 
-    // Compute signature over filtered set (sorted), with passphrase
-    const { signature } = signPayfast(filtered, process.env.PAYFAST_PASSPHRASE);
-
-    // Include signature as another field (PayFast expects it in the form)
-    filtered.signature = signature;
-
-    // Return HTML that auto-POSTs the exact same fields you signed
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
-      body: htmlAutoPost(`${PF_BASE}/eng/process`, filtered)
+      body: htmlAutoPost(`${PF_BASE}/eng/process`, fields)
     };
 
   } catch (e: any) {
