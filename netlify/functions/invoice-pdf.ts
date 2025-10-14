@@ -11,6 +11,7 @@ function ZAR(n: number) {
 export const handler: Handler = async (event) => {
   try {
     const id = event.queryStringParameters?.m_payment_id;
+    const asInline = event.queryStringParameters?.inline === '1' || event.queryStringParameters?.inline === 'true';
     if (!id) return { statusCode: 400, body: 'Missing m_payment_id' };
 
     if (!SUPABASE_URL || !SRK) {
@@ -127,7 +128,7 @@ export const handler: Handler = async (event) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="BLOM-Receipt-${id}.pdf"`,
+        'Content-Disposition': `${asInline ? 'inline' : 'attachment'}; filename="BLOM-Receipt-${id}.pdf"`,
         'Cache-Control': 'private, max-age=0, no-store',
       },
       body: Buffer.from(buf).toString('base64'),

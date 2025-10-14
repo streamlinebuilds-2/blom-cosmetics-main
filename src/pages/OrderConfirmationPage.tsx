@@ -127,14 +127,12 @@ export const OrderConfirmationPage: React.FC = () => {
       <main className="section-padding">
         <Container>
           {/* Success Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="h-12 w-12 text-green-500" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Order Confirmed!</h1>
-            <p className="text-xl text-gray-600 mb-2">
-              Thank you for your purchase. Your order has been successfully placed.
-            </p>
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Payment Successful</h1>
+            <p className="text-lg text-gray-600 mb-4">Thank you for your order! A confirmation email has been sent to you.</p>
             <p className="text-lg text-gray-500">
               Order #{orderData.orderNumber} • Placed on {orderData.orderDate}
             </p>
@@ -264,26 +262,38 @@ export const OrderConfirmationPage: React.FC = () => {
 
               {/* Actions */}
               <Card>
-                <CardContent className="flex flex-wrap gap-4 justify-center">
+                <CardContent className="flex flex-wrap gap-3 justify-center">
+                  <a
+                    href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderData.orderNumber)}`}
+                    target="_blank" rel="noopener"
+                    className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    <Download className="h-4 w-4 mr-2" /> View Invoice
+                  </a>
                   <a
                     href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderData.orderNumber)}`}
-                    className="btn-outline inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+                    className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Receipt (PDF)
+                    <Download className="h-4 w-4 mr-2" /> Download PDF
                   </a>
-                  <Button variant="outline">
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share Order
-                  </Button>
-                  <Button variant="outline">
-                    <Package className="h-4 w-4 mr-2" />
-                    Track Order
-                  </Button>
-                  <Button>
-                    Continue Shopping
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
+                  <button
+                    onClick={() => window.print()}
+                    className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+                  >
+                    Print Invoice
+                  </button>
+                  <a
+                    href="/track-order"
+                    className="inline-flex items-center px-4 py-2 rounded-md bg-pink-400 text-white hover:bg-pink-500"
+                  >
+                    <Package className="h-4 w-4 mr-2" /> Track My Order
+                  </a>
+                  <a
+                    href="/shop"
+                    className="inline-flex items-center px-4 py-2 rounded-md bg-gray-900 text-white hover:bg-black"
+                  >
+                    Continue Shopping <ArrowRight className="h-4 w-4 ml-2" />
+                  </a>
                 </CardContent>
               </Card>
             </div>
