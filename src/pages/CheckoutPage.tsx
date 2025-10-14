@@ -134,12 +134,12 @@ export const CheckoutPage: React.FC = () => {
   const calculateShipping = () => {
     if (shippingMethod === 'store-pickup') return 0;
     if (shippingMethod === 'locker') return 50;
-    // Door-to-door: Free over R1500, otherwise R75
-    return cartState.total >= 1500 ? 0 : 75;
+    // Door-to-door: Free over R1500, otherwise R75 (use items subtotal)
+    return cartState.subtotal >= 1500 ? 0 : 75;
   };
 
   const shippingCost = calculateShipping();
-  const orderTotal = cartState.total + shippingCost;
+  const orderTotal = cartState.subtotal + shippingCost;
 
   const provinces = [
     'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
@@ -296,15 +296,15 @@ export const CheckoutPage: React.FC = () => {
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">🚚 Door-to-Door Delivery</span>
                                   <span className="text-lg font-bold text-gray-900">
-                                    {cartState.total >= 1500 ? 'FREE' : 'R75'}
+                                    {cartState.subtotal >= 1500 ? 'FREE' : 'R75'}
                                   </span>
                                 </div>
                                 <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
-                                {cartState.total >= 1500 && (
+                                {cartState.subtotal >= 1500 && (
                                   <span className="inline-block mt-2 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">⭐ Free over R1500</span>
                                 )}
-                                {cartState.total < 1500 && (
-                                  <p className="text-xs text-gray-500 mt-1">Add R{(1500 - cartState.total).toFixed(2)} more for free delivery!</p>
+                                {cartState.subtotal < 1500 && (
+                                  <p className="text-xs text-gray-500 mt-1">Add R{(1500 - cartState.subtotal).toFixed(2)} more for free delivery!</p>
                                 )}
                               </div>
                             </div>
@@ -699,7 +699,7 @@ export const CheckoutPage: React.FC = () => {
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Subtotal:</span>
-                      <span>{formatPrice(cartState.total)}</span>
+                      <span>{formatPrice(cartState.subtotal)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span>Shipping:</span>
@@ -720,7 +720,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
 
                   {/* Shipping Notice */}
-                  {cartState.subtotal < 500 && (
+                  {cartState.subtotal < 1500 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-sm text-blue-800">
                         Add {formatPrice(1500 - cartState.subtotal)} more for free shipping!
