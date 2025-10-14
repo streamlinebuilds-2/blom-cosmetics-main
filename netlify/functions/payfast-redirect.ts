@@ -8,10 +8,11 @@ const RETURN_URL = `${SITE_BASE_URL}/payment-success`;
 const CANCEL_URL = `${SITE_BASE_URL}/payment-cancelled`;
 const NOTIFY_URL = process.env.N8N_ITN_URL || '';
 
-// PayFast encoding (space -> +, uppercase hex)
+// PHP-style urlencode for PayFast: spaces -> +, and encode ! ' ( ) *
 function encPF(v: unknown) {
-  const enc = encodeURIComponent(String(v ?? ''));
-  return enc.replace(/%20/g, '+').replace(/%[0-9a-f]{2}/g, m => m.toUpperCase());
+  return encodeURIComponent(String(v ?? ''))
+    .replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())
+    .replace(/%20/g, '+');
 }
 
 // Build signature using documentation order (not sorting)
