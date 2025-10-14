@@ -15,20 +15,19 @@ function encPF(v: unknown) {
 }
 
 // Build signature over sorted key=value and append &passphrase=...
-function signPayfast(params: Record<string, any>, passphrase?: string) {
-  // Include only fields that have a non-empty value (PayFast requirement)
-  const entries = Object.entries(params).filter(([, v]) => v !== undefined && v !== null && String(v) !== '');
-  const keys = entries.map(([k]) => k).sort();
-  const qs = keys.map(k => `${k}=${encPF(params[k])}`).join('&');
+function signPayfast(filteredParams: Record<string, any>, passphrase?: string) {
+  const keys = Object.keys(filteredParams).sort();
+  const qs = keys.map(k => `${k}=${encPF(filteredParams[k])}`).join('&');
   const base = passphrase ? `${qs}&passphrase=${encPF(passphrase)}` : qs;
-  
-  // Uncomment to debug in logs if needed:
-  // console.log('PF baseString:', base);
-  
-  return { 
-    signature: crypto.createHash('md5').update(base).digest('hex'), 
-    base 
-  };
+  const sig = crypto.createHash('md5').update(base).digest('hex');
+
+  // TEMP LOGS (remove after success)
+  console.log('PF merchant:', process.env.PAYFAST_MERCHANT_ID);
+  console.log('PF passphrase length:', (process.env.PAYFAST_PASSPHRASE || '').length);
+  console.log('PF baseString:', base);
+  console.log('PF signature length:', sig.length, 'signature:', sig);
+
+  return { signature: sig, base };
 }
 
 async function upsertOrder({ 
@@ -110,17 +109,13 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const body = JSON.parse(event.body || '{}');
+    const payload = JSON.parse(event.body || '{}');
     
-    const amount = Number(body.amount);
-    const item_name = String(body.item_name || 'BLOM Order');
-    const m_payment_id = String(body.m_payment_id || `BLOM-${Date.now()}`);
-    const email = body.email_address ? String(body.email_address) : undefined;
-    const name = body.name_first || body.name_last
-      ? `${body.name_first ?? ''}${body.name_last ? ' ' + body.name_last : ''}`.trim()
-      : undefined;
+    const amountNum = Number(payload.amount);
+    const item_name = String(payload.item_name || 'BLOM Order');
+    const m_payment_id = String(payload.m_payment_id || `BLOM-${Date.now()}`);
     
-    if (!Number.isFinite(amount) || amount <= 0) {
+    if (!Number.isFinite(amountNum) || amountNum <= 0) {
       return { 
         statusCode: 400,
         headers,
@@ -132,80 +127,64 @@ export const handler: Handler = async (event) => {
     try {
       await upsertOrder({ 
         merchant_payment_id: m_payment_id, 
-        amount, 
+        amount: amountNum, 
         currency: 'ZAR', 
-        email, 
-        name,
-        items: body.items,
-        shippingInfo: body.shippingInfo
+        email: payload.email_address,
+        name: payload.name_first || payload.name_last
+          ? `${payload.name_first ?? ''}${payload.name_last ? ' ' + payload.name_last : ''}`.trim()
+          : undefined,
+        items: payload.items,
+        shippingInfo: payload.shippingInfo
       });
     } catch (e) {
       console.error('Order upsert failed:', e);
       // Continue anyway - we can create order via ITN webhook
     }
 
-    // 2) Build PayFast params - only include non-empty values
-    const params: Record<string, any> = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
-      return_url: RETURN_URL,
-      cancel_url: CANCEL_URL,
-      notify_url: NOTIFY_URL,
-      m_payment_id,
-      amount: amount.toFixed(2),  // Use 'amount' for the form (not amount_gross)
-      item_name,
-      // Optional customer fields - only include if not empty
-      email_address: email,
-      name_first: body.name_first,
-      name_last: body.name_last,
-      cell_number: body.cell_number
-    };
-
-    // 3) Compute signature (only includes non-empty fields)
-    const { signature } = signPayfast(params, process.env.PAYFAST_PASSPHRASE);
-
-    // 4) Build HTML auto-POST form (instead of JSON redirect)
+    // Helper: HTML auto-submit form
     function htmlAutoPost(action: string, fields: Record<string, any>) {
-      const inputs = Object.entries(fields)
-        .filter(([, v]) => v !== undefined && v !== null && String(v) !== '')
-        .map(([k, v]) => `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`)
-        .join('\n');
-
-      return `<!doctype html>
-<html><head><meta charset="utf-8"><title>Redirecting…</title></head>
-<body onload="document.forms[0].submit();">
-  <p>Redirecting to PayFast…</p>
+      const inputs = Object.entries(fields).map(([k, v]) =>
+        `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`
+      ).join('\n');
+      return `<!doctype html><meta charset="utf-8"><title>Redirecting…</title>
+<body onload="document.forms[0].submit()">
   <form action="${action}" method="post" accept-charset="utf-8">
     ${inputs}
   </form>
-</body></html>`;
+</body>`;
     }
 
-    // Include the same fields you signed (non-empty), plus signature
-    const formFields = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
+    // 2) Build ONE params object, filter empties, sign THAT exact set, and post THAT exact set
+    const params = {
+      merchant_id: process.env.PAYFAST_MERCHANT_ID,      // 10042668
+      merchant_key: process.env.PAYFAST_MERCHANT_KEY,    // da7qpwl4xiggc
       return_url: RETURN_URL,
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
-      m_payment_id,
-      amount: amount.toFixed(2),
+      m_payment_id,                                      // from your payload
+      amount: amountNum.toFixed(2),                      // string with 2 decimals
       item_name,
-      email_address: email,
-      name_first: body.name_first,
-      name_last: body.name_last,
-      cell_number: body.cell_number,
-      signature  // ← your 32-char MD5 hex
+      email_address: payload.email_address,
+      name_first: payload.name_first,
+      name_last: payload.name_last
     };
 
-    // Respond with HTML (not JSON / not 303)
+    // Remove empty/undefined ONLY ONCE, then reuse the same object for signing AND posting
+    const filtered = Object.fromEntries(
+      Object.entries(params).filter(([, v]) => v !== undefined && v !== null && String(v) !== '')
+    );
+
+    // Compute signature over filtered set (sorted), with passphrase
+    const { signature } = signPayfast(filtered, process.env.PAYFAST_PASSPHRASE);
+
+    // Include signature as another field (PayFast expects it in the form)
+    filtered.signature = signature;
+
+    // Return HTML that auto-POSTs the exact same fields you signed
     return {
       statusCode: 200,
-      headers: {
-        ...headers,
-        'Content-Type': 'text/html; charset=utf-8'
-      },
-      body: htmlAutoPost(`${PF_BASE}/eng/process`, formFields)
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      body: htmlAutoPost(`${PF_BASE}/eng/process`, filtered)
     };
 
   } catch (e: any) {
