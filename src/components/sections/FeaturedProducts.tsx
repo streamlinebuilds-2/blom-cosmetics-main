@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from '../layout/Container';
 import { ProductCard } from '../ProductCard';
-import { BestSellerCard } from './BestSellerCard';
+import { HomepageBestSellerCard } from './HomepageBestSellerCard';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { Product, ProductImage } from '../../lib/supabase';
@@ -37,7 +37,7 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
         product_images: [
-          { image_url: '/cuticle-oil-colorful.webp', sort_order: 1 }
+          { image_url: '/cuticle-oil-white.webp', sort_order: 1 }
         ]
       },
       {
@@ -48,7 +48,7 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Mirror shine, chip-resistant, professional finish.',
         product_images: [
-          { image_url: '/top-coat-colorful.webp', sort_order: 1 }
+          { image_url: '/top-coat-white.webp', sort_order: 1 }
         ]
       },
       {
@@ -59,7 +59,7 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Professional-grade, fast acting nail remover.',
         product_images: [
-          { image_url: '/acetone-remover-colorful.webp', sort_order: 1 }
+          { image_url: '/acetone-remover-white.webp', sort_order: 1 }
         ]
       },
       {
@@ -70,7 +70,7 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Professional acrylic powders in 13 beautiful colors.',
         product_images: [
-          { image_url: '/core-acrylics-colorful.webp', sort_order: 1 }
+          { image_url: '/core-acrylics-white.webp', sort_order: 1 }
         ]
       }
     ];
@@ -201,7 +201,7 @@ export const FeaturedProducts: React.FC = () => {
 
           <div className="grid-responsive">
             {fallbackProducts.map((product) => (
-              <BestSellerCard
+              <HomepageBestSellerCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
@@ -244,7 +244,7 @@ export const FeaturedProducts: React.FC = () => {
             const imageUrl = primaryImage?.image_url || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
 
             return (
-              <BestSellerCard
+              <HomepageBestSellerCard
                 key={product.id}
                 id={product.id}
                 name={product.name}

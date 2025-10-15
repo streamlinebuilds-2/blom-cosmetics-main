@@ -173,11 +173,32 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search suburb, mall, or city name..."
+              placeholder="Search suburb, mall, city, or area name..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                // Auto-search as user types (debounced)
+                const timeoutId = setTimeout(() => {
+                  if (e.target.value.trim().length >= 2) {
+                    fetchPickupPoints(e.target.value, userLocation?.lat, userLocation?.lng);
+                  }
+                }, 500);
+                return () => clearTimeout(timeoutId);
+              }}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  fetchPickupPoints('', userLocation?.lat, userLocation?.lng);
+                }}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            )}
           </div>
         </form>
         

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
 import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, User, CreditCard as Edit, Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
-import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
+import { AddressSmartZA } from '../components/checkout/AddressSmartZA';
 import { LockerPickerList } from '../components/checkout/LockerPickerList';
 import { validateMobileNumber, validateAddress, validatePickupPoint, formatMobileNumber } from '../lib/validation';
 
@@ -489,9 +489,9 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Address Autocomplete (only for door-to-door) */}
+                      {/* Smart Address (only for door-to-door) */}
                       {shippingMethod === 'door-to-door' && (
-                        <AddressAutocomplete
+                        <AddressSmartZA
                           value={deliveryAddress}
                           onChange={setDeliveryAddress}
                         />
