@@ -78,18 +78,12 @@ function toParcels(items: OrderItem[]) {
 }
 
 function buildDelivery(order: Order) {
-  if (order.shipping_method === 'locker') {
+  // For locker/kiosk deliveries, use pickup point fields instead of address
+  if (order.shipping_method === 'locker' && order.locker_id) {
     return {
-      address: {
-        type: 'locker',
-        company: order.locker_name || 'Locker',
-        street_address: order.locker_street || '',
-        local_area: order.locker_suburb || '',
-        city: order.locker_city || '',
-        zone: order.locker_zone || '',
-        country: 'ZA',
-        code: order.locker_postal_code || ''
-      },
+      // Use pickup point fields for locker delivery
+      delivery_pickup_point_id: order.locker_id,
+      delivery_pickup_point_provider: 'tcg-locker',
       contact: {
         name: order.customer_name || 'Customer',
         email: order.customer_email || '',
@@ -97,6 +91,8 @@ function buildDelivery(order: Order) {
       }
     };
   }
+  
+  // For door-to-door deliveries, use address fields
   return {
     address: {
       type: 'residential',
@@ -166,12 +162,18 @@ export const handler: Handler = async (event) => {
     // Service level (placeholder codes; replace when you have the real ones)
     const service_level_code = (order.shipping_method === 'locker') ? 'LOCKER-STD' : 'ECO-STD';
 
-    // Create shipment
+    // Create shipment payload based on delivery type
     const shipPayload = {
       customer_reference: order.merchant_payment_id,
       collection_address: WAREHOUSE.address,
       collection_contact: { name: WAREHOUSE.name, email: WAREHOUSE.email, mobile_number: WAREHOUSE.mobile_number },
-      delivery_address: delivery.address,
+      // Conditionally include delivery_address OR delivery_pickup_point fields
+      ...(delivery.delivery_pickup_point_id ? {
+        delivery_pickup_point_id: delivery.delivery_pickup_point_id,
+        delivery_pickup_point_provider: delivery.delivery_pickup_point_provider
+      } : {
+        delivery_address: delivery.address
+      }),
       delivery_contact: delivery.contact,
       parcels,
       service_level_code

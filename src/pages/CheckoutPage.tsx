@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
 import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, User, CreditCard as Edit, Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
+import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
+import { LockerPicker } from '../components/checkout/LockerPicker';
+import { validateMobileNumber, validateAddress, validatePickupPoint, formatMobileNumber } from '../lib/validation';
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -26,6 +29,40 @@ export const CheckoutPage: React.FC = () => {
     country: 'South Africa',
     lockerLocation: ''
   });
+
+  // New address fields for door-to-door delivery
+  const [deliveryAddress, setDeliveryAddress] = useState({
+    street_address: '',
+    local_area: '',
+    city: '',
+    zone: '',
+    code: '',
+    country: 'ZA',
+    lat: undefined as number | undefined,
+    lng: undefined as number | undefined
+  });
+
+  // Pickup point data for locker/kiosk delivery
+  const [selectedPickupPoint, setSelectedPickupPoint] = useState<{
+    id: string;
+    name: string;
+    street_address: string;
+    local_area: string;
+    city: string;
+    zone: string;
+    code: string;
+    country: string;
+    lat: number;
+    lng: number;
+    provider: string;
+  } | null>(null);
+
+  // Validation errors
+  const [validationErrors, setValidationErrors] = useState<{
+    mobile?: string;
+    address?: string[];
+    pickupPoint?: string[];
+  }>({});
 
   const [paymentInfo, setPaymentInfo] = useState({
     method: 'payfast',
@@ -55,8 +92,43 @@ export const CheckoutPage: React.FC = () => {
     cartStore.removeItem(itemId);
   };
 
+  const validateShippingForm = () => {
+    const errors: { mobile?: string; address?: string[]; pickupPoint?: string[] } = {};
+
+    // Validate mobile number (required for all methods)
+    const mobileValidation = validateMobileNumber(shippingInfo.phone);
+    if (!mobileValidation.isValid) {
+      errors.mobile = mobileValidation.error;
+    }
+
+    // Validate based on shipping method
+    if (shippingMethod === 'door-to-door') {
+      const addressValidation = validateAddress(deliveryAddress);
+      if (!addressValidation.isValid) {
+        errors.address = addressValidation.errors;
+      }
+    } else if (shippingMethod === 'locker') {
+      if (!selectedPickupPoint) {
+        errors.pickupPoint = ['Please select a pickup point'];
+      } else {
+        const pickupValidation = validatePickupPoint(selectedPickupPoint);
+        if (!pickupValidation.isValid) {
+          errors.pickupPoint = pickupValidation.errors;
+        }
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateShippingForm()) {
+      return;
+    }
+
     setStep('payment');
   };
 
@@ -72,7 +144,7 @@ export const CheckoutPage: React.FC = () => {
       // Generate order ID
       const orderId = `BLOM-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
       
-      // Prepare payment data
+      // Prepare payment data with all shipping fields
       const paymentData = {
         m_payment_id: orderId,
         amount: orderTotal,
@@ -80,7 +152,7 @@ export const CheckoutPage: React.FC = () => {
         name_first: shippingInfo.firstName,
         name_last: shippingInfo.lastName,
         email_address: shippingInfo.email,
-        cell_number: shippingInfo.phone,
+        cell_number: formatMobileNumber(shippingInfo.phone),
         items: cartState.items.map(item => ({
           name: item.name,
           quantity: item.quantity,
@@ -89,7 +161,32 @@ export const CheckoutPage: React.FC = () => {
         shippingInfo: {
           ...shippingInfo,
           method: shippingMethod,
-          cost: shippingCost
+          cost: shippingCost,
+          // Door-to-door delivery fields
+          ...(shippingMethod === 'door-to-door' && {
+            ship_to_street: deliveryAddress.street_address,
+            ship_to_suburb: deliveryAddress.local_area,
+            ship_to_city: deliveryAddress.city,
+            ship_to_zone: deliveryAddress.zone,
+            ship_to_postal_code: deliveryAddress.code,
+            ship_to_country: deliveryAddress.country,
+            ship_to_lat: deliveryAddress.lat,
+            ship_to_lng: deliveryAddress.lng
+          }),
+          // Locker/Kiosk delivery fields
+          ...(shippingMethod === 'locker' && selectedPickupPoint && {
+            locker_id: selectedPickupPoint.id,
+            locker_name: selectedPickupPoint.name,
+            locker_street: selectedPickupPoint.street_address,
+            locker_suburb: selectedPickupPoint.local_area,
+            locker_city: selectedPickupPoint.city,
+            locker_zone: selectedPickupPoint.zone,
+            locker_postal_code: selectedPickupPoint.code,
+            locker_country: selectedPickupPoint.country,
+            locker_lat: selectedPickupPoint.lat,
+            locker_lng: selectedPickupPoint.lng,
+            locker_provider: selectedPickupPoint.provider
+          })
         }
       };
 
@@ -313,30 +410,12 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Locker Location (only show if locker selected) */}
+                      {/* Locker/Kiosk Picker (only show if locker selected) */}
                       {shippingMethod === 'locker' && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Select Your Nearest Locker/Kiosk Location *
-                          </label>
-                          <select
-                            required
-                            value={shippingInfo.lockerLocation}
-                            onChange={(e) => setShippingInfo({...shippingInfo, lockerLocation: e.target.value})}
-                            className="input-field"
-                          >
-                            <option value="">Choose a location...</option>
-                            <option value="Johannesburg CBD">Johannesburg CBD</option>
-                            <option value="Sandton">Sandton</option>
-                            <option value="Pretoria Central">Pretoria Central</option>
-                            <option value="Centurion">Centurion</option>
-                            <option value="Cape Town CBD">Cape Town CBD</option>
-                            <option value="Durban CBD">Durban CBD</option>
-                            <option value="Bloemfontein">Bloemfontein</option>
-                            <option value="Port Elizabeth">Port Elizabeth</option>
-                          </select>
-                          <p className="text-xs text-gray-500 mt-1">More locations available at checkout confirmation</p>
-                        </div>
+                        <LockerPicker
+                          value={selectedPickupPoint}
+                          onChange={setSelectedPickupPoint}
+                        />
                       )}
                       
 
@@ -385,82 +464,59 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Phone Number *
+                            Mobile Number * <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="tel"
                             required
                             value={shippingInfo.phone}
-                            onChange={(e) => setShippingInfo({...shippingInfo, phone: e.target.value})}
-                            className="input-field"
-                            placeholder="+27 XX XXX XXXX"
+                            onChange={(e) => {
+                              setShippingInfo({...shippingInfo, phone: e.target.value});
+                              // Clear mobile validation error when user types
+                              if (validationErrors.mobile) {
+                                setValidationErrors({...validationErrors, mobile: undefined});
+                              }
+                            }}
+                            className={`input-field ${validationErrors.mobile ? 'border-red-500 focus:ring-red-500' : ''}`}
+                            placeholder="+27 XX XXX XXXX or 0XX XXX XXXX"
                           />
+                          {validationErrors.mobile && (
+                            <p className="text-red-500 text-sm mt-1">{validationErrors.mobile}</p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">
+                            Required for delivery notifications and pickup PIN/OTP
+                          </p>
                         </div>
                       </div>
 
-                      {/* Address fields (hidden for store pickup) */}
-                      {shippingMethod !== 'store-pickup' && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Street Address *
-                          </label>
-                          <input
-                            type="text"
-                            required={shippingMethod !== 'store-pickup'}
-                            value={shippingInfo.address}
-                            onChange={(e) => setShippingInfo({...shippingInfo, address: e.target.value})}
-                            className="input-field"
-                            placeholder="123 Main Street"
-                          />
+                      {/* Address Autocomplete (only for door-to-door) */}
+                      {shippingMethod === 'door-to-door' && (
+                        <AddressAutocomplete
+                          value={deliveryAddress}
+                          onChange={setDeliveryAddress}
+                        />
+                      )}
+
+                      {/* Validation Errors */}
+                      {validationErrors.address && validationErrors.address.length > 0 && (
+                        <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                          <p className="text-red-600 text-sm font-medium mb-1">Please fix the following address issues:</p>
+                          <ul className="text-red-600 text-sm list-disc list-inside">
+                            {validationErrors.address.map((error, index) => (
+                              <li key={index}>{error}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
 
-                      {shippingMethod !== 'store-pickup' && (
-                        <div className="grid md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              City *
-                            </label>
-                            <input
-                              type="text"
-                              required={shippingMethod !== 'store-pickup'}
-                              value={shippingInfo.city}
-                              onChange={(e) => setShippingInfo({...shippingInfo, city: e.target.value})}
-                              className="input-field"
-                              placeholder="Cape Town"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Province *
-                            </label>
-                            <select
-                              required={shippingMethod !== 'store-pickup'}
-                              value={shippingInfo.province}
-                              onChange={(e) => setShippingInfo({...shippingInfo, province: e.target.value})}
-                              className="input-field"
-                            >
-                              <option value="">Select Province</option>
-                              {provinces.map((province) => (
-                                <option key={province} value={province}>
-                                  {province}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Postal Code *
-                            </label>
-                            <input
-                              type="text"
-                              required={shippingMethod !== 'store-pickup'}
-                              value={shippingInfo.postalCode}
-                              onChange={(e) => setShippingInfo({...shippingInfo, postalCode: e.target.value})}
-                              className="input-field"
-                              placeholder="8001"
-                            />
-                          </div>
+                      {validationErrors.pickupPoint && validationErrors.pickupPoint.length > 0 && (
+                        <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                          <p className="text-red-600 text-sm font-medium mb-1">Please fix the following pickup point issues:</p>
+                          <ul className="text-red-600 text-sm list-disc list-inside">
+                            {validationErrors.pickupPoint.map((error, index) => (
+                              <li key={index}>{error}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
 
