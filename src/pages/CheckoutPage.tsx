@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
 import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, User, CreditCard as Edit, Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
-import { LockerPicker } from '../components/checkout/LockerPicker';
+import { LockerPickerList } from '../components/checkout/LockerPickerList';
 import { validateMobileNumber, validateAddress, validatePickupPoint, formatMobileNumber } from '../lib/validation';
 
 export const CheckoutPage: React.FC = () => {
@@ -412,7 +412,7 @@ export const CheckoutPage: React.FC = () => {
 
                       {/* Locker/Kiosk Picker (only show if locker selected) */}
                       {shippingMethod === 'locker' && (
-                        <LockerPicker
+                        <LockerPickerList
                           value={selectedPickupPoint}
                           onChange={setSelectedPickupPoint}
                         />
