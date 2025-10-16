@@ -69,16 +69,16 @@ export const Footer: React.FC = () => {
         <div className="footer-col">
           <h4>Connect</h4>
           <div className="footer-socials">
-            <a aria-label="Instagram" href="https://instagram.com/yourhandle" target="_blank" rel="noopener" className="social-link">
+            <a aria-label="Instagram" href="https://www.instagram.com/cosmetics_blom/" target="_blank" rel="noopener" className="social-link">
               <Instagram className="h-6 w-6" strokeWidth={2} />
             </a>
-            <a aria-label="Facebook" href="https://facebook.com/yourhandle" target="_blank" rel="noopener" className="social-link">
+            <a aria-label="Facebook" href="https://www.facebook.com/profile.php?id=61581058185006" target="_blank" rel="noopener" className="social-link">
               <Facebook className="h-6 w-6" strokeWidth={2} />
             </a>
-            <a aria-label="WhatsApp" href="https://wa.me/yourwhatsapp" target="_blank" rel="noopener" className="social-link">
+            <a aria-label="WhatsApp" href="https://wa.me/27795483317" target="_blank" rel="noopener" className="social-link">
               <WhatsAppIcon className="h-6 w-6" strokeWidth={2} />
             </a>
-            <a aria-label="TikTok" href="https://tiktok.com/@yourhandle" target="_blank" rel="noopener" className="social-link">
+            <a aria-label="TikTok" href="https://www.tiktok.com/@blom.cosmetics" target="_blank" rel="noopener" className="social-link">
               <TikTokIcon className="h-6 w-6" strokeWidth={2} />
             </a>
           </div>
