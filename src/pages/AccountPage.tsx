@@ -47,8 +47,8 @@ export const AccountPage: React.FC = () => {
     const hasSessionCookie = cookies.length > 0;
     const localStorageKeys = Object.keys(localStorage).filter(key => key.startsWith('sb-'));
     const hasLocalStorageSession = localStorageKeys.length > 0;
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env.SUPABASE_ANON_KEY;
     const hasEnvVars = !!(supabaseUrl && supabaseKey);
     setDebugInfo(`Cookies: ${cookies.length} (${hasSessionCookie ? 'YES' : 'NO'}) | LocalStorage: ${localStorageKeys.length} (${hasLocalStorageSession ? 'YES' : 'NO'}) | Env: ${hasEnvVars ? 'YES' : 'NO'}`);
 

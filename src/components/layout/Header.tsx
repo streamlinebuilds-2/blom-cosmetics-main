@@ -218,7 +218,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                   // Check authentication state properly
                   try {
                     // Check for Supabase session in localStorage
-                    const supabaseSession = localStorage.getItem('sb-' + import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token');
+            const baseUrl = (import.meta as any).env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL || '';
+            const supabaseSession = localStorage.getItem('sb-' + baseUrl.split('//')[1]?.split('.')[0] + '-auth-token');
                     const hasSession = supabaseSession || document.cookie.includes('sb-');
                     
                     if (!hasSession) {

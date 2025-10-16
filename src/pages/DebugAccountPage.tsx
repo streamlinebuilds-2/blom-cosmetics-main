@@ -23,10 +23,10 @@ export default function DebugAccountPage() {
     });
 
     // Check environment variables
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+    const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL;
+    const supabaseKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env.SUPABASE_ANON_KEY;
     const hasEnvVars = !!(supabaseUrl && supabaseKey);
-    setDebugInfo(`Env: ${hasEnvVars ? 'YES' : 'NO'} | URL: ${supabaseUrl ? 'SET' : 'MISSING'}`);
+    setDebugInfo(`Env: ${hasEnvVars ? 'YES' : 'NO'} | URL set: ${!!supabaseUrl} | KEY set: ${!!supabaseKey}`);
     setStep(4);
 
     return unsubscribe;
