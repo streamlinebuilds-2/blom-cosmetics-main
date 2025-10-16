@@ -79,7 +79,7 @@ function toParcels(items: OrderItem[]) {
 
 function buildDelivery(order: Order) {
   // For locker/kiosk deliveries, use pickup point fields instead of address
-  if (order.shipping_method === 'locker' && order.locker_id) {
+  if ((order.shipping_method === 'locker' || (order as any).shipping_method === 'kiosk') && order.locker_id) {
     return {
       // Use pickup point fields for locker delivery
       delivery_pickup_point_id: order.locker_id,
@@ -87,7 +87,7 @@ function buildDelivery(order: Order) {
       contact: {
         name: order.customer_name || 'Customer',
         email: order.customer_email || '',
-        mobile_number: order.customer_mobile || ''
+        mobile_number: order.customer_mobile || (order as any).customer_phone || (order as any).phone || ''
       }
     };
   }
@@ -106,7 +106,7 @@ function buildDelivery(order: Order) {
     contact: {
       name: order.customer_name || 'Customer',
       email: order.customer_email || '',
-      mobile_number: order.customer_mobile || ''
+      mobile_number: order.customer_mobile || (order as any).customer_phone || (order as any).phone || ''
     }
   };
 }
@@ -133,6 +133,19 @@ export const handler: Handler = async (event) => {
         label_url: order.label_url,
         sticker_url: order.sticker_url
       })};
+    }
+
+    // If merchant explicitly selected own-fleet, short-circuit and mark submitted
+    if (order.shipping_method === 'own-fleet') {
+      await fetch(`${SB_URL}/rest/v1/orders?id=eq.${encodeURIComponent(orderId)}`, {
+        method: 'PATCH',
+        headers: {
+          apikey: SRK, Authorization: `Bearer ${SRK}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ shipping_status: 'submitted' })
+      });
+      return { statusCode: 200, body: JSON.stringify({ message: 'Own-fleet order marked submitted', orderId }) };
     }
 
     // Load items
