@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, AlertCircle } from 'lucide-react';
 
 type Address = {
   street_address: string;
@@ -16,6 +16,29 @@ interface AddressSmartZAProps {
   className?: string;
 }
 
+// Validation function
+const validateAddress = (address: Address) => {
+  const errors: string[] = [];
+  
+  if (!address.street_address.trim()) {
+    errors.push('Street address is required');
+  }
+  
+  if (!address.local_area.trim()) {
+    errors.push('Suburb is required');
+  }
+  
+  if (!address.city.trim()) {
+    errors.push('City is required');
+  }
+  
+  if (!address.code.trim()) {
+    errors.push('Postal code is required');
+  }
+  
+  return errors;
+};
+
 export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
   value,
   onChange,
@@ -25,6 +48,26 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  // Fallback address data for when API fails
+  const getFallbackAddresses = (query: string) => {
+    const fallbackData = [
+      { suburb: 'Cape Town CBD', city: 'Cape Town', province: 'Western Cape', postal_code: '8001' },
+      { suburb: 'Sea Point', city: 'Cape Town', province: 'Western Cape', postal_code: '8005' },
+      { suburb: 'Sandton', city: 'Johannesburg', province: 'Gauteng', postal_code: '2196' },
+      { suburb: 'Rosebank', city: 'Johannesburg', province: 'Gauteng', postal_code: '2196' },
+      { suburb: 'Umhlanga', city: 'Durban', province: 'KwaZulu-Natal', postal_code: '4320' },
+      { suburb: 'Ballito', city: 'Durban', province: 'KwaZulu-Natal', postal_code: '4420' },
+      { suburb: 'Pretoria', city: 'Pretoria', province: 'Gauteng', postal_code: '0002' },
+      { suburb: 'Centurion', city: 'Pretoria', province: 'Gauteng', postal_code: '0157' }
+    ];
+    
+    return fallbackData.filter(item => 
+      item.suburb.toLowerCase().includes(query.toLowerCase()) ||
+      item.city.toLowerCase().includes(query.toLowerCase())
+    );
+  };
 
   async function searchAddresses(query: string) {
     setSearchQuery(query);
@@ -37,28 +80,43 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
     try {
       setLoading(true);
       const response = await fetch(`/.netlify/functions/za-postal-search?q=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        console.warn('Address API failed, using fallback data');
+        const fallbackAddresses = getFallbackAddresses(query);
+        setSuggestions(fallbackAddresses);
+        setOpen(true);
+        return;
+      }
+      
       const data = await response.json();
       setSuggestions(Array.isArray(data) ? data : []);
       setOpen(true);
     } catch (error) {
       console.error('Address search error:', error);
-      setSuggestions([]);
+      console.warn('Using fallback data due to error');
+      const fallbackAddresses = getFallbackAddresses(query);
+      setSuggestions(fallbackAddresses);
+      setOpen(true);
     } finally {
       setLoading(false);
     }
   }
 
   function selectAddress(address: any) {
-    onChange({
+    const newAddress = {
       ...value,
       local_area: address.suburb,
       city: address.city,
       zone: address.province,
       code: address.postal_code,
       country: 'ZA'
-    });
+    };
+    
+    onChange(newAddress);
     setSearchQuery(`${address.suburb}, ${address.city}`);
     setOpen(false);
+    setErrors([]); // Clear errors when valid selection is made
   }
 
   return (
@@ -94,7 +152,14 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
               value={searchQuery}
               onChange={(e) => searchAddresses(e.target.value)}
               onFocus={() => { if (suggestions.length) setOpen(true); }}
-              onBlur={() => setTimeout(() => setOpen(false), 150)} // allow click
+              onBlur={() => {
+                setTimeout(() => {
+                  setOpen(false);
+                  // Validate when user leaves the field
+                  const validationErrors = validateAddress(value);
+                  setErrors(validationErrors);
+                }, 150);
+              }}
             />
           </div>
           
@@ -129,6 +194,21 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
             </div>
           )}
         </div>
+        
+        {/* Display validation errors */}
+        {errors.length > 0 && (
+          <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle className="h-4 w-4 text-red-500" />
+              <span className="text-sm font-medium text-red-800">Please fix the following:</span>
+            </div>
+            <ul className="text-sm text-red-700 list-disc list-inside">
+              {errors.map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Auto-filled Fields */}
