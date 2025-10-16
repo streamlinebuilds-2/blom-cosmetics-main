@@ -58,9 +58,19 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
         input.label,
       ].filter((v: any) => typeof v === 'string' && v.trim().length > 0);
       if (candidates.length) return candidates.join(' ');
-      try { return JSON.stringify(input); } catch { return ''; }
+      // Don't expose raw JSON strings; return empty when unknown
+      return '';
     }
     return '';
+  };
+
+  // Build a short, human-readable line for a pickup point
+  const formatAddressLine = (p: PickupPoint & { entered_address?: string }): string => {
+    // Prefer explicit entered_address if it looks like a street
+    const entered = toStringSafe((p as any).entered_address);
+    if (entered && /\d/.test(entered)) return entered;
+    const line = [p.street_address, p.local_area, p.city].filter(Boolean).join(', ');
+    return line || [p.city, p.zone].filter(Boolean).join(', ');
   };
   const [points, setPoints] = useState<PickupPoint[]>([]);
   const [loading, setLoading] = useState(false);
@@ -220,7 +230,7 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
     const transformedPoints: PickupPoint[] = pointsArray.map((point: any) => ({
         id: String(point.id || point.code || point.pickup_point_id || `point_${Math.random()}`),
         name: toStringSafe(point.name || point.title || 'Pickup Point'),
-        street_address: toStringSafe(point.street_address || point.address),
+        street_address: toStringSafe(point.street_address || point.address || point.street || ''),
         local_area: toStringSafe(point.local_area || point.suburb),
         city: toStringSafe(point.city),
         zone: toStringSafe(point.zone || point.province),
@@ -412,14 +422,16 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-900">{point.name}</h4>
+                      <h4 className="font-medium text-gray-900">{point.name || formatAddressLine(point as any)}</h4>
                       {value?.id === point.id && (
                         <Check className="h-4 w-4 text-pink-400" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {[point.street_address, point.local_area, point.city].filter(Boolean).join(', ')}
-                    </p>
+                    {formatAddressLine(point as any) && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        {formatAddressLine(point as any)}
+                      </p>
+                    )}
                     <p className="text-xs text-gray-500 mt-1">
                       {[point.zone, point.code].filter(Boolean).join(' ')}
                     </p>
@@ -460,7 +472,7 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
           <div className="text-sm">
             <p className="font-medium">{value.name}</p>
             <p className="text-gray-600">
-              {[value.street_address, value.local_area, value.city].filter(Boolean).join(', ')}, {[value.zone, value.code].filter(Boolean).join(' ')}
+              {formatAddressLine(value as any)}
             </p>
             {value.distance !== undefined && (
               <p className="text-xs text-blue-600 mt-1 font-medium">
