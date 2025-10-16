@@ -79,18 +79,51 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
     
     try {
       setLoading(true);
-      const response = await fetch(`/.netlify/functions/za-postal-search?q=${encodeURIComponent(query)}`);
-      
-      if (!response.ok) {
-        console.warn('Address API failed, using fallback data');
-        const fallbackAddresses = getFallbackAddresses(query);
-        setSuggestions(fallbackAddresses);
-        setOpen(true);
-        return;
+      // 1) Try our suburb/city index first when query looks like area-only
+      const looksLikeArea = /\d/.test(query) === false; // no digits -> likely suburb/city
+      if (looksLikeArea) {
+        const response = await fetch(`/.netlify/functions/za-postal-search?q=${encodeURIComponent(query)}`);
+        if (response.ok) {
+          const data = await response.json();
+          const arr = Array.isArray(data) ? data : [];
+          if (arr.length > 0) {
+            setSuggestions(arr);
+            setOpen(true);
+            return;
+          }
+        }
       }
-      
-      const data = await response.json();
-      setSuggestions(Array.isArray(data) ? data : []);
+
+      // 2) Street-level fallback via Nominatim (OpenStreetMap)
+      const nomi = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=za&limit=8&q=${encodeURIComponent(query)}`,
+        { headers: { 'Accept-Language': 'en' } }
+      );
+      if (nomi.ok) {
+        const results = await nomi.json();
+        const mapped = (Array.isArray(results) ? results : []).map((r: any) => ({
+          // normalized fields to match selectAddress
+          suburb: r.address?.suburb || r.address?.neighbourhood || r.address?.hamlet || r.address?.residential || '',
+          city: r.address?.city || r.address?.town || r.address?.village || r.address?.municipality || '',
+          province: r.address?.state || '',
+          postal_code: r.address?.postcode || '',
+          street_line: r.address?.house_number && r.address?.road ? `${r.address.house_number} ${r.address.road}` : (r.display_name?.split(',')[0] || ''),
+          lat: parseFloat(r.lat),
+          lng: parseFloat(r.lon)
+        }));
+
+        // Prefer entries that have a street_line
+        const good = mapped.filter(m => m.street_line);
+        if (good.length > 0) {
+          setSuggestions(good);
+          setOpen(true);
+          return;
+        }
+      }
+
+      // 3) Final fallback to small local list
+      const fallbackAddresses = getFallbackAddresses(query);
+      setSuggestions(fallbackAddresses);
       setOpen(true);
     } catch (error) {
       console.error('Address search error:', error);
@@ -104,17 +137,21 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
   }
 
   function selectAddress(address: any) {
+    const street = address.street_line || value.street_address;
     const newAddress = {
       ...value,
-      local_area: address.suburb,
-      city: address.city,
-      zone: address.province,
-      code: address.postal_code,
+      street_address: street || value.street_address,
+      local_area: address.suburb || value.local_area,
+      city: address.city || value.city,
+      zone: address.province || value.zone,
+      code: address.postal_code || value.code,
       country: 'ZA'
     };
     
     onChange(newAddress);
-    setSearchQuery(`${address.suburb}, ${address.city}`);
+    // Show chosen street + area in the search box
+    const label = [street, address.suburb, address.city].filter(Boolean).join(', ');
+    setSearchQuery(label || `${address.suburb}, ${address.city}`);
     setOpen(false);
     setErrors([]); // Clear errors when valid selection is made
   }
@@ -185,10 +222,21 @@ export const AddressSmartZA: React.FC<AddressSmartZAProps> = ({
                   onClick={() => selectAddress(suggestion)}
                   className="block w-full text-left px-3 py-2 hover:bg-pink-50 transition-colors border-b border-gray-100 last:border-b-0"
                 >
-                  <div className="font-medium text-gray-900">{suggestion.suburb}</div>
-                  <div className="text-xs text-gray-600">
-                    {suggestion.city}, {suggestion.province} · {suggestion.postal_code}
+                  <div className="font-medium text-gray-900">
+                    {suggestion.street_line ? (
+                      <>
+                        {suggestion.street_line}
+                        <span className="text-gray-500 font-normal"> — {suggestion.suburb || suggestion.city}</span>
+                      </>
+                    ) : (
+                      suggestion.suburb || `${suggestion.city}`
+                    )}
                   </div>
+                  {(suggestion.city || suggestion.postal_code) && (
+                    <div className="text-xs text-gray-600">
+                      {[suggestion.city, suggestion.province, suggestion.postal_code].filter(Boolean).join(' · ')}
+                    </div>
+                  )}
                 </button>
               ))}
             </div>
