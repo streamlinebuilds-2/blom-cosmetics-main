@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { HeroSlider } from '../components/sections/HeroSlider';
@@ -11,8 +11,17 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Star, Award, Users, Sparkles, Shield, Truck, RefreshCw, CheckCircle, Zap, Heart } from 'lucide-react';
 import { Testimonials } from '../components/sections/Testimonials';
+import { updateSEO } from '../lib/seo';
 
 export const HomePage: React.FC = () => {
+  useEffect(() => {
+    updateSEO({
+      title: "BLOM Cosmetics - Premium Nail Care Products & Professional Training South Africa",
+      description: "Discover BLOM Cosmetics - South Africa's leading provider of premium nail care products, professional acrylic systems, and expert beauty training. Shop cuticle oils, nail files, acrylics, and furniture.",
+      keywords: "nail care products, acrylic nails, cuticle oil, nail files, beauty training, nail art, professional cosmetics, South Africa, BLOM, manicure, pedicure, nail salon supplies",
+      url: "https://blom-cosmetics.co.za/"
+    });
+  }, []);
 
   const testimonials = [
     {

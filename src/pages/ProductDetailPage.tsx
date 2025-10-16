@@ -9,6 +9,8 @@ import { PaymentMethods } from '../components/payment/PaymentMethods';
 import { StickyCart } from '../components/cart/StickyCart';
 import { cartStore, showNotification } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
+import { updateSEO, productSEO } from '../lib/seo';
+import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { 
   Star, 
   Heart, 
@@ -1126,12 +1128,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       const firstVariant = foundProduct.variants[0];
       setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
 
-      // Set page title and meta description
-      document.title = `${foundProduct.name} - BLOM Cosmetics`;
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription) {
-        metaDescription.setAttribute('content', foundProduct.shortDescription);
-      }
+      // Update SEO with product data
+      updateSEO(productSEO(
+        foundProduct.name,
+        foundProduct.shortDescription,
+        foundProduct.price,
+        foundProduct.images[0]
+      ));
     }
 
     setLoading(false);
@@ -1282,6 +1285,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   return (
     <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
+      
+      {/* Structured Data */}
+      {product && (
+        <ProductStructuredData 
+          product={{
+            id: product.id,
+            name: product.name,
+            description: product.shortDescription,
+            price: product.price,
+            originalPrice: product.compareAtPrice,
+            image: product.images[0],
+            inStock: product.stock !== 'Out of Stock',
+            rating: product.rating,
+            reviewCount: product.reviewCount,
+            category: product.category,
+            brand: 'BLOM Cosmetics'
+          }}
+        />
+      )}
 
       <main>
         {/* Breadcrumb */}
