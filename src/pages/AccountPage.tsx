@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle, LogOut, AlertCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Package, Heart, Settings, CreditCard, Truck, Star, CreditCard as Edit, Eye, Download, Calendar, ShoppingBag, Award, Bell, Lock, HelpCircle, LogOut, AlertCircle, ExternalLink, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { authService, AuthState } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { wishlistStore } from '../lib/wishlist';
@@ -30,6 +30,8 @@ export const AccountPage: React.FC = () => {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
   const [debugInfo, setDebugInfo] = useState<string>('');
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
 
   useEffect(() => {
     console.log('AccountPage useEffect running...');
@@ -85,6 +87,24 @@ export const AccountPage: React.FC = () => {
     return unsubscribe;
   }, []);
 
+  // Fetch user orders
+  const fetchOrders = async (userId: string) => {
+    setOrdersLoading(true);
+    try {
+      const response = await fetch(`/.netlify/functions/user-orders?user_id=${encodeURIComponent(userId)}`);
+      if (response.ok) {
+        const ordersData = await response.json();
+        setOrders(ordersData);
+      } else {
+        console.error('Failed to fetch orders:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
   // Load profile when user is present
   useEffect(() => {
     (async () => {
@@ -132,6 +152,9 @@ export const AccountPage: React.FC = () => {
           .upsert({ id: user.id, email: user.email ?? null, name: user.user_metadata?.name ?? null, phone: user.user_metadata?.phone ?? null }, { onConflict: 'id' });
       } catch {}
       setProfile({ id: user.id, email: user.email ?? null, name: user.user_metadata?.name ?? null, phone: user.user_metadata?.phone ?? null });
+      
+      // Fetch orders for this user
+      fetchOrders(user.id);
     })();
   }, [authState.user?.id]); // Only depend on user ID, not the entire user object
 
@@ -244,61 +267,54 @@ export const AccountPage: React.FC = () => {
     phone: profile?.phone || '',
     address: '—',
     memberSince: authService.formatMemberSince(authState.user?.created_at || ''),
-    totalOrders: 0,
-    totalSpent: 0,
-    loyaltyPoints: 0
-  }), [profile?.name, profile?.email, profile?.phone, authState.user?.user_metadata?.full_name, authState.user?.email, authState.user?.created_at]);
-
-  const recentOrders = [
-    {
-      id: 'BLOM-2024-001',
-      date: '2024-01-15',
-      status: 'Delivered',
-      total: 450,
-      items: 3,
-      trackingNumber: 'TN123456789'
-    },
-    {
-      id: 'BLOM-2024-002',
-      date: '2024-01-10',
-      status: 'Processing',
-      total: 299,
-      items: 2,
-      trackingNumber: 'TN987654321'
-    },
-    {
-      id: 'BLOM-2024-003',
-      date: '2024-01-05',
-      status: 'Shipped',
-      total: 680,
-      items: 5,
-      trackingNumber: 'TN456789123'
-    }
-  ];
-
-  // Subscribe to wishlist changes (stage >= 4 to avoid extra effects during debugging)
-  useEffect(() => {
-    if (stage < 4) return;
-    const unsubscribe = wishlistStore.subscribe(() => {
-      setWishlistItems(wishlistStore.getItems());
-    });
-    return unsubscribe;
-  }, [stage]);
+    totalOrders: orders.length,
+    totalSpent: orders.reduce((sum, order) => sum + order.total, 0),
+    loyaltyPoints: Math.floor(orders.reduce((sum, order) => sum + order.total, 0) / 10) // 1 point per R10 spent
+  }), [profile?.name, profile?.email, profile?.phone, authState.user?.user_metadata?.full_name, authState.user?.email, authState.user?.created_at, orders]);
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Delivered':
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'delivered':
         return 'text-green-600 bg-green-100';
-      case 'Shipped':
+      case 'shipped':
         return 'text-blue-600 bg-blue-100';
-      case 'Processing':
+      case 'processing':
+      case 'pending':
         return 'text-yellow-600 bg-yellow-100';
+      case 'cancelled':
+        return 'text-red-600 bg-red-100';
       default:
         return 'text-gray-600 bg-gray-100';
     }
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'delivered':
+        return <CheckCircle className="h-4 w-4" />;
+      case 'shipped':
+        return <Truck className="h-4 w-4" />;
+      case 'processing':
+      case 'pending':
+        return <Clock className="h-4 w-4" />;
+      case 'cancelled':
+        return <XCircle className="h-4 w-4" />;
+      default:
+        return <Package className="h-4 w-4" />;
+    }
+  };
+
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
+
+  // Subscribe to wishlist changes
+  useEffect(() => {
+    const unsubscribe = wishlistStore.subscribe(() => {
+      setWishlistItems(wishlistStore.getItems());
+    });
+    return unsubscribe;
+  }, []);
 
   const tabItems = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -314,25 +330,7 @@ export const AccountPage: React.FC = () => {
 
       <main className="section-padding">
         <Container>
-          {/* Debug Banner */}
-          <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-6">
-            <p className="text-sm">
-              <strong>Debug Info:</strong> {debugInfo} | 
-              User: {authState.user ? 'YES' : 'NO'} | 
-              Profile: {profile ? 'YES' : 'NO'} | 
-              Loading: {authState.loading ? 'YES' : 'NO'} | Stage: {stage}
-            </p>
-          </div>
-          
-          {/* Emergency Fallback */}
-          <div className="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded mb-6">
-            <p className="text-sm">
-              <strong>Emergency Debug:</strong> If you can see this, the component is rendering. 
-              Auth State: {JSON.stringify(authState)} | 
-              Profile: {profile ? 'EXISTS' : 'NULL'}
-            </p>
-          </div>
-          {/* Account Header (always on) */}
+          {/* Account Header */}
           <div className="bg-gradient-to-r from-pink-400 to-blue-300 rounded-2xl p-8 text-white mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
               <div className="flex items-center gap-6 mb-6 md:mb-0">
@@ -344,29 +342,26 @@ export const AccountPage: React.FC = () => {
                   <p className="text-pink-100">Member since {userData.memberSince}</p>
                 </div>
               </div>
-              {stage >= 2 && (
-                <div className="grid grid-cols-3 gap-6 text-center">
-                  <div>
-                    <div className="text-2xl font-bold">{userData.totalOrders}</div>
-                    <div className="text-pink-100 text-sm">Orders</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{formatPrice(userData.totalSpent)}</div>
-                    <div className="text-pink-100 text-sm">Total Spent</div>
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{userData.loyaltyPoints}</div>
-                    <div className="text-pink-100 text-sm">Points</div>
-                  </div>
+              <div className="grid grid-cols-3 gap-6 text-center">
+                <div>
+                  <div className="text-2xl font-bold">{userData.totalOrders}</div>
+                  <div className="text-pink-100 text-sm">Orders</div>
                 </div>
-              )}
+                <div>
+                  <div className="text-2xl font-bold">{formatPrice(userData.totalSpent)}</div>
+                  <div className="text-pink-100 text-sm">Total Spent</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold">{userData.loyaltyPoints}</div>
+                  <div className="text-pink-100 text-sm">Points</div>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="grid lg:grid-cols-4 gap-8">
-            {/* Sidebar Navigation (stage >= 2) */}
-            {stage >= 2 && (
-              <div className="lg:col-span-1">
+            {/* Sidebar Navigation */}
+            <div className="lg:col-span-1">
                 <Card>
                   <CardContent className="p-0">
                     <nav className="space-y-1">
@@ -421,10 +416,9 @@ export const AccountPage: React.FC = () => {
                   </CardContent>
                 </Card>
               </div>
-            )}
 
             {/* Main Content */}
-            <div className={stage >= 2 ? "lg:col-span-3" : "lg:col-span-4"}>
+            <div className="lg:col-span-3">
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
@@ -483,93 +477,125 @@ export const AccountPage: React.FC = () => {
                       </div>
                   </div>
 
-                  {stage >= 3 && (
-                    <div className="grid md:grid-cols-3 gap-6">
-                      <Card className="text-center">
-                        <CardContent className="p-6">
-                          <Package className="h-12 w-12 text-blue-400 mx-auto mb-4" />
-                          <div className="text-3xl font-bold text-blue-600 mb-2">{userData.totalOrders}</div>
-                          <div className="text-gray-600">Total Orders</div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="text-center">
-                        <CardContent className="p-6">
-                          <CreditCard className="h-12 w-12 text-green-400 mx-auto mb-4" />
-                          <div className="text-3xl font-bold text-green-600 mb-2">{formatPrice(userData.totalSpent)}</div>
-                          <div className="text-gray-600">Total Spent</div>
-                        </CardContent>
-                      </Card>
-                      
-                      <Card className="text-center">
-                        <CardContent className="p-6">
-                          <Star className="h-12 w-12 text-primary-blue mx-auto mb-4" />
-                          <div className="text-3xl font-bold text-yellow-600 mb-2">{userData.loyaltyPoints}</div>
-                          <div className="text-gray-600">Loyalty Points</div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
+                  <div className="grid md:grid-cols-3 gap-6">
+                    <Card className="text-center">
+                      <CardContent className="p-6">
+                        <Package className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+                        <div className="text-3xl font-bold text-blue-600 mb-2">{userData.totalOrders}</div>
+                        <div className="text-gray-600">Total Orders</div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="text-center">
+                      <CardContent className="p-6">
+                        <CreditCard className="h-12 w-12 text-green-400 mx-auto mb-4" />
+                        <div className="text-3xl font-bold text-green-600 mb-2">{formatPrice(userData.totalSpent)}</div>
+                        <div className="text-gray-600">Total Spent</div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="text-center">
+                      <CardContent className="p-6">
+                        <Star className="h-12 w-12 text-primary-blue mx-auto mb-4" />
+                        <div className="text-3xl font-bold text-yellow-600 mb-2">{userData.loyaltyPoints}</div>
+                        <div className="text-gray-600">Loyalty Points</div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               )}
 
               {/* Orders Tab */}
-              {stage >= 2 && activeTab === 'orders' && (
+              {activeTab === 'orders' && (
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
-                      <h2 className="text-2xl font-bold">Order History</h2>
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-2xl font-bold">Order History</h2>
+                        {ordersLoading && (
+                          <div className="flex items-center gap-2 text-gray-500">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-400"></div>
+                            <span className="text-sm">Loading orders...</span>
+                          </div>
+                        )}
+                      </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-4">
-                        {recentOrders.map((order) => (
-                          <div key={order.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
-                              <div>
-                                <h3 className="font-bold text-lg">Order {order.id}</h3>
-                                <p className="text-gray-600">Placed on {new Date(order.date).toLocaleDateString()}</p>
-                              </div>
-                              <div className="flex items-center gap-4">
-                                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}>
-                                  {order.status}
-                                </span>
-                                <div className="text-right">
-                                  <div className="font-bold">{formatPrice(order.total)}</div>
-                                  <div className="text-sm text-gray-500">{order.items} items</div>
+                      {orders.length === 0 && !ordersLoading ? (
+                        <div className="text-center py-12">
+                          <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">No orders yet</h3>
+                          <p className="text-gray-500 mb-6">Your order history will appear here once you make your first purchase</p>
+                          <Button onClick={() => window.location.href = '/shop'}>
+                            Start Shopping
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {orders.map((order) => (
+                            <div key={order.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-white">
+                              <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
+                                <div>
+                                  <h3 className="font-bold text-lg">Order {order.id}</h3>
+                                  <p className="text-gray-600">Placed on {new Date(order.date).toLocaleDateString()}</p>
+                                  {order.shippingAddress && (
+                                    <p className="text-sm text-gray-500 mt-1">
+                                      <MapPin className="h-3 w-3 inline mr-1" />
+                                      {order.shippingAddress}
+                                    </p>
+                                  )}
+                                  {order.pickupPoint && (
+                                    <p className="text-sm text-gray-500 mt-1">
+                                      <Package className="h-3 w-3 inline mr-1" />
+                                      Pickup: {order.pickupPoint}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                  <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1 ${getStatusColor(order.status)}`}>
+                                    {getStatusIcon(order.status)}
+                                    {order.status}
+                                  </span>
+                                  <div className="text-right">
+                                    <div className="font-bold">{formatPrice(order.total)}</div>
+                                    <div className="text-sm text-gray-500">{order.items} items</div>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            
-                            <div className="flex flex-wrap gap-3">
-                              <Button variant="outline" size="sm">
-                                <Eye className="h-4 w-4 mr-2" />
-                                View Details
-                              </Button>
-                              {order.status === 'Shipped' && (
-                                <Button variant="outline" size="sm">
-                                  <Truck className="h-4 w-4 mr-2" />
-                                  Track Package
+                              
+                              <div className="flex flex-wrap gap-3">
+                                <Button variant="outline" size="sm" onClick={() => window.open(`/.netlify/functions/invoice-pdf?m_payment_id=${order.id}&inline=1`, '_blank')}>
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  View Invoice
                                 </Button>
-                              )}
-                              <Button variant="outline" size="sm">
-                                <Download className="h-4 w-4 mr-2" />
-                                Download Invoice
-                              </Button>
+                                <Button variant="outline" size="sm" onClick={() => window.open(`/.netlify/functions/invoice-pdf?m_payment_id=${order.id}`, '_blank')}>
+                                  <Download className="h-4 w-4 mr-2" />
+                                  Download PDF
+                                </Button>
+                                {order.trackingNumber && (
+                                  <Button variant="outline" size="sm" onClick={() => window.location.href = `/track-order?order=${order.id}`}>
+                                    <Truck className="h-4 w-4 mr-2" />
+                                    Track Package
+                                  </Button>
+                                )}
+                                {order.status.toLowerCase() === 'shipped' && !order.trackingNumber && (
+                                  <Button variant="outline" size="sm" onClick={() => window.location.href = `/track-order?order=${order.id}`}>
+                                    <ExternalLink className="h-4 w-4 mr-2" />
+                                    Track Order
+                                  </Button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
-                      </div>
-                      
-                      <div className="text-center mt-8">
-                        <Button variant="outline">View All Orders</Button>
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </div>
               )}
 
               {/* Wishlist Tab */}
-              {stage >= 4 && activeTab === 'wishlist' && (
+              {activeTab === 'wishlist' && (
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>
@@ -621,7 +647,7 @@ export const AccountPage: React.FC = () => {
               )}
 
               {/* Settings Tab */}
-              {stage >= 2 && activeTab === 'settings' && (
+              {activeTab === 'settings' && (
                 <div className="space-y-6">
                   <Card>
                     <CardHeader>

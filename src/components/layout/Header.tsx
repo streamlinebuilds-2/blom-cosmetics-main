@@ -215,15 +215,19 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
-                  // If no session cookie present, go straight to login to avoid blank state
+                  // Check authentication state properly
                   try {
-                    const hasAuth = document.cookie.includes('sb-');
-                    if (!hasAuth) {
+                    // Check for Supabase session in localStorage
+                    const supabaseSession = localStorage.getItem('sb-' + import.meta.env.VITE_SUPABASE_URL?.split('//')[1]?.split('.')[0] + '-auth-token');
+                    const hasSession = supabaseSession || document.cookie.includes('sb-');
+                    
+                    if (!hasSession) {
                       window.location.assign('/login?redirect=/account');
                     } else {
                       window.location.assign('/account');
                     }
                   } catch {
+                    // Fallback: let the account page handle auth check
                     window.location.assign('/account');
                   }
                 }}
