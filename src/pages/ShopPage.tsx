@@ -306,35 +306,22 @@ export const ShopPage: React.FC = () => {
       id: '15',
       name: 'Crystal Kolinsky Sculpting Brush',
       slug: 'crystal-kolinsky-sculpting-brush',
-      price: -1,
+      price: 450,
       compareAtPrice: undefined,
       short_description: 'Premium Kolinsky brush with floating glitter handle.',
       shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
       description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
       images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-colorful.webp'],
-      category: 'coming-soon',
+      category: 'tools-essentials',
       rating: 4.9,
       reviews: 23,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: []
-    },
-    {
-      id: '16',
-      name: 'Diamond Precision Nail Art Brush',
-      slug: 'diamond-precision-nail-art-brush',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'Premium Kolinsky brush with floating glitter handle.',
-      shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
-      description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
-      images: ['/acrylic-sculpture-brush-white-2.webp', '/acrylic-sculpture-brush-colorful-2.webp'],
-      category: 'coming-soon',
-      rating: 4.9,
-      reviews: 23,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: []
+      badges: ['Professional'],
+      inStock: true,
+      variants: [
+        { name: 'Size 8', price: 480, inStock: false },
+        { name: 'Size 10', price: 450, inStock: true },
+        { name: 'Size 12', price: 480, inStock: false }
+      ]
     },
     // Furniture Products
     {
