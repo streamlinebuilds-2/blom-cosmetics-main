@@ -171,6 +171,30 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
       pointsArray = [];
     }
     
+    // If no results but we have a search term and not lat/lng, try geocoding the search
+    if (pointsArray.length === 0 && search && (!lat || !lng)) {
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=za&q=${encodeURIComponent(
+            search
+          )}`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        if (geoRes.ok) {
+          const geo = await geoRes.json();
+          if (Array.isArray(geo) && geo[0]?.lat && geo[0]?.lon) {
+            const geoLat = parseFloat(geo[0].lat);
+            const geoLng = parseFloat(geo[0].lon);
+            // Re-fetch using derived lat/lng
+            await fetchPickupPoints(undefined, geoLat, geoLng);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Geocoding fallback failed:', e);
+      }
+    }
+
     // Transform ShipLogic data to our format
     const transformedPoints: PickupPoint[] = pointsArray.map((point: any) => ({
         id: String(point.id || point.code || point.pickup_point_id || `point_${Math.random()}`),
@@ -225,9 +249,9 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
     onChange(point);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
+  const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    fetchPickupPoints(searchQuery, userLocation?.lat, userLocation?.lng);
+    await fetchPickupPoints(searchQuery, userLocation?.lat, userLocation?.lng);
   };
 
   return (
