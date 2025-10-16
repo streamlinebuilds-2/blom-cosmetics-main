@@ -173,19 +173,19 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
     
     // Transform ShipLogic data to our format
     const transformedPoints: PickupPoint[] = pointsArray.map((point: any) => ({
-        id: point.id || point.code || point.pickup_point_id || `point_${Math.random()}`,
-        name: point.name || point.title || 'Pickup Point',
-        street_address: point.street_address || point.address || '',
-        local_area: point.local_area || point.suburb || '',
-        city: point.city || '',
-        zone: point.zone || point.province || '',
-        code: point.code || point.postal_code || '',
-        country: point.country || 'ZA',
-        lat: parseFloat(point.lat || point.latitude || 0),
-        lng: parseFloat(point.lng || point.longitude || 0),
-        provider: point.provider || 'tcg-locker',
-        hours: point.hours || point.opening_hours || 'Mon-Fri 8AM-6PM',
-        phone: point.phone || point.contact_number || ''
+        id: String(point.id || point.code || point.pickup_point_id || `point_${Math.random()}`),
+        name: String(point.name || point.title || 'Pickup Point'),
+        street_address: String(point.street_address || point.address || ''),
+        local_area: String(point.local_area || point.suburb || ''),
+        city: String(point.city || ''),
+        zone: String(point.zone || point.province || ''),
+        code: String(point.code || point.postal_code || ''),
+        country: String(point.country || 'ZA'),
+        lat: parseFloat(point.lat ?? point.latitude ?? 0),
+        lng: parseFloat(point.lng ?? point.longitude ?? 0),
+        provider: String(point.provider || 'tcg-locker'),
+        hours: point.hours ? String(point.hours) : (point.opening_hours ? String(point.opening_hours) : 'Mon-Fri 8AM-6PM'),
+        phone: point.phone ? String(point.phone) : (point.contact_number ? String(point.contact_number) : '')
       }));
 
       // Calculate distances if user location is available
