@@ -11,7 +11,7 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Star, Award, Users, Sparkles, Shield, Truck, RefreshCw, CheckCircle, Zap, Heart } from 'lucide-react';
 import { Testimonials } from '../components/sections/Testimonials';
-import { updateSEO } from '../lib/seo';
+import { updateSEO, trackPageView } from '../lib/seo';
 
 export const HomePage: React.FC = () => {
   useEffect(() => {
@@ -21,6 +21,12 @@ export const HomePage: React.FC = () => {
       keywords: "nail care products, acrylic nails, cuticle oil, nail files, beauty training, nail art, professional cosmetics, South Africa, BLOM, manicure, pedicure, nail salon supplies",
       url: "https://blom-cosmetics.co.za/"
     });
+    
+    // Track page view
+    trackPageView(
+      "BLOM Cosmetics - Premium Nail Care Products & Professional Training South Africa",
+      "https://blom-cosmetics.co.za/"
+    );
   }, []);
 
   const testimonials = [

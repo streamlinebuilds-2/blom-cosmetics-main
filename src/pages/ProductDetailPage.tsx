@@ -9,7 +9,7 @@ import { PaymentMethods } from '../components/payment/PaymentMethods';
 import { StickyCart } from '../components/cart/StickyCart';
 import { cartStore, showNotification } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
-import { updateSEO, productSEO } from '../lib/seo';
+import { updateSEO, productSEO, trackPageView } from '../lib/seo';
 import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { 
   Star, 
@@ -1129,12 +1129,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
 
       // Update SEO with product data
-      updateSEO(productSEO(
+      const seoData = productSEO(
         foundProduct.name,
         foundProduct.shortDescription,
         foundProduct.price,
         foundProduct.images[0]
-      ));
+      );
+      updateSEO(seoData);
+      
+      // Track product page view
+      trackPageView(seoData.title || '', seoData.url || '');
     }
 
     setLoading(false);

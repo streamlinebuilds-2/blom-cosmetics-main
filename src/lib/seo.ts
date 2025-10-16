@@ -118,7 +118,7 @@ export function trackEvent(action: string, category: string, label?: string, val
 // Track page views
 export function trackPageView(pageTitle: string, pageLocation: string) {
   if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('config', 'G-XXXXXXXXXX', {
+    (window as any).gtag('config', 'G-H9GCB42G9C', {
       page_title: pageTitle,
       page_location: pageLocation
     });
