@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, ShoppingCart, ShoppingBag } from 'lucide-react';
 import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
+import { OptimizedImage } from './seo/OptimizedImage';
 
 interface ProductCardProps {
   id: string;
@@ -159,31 +160,33 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {/* Image Container with Shimmer Effect */}
         <div className="relative aspect-square overflow-hidden md:w-24 md:h-24 md:flex-shrink-0">
           {/* Default white background image */}
-          <img
+          <OptimizedImage
             src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
             alt={name}
+            productName={name}
+            productPrice={price}
+            productCategory="Nail Care Products"
             className={`w-full h-full object-cover transition-all duration-300 ease-out ${
               isMobile ? (isInView ? 'opacity-0 scale-[1.02]' : 'opacity-100') : ''
             } group-hover:opacity-0 group-hover:scale-[1.02]`}
+            width={400}
+            height={400}
             loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-            }}
           />
           {/* Hover colorful image */}
           {images[1] && (
-            <img
+            <OptimizedImage
               src={images[1]}
-              alt={name}
+              alt={`${name} - Colorful view`}
+              productName={name}
+              productPrice={price}
+              productCategory="Nail Care Products"
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out ${
                 isMobile ? (isInView ? 'opacity-100 scale-[1.02]' : 'opacity-0') : 'opacity-0'
               } group-hover:opacity-100 group-hover:scale-[1.02]`}
+              width={400}
+              height={400}
               loading="lazy"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-              }}
             />
           )}
           

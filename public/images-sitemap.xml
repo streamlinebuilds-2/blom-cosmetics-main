@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Product Images -->
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/cuticle-oil</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/cuticle-oil-white.webp</image:loc>
+      <image:title>Cuticle Oil - Premium Nail Care Product</image:title>
+      <image:caption>Professional cuticle oil with Vitamin E, Jojoba & Soybean Oil for nourished nails</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/cuticle-oil-colorful.webp</image:loc>
+      <image:title>Cuticle Oil - Colorful View</image:title>
+      <image:caption>Premium cuticle oil bottle with colorful design for nail care professionals</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/top-coat</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/top-coat-white.webp</image:loc>
+      <image:title>Top Coat - Professional Nail Polish</image:title>
+      <image:caption>Professional top coat for long-lasting nail polish finish</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/top-coat-colorful.webp</image:loc>
+      <image:title>Top Coat - Colorful View</image:title>
+      <image:caption>Professional top coat with colorful packaging for nail artists</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/acetone-remover</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/acetone-remover-white.webp</image:loc>
+      <image:title>Acetone Remover - Professional Nail Polish Remover</image:title>
+      <image:caption>Professional acetone nail polish remover for salons and nail artists</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/acetone-remover-colorful.webp</image:loc>
+      <image:title>Acetone Remover - Colorful View</image:title>
+      <image:caption>Professional acetone remover with vibrant packaging design</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/core-acrylics</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/core-acrylics-white.webp</image:loc>
+      <image:title>Core Acrylics - Professional Acrylic Powder</image:title>
+      <image:caption>Professional acrylic powder system for nail extensions and overlays</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/core-acrylics-colorful.webp</image:loc>
+      <image:title>Core Acrylics - Colorful View</image:title>
+      <image:caption>Professional acrylic powder with colorful packaging for nail professionals</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/crystal-kolinsky-sculpting-brush</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/acrylic-sculpture-brush-white.webp</image:loc>
+      <image:title>Crystal Kolinsky Sculpting Brush - Professional Tool</image:title>
+      <image:caption>Premium Kolinsky brush with floating glitter handle for professional acrylic work</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/acrylic-sculpture-brush-colorful.webp</image:loc>
+      <image:title>Crystal Kolinsky Sculpting Brush - Colorful View</image:title>
+      <image:caption>Professional Kolinsky sculpting brush with beautiful colorful handle design</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Furniture Images -->
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/rose-petal-manicure-table</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/rose-petal-manicure-table-colorful.webp</image:loc>
+      <image:title>Rose Petal Manicure Table - Professional Salon Furniture</image:title>
+      <image:caption>Beautiful manicure table perfect for salons and home studios with elegant design</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/rose-petal-manicure-table-white.webp</image:loc>
+      <image:title>Rose Petal Manicure Table - White View</image:title>
+      <image:caption>Professional manicure table with clean white finish for modern salons</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/princess-dresser</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/princess-dresser-white.webp</image:loc>
+      <image:title>Princess Dresser - Professional Salon Storage</image:title>
+      <image:caption>Elegant princess dresser with LED lights and mirror for professional nail salons</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/products/floral-manicure-table</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/floral-manicure-table-white.webp</image:loc>
+      <image:title>Floral Manicure Table - Professional Salon Furniture</image:title>
+      <image:caption>Beautiful floral manicure table with glass top included for nail professionals</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Hero Images -->
+  <url>
+    <loc>https://blom-cosmetics.co.za/</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/hero-desktop-1.webp</image:loc>
+      <image:title>BLOM Cosmetics - Premium Nail Care Products</image:title>
+      <image:caption>Professional nail care products and training for beauty professionals in South Africa</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/hero-desktop-2.webp</image:loc>
+      <image:title>Professional Nail Training Courses</image:title>
+      <image:caption>Expert nail training courses and professional beauty education</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/hero-desktop-3.webp</image:loc>
+      <image:title>Professional Salon Furniture</image:title>
+      <image:caption>Premium manicure tables and salon furniture for professional nail artists</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Category Images -->
+  <url>
+    <loc>https://blom-cosmetics.co.za/shop?category=prep-finishing</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/cuticle-category.webp</image:loc>
+      <image:title>Prep & Finishing Products</image:title>
+      <image:caption>Professional prep and finishing products for nail care professionals</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/shop?category=tools-essentials</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/nail-essentials-category.webp</image:loc>
+      <image:title>Tools & Essentials</image:title>
+      <image:caption>Essential nail tools and professional equipment for nail artists</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/shop?category=acrylic-systems</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/acrylic-category.webp</image:loc>
+      <image:title>Acrylic Systems</image:title>
+      <image:caption>Professional acrylic nail systems and extension products</image:caption>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://blom-cosmetics.co.za/shop?category=furniture</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/education-category.webp</image:loc>
+      <image:title>Professional Salon Furniture</image:title>
+      <image:caption>Premium manicure tables and salon furniture for professional nail artists</image:caption>
+    </image:image>
+  </url>
+  
+  <!-- Course Images -->
+  <url>
+    <loc>https://blom-cosmetics.co.za/courses</loc>
+    <image:image>
+      <image:loc>https://blom-cosmetics.co.za/professional-acrylic-training-hero.webp</image:loc>
+      <image:title>Professional Acrylic Nail Training</image:title>
+      <image:caption>Expert-led acrylic nail training courses for beauty professionals</image:caption>
+    </image:image>
+  </url>
+
+</urlset>

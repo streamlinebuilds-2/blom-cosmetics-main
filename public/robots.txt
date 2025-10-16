@@ -1,8 +1,9 @@
 User-agent: *
 Allow: /
 
-# Sitemap
+# Sitemaps
 Sitemap: https://blom-cosmetics.co.za/sitemap.xml
+Sitemap: https://blom-cosmetics.co.za/images-sitemap.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1
