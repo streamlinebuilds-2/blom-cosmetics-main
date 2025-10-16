@@ -19,7 +19,7 @@ export const handler: Handler = async (event) => {
     }
 
     const orderRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,total_price,product_id)&merchant_payment_id=eq.${encodeURIComponent(id)}&limit=1`,
+      `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,subtotal,product_id)&merchant_payment_id=eq.${encodeURIComponent(id)}&limit=1`,
       { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } }
     );
     if (!orderRes.ok) return { statusCode: orderRes.status, body: await orderRes.text() };
@@ -31,10 +31,10 @@ export const handler: Handler = async (event) => {
       name: it.name || `Product ${it.product_id}` || 'Item',
       qty: Number(it.quantity ?? 1),
       unit: Number(it.unit_price ?? 0),
-      total: Number(it.total_price ?? (Number(it.quantity ?? 1) * Number(it.unit_price ?? 0)))
+      total: Number(it.subtotal ?? (Number(it.quantity ?? 1) * Number(it.unit_price ?? 0)))
     }));
     const subtotal = items.reduce((s: number, i: any) => s + i.total, 0);
-    const shipping = Number(order.shipping_total ?? 0);
+    const shipping = Number(order.shipping ?? 0);
     const grand = Number(order.total_amount ?? subtotal + shipping);
 
     const { Document, Page, Text, View, StyleSheet, Font, renderToBuffer /*, Image*/ } = await import('@react-pdf/renderer');
@@ -332,15 +332,7 @@ export const handler: Handler = async (event) => {
 
           // Footer
           React.createElement(View, { style: styles.footer },
-            React.createElement(Text, { style: styles.footerText }, 'Thank you for your order! This receipt was generated automatically.'),
-            React.createElement(View, { style: styles.actionButtons },
-              React.createElement(View, { style: [styles.button, styles.primaryButton] },
-                React.createElement(Text, { style: { color: 'white', fontSize: 9, fontWeight: 'bold' } }, 'Print / Save as PDF')
-              ),
-              React.createElement(View, { style: [styles.button, styles.secondaryButton] },
-                React.createElement(Text, { style: { color: '#3b82f6', fontSize: 9, fontWeight: 'bold' } }, 'Download PDF')
-              )
-            )
+            React.createElement(Text, { style: styles.footerText }, 'Thank you for your order! This receipt was generated automatically.')
           )
         )
       )

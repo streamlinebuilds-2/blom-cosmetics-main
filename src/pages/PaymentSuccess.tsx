@@ -3,6 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { cartStore } from '../lib/cart';
+import { CheckCircle, FileText, Truck, ShoppingBag } from 'lucide-react';
 
 export default function PaymentSuccess() {
   const [orderInfo, setOrderInfo] = useState<any>(null);
@@ -20,61 +21,97 @@ export default function PaymentSuccess() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       <Header showMobileMenu={true} />
-      <main className="section-padding">
+      <main className="py-16">
         <Container>
-          {/* Confetti / Glow */}
-          <div className="pointer-events-none fixed inset-0 opacity-60 mix-blend-screen" aria-hidden>
-            <div className="absolute -top-10 left-1/4 w-40 h-40 rounded-full bg-pink-200 blur-3xl" />
-            <div className="absolute top-10 right-1/4 w-40 h-40 rounded-full bg-blue-200 blur-3xl" />
-          </div>
-
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-white/80 backdrop-blur rounded-2xl shadow-lg p-6 sm:p-8">
-              <div className="text-center">
-                <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-emerald-500 text-white shadow-lg">
-                  <span className="text-2xl">✅</span>
+          <div className="max-w-2xl mx-auto">
+            {/* Professional Success Card */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-6 border-b border-gray-200">
+                <div className="flex items-center justify-center mb-4">
+                  <div className="flex items-center justify-center w-16 h-16 bg-green-500 rounded-full">
+                    <CheckCircle className="w-8 h-8 text-white" />
+                  </div>
                 </div>
-                <h1 className="font-serif text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-2">Payment Successful</h1>
-                <p className="text-gray-600 mb-6">Thank you for your order! A confirmation email has been sent to you.</p>
+                <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Payment Successful</h1>
+                <p className="text-gray-600 text-center">Your order has been processed and confirmed</p>
+              </div>
 
-                {/* Order summary */}
+              {/* Content */}
+              <div className="px-8 py-6">
+                {/* Order Summary */}
                 {orderInfo && (
-                  <div className="text-left bg-gray-50 border rounded-xl p-4 sm:p-5 mb-6">
-                    <h2 className="font-semibold text-gray-900 mb-3">Order Summary</h2>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                      <span>Order ID</span><span className="text-right font-mono">#{orderInfo.orderId}</span>
-                      <span>Subtotal</span><span className="text-right">R{(orderInfo.total - orderInfo.shipping).toFixed(2)}</span>
-                      <span>Shipping</span><span className="text-right">{orderInfo.shipping === 0 ? 'FREE' : `R${orderInfo.shipping.toFixed(2)}`}</span>
-                      <span className="font-semibold">Total</span><span className="text-right font-semibold">R{orderInfo.total.toFixed(2)}</span>
-                      <span>Status</span><span className="text-right text-green-600 font-medium">✅ Paid</span>
+                  <div className="bg-gray-50 rounded-lg p-6 mb-8">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span className="text-sm font-medium text-gray-600">Order ID</span>
+                        <span className="text-sm font-mono text-gray-900">#{orderInfo.orderId}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span className="text-sm font-medium text-gray-600">Subtotal</span>
+                        <span className="text-sm text-gray-900">R{(orderInfo.total - orderInfo.shipping).toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                        <span className="text-sm font-medium text-gray-600">Shipping</span>
+                        <span className="text-sm text-gray-900">{orderInfo.shipping === 0 ? 'FREE' : `R${orderInfo.shipping.toFixed(2)}`}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-base font-semibold text-gray-900">Total</span>
+                        <span className="text-base font-semibold text-gray-900">R{orderInfo.total.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between items-center pt-2">
+                        <span className="text-sm font-medium text-gray-600">Status</span>
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Paid
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                {/* Action Buttons */}
+                <div className="space-y-4">
                   {orderInfo && (
-                    <>
-                      <button
-                        onClick={() => window.print()}
-                        className="inline-flex justify-center rounded-full bg-blue-500 px-6 py-3 text-white font-semibold shadow hover:bg-blue-600 transition-colors"
-                      >
-                        Print / Save as PDF
-                      </button>
-                      <a
-                        href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderInfo.orderId)}`}
-                        className="inline-flex justify-center rounded-full border border-blue-500 px-6 py-3 text-blue-500 font-semibold hover:bg-blue-50 transition-colors"
-                      >
-                        Download PDF
-                      </a>
-                    </>
+                    <a
+                      href={`/invoice?m_payment_id=${encodeURIComponent(orderInfo.orderId)}`}
+                      className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <FileText className="w-5 h-5 mr-2" />
+                      View Invoice
+                    </a>
                   )}
-                  <a href="/track-order" className="inline-flex justify-center rounded-full bg-pink-500 px-6 py-3 text-white font-semibold shadow hover:bg-pink-600 transition-colors">Track My Order</a>
-                  <a href="/shop" className="inline-flex justify-center rounded-full border border-gray-300 px-6 py-3 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Continue Shopping</a>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <a 
+                      href="/track-order" 
+                      className="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <Truck className="w-5 h-5 mr-2" />
+                      Track Order
+                    </a>
+                    <a 
+                      href="/shop" 
+                      className="flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      <ShoppingBag className="w-5 h-5 mr-2" />
+                      Continue Shopping
+                    </a>
+                  </div>
                 </div>
 
-                <p className="mt-6 text-xs text-gray-500">If you don’t receive a confirmation email within 5 minutes, contact <a className="underline" href="mailto:support@blom-cosmetics.co.za">support@blom-cosmetics.co.za</a>.</p>
+                {/* Support Info */}
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <p className="text-sm text-gray-500 text-center">
+                    Need help? Contact us at{' '}
+                    <a href="mailto:shopblomcosmetics@gmail.com" className="text-blue-600 hover:text-blue-700 font-medium">
+                      shopblomcosmetics@gmail.com
+                    </a>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
