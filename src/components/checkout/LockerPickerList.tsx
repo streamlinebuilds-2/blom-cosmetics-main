@@ -41,6 +41,27 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
   onChange,
   className = ''
 }) => {
+  // Safely coerce ShipLogic fields to readable strings
+  const toStringSafe = (input: any): string => {
+    if (input == null) return '';
+    if (typeof input === 'string') return input;
+    if (typeof input === 'number') return String(input);
+    if (typeof input === 'object') {
+      const candidates = [
+        input.line1,
+        input.address1,
+        input.address,
+        input.street,
+        input.road,
+        input.name,
+        input.description,
+        input.label,
+      ].filter((v: any) => typeof v === 'string' && v.trim().length > 0);
+      if (candidates.length) return candidates.join(' ');
+      try { return JSON.stringify(input); } catch { return ''; }
+    }
+    return '';
+  };
   const [points, setPoints] = useState<PickupPoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -198,18 +219,18 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
     // Transform ShipLogic data to our format
     const transformedPoints: PickupPoint[] = pointsArray.map((point: any) => ({
         id: String(point.id || point.code || point.pickup_point_id || `point_${Math.random()}`),
-        name: String(point.name || point.title || 'Pickup Point'),
-        street_address: String(point.street_address || point.address || ''),
-        local_area: String(point.local_area || point.suburb || ''),
-        city: String(point.city || ''),
-        zone: String(point.zone || point.province || ''),
-        code: String(point.code || point.postal_code || ''),
-        country: String(point.country || 'ZA'),
+        name: toStringSafe(point.name || point.title || 'Pickup Point'),
+        street_address: toStringSafe(point.street_address || point.address),
+        local_area: toStringSafe(point.local_area || point.suburb),
+        city: toStringSafe(point.city),
+        zone: toStringSafe(point.zone || point.province),
+        code: toStringSafe(point.code || point.postal_code),
+        country: toStringSafe(point.country || 'ZA'),
         lat: parseFloat(point.lat ?? point.latitude ?? 0),
         lng: parseFloat(point.lng ?? point.longitude ?? 0),
-        provider: String(point.provider || 'tcg-locker'),
-        hours: point.hours ? String(point.hours) : (point.opening_hours ? String(point.opening_hours) : 'Mon-Fri 8AM-6PM'),
-        phone: point.phone ? String(point.phone) : (point.contact_number ? String(point.contact_number) : '')
+        provider: toStringSafe(point.provider || 'tcg-locker'),
+        hours: toStringSafe(point.hours || point.opening_hours || ''),
+        phone: toStringSafe(point.phone || point.contact_number || '')
       }));
 
       // Calculate distances if user location is available
@@ -397,10 +418,10 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
                       )}
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
-                      {point.street_address}, {point.local_area}, {point.city}
+                      {[point.street_address, point.local_area, point.city].filter(Boolean).join(', ')}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {point.zone} {point.code}
+                      {[point.zone, point.code].filter(Boolean).join(' ')}
                     </p>
                     {point.distance !== undefined && (
                       <p className="text-xs text-blue-600 mt-1 font-medium">
@@ -439,7 +460,7 @@ export const LockerPickerList: React.FC<LockerPickerListProps> = ({
           <div className="text-sm">
             <p className="font-medium">{value.name}</p>
             <p className="text-gray-600">
-              {value.street_address}, {value.local_area}, {value.city}, {value.zone} {value.code}
+              {[value.street_address, value.local_area, value.city].filter(Boolean).join(', ')}, {[value.zone, value.code].filter(Boolean).join(' ')}
             </p>
             {value.distance !== undefined && (
               <p className="text-xs text-blue-600 mt-1 font-medium">
