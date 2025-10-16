@@ -77,7 +77,7 @@ export default function PaymentSuccess() {
                 <div className="space-y-4">
                   {orderInfo && (
                     <a
-                      href={`/invoice?m_payment_id=${encodeURIComponent(orderInfo.orderId)}`}
+                      href={`/invoice?m_payment_id=${encodeURIComponent(orderInfo.orderId)}&fallback=1`}
                       className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       <FileText className="w-5 h-5 mr-2" />

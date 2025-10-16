@@ -13,6 +13,7 @@ export default function InvoiceViewer() {
     // Get order ID from URL params
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('m_payment_id');
+    const fallback = urlParams.get('fallback') === '1';
     if (id) {
       setOrderId(id);
       setLoading(false);
