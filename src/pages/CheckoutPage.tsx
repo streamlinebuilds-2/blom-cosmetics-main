@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
 import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, User, CreditCard as Edit, Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
-import { AddressSmartZA } from '../components/checkout/AddressSmartZA';
+import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { LockerPickerList } from '../components/checkout/LockerPickerList';
 import { validateMobileNumber, validateAddress, validatePickupPoint, formatMobileNumber } from '../lib/validation';
 
@@ -41,6 +41,9 @@ export const CheckoutPage: React.FC = () => {
     lat: undefined as number | undefined,
     lng: undefined as number | undefined
   });
+
+  // Address input for autocomplete
+  const [addressInput, setAddressInput] = useState('');
 
   // Pickup point data for locker/kiosk delivery
   const [selectedPickupPoint, setSelectedPickupPoint] = useState<{
@@ -90,6 +93,22 @@ export const CheckoutPage: React.FC = () => {
 
   const handleRemoveItem = (itemId: string) => {
     cartStore.removeItem(itemId);
+  };
+
+  // Handle address selection from autocomplete
+  const handleAddressSelect = (suggestion: any) => {
+    const { properties, geometry } = suggestion;
+    
+    setDeliveryAddress({
+      street_address: properties.address_line1 || '',
+      local_area: properties.city || '',
+      city: properties.city || '',
+      zone: properties.state || '',
+      code: properties.postcode || '',
+      country: 'ZA',
+      lat: geometry.coordinates[1], // lat
+      lng: geometry.coordinates[0]  // lon
+    });
   };
 
   const validateShippingForm = () => {
@@ -491,10 +510,71 @@ export const CheckoutPage: React.FC = () => {
 
                       {/* Smart Address (only for door-to-door) */}
                       {shippingMethod === 'door-to-door' && (
-                        <AddressSmartZA
-                          value={deliveryAddress}
-                          onChange={setDeliveryAddress}
-                        />
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Delivery Address <span className="text-red-500">*</span>
+                            </label>
+                            <AddressAutocomplete
+                              value={addressInput}
+                              onChange={setAddressInput}
+                              onAddressSelect={handleAddressSelect}
+                              placeholder="Start typing your address..."
+                              className="mb-4"
+                            />
+                          </div>
+
+                          {/* Auto-filled Fields */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                              <input
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                value={deliveryAddress.street_address}
+                                onChange={(e) => setDeliveryAddress({...deliveryAddress, street_address: e.target.value})}
+                                placeholder="Auto-filled"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                              <input
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                value={deliveryAddress.city}
+                                onChange={(e) => setDeliveryAddress({...deliveryAddress, city: e.target.value})}
+                                placeholder="Auto-filled"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                              <input
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                value={deliveryAddress.zone}
+                                onChange={(e) => setDeliveryAddress({...deliveryAddress, zone: e.target.value})}
+                                placeholder="Auto-filled"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                              <input
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                value={deliveryAddress.code}
+                                onChange={(e) => setDeliveryAddress({...deliveryAddress, code: e.target.value})}
+                                placeholder="Auto-filled"
+                                maxLength={4}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                            <div className="flex items-center gap-2 mb-1">
+                              <MapPin className="h-4 w-4 text-blue-500" />
+                              <span className="text-sm font-medium text-blue-800">Address Tip</span>
+                            </div>
+                            <p className="text-xs text-blue-700">
+                              Start typing your address above to get suggestions. This will auto-fill all the fields below for accurate delivery.
+                            </p>
+                          </div>
+                        </div>
                       )}
 
                       {/* Validation Errors */}

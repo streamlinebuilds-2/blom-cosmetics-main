@@ -410,9 +410,8 @@ export const ContactPage: React.FC = () => {
                   href="https://wa.me/27795483317" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
                   CHAT NOW
                 </a>
               </Card>
@@ -427,9 +426,8 @@ export const ContactPage: React.FC = () => {
                 <ClickableContact 
                   type="email" 
                   value="shopblomcosmetics@gmail.com"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  <Mail className="h-4 w-4" />
                   SEND EMAIL
                 </ClickableContact>
               </Card>
@@ -444,9 +442,8 @@ export const ContactPage: React.FC = () => {
                 <ClickableContact 
                   type="phone" 
                   value="+27 79 548 3317"
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
-                  <Phone className="h-4 w-4" />
                   CALL NOW
                 </ClickableContact>
               </Card>

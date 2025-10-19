@@ -46,6 +46,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [allImages, setAllImages] = useState<string[]>([]);
 
   // Product database - matches ShopPage products
   const productDatabase = {
@@ -101,7 +102,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         { name: 'Dragon Fruit Lotus', image: '/cuticle-oil-dragon-fruit-lotus.webp' },
         { name: 'Watermelon', image: '/cuticle-oil-watermelon.webp' }
       ],
-      rating: 4.9,
+      rating: 0,
       reviewCount: 156,
       reviews: [
         {
@@ -260,7 +261,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         claims: ['High Gloss', 'Chip-Resistant', 'Professional Grade']
       },
       variants: [],
-      rating: 4.9,
+      rating: 0,
       reviewCount: 201,
       reviews: []
     },
@@ -509,21 +510,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         claims: ['Professional Grade', '13 Colors', 'Self-Leveling']
       },
       variants: [
-        { name: 'Baby Blue', image: '/acrylic-powder-baby-blue.webp' },
-        { name: 'Lilac Mist', image: '/core-acrylics-colorful.webp' },
-        { name: 'Blush Pink', image: '/core-acrylics-colorful.webp' },
-        { name: 'Ballet Pink', image: '/core-acrylics-colorful.webp' },
-        { name: 'Fuchsia Pink', image: '/core-acrylics-colorful.webp' },
-        { name: 'Cloud Grey', image: '/core-acrylics-colorful.webp' },
-        { name: 'Mint Mist', image: '/core-acrylics-colorful.webp' },
-        { name: 'Rose Pink', image: '/core-acrylics-colorful.webp' },
-        { name: 'Fresh Mint', image: '/core-acrylics-colorful.webp' },
-        { name: 'Soft Nude', image: '/core-acrylics-colorful.webp' },
-        { name: 'Petal Pink', image: '/core-acrylics-colorful.webp' },
-        { name: 'Sky Blue', image: '/core-acrylics-colorful.webp' },
-        { name: 'Lemon Glow', image: '/core-acrylics-colorful.webp' }
+        { name: 'Baby Blue', image: '/acrylic-powder-baby-blue.jpg' },
+        { name: 'Lilac Mist', image: '/acrylic-powder-baby-ligt-purple.jpg' },
+        { name: 'Blush Pink', image: '/acrylic-powder-baby-pink.jpg' },
+        { name: 'Ballet Pink', image: '/acrylic-powder-ballet-pink.jpg' },
+        { name: 'Fuchsia Pink', image: '/acrylic-powder-hot-pink.jpg' },
+        { name: 'Cloud Grey', image: '/acrylic-powder-light-grey.jpg' },
+        { name: 'Mint Mist', image: '/acrylic-powder-light-mint.jpg' },
+        { name: 'Rose Pink', image: '/acrylic-powder-light-pink.jpg' },
+        { name: 'Fresh Mint', image: '/acrylic-powder-mint.jpg' },
+        { name: 'Soft Nude', image: '/acrylic-powder-nude.jpg' },
+        { name: 'Petal Pink', image: '/acrylic-powder-pink.jpg' },
+        { name: 'Sky Blue', image: '/acrylic-powder-sky-blue.jpg' },
+        { name: 'Lemon Glow', image: '/acrylic-powder-yellow.jpg' }
       ],
-      rating: 4.9,
+      rating: 0,
       reviewCount: 156,
       reviews: []
     },
@@ -622,13 +623,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         { name: 'Size 10', price: 450, inStock: true },
         { name: 'Size 12', price: 480, inStock: false }
       ],
-      rating: 4.9,
+      rating: 0,
       reviewCount: 23,
       reviews: []
     },
     'rose-petal-manicure-table': {
       id: '13',
-      name: 'Rose Petal Manicure Tabel',
+      name: 'Rose Petal Manicure Table',
       slug: 'rose-petal-manicure-table',
       category: 'Furniture',
       shortDescription: 'Beautiful manicure table perfect for salons and home studios.',
@@ -671,7 +672,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     },
     'iris-manicure-table': {
       id: '14',
-      name: 'Iris Manicure Tabel',
+      name: 'Iris Manicure Table',
       slug: 'iris-manicure-table',
       category: 'Furniture',
       shortDescription: 'Professional manicure table with integrated shelf system.',
@@ -719,7 +720,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     },
     'blom-manicure-workstation': {
       id: '15',
-      name: 'Blom Manicure Tabel & Work Station',
+      name: 'Blom Manicure Table & Work Station',
       slug: 'blom-manicure-workstation',
       category: 'Furniture',
       shortDescription: 'Complete professional workstation with table and shelf.',
@@ -769,7 +770,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     },
     'daisy-manicure-table': {
       id: '16',
-      name: 'Daisy Manicure Tabel',
+      name: 'Daisy Manicure Table',
       slug: 'daisy-manicure-table',
       category: 'Furniture',
       shortDescription: 'Classic manicure table with timeless design.',
@@ -865,7 +866,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     },
     'blossom-manicure-table': {
       id: '18',
-      name: 'Blossom Manicure Tabel',
+      name: 'Blossom Manicure Table',
       slug: 'blossom-manicure-table',
       category: 'Furniture',
       shortDescription: 'Premium manicure table with elegant design and superior build quality.',
@@ -1128,6 +1129,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       const firstVariant = foundProduct.variants[0];
       setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
 
+      // Build allImages array including variant images
+      const images = [...foundProduct.images];
+      foundProduct.variants.forEach((variant: any) => {
+        if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
+          images.push(variant.image);
+        }
+      });
+      setAllImages(images);
+
       // Update SEO with product data
       const seoData = productSEO(
         foundProduct.name,
@@ -1199,12 +1209,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   const nextImage = () => {
     if (!product) return;
-    setSelectedImage((prev) => (prev + 1) % product.images.length);
+    setSelectedImage((prev) => (prev + 1) % allImages.length);
   };
 
   const prevImage = () => {
     if (!product) return;
-    setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
+    setSelectedImage((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
   const toggleAccordion = (section: string) => {
@@ -1336,13 +1346,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 {/* Main Image */}
                 <div className="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gray-50 shadow-md">
                   <img
-                    src={product.images[selectedImage] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'}
+                    src={allImages[selectedImage] || product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
                   
                   {/* Navigation Arrows */}
-                  {product.images.length > 1 && (
+                  {allImages.length > 1 && (
                     <>
                       <button
                         onClick={prevImage}
@@ -1376,9 +1386,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 </div>
 
                 {/* Thumbnail Images */}
-                {product.images.length > 1 && (
+                {allImages.length > 1 && (
                   <div className="flex gap-3">
-                    {product.images.map((image: string, index: number) => (
+                    {allImages.map((image: string, index: number) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImage(index)}
@@ -1461,12 +1471,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                             onClick={() => {
                               setSelectedVariant(variantName);
                               if (variantImage) {
-                                const imageIndex = product.images.indexOf(variantImage);
+                                const imageIndex = allImages.indexOf(variantImage);
                                 if (imageIndex !== -1) {
                                   setSelectedImage(imageIndex);
-                                } else {
-                                  product.images.push(variantImage);
-                                  setSelectedImage(product.images.length - 1);
                                 }
                               }
                             }}

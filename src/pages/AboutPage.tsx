@@ -115,11 +115,11 @@ export const AboutPage: React.FC = () => {
                 </div>
               </div>
               <div className="relative">
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-1">
                   <img
                     src="https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop"
                     alt="Dreamy beach scene with BLOM logo"
-                    className="w-full h-96 object-cover"
+                    className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-br from-pink-200/20 via-blue-200/20 to-purple-200/20"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
