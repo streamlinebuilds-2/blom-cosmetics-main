@@ -227,25 +227,13 @@ export const CartWidget: React.FC = () => {
             {cartState.items.length > 0 && (
               <div className="border-t p-6 space-y-4">
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between font-bold text-lg">
                     <span>Subtotal:</span>
                     <span>{formatPrice(cartState.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Shipping:</span>
-                    <span>{cartState.shipping === 0 ? 'Free' : formatPrice(cartState.shipping)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax:</span>
-                    <span>{formatPrice(cartState.tax)}</span>
-                  </div>
-                  <div className="flex justify-between font-bold text-lg border-t pt-2">
-                    <span>Total:</span>
-                    <span>{formatPrice(cartState.total)}</span>
-                  </div>
                 </div>
                 
-                {cartState.subtotal < 500 && (
+                {cartState.subtotal < 1500 && (
                   <p className="text-sm text-gray-600 text-center">
                     Add {formatPrice(1500 - cartState.subtotal)} more for free shipping!
                   </p>
