@@ -11,6 +11,7 @@ import { cartStore, showNotification } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { updateSEO, productSEO, trackPageView } from '../lib/seo';
 import { ProductStructuredData } from '../components/seo/ProductStructuredData';
+import { ShareButton } from '../components/ui/ShareButton';
 import { 
   Star, 
   Heart, 
@@ -1529,13 +1530,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     BUY NOW
                   </button>
                   <div className="flex gap-3 pt-2">
-                    <button
-                      onClick={() => {}}
-                      className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-gray-400 transition-colors"
-                    >
-                      <Share2 className="h-5 w-5 text-gray-600" />
-                      <span className="text-sm font-medium">Share</span>
-                    </button>
+                    <ShareButton
+                      url={window.location.href}
+                      title={product.name}
+                      description={product.shortDescription}
+                      className="flex-1"
+                    />
                   </div>
                 </div>
 

@@ -8,6 +8,7 @@ import { ReviewSection } from '../review/ReviewSection';
 import { PaymentMethods } from '../payment/PaymentMethods';
 import { StickyCart } from '../cart/StickyCart';
 import { cartStore, showNotification } from '../../lib/cart';
+import { ShareButton } from '../ui/ShareButton';
 import { 
   Star, 
   Heart, 
@@ -350,10 +351,12 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                     >
                       <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current text-pink-400' : 'text-gray-600'}`} />
                     </button>
-                    <button className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full border-2 border-gray-300 hover:border-pink-400 transition-colors">
-                      <Share2 className="h-5 w-5 text-gray-600" />
-                      <span className="text-sm font-medium">Share</span>
-                    </button>
+                    <ShareButton
+                      url={window.location.href}
+                      title={productData.name}
+                      description={productData.shortDescription}
+                      className="flex-1"
+                    />
                   </div>
                 </div>
 

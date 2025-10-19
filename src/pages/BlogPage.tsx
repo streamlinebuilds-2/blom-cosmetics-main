@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { queries, BlogPost } from '../lib/supabase';
+import { ShareButton } from '../components/ui/ShareButton';
 import { 
   Calendar, 
   Clock, 
@@ -506,9 +507,12 @@ export const BlogPage: React.FC = () => {
                       <button className="p-2 bg-white rounded-lg hover:bg-pink-50 transition-colors">
                         <Heart className="h-5 w-5 text-pink-400" />
                       </button>
-                      <button className="p-2 bg-white rounded-lg hover:bg-pink-50 transition-colors">
-                        <Share2 className="h-5 w-5 text-pink-400" />
-                      </button>
+                      <ShareButton
+                        url={window.location.href}
+                        title={post.title}
+                        description={post.excerpt}
+                        className="p-2 bg-white rounded-lg hover:bg-pink-50 transition-colors"
+                      />
                       <button className="p-2 bg-white rounded-lg hover:bg-pink-50 transition-colors">
                         <BookOpen className="h-5 w-5 text-pink-400" />
                       </button>
