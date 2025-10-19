@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from '../layout/Container';
 import { ProductCard } from '../ProductCard';
-import { HomepageBestSellerCard } from './HomepageBestSellerCard';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
 import { Product, ProductImage } from '../../lib/supabase';
@@ -27,7 +26,7 @@ export const FeaturedProducts: React.FC = () => {
   };
 
   useEffect(() => {
-    // Use hardcoded bestseller products instead of Supabase query
+    // Use hardcoded bestseller products with old image format
     const bestsellerProducts = [
       {
         id: '1',
@@ -37,7 +36,8 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
         product_images: [
-          { image_url: '/cuticle-oil-white.webp', sort_order: 1 }
+          { image_url: '/cuticle-oil-white.webp', sort_order: 1 },
+          { image_url: '/cuticle-oil-colorful.webp', sort_order: 2 }
         ]
       },
       {
@@ -48,7 +48,8 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Mirror shine, chip-resistant, professional finish.',
         product_images: [
-          { image_url: '/top-coat-white.webp', sort_order: 1 }
+          { image_url: '/top-coat-white.webp', sort_order: 1 },
+          { image_url: '/top-coat-colorful.webp', sort_order: 2 }
         ]
       },
       {
@@ -59,7 +60,8 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Professional-grade, fast acting nail remover.',
         product_images: [
-          { image_url: '/acetone-remover-white.webp', sort_order: 1 }
+          { image_url: '/acetone-remover-white.webp', sort_order: 1 },
+          { image_url: '/acetone-remover-colorful.webp', sort_order: 2 }
         ]
       },
       {
@@ -70,7 +72,8 @@ export const FeaturedProducts: React.FC = () => {
         compare_at_price: null,
         short_description: 'Professional acrylic powders in 13 beautiful colors.',
         product_images: [
-          { image_url: '/core-acrylics-white.webp', sort_order: 1 }
+          { image_url: '/core-acrylics-white.webp', sort_order: 1 },
+          { image_url: '/core-acrylics-colorful.webp', sort_order: 2 }
         ]
       }
     ];
@@ -78,55 +81,6 @@ export const FeaturedProducts: React.FC = () => {
     setProducts(bestsellerProducts as ProductWithImages[]);
     setLoading(false);
   }, []);
-
-  // Intersection Observer for mobile shimmer effect
-  useEffect(() => {
-    const observerOptions = {
-      threshold: 0.5,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const shimmerElement = entry.target.querySelector('.shimmer');
-          if (shimmerElement && !shimmerElement.classList.contains('shimmer-on-scroll')) {
-            // Make container visible first
-            const shimmerContainer = entry.target.querySelector('.absolute.inset-0');
-            if (shimmerContainer) {
-              shimmerContainer.style.opacity = '1';
-              shimmerContainer.style.pointerEvents = 'none';
-            }
-            
-            shimmerElement.classList.add('shimmer-on-scroll');
-            // Remove class after animation to allow re-triggering
-            setTimeout(() => {
-              shimmerElement.classList.remove('shimmer-on-scroll');
-              if (shimmerContainer) {
-                shimmerContainer.style.opacity = '0';
-              }
-            }, 4000);
-          }
-        } else {
-          // When element goes out of view, reset for re-triggering
-          const shimmerElement = entry.target.querySelector('.shimmer');
-          if (shimmerElement) {
-            shimmerElement.classList.remove('shimmer-on-scroll');
-            const shimmerContainer = entry.target.querySelector('.absolute.inset-0');
-            if (shimmerContainer) {
-              shimmerContainer.style.opacity = '0';
-            }
-          }
-        }
-      });
-    }, observerOptions);
-
-    // Observe all best seller cards
-    const bestSellerCards = document.querySelectorAll('.best-seller-card');
-    bestSellerCards.forEach((card) => observer.observe(card));
-
-    return () => observer.disconnect();
-  }, [products, loading, error]);
 
   if (loading) {
     return (
@@ -201,14 +155,14 @@ export const FeaturedProducts: React.FC = () => {
 
           <div className="grid-responsive">
             {fallbackProducts.map((product) => (
-              <HomepageBestSellerCard
+              <ProductCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
                 slug={product.slug}
                 price={product.price}
                 shortDescription={product.description}
-                image={product.image}
+                images={[product.image]}
                 inStock={true}
                 badges={['Bestseller']}
               />
@@ -240,11 +194,10 @@ export const FeaturedProducts: React.FC = () => {
 
         <div className="grid-responsive">
           {products.map((product) => {
-            const primaryImage = product.product_images.find(img => img.sort_order === 1) || product.product_images[0];
-            const imageUrl = primaryImage?.image_url || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+            const images = product.product_images.map(img => img.image_url);
 
             return (
-              <HomepageBestSellerCard
+              <ProductCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
@@ -252,7 +205,7 @@ export const FeaturedProducts: React.FC = () => {
                 price={product.price}
                 compareAtPrice={product.compare_at_price}
                 shortDescription={product.short_description}
-                image={imageUrl}
+                images={images}
                 inStock={true}
                 badges={['Bestseller']}
               />
