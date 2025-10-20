@@ -1,0 +1,28 @@
+[
+  {
+    "id": "t1",
+    "name": "Leah M.",
+    "role": "Salon Owner",
+    "quote": "BLOM’s prep system changed our retention. Clients are thrilled!",
+    "product": "Prep & Primer Bundle",
+    "image": "/testimonials/leah.webp"
+  },
+  {
+    "id": "t2",
+    "name": "Kayla P.",
+    "role": "Nail Artist",
+    "quote": "The acrylic powders are buttery smooth. So easy to sculpt.",
+    "product": "Core Acrylics",
+    "image": "/testimonials/kayla.webp"
+  },
+  {
+    "id": "t3",
+    "name": "Dani S.",
+    "role": "Freelance Tech",
+    "quote": "Cuticle Oil became my retail best seller. Clients buy two!",
+    "product": "Cuticle Oil",
+    "image": "/testimonials/dani.webp"
+  }
+]
+
+
