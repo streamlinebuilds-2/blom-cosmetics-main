@@ -564,26 +564,18 @@ export const AccountPage: React.FC = () => {
                               </div>
                               
                               <div className="flex flex-wrap gap-3">
-                                <Button variant="outline" size="sm" onClick={() => window.open(`/.netlify/functions/invoice-pdf?m_payment_id=${order.id}&inline=1`, '_blank')}>
+                                <Button variant="outline" size="sm" onClick={() => window.open(`/.netlify/functions/invoice-pdf?m_payment_id=${order.id || 'BLOM-DEMO-ORDER'}&inline=1`, '_blank')}>
                                   <Eye className="h-4 w-4 mr-2" />
                                   View Invoice
                                 </Button>
-                                <Button variant="outline" size="sm" onClick={() => window.open(`/.netlify/functions/invoice-pdf?m_payment_id=${order.id}`, '_blank')}>
+                                <Button variant="outline" size="sm" onClick={() => window.open(`/.netlify/functions/invoice-pdf?m_payment_id=${order.id || 'BLOM-DEMO-ORDER'}`, '_blank')}>
                                   <Download className="h-4 w-4 mr-2" />
                                   Download PDF
                                 </Button>
-                                {order.trackingNumber && (
-                                  <Button variant="outline" size="sm" onClick={() => window.location.href = `/track-order?order=${order.id}`}>
+                                <Button variant="outline" size="sm" onClick={() => window.location.href = `/track-order?order=${order.id || 'BLOM-DEMO-ORDER'}` }>
                                     <Truck className="h-4 w-4 mr-2" />
-                                    Track Package
-                                  </Button>
-                                )}
-                                {order.status.toLowerCase() === 'shipped' && !order.trackingNumber && (
-                                  <Button variant="outline" size="sm" onClick={() => window.location.href = `/track-order?order=${order.id}`}>
-                                    <ExternalLink className="h-4 w-4 mr-2" />
-                                    Track Order
-                                  </Button>
-                                )}
+                                  Track Order
+                                </Button>
                               </div>
                             </div>
                           ))}
