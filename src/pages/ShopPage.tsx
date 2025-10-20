@@ -22,6 +22,51 @@ export const ShopPage: React.FC = () => {
 
   // All BLOM products with detailed information - Final Product List
   const allProducts = [
+    // Bundle Deals
+    {
+      id: 'bundle-1',
+      name: 'Acrylic Starter Kit',
+      slug: 'acrylic-starter-kit',
+      price: 850,
+      compareAtPrice: 1050,
+      short_description: 'Everything you need to start doing acrylic nails - save R200!',
+      shortDescription: 'Everything you need to start doing acrylic nails - save R200!',
+      description: 'Complete starter kit with essential acrylic products for beginners and professionals.',
+      images: ['/bundle-acrylic-starter-white.webp', '/bundle-acrylic-starter-colorful.webp'],
+      category: 'bundle-deals',
+      rating: 0,
+      reviews: 0,
+      badges: ['Bundle', 'Save 19%'],
+      inStock: true,
+      includedProducts: [
+        { productId: '9', productName: 'Core Acrylics (56 g)', quantity: 1 },
+        { productId: '10', productName: 'Nail Liquid (Monomer)', quantity: 1 },
+        { productId: '6', productName: 'Nail File (80/80 Grit)', quantity: 1 }
+      ],
+      variants: []
+    },
+    {
+      id: 'bundle-2',
+      name: 'Prep & Finish Bundle',
+      slug: 'prep-finish-bundle',
+      price: 480,
+      compareAtPrice: 550,
+      short_description: 'Complete prep and finishing system - save R70!',
+      shortDescription: 'Complete prep and finishing system - save R70!',
+      description: 'Everything you need to prep nails and finish with a perfect shine.',
+      images: ['/bundle-prep-finish-white.webp', '/bundle-prep-finish-colorful.webp'],
+      category: 'bundle-deals',
+      rating: 0,
+      reviews: 0,
+      badges: ['Bundle', 'Save 13%'],
+      inStock: true,
+      includedProducts: [
+        { productId: '1', productName: 'Cuticle Oil', quantity: 1 },
+        { productId: '2', productName: 'Vitamin Primer', quantity: 1 },
+        { productId: '4', productName: 'Top Coat', quantity: 1 }
+      ],
+      variants: []
+    },
     // Live Products (with Prices)
     {
       id: '1',
@@ -522,6 +567,7 @@ export const ShopPage: React.FC = () => {
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
+    { name: 'Bundle Deals', slug: 'bundle-deals', count: allProducts.filter(p => p.category === 'bundle-deals').length },
     { name: 'Acrylic System', slug: 'acrylic-system', count: allProducts.filter(p => p.category === 'acrylic-system').length },
     { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
     { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },

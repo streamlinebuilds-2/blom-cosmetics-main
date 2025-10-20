@@ -51,6 +51,106 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   // Product database - matches ShopPage products
   const productDatabase = {
+    'acrylic-starter-kit': {
+      id: 'bundle-1',
+      name: 'Acrylic Starter Kit',
+      slug: 'acrylic-starter-kit',
+      category: 'Bundle Deals',
+      shortDescription: 'Everything you need to start doing acrylic nails - save R200!',
+      overview: 'Our Acrylic Starter Kit is the perfect way to begin your acrylic nail journey. This comprehensive bundle includes everything you need to create beautiful, professional-quality acrylic nails. Save R200 compared to buying items individually while getting all the essentials in one convenient package.',
+      price: 850,
+      compareAtPrice: 1050,
+      stock: 'In Stock',
+      images: ['/bundle-acrylic-starter-white.webp', '/bundle-acrylic-starter-colorful.webp'],
+      features: [
+        'Complete acrylic system for beginners',
+        'Professional-grade products included',
+        'Save R200 compared to buying individually',
+        'Everything needed to create beautiful acrylic nails',
+        'Perfect for starting your nail business or personal use'
+      ],
+      howToUse: [
+        'Start with clean, prepped natural nails',
+        'Apply primer and allow to dry completely',
+        'Use monomer with acrylic powder to create beads',
+        'Apply and shape the acrylic on the nail',
+        'File and buff to desired shape and smoothness',
+        'Finish with top coat for lasting shine'
+      ],
+      ingredients: {
+        inci: ['See individual product pages for full ingredient lists'],
+        key: [
+          'Core Acrylics – Professional acrylic powder system',
+          'Nail Liquid (Monomer) – Fast-drying, low-odor formula',
+          'Nail File – 80/80 grit for shaping and finishing'
+        ]
+      },
+      includedProducts: [
+        { id: '9', name: 'Core Acrylics (56 g)', quantity: 1, price: 280 },
+        { id: '10', name: 'Nail Liquid (Monomer)', quantity: 1, price: 380 },
+        { id: '6', name: 'Nail File (80/80 Grit)', quantity: 1, price: 35 }
+      ],
+      details: {
+        bundleValue: 'R695',
+        bundlePrice: 'R850',
+        savings: 'R200 (19% off)',
+        totalItems: '3 products included'
+      },
+      variants: [],
+      rating: 0,
+      reviewCount: 0,
+      reviews: []
+    },
+    'prep-finish-bundle': {
+      id: 'bundle-2',
+      name: 'Prep & Finish Bundle',
+      slug: 'prep-finish-bundle',
+      category: 'Bundle Deals',
+      shortDescription: 'Complete prep and finishing system - save R70!',
+      overview: 'Our Prep & Finish Bundle includes everything you need for perfect nail preparation and a flawless finish. Start with nourishing cuticle oil, apply primer for lasting adhesion, and seal with our professional top coat. This bundle saves you R70 while giving you salon-quality results at home.',
+      price: 480,
+      compareAtPrice: 550,
+      stock: 'In Stock',
+      images: ['/bundle-prep-finish-white.webp', '/bundle-prep-finish-colorful.webp'],
+      features: [
+        'Complete nail prep system',
+        'Professional finishing products',
+        'Save R70 compared to buying individually',
+        'Perfect for both beginners and professionals',
+        'Create salon-quality results at home'
+      ],
+      howToUse: [
+        'Apply cuticle oil and massage into cuticles and surrounding skin',
+        'Prep nail surface with dehydrator to remove oils',
+        'Apply vitamin primer for superior adhesion',
+        'Complete your manicure or nail art',
+        'Finish with top coat for lasting shine and protection',
+        'Reapply cuticle oil daily for ongoing nail health'
+      ],
+      ingredients: {
+        inci: ['See individual product pages for full ingredient lists'],
+        key: [
+          'Cuticle Oil – Vitamin E, Jojoba & Soybean Oil blend',
+          'Vitamin Primer – Acid-free, vitamin-enriched formula',
+          'Top Coat – High-gloss, chip-resistant finish'
+        ]
+      },
+      includedProducts: [
+        { id: '1', name: 'Cuticle Oil', quantity: 1, price: 140 },
+        { id: '2', name: 'Vitamin Primer', quantity: 1, price: 210 },
+        { id: '4', name: 'Top Coat', quantity: 1, price: 200 }
+      ],
+      details: {
+        bundleValue: 'R550',
+        bundlePrice: 'R480',
+        savings: 'R70 (13% off)',
+        totalItems: '3 products included'
+      },
+      variants: [],
+      rating: 0,
+      reviewCount: 0,
+      reviews: []
+    },
     'cuticle-oil': {
       id: '1',
       name: 'Cuticle Oil',
@@ -1826,6 +1926,59 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                       </Card>
                     )}
                   </>
+                )}
+
+                {/* What's Included in This Bundle - Only for bundles */}
+                {product.includedProducts && product.includedProducts.length > 0 && (
+                  <Card className="mt-6">
+                    <button
+                      onClick={() => toggleAccordion('bundle-contents')}
+                      className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                    >
+                      <h3 className="font-semibold text-lg">What's Included in This Bundle</h3>
+                      {expandedAccordion === 'bundle-contents' ? (
+                        <ChevronUp className="h-5 w-5 text-pink-400" />
+                      ) : (
+                        <ChevronDown className="h-5 w-5 text-pink-400" />
+                      )}
+                    </button>
+                    {expandedAccordion === 'bundle-contents' && (
+                      <div className="px-6 pb-6">
+                        <div className="bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-6 space-y-4">
+                          {product.includedProducts.map((item: any, index: number) => (
+                            <div key={index} className="flex items-center justify-between bg-white rounded-xl p-4 shadow-sm">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                  <Check className="h-6 w-6 text-pink-600" />
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold text-gray-900">{item.name}</h4>
+                                  <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                                </div>
+                              </div>
+                              <span className="text-gray-600 font-medium">R{item.price}</span>
+                            </div>
+                          ))}
+                          <div className="border-t-2 border-gray-200 pt-4 mt-4">
+                            <div className="flex justify-between items-center">
+                              <span className="text-lg font-bold text-gray-900">Bundle Total:</span>
+                              <div className="text-right">
+                                <span className="text-2xl font-bold text-pink-600">R{product.price}</span>
+                                {product.compareAtPrice && (
+                                  <div className="text-sm text-gray-500 line-through">R{product.compareAtPrice}</div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="mt-2 text-right">
+                              <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                                Save R{product.compareAtPrice - product.price} ({Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% off)
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </Card>
                 )}
               </div>
             </div>
