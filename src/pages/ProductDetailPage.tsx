@@ -51,100 +51,50 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
 
   // Product database - matches ShopPage products
   const productDatabase = {
-    'acrylic-starter-kit': {
+    'prep-primer-bundle': {
       id: 'bundle-1',
-      name: 'Acrylic Starter Kit',
-      slug: 'acrylic-starter-kit',
+      name: 'Prep & Primer Bundle',
+      slug: 'prep-primer-bundle',
       category: 'Bundle Deals',
-      shortDescription: 'Everything you need to start doing acrylic nails - save R200!',
-      overview: 'Our Acrylic Starter Kit is the perfect way to begin your acrylic nail journey. This comprehensive bundle includes everything you need to create beautiful, professional-quality acrylic nails. Save R200 compared to buying items individually while getting all the essentials in one convenient package.',
-      price: 850,
-      compareAtPrice: 1050,
+      shortDescription: 'Essential prep duo - Dehydrator & Primer - save R40!',
+      overview: 'Get the perfect foundation for long-lasting nail enhancements with our Prep & Primer Bundle. This essential duo combines our Prep Solution (Nail Dehydrator) to remove oils and moisture, with our Vitamin Primer for superior adhesion. Save R40 when you buy them together.',
+      price: 370,
+      compareAtPrice: 410,
       stock: 'In Stock',
-      images: ['/bundle-acrylic-starter-white.webp', '/bundle-acrylic-starter-colorful.webp'],
+      images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp'],
       features: [
-        'Complete acrylic system for beginners',
-        'Professional-grade products included',
-        'Save R200 compared to buying individually',
-        'Everything needed to create beautiful acrylic nails',
-        'Perfect for starting your nail business or personal use'
+        'Complete nail preparation system',
+        'Professional-grade adhesion products',
+        'Save R40 compared to buying individually',
+        'Perfect for gel and acrylic applications',
+        'Prevents lifting and ensures long-lasting results',
+        'Suitable for both beginners and professionals'
       ],
       howToUse: [
-        'Start with clean, prepped natural nails',
-        'Apply primer and allow to dry completely',
-        'Use monomer with acrylic powder to create beads',
-        'Apply and shape the acrylic on the nail',
-        'File and buff to desired shape and smoothness',
-        'Finish with top coat for lasting shine'
+        'Start with clean, shaped natural nails',
+        'Apply Prep Solution to dehydrate the nail plate',
+        'Allow to dry completely (30-60 seconds)',
+        'Apply a thin layer of Vitamin Primer',
+        'Let primer dry before applying gel or acrylic',
+        'Proceed with your nail enhancement application'
       ],
       ingredients: {
         inci: ['See individual product pages for full ingredient lists'],
         key: [
-          'Core Acrylics – Professional acrylic powder system',
-          'Nail Liquid (Monomer) – Fast-drying, low-odor formula',
-          'Nail File – 80/80 grit for shaping and finishing'
+          'Prep Solution – Removes oils and moisture from nail plate',
+          'Vitamin Primer – Acid-free, vitamin-enriched adhesion formula',
+          'Both products work together for maximum bond strength'
         ]
       },
       includedProducts: [
-        { id: '9', name: 'Core Acrylics (56 g)', quantity: 1, price: 280 },
-        { id: '10', name: 'Nail Liquid (Monomer)', quantity: 1, price: 380 },
-        { id: '6', name: 'Nail File (80/80 Grit)', quantity: 1, price: 35 }
+        { id: '3', name: 'Prep Solution (Nail Dehydrator)', quantity: 1, price: 200 },
+        { id: '2', name: 'Vitamin Primer', quantity: 1, price: 210 }
       ],
       details: {
-        bundleValue: 'R695',
-        bundlePrice: 'R850',
-        savings: 'R200 (19% off)',
-        totalItems: '3 products included'
-      },
-      variants: [],
-      rating: 0,
-      reviewCount: 0,
-      reviews: []
-    },
-    'prep-finish-bundle': {
-      id: 'bundle-2',
-      name: 'Prep & Finish Bundle',
-      slug: 'prep-finish-bundle',
-      category: 'Bundle Deals',
-      shortDescription: 'Complete prep and finishing system - save R70!',
-      overview: 'Our Prep & Finish Bundle includes everything you need for perfect nail preparation and a flawless finish. Start with nourishing cuticle oil, apply primer for lasting adhesion, and seal with our professional top coat. This bundle saves you R70 while giving you salon-quality results at home.',
-      price: 480,
-      compareAtPrice: 550,
-      stock: 'In Stock',
-      images: ['/bundle-prep-finish-white.webp', '/bundle-prep-finish-colorful.webp'],
-      features: [
-        'Complete nail prep system',
-        'Professional finishing products',
-        'Save R70 compared to buying individually',
-        'Perfect for both beginners and professionals',
-        'Create salon-quality results at home'
-      ],
-      howToUse: [
-        'Apply cuticle oil and massage into cuticles and surrounding skin',
-        'Prep nail surface with dehydrator to remove oils',
-        'Apply vitamin primer for superior adhesion',
-        'Complete your manicure or nail art',
-        'Finish with top coat for lasting shine and protection',
-        'Reapply cuticle oil daily for ongoing nail health'
-      ],
-      ingredients: {
-        inci: ['See individual product pages for full ingredient lists'],
-        key: [
-          'Cuticle Oil – Vitamin E, Jojoba & Soybean Oil blend',
-          'Vitamin Primer – Acid-free, vitamin-enriched formula',
-          'Top Coat – High-gloss, chip-resistant finish'
-        ]
-      },
-      includedProducts: [
-        { id: '1', name: 'Cuticle Oil', quantity: 1, price: 140 },
-        { id: '2', name: 'Vitamin Primer', quantity: 1, price: 210 },
-        { id: '4', name: 'Top Coat', quantity: 1, price: 200 }
-      ],
-      details: {
-        bundleValue: 'R550',
-        bundlePrice: 'R480',
-        savings: 'R70 (13% off)',
-        totalItems: '3 products included'
+        bundleValue: 'R410',
+        bundlePrice: 'R370',
+        savings: 'R40 (10% off)',
+        totalItems: '2 products included'
       },
       variants: [],
       rating: 0,

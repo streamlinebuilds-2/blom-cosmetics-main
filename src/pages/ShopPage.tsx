@@ -25,45 +25,22 @@ export const ShopPage: React.FC = () => {
     // Bundle Deals
     {
       id: 'bundle-1',
-      name: 'Acrylic Starter Kit',
-      slug: 'acrylic-starter-kit',
-      price: 850,
-      compareAtPrice: 1050,
-      short_description: 'Everything you need to start doing acrylic nails - save R200!',
-      shortDescription: 'Everything you need to start doing acrylic nails - save R200!',
-      description: 'Complete starter kit with essential acrylic products for beginners and professionals.',
-      images: ['/bundle-acrylic-starter-white.webp', '/bundle-acrylic-starter-colorful.webp'],
+      name: 'Prep & Primer Bundle',
+      slug: 'prep-primer-bundle',
+      price: 370,
+      compareAtPrice: 410,
+      short_description: 'Essential prep duo - Dehydrator & Primer - save R40!',
+      shortDescription: 'Essential prep duo - Dehydrator & Primer - save R40!',
+      description: 'Perfect nail preparation starts here. Get both our Prep Solution and Vitamin Primer together and save.',
+      images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp'],
       category: 'bundle-deals',
       rating: 0,
       reviews: 0,
-      badges: ['Bundle', 'Save 19%'],
+      badges: ['Bundle', 'Save 10%'],
       inStock: true,
       includedProducts: [
-        { productId: '9', productName: 'Core Acrylics (56 g)', quantity: 1 },
-        { productId: '10', productName: 'Nail Liquid (Monomer)', quantity: 1 },
-        { productId: '6', productName: 'Nail File (80/80 Grit)', quantity: 1 }
-      ],
-      variants: []
-    },
-    {
-      id: 'bundle-2',
-      name: 'Prep & Finish Bundle',
-      slug: 'prep-finish-bundle',
-      price: 480,
-      compareAtPrice: 550,
-      short_description: 'Complete prep and finishing system - save R70!',
-      shortDescription: 'Complete prep and finishing system - save R70!',
-      description: 'Everything you need to prep nails and finish with a perfect shine.',
-      images: ['/bundle-prep-finish-white.webp', '/bundle-prep-finish-colorful.webp'],
-      category: 'bundle-deals',
-      rating: 0,
-      reviews: 0,
-      badges: ['Bundle', 'Save 13%'],
-      inStock: true,
-      includedProducts: [
-        { productId: '1', productName: 'Cuticle Oil', quantity: 1 },
-        { productId: '2', productName: 'Vitamin Primer', quantity: 1 },
-        { productId: '4', productName: 'Top Coat', quantity: 1 }
+        { productId: '3', productName: 'Prep Solution (Nail Dehydrator)', quantity: 1 },
+        { productId: '2', productName: 'Vitamin Primer', quantity: 1 }
       ],
       variants: []
     },

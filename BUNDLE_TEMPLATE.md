@@ -1,84 +1,179 @@
-# Bundle Template - Easy Copy & Paste
+# Bundle Template - Easy Copy & Paste for Owner
 
 Use this template to quickly add new bundle deals to your shop.
 
-## Instructions
-1. Copy the "Shop Page Bundle" section and paste into `src/pages/ShopPage.tsx` in the `allProducts` array
-2. Copy the "Product Detail Bundle" section and paste into `src/pages/ProductDetailPage.tsx` in the `productDatabase` object
-3. Replace all placeholders with your bundle information
-4. Add your bundle images to the `public` folder
+## 📋 Instructions
+1. Copy the "Shop Page Bundle" section below
+2. Paste it into `src/pages/ShopPage.tsx` in the `allProducts` array (after line 25)
+3. Copy the "Product Detail Bundle" section below
+4. Paste it into `src/pages/ProductDetailPage.tsx` in the `productDatabase` object (after line 54)
+5. Replace ALL placeholders (marked with `[...]`) with your bundle information
+6. Add your bundle images to the `public` folder with these exact names:
+   - `/bundle-[your-bundle-slug]-white.webp` (normal/white background)
+   - `/bundle-[your-bundle-slug]-colorful.webp` (hover/colorful version)
 
 ---
 
-## Shop Page Bundle (ShopPage.tsx)
+## 🛍️ Shop Page Bundle Code
+
+**Copy this entire block and paste into `src/pages/ShopPage.tsx`:**
 
 ```typescript
 {
-  id: 'bundle-X', // Change X to next number
-  name: '[BUNDLE NAME]', // e.g., 'Gel Essentials Bundle'
-  slug: '[bundle-slug]', // e.g., 'gel-essentials-bundle'
-  price: [BUNDLE_PRICE], // e.g., 500
-  compareAtPrice: [ORIGINAL_TOTAL], // e.g., 650
-  short_description: '[SHORT DESCRIPTION]', // e.g., 'Complete gel system - save R150!'
-  shortDescription: '[SHORT DESCRIPTION]',
-  description: '[FULL DESCRIPTION]',
-  images: ['/[bundle-image-white].webp', '/[bundle-image-colorful].webp'],
+  id: 'bundle-X',  // ⚠️ CHANGE X to next number (e.g., bundle-2, bundle-3, etc.)
+  name: '[BUNDLE NAME]',  // e.g., 'Gel Essentials Bundle'
+  slug: '[bundle-slug]',  // e.g., 'gel-essentials-bundle' (lowercase, use hyphens)
+  price: [BUNDLE_PRICE],  // e.g., 500 (your discounted price)
+  compareAtPrice: [ORIGINAL_TOTAL],  // e.g., 650 (sum of individual product prices)
+  short_description: '[SHORT DESCRIPTION - save RXX!]',  // e.g., 'Complete gel system - save R150!'
+  shortDescription: '[SHORT DESCRIPTION - save RXX!]',  // Same as above
+  description: '[FULL DESCRIPTION]',  // e.g., 'Everything you need for perfect gel nails.'
+  images: ['/bundle-[your-slug]-white.webp', '/bundle-[your-slug]-colorful.webp'],
+  category: 'bundle-deals',  // ⚠️ DO NOT CHANGE THIS
+  rating: 0,  // ⚠️ DO NOT CHANGE THIS
+  reviews: 0,  // ⚠️ DO NOT CHANGE THIS
+  badges: ['Bundle', 'Save [X]%'],  // Calculate %: ((compareAtPrice - price) / compareAtPrice) * 100
+  inStock: true,  // Change to false if out of stock
+  includedProducts: [
+    { productId: '[ID]', productName: '[PRODUCT NAME]', quantity: [QTY] },
+    // Add more products - see Product IDs list below
+  ],
+  variants: []  // ⚠️ DO NOT CHANGE THIS
+},
+```
+
+---
+
+## 📄 Product Detail Page Bundle Code
+
+**Copy this entire block and paste into `src/pages/ProductDetailPage.tsx`:**
+
+```typescript
+'[bundle-slug]': {  // ⚠️ MUST match the slug from ShopPage (same as above)
+  id: 'bundle-X',  // ⚠️ MUST match the id from ShopPage
+  name: '[BUNDLE NAME]',  // Same as ShopPage
+  slug: '[bundle-slug]',  // Same as ShopPage
+  category: 'Bundle Deals',  // ⚠️ DO NOT CHANGE THIS
+  shortDescription: '[SHORT DESCRIPTION - save RXX!]',  // Same as ShopPage
+  overview: '[DETAILED OVERVIEW - Write 2-3 sentences explaining what this bundle includes and why customers should buy it]',
+  price: [BUNDLE_PRICE],  // Same as ShopPage
+  compareAtPrice: [ORIGINAL_TOTAL],  // Same as ShopPage
+  stock: 'In Stock',  // Change to 'Out of Stock' if needed
+  images: ['/bundle-[your-slug]-white.webp', '/bundle-[your-slug]-colorful.webp'],  // Same as ShopPage
+  features: [
+    '[Feature or benefit 1]',
+    '[Feature or benefit 2]',
+    '[Feature or benefit 3]',
+    'Save R[AMOUNT] compared to buying individually',  // Calculate: compareAtPrice - price
+    '[Any other benefits]'
+  ],
+  howToUse: [
+    '[Step 1 - How to use the first product]',
+    '[Step 2 - How to use the second product]',
+    '[Step 3 - Next step in the process]',
+    '[Step 4 - Final step or tip]',
+    // Add more steps if needed
+  ],
+  ingredients: {
+    inci: ['See individual product pages for full ingredient lists'],  // ⚠️ Keep this as is
+    key: [
+      '[Product 1 Name] – [Brief description of what it does]',
+      '[Product 2 Name] – [Brief description of what it does]',
+      '[Product 3 Name] – [Brief description of what it does]'
+    ]
+  },
+  includedProducts: [
+    { id: '[PRODUCT_ID]', name: '[PRODUCT NAME]', quantity: [QTY], price: [INDIVIDUAL_PRICE] },
+    // Add all products in this bundle - see Product IDs list below
+  ],
+  details: {
+    bundleValue: 'R[ORIGINAL_TOTAL]',  // Same as compareAtPrice
+    bundlePrice: 'R[BUNDLE_PRICE]',  // Same as price
+    savings: 'R[SAVINGS_AMOUNT] ([X]% off)',  // Calculate both
+    totalItems: '[X] products included'  // Count the products
+  },
+  variants: [],  // ⚠️ DO NOT CHANGE THIS
+  rating: 0,  // ⚠️ DO NOT CHANGE THIS
+  reviewCount: 0,  // ⚠️ DO NOT CHANGE THIS
+  reviews: []  // ⚠️ DO NOT CHANGE THIS
+}
+```
+
+---
+
+## 📦 CURRENT EXAMPLE: Prep & Primer Bundle
+
+### Shop Page Code:
+```typescript
+{
+  id: 'bundle-1',
+  name: 'Prep & Primer Bundle',
+  slug: 'prep-primer-bundle',
+  price: 370,
+  compareAtPrice: 410,
+  short_description: 'Essential prep duo - Dehydrator & Primer - save R40!',
+  shortDescription: 'Essential prep duo - Dehydrator & Primer - save R40!',
+  description: 'Perfect nail preparation starts here. Get both our Prep Solution and Vitamin Primer together and save.',
+  images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp'],
   category: 'bundle-deals',
   rating: 0,
   reviews: 0,
-  badges: ['Bundle', 'Save [X]%'], // Calculate percentage: ((compareAtPrice - price) / compareAtPrice) * 100
+  badges: ['Bundle', 'Save 10%'],
   inStock: true,
   includedProducts: [
-    { productId: '[PRODUCT_ID]', productName: '[PRODUCT NAME]', quantity: [QTY] },
-    // Add more products as needed
+    { productId: '3', productName: 'Prep Solution (Nail Dehydrator)', quantity: 1 },
+    { productId: '2', productName: 'Vitamin Primer', quantity: 1 }
   ],
   variants: []
 },
 ```
 
-## Product Detail Bundle (ProductDetailPage.tsx)
-
+### Product Detail Code:
 ```typescript
-'[bundle-slug]': {
-  id: 'bundle-X',
-  name: '[BUNDLE NAME]',
-  slug: '[bundle-slug]',
+'prep-primer-bundle': {
+  id: 'bundle-1',
+  name: 'Prep & Primer Bundle',
+  slug: 'prep-primer-bundle',
   category: 'Bundle Deals',
-  shortDescription: '[SHORT DESCRIPTION]',
-  overview: '[DETAILED OVERVIEW - 2-3 sentences about the bundle]',
-  price: [BUNDLE_PRICE],
-  compareAtPrice: [ORIGINAL_TOTAL],
+  shortDescription: 'Essential prep duo - Dehydrator & Primer - save R40!',
+  overview: 'Get the perfect foundation for long-lasting nail enhancements with our Prep & Primer Bundle. This essential duo combines our Prep Solution (Nail Dehydrator) to remove oils and moisture, with our Vitamin Primer for superior adhesion. Save R40 when you buy them together.',
+  price: 370,
+  compareAtPrice: 410,
   stock: 'In Stock',
-  images: ['/[bundle-image-white].webp', '/[bundle-image-colorful].webp'],
+  images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp'],
   features: [
-    '[Feature 1]',
-    '[Feature 2]',
-    '[Feature 3]',
-    'Save R[AMOUNT] compared to buying individually'
+    'Complete nail preparation system',
+    'Professional-grade adhesion products',
+    'Save R40 compared to buying individually',
+    'Perfect for gel and acrylic applications',
+    'Prevents lifting and ensures long-lasting results',
+    'Suitable for both beginners and professionals'
   ],
   howToUse: [
-    '[Step 1]',
-    '[Step 2]',
-    '[Step 3]',
-    '[Step 4]'
+    'Start with clean, shaped natural nails',
+    'Apply Prep Solution to dehydrate the nail plate',
+    'Allow to dry completely (30-60 seconds)',
+    'Apply a thin layer of Vitamin Primer',
+    'Let primer dry before applying gel or acrylic',
+    'Proceed with your nail enhancement application'
   ],
   ingredients: {
     inci: ['See individual product pages for full ingredient lists'],
     key: [
-      '[Product 1] – [Description]',
-      '[Product 2] – [Description]',
-      '[Product 3] – [Description]'
+      'Prep Solution – Removes oils and moisture from nail plate',
+      'Vitamin Primer – Acid-free, vitamin-enriched adhesion formula',
+      'Both products work together for maximum bond strength'
     ]
   },
   includedProducts: [
-    { id: '[PRODUCT_ID]', name: '[PRODUCT NAME]', quantity: [QTY], price: [PRICE] },
-    // Add more products as needed
+    { id: '3', name: 'Prep Solution (Nail Dehydrator)', quantity: 1, price: 200 },
+    { id: '2', name: 'Vitamin Primer', quantity: 1, price: 210 }
   ],
   details: {
-    bundleValue: 'R[ORIGINAL_TOTAL]',
-    bundlePrice: 'R[BUNDLE_PRICE]',
-    savings: 'R[SAVINGS] ([X]% off)',
-    totalItems: '[X] products included'
+    bundleValue: 'R410',
+    bundlePrice: 'R370',
+    savings: 'R40 (10% off)',
+    totalItems: '2 products included'
   },
   variants: [],
   rating: 0,
@@ -89,165 +184,114 @@ Use this template to quickly add new bundle deals to your shop.
 
 ---
 
-## Example Bundle (Fully Filled Out)
+## 🔢 PRODUCT IDS & PRICES (Use these in your bundles)
 
-### Shop Page:
-```typescript
-{
-  id: 'bundle-3',
-  name: 'Professional Tools Bundle',
-  slug: 'professional-tools-bundle',
-  price: 350,
-  compareAtPrice: 415,
-  short_description: 'Essential tools for every nail tech - save R65!',
-  shortDescription: 'Essential tools for every nail tech - save R65!',
-  description: 'Complete set of professional nail tools for perfect manicures every time.',
-  images: ['/bundle-tools-white.webp', '/bundle-tools-colorful.webp'],
-  category: 'bundle-deals',
-  rating: 0,
-  reviews: 0,
-  badges: ['Bundle', 'Save 16%'],
-  inStock: true,
-  includedProducts: [
-    { productId: '6', productName: 'Nail File (80/80 Grit)', quantity: 2 },
-    { productId: '7', productName: 'Nail Forms', quantity: 1 },
-    { productId: '8', productName: 'Crystal Kolinsky Sculpting Brush', quantity: 1 }
-  ],
-  variants: []
-},
+| ID | Product Name | Price |
+|----|--------------|-------|
+| '1' | Cuticle Oil | R140 |
+| '2' | Vitamin Primer | R210 |
+| '3' | Prep Solution (Nail Dehydrator) | R200 |
+| '4' | Top Coat | R190 |
+| '5' | Fairy Dust Top Coat | R195 |
+| '6' | Nail File (80/80 Grit) | R35 |
+| '7' | Nail Forms | R290 |
+| '8' | Crystal Kolinsky Sculpting Brush | R450 |
+| '9' | Core Acrylics (56 g) | R280 |
+| '10' | Nail Liquid (Monomer) | R380 |
+
+---
+
+## 💡 TIPS FOR CREATING GREAT BUNDLES
+
+### 1. **Pricing Strategy**
+- Aim for **10-20% discount** to make it attractive
+- Example: If products cost R410 individually, sell bundle for R370 (save R40 = 10%)
+
+### 2. **Product Combinations**
+Group products that:
+- Are used together (e.g., primer + dehydrator)
+- Complete a process (e.g., prep → apply → finish)
+- Save time for professionals
+- Help beginners start out
+
+### 3. **Calculating Savings**
+```
+Original Total = Product1 Price + Product2 Price + Product3 Price
+Your Bundle Price = (Choose your discounted price)
+Savings = Original Total - Bundle Price
+Percentage = (Savings / Original Total) × 100
 ```
 
-### Product Detail:
-```typescript
-'professional-tools-bundle': {
-  id: 'bundle-3',
-  name: 'Professional Tools Bundle',
-  slug: 'professional-tools-bundle',
-  category: 'Bundle Deals',
-  shortDescription: 'Essential tools for every nail tech - save R65!',
-  overview: 'Our Professional Tools Bundle includes everything you need to create flawless nail art. Perfect for both salon professionals and home enthusiasts, this bundle combines quality tools at an unbeatable price.',
-  price: 350,
-  compareAtPrice: 415,
-  stock: 'In Stock',
-  images: ['/bundle-tools-white.webp', '/bundle-tools-colorful.webp'],
-  features: [
-    'Professional-grade nail tools',
-    'Perfect for salon or home use',
-    'Save R65 compared to buying individually',
-    'Everything needed for perfect nail prep and application',
-    'Durable and long-lasting construction'
-  ],
-  howToUse: [
-    'Use nail files to shape and smooth nail edges',
-    'Apply nail forms for perfect extension placement',
-    'Use sculpting brush with acrylic for precise application',
-    'Clean and sanitize all tools after each use',
-    'Store in a clean, dry place for longevity'
-  ],
-  ingredients: {
-    inci: ['See individual product pages for full product specifications'],
-    key: [
-      'Nail File – 80/80 grit for shaping and finishing',
-      'Nail Forms – 300 forms per roll with holographic guide',
-      'Sculpting Brush – Professional Kolinsky bristles'
-    ]
-  },
-  includedProducts: [
-    { id: '6', name: 'Nail File (80/80 Grit)', quantity: 2, price: 70 },
-    { id: '7', name: 'Nail Forms', quantity: 1, price: 290 },
-    { id: '8', name: 'Crystal Kolinsky Sculpting Brush', quantity: 1, price: 55 }
-  ],
-  details: {
-    bundleValue: 'R415',
-    bundlePrice: 'R350',
-    savings: 'R65 (16% off)',
-    totalItems: '4 items included (2 files + 1 forms + 1 brush)'
-  },
-  variants: [],
-  rating: 0,
-  reviewCount: 0,
-  reviews: []
-}
-```
+**Example:**
+- Prep Solution: R200
+- Vitamin Primer: R210
+- **Total: R410**
+- Bundle Price: R370
+- **Savings: R40 (10%)**
+
+### 4. **Image Requirements**
+- **White version**: Product bottles on white background (like other products)
+- **Colorful version**: Same products with colorful/styled background (for hover effect)
+- **Size**: 800x800px minimum (square)
+- **Format**: `.webp` (preferred) or `.jpg`
+- **File names**: MUST match exactly (e.g., `/bundle-prep-primer-white.webp`)
 
 ---
 
-## Quick Reference
+## ✅ CHECKLIST BEFORE ADDING BUNDLE
 
-### Product IDs (from ShopPage.tsx)
-- '1' = Cuticle Oil (R140)
-- '2' = Vitamin Primer (R210)
-- '3' = Prep Solution (R200)
-- '4' = Top Coat (R190)
-- '5' = Fairy Dust Top Coat (R195)
-- '6' = Nail File (R35)
-- '7' = Nail Forms (R290)
-- '8' = Crystal Kolinsky Sculpting Brush (R450)
-- '9' = Core Acrylics (R280)
-- '10' = Nail Liquid/Monomer (R380)
-
-### Tips for Creating Bundles
-1. **Pricing**: Aim for 10-25% discount to make bundles attractive
-2. **Product Selection**: Group complementary products that are often used together
-3. **Images**: Create custom bundle images showing all products together
-4. **Descriptions**: Clearly explain the value proposition and what customers get
-5. **Badge**: Always include both "Bundle" and "Save X%" badges for visibility
-
-### Calculating Savings
-```javascript
-// Original total price
-const originalTotal = product1Price + product2Price + product3Price;
-
-// Your bundle price (discounted)
-const bundlePrice = 500; // Your chosen price
-
-// Calculate savings
-const savings = originalTotal - bundlePrice;
-const savingsPercentage = Math.round((savings / originalTotal) * 100);
-
-// Use in badges: ['Bundle', `Save ${savingsPercentage}%`]
-```
+- [ ] Bundle name is clear and descriptive
+- [ ] Slug uses lowercase and hyphens (no spaces)
+- [ ] Price is discounted by 10-20%
+- [ ] All product IDs are correct
+- [ ] Savings percentage is calculated correctly
+- [ ] Both images are created and named correctly
+- [ ] Short description mentions the savings amount
+- [ ] "How to Use" explains the complete process
+- [ ] Code is pasted in BOTH files (ShopPage.tsx AND ProductDetailPage.tsx)
 
 ---
 
-## Image Requirements
+## 🎯 WHERE TO PASTE THE CODE
 
-### Bundle Images Needed:
-- White background version (e.g., `/bundle-name-white.webp`)
-- Colorful/styled version (e.g., `/bundle-name-colorful.webp`)
+### ShopPage.tsx
+1. Open `src/pages/ShopPage.tsx`
+2. Find line 25 (after `const allProducts = [`)
+3. Find the comment `// Bundle Deals`
+4. Paste your new bundle code AFTER the existing bundle (before `// Live Products`)
 
-### Image Specifications:
-- Format: WebP (recommended) or JPG/PNG
-- Dimensions: 800x800px minimum (square aspect ratio)
-- Background: White for first image, creative for second
-- Content: Show all products in the bundle arranged attractively
-- File size: Keep under 200KB for fast loading
-
----
-
-## Testing Checklist
-
-After adding a new bundle:
-- [ ] Bundle appears in "Bundle Deals" category on shop page
-- [ ] Bundle displays correctly in grid and list view
-- [ ] Clicking bundle card navigates to bundle detail page
-- [ ] Bundle detail page shows all included products
-- [ ] Savings percentage displays correctly
-- [ ] "Add to Cart" button works
-- [ ] Price comparison shows strikethrough original price
-- [ ] All images load properly
-- [ ] Mobile responsive layout looks good
-- [ ] "What's Included" accordion expands/collapses correctly
+### ProductDetailPage.tsx
+1. Open `src/pages/ProductDetailPage.tsx`
+2. Find line 54 (after `const productDatabase = {`)
+3. Paste your new bundle code AFTER the existing bundle (before `'cuticle-oil': {`)
 
 ---
 
-## Support
+## 🆘 TROUBLESHOOTING
 
-For questions or help with bundle creation:
-- Review existing bundles in `ShopPage.tsx` for reference
-- Check `ProductDetailPage.tsx` for bundle structure
-- Ensure all product IDs match existing products
-- Test thoroughly on both desktop and mobile
+**Bundle not showing up?**
+- Check that `category: 'bundle-deals'` is correct
+- Make sure the slug is unique (no duplicates)
+- Verify both Shop and Detail pages have the bundle
+
+**Images not loading?**
+- Check file names match exactly (case-sensitive)
+- Images must be in the `public` folder
+- Use `.webp` format for best results
+
+**Price display wrong?**
+- `price` = discounted bundle price
+- `compareAtPrice` = sum of individual products
+- Check your math!
+
+---
+
+## 📞 NEED HELP?
+
+If you get stuck:
+1. Look at the current "Prep & Primer Bundle" example
+2. Double-check all placeholder text is replaced
+3. Verify product IDs match the table above
+4. Make sure images are in the `public` folder
 
 Happy bundling! 🎉
-
