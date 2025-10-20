@@ -1395,7 +1395,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
               {/* Product Media */}
               <div>
                 {/* Main Image */}
-                <div className="relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gray-50 shadow-md">
+                <div className={`relative aspect-square mb-6 overflow-hidden rounded-2xl bg-gray-50 shadow-md ${
+                  product.category === 'Acrylic System' ? 'max-h-[350px] sm:max-h-none' : ''
+                }`}>
                   <img
                     src={allImages[selectedImage] || product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'}
                     alt={product.name}
