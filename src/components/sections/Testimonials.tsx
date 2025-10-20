@@ -42,7 +42,7 @@ export const Testimonials: React.FC = () => {
 
         <div className="relative max-w-4xl mx-auto">
           {/* Image */}
-          <div className="aspect-video rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
+          <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg max-w-sm mx-auto">
             <img
               src={t.image}
               alt={t.name}
