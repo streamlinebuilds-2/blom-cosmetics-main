@@ -4,16 +4,16 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Button } from '../components/ui/Button';
-import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, X, ChevronDown } from 'lucide-react';
+import { Search, Filter, Grid2x2 as Grid2X2, List, X, ChevronDown } from 'lucide-react';
 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
+  const [viewMode, setViewMode] = useState<'grid-2' | 'list'>(() => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth < 768 ? 'list' : 'grid-3';
+      return window.innerWidth < 768 ? 'list' : 'grid-2';
     }
-    return 'grid-3';
+    return 'grid-2';
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
@@ -616,16 +616,13 @@ export const ShopPage: React.FC = () => {
 
   const getGridClasses = () => {
     switch (viewMode) {
-      case 'grid-3':
-        // On mobile show 2 columns, tablet 2, desktop 3
-        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
       case 'grid-2':
-        // Consistent 2-column grid on mobile and tablet
-        return 'grid-cols-2 sm:grid-cols-2';
+        // On mobile show 1 column, tablet+ show 2 columns
+        return 'grid-cols-1 sm:grid-cols-2';
       case 'list':
         return 'grid-cols-1';
       default:
-        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
+        return 'grid-cols-1 sm:grid-cols-2';
     }
   };
 
@@ -734,14 +731,6 @@ export const ShopPage: React.FC = () => {
                   {sortedProducts.length} of {allProducts.length}
                 </span>
                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                      <button
-                        onClick={() => setViewMode('grid-3')}
-                    className={`p-1.5 rounded-md transition-colors ${
-                      viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                      >
-                    <Grid3X3 className="h-3 w-3" />
-                      </button>
                       <button
                         onClick={() => setViewMode('grid-2')}
                     className={`p-1.5 rounded-md transition-colors ${

@@ -356,31 +356,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-3 sm:p-4 md:p-6">
+      <div className="p-4 sm:p-4 md:p-6">
         {/* Product Name */}
-        <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem] text-center">
+        <h3 className="font-bold text-base sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem] text-center">
           {name}
         </h3>
 
         {/* Short Description */}
         {shortDescription && (
-          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed text-center">
+          <p className="text-gray-600 text-sm sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed text-center">
             {shortDescription}
           </p>
         )}
 
         {/* Price - Centered */}
-        <div className="text-center mb-2 sm:mb-3 md:mb-4">
+        <div className="text-center mb-3 sm:mb-3 md:mb-4">
           <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+            <span className="text-xl sm:text-xl md:text-2xl font-bold text-gray-900">
               {price === -1 ? 'Coming Soon' : formatPrice(price)}
             </span>
             {compareAtPrice && (
               <>
-                <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
+                <span className="text-base sm:text-base md:text-lg text-gray-400 line-through">
                   {formatPrice(compareAtPrice)}
                 </span>
-                <span className="text-[10px] sm:text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
+                <span className="text-xs sm:text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 sm:px-2 sm:py-1 rounded-full">
                   {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
                 </span>
               </>
@@ -394,14 +394,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             type="button"
             onClick={handleAddToCart}
             disabled={!inStock || price === -1}
-            className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-3 sm:py-2.5 sm:px-5 md:py-3.5 md:px-8 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 ${
+            className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-3 px-4 sm:py-2.5 sm:px-5 md:py-3.5 md:px-8 rounded-full font-bold text-sm sm:text-xs md:text-sm uppercase transition-all duration-200 ${
               inStock && price !== -1
                 ? 'bg-pink-400 text-white hover:bg-pink-400 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
             aria-disabled={!inStock || price === -1}
           >
-            <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+            <ShoppingCart className="h-4 w-4 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
             {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
         </div>
