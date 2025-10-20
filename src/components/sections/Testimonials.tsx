@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container } from '../layout/Container';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -27,9 +27,21 @@ const testimonials = [
 
 export const Testimonials: React.FC = () => {
   const [index, setIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   const prev = () => setIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
   const next = () => setIndex((i) => (i + 1) % testimonials.length);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (isPaused) return;
+    
+    const interval = setInterval(() => {
+      setIndex((i) => (i + 1) % testimonials.length);
+    }, 3000); // Change every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   const t = testimonials[index];
 
@@ -40,7 +52,11 @@ export const Testimonials: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-900">What Our Customers Say</h2>
         </div>
 
-        <div className="relative max-w-4xl mx-auto">
+        <div 
+          className="relative max-w-4xl mx-auto"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           {/* Image */}
           <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg max-w-sm mx-auto">
             <img
