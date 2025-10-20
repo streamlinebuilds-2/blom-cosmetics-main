@@ -1,42 +1,58 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Container } from '../layout/Container';
 import { ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
 interface Testimonial {
-  id: string;
+  id: number;
   name: string;
-  role?: string;
-  quote: string;
-  product?: string;
-  image?: string; // path under /public (e.g. /testimonials/leah.webp)
+  role: string;
+  content: string;
+  rating: number;
+  image: string;
 }
 
+const testimonials: Testimonial[] = [
+  {
+    id: 1,
+    name: 'Sarah Mitchell',
+    role: 'Professional Nail Technician',
+    content: 'BLOM products have transformed my nail art business. The quality is unmatched and my clients love the results.',
+    rating: 5,
+    image: '/sarah.webp'
+  },
+  {
+    id: 2,
+    name: 'Jessica Chen',
+    role: 'Salon Owner',
+    content: 'The training courses are exceptional. My entire team is now certified and our service quality has improved dramatically.',
+    rating: 5,
+    image: '/testimonial-6.webp'
+  },
+  {
+    id: 3,
+    name: 'Michelle Adams',
+    role: 'Freelance Artist',
+    content: 'From beginner to pro - BLOM\'s educational content and premium products made my journey seamless.',
+    rating: 5,
+    image: '/michelle.webp'
+  },
+  {
+    id: 4,
+    name: 'Jaundré',
+    role: 'Pro Nail Artist',
+    content: 'Blom\'s acrylic system changed my sets — clarity and strength are unreal.',
+    rating: 5,
+    image: '/jaundre.webp'
+  }
+];
+
 export const Testimonials: React.FC = () => {
-  const [items, setItems] = useState<Testimonial[]>([]);
   const [index, setIndex] = useState(0);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        // Prefer static import, fallback to fetch
-        try {
-          const mod = await import('../../../content/testimonials/testimonials.json');
-          setItems(mod.default || []);
-        } catch {
-          const res = await fetch('/content/testimonials/testimonials.json');
-          const data = await res.json();
-          setItems(data || []);
-        }
-      } catch {}
-    })();
-  }, []);
+  const prev = () => setIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
+  const next = () => setIndex((i) => (i + 1) % testimonials.length);
 
-  const prev = () => setIndex((i) => (i - 1 + items.length) % Math.max(1, items.length));
-  const next = () => setIndex((i) => (i + 1) % Math.max(1, items.length));
-
-  if (!items.length) return null;
-
-  const t = items[index];
+  const t = testimonials[index];
 
   return (
     <section className="py-16">
@@ -59,7 +75,7 @@ export const Testimonials: React.FC = () => {
             <div className="md:col-span-1">
               <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50">
                 <img
-                  src={t.image || '/testimonials/placeholder.webp'}
+                  src={t.image}
                   alt={t.name}
                   className="w-full h-full object-cover"
                   loading="lazy"
@@ -71,17 +87,16 @@ export const Testimonials: React.FC = () => {
             <div className="md:col-span-2">
               <div className="relative">
                 <Quote className="absolute -top-2 -left-2 h-8 w-8 text-pink-300" />
-                <p className="text-xl text-gray-800 leading-relaxed pl-8">{t.quote}</p>
+                <p className="text-xl text-gray-800 leading-relaxed pl-8">"{t.content}"</p>
               </div>
               <div className="mt-6">
                 <div className="font-semibold text-gray-900">{t.name}</div>
-                {t.role && <div className="text-gray-500 text-sm">{t.role}</div>}
-                {t.product && <div className="text-pink-400 text-sm mt-1">on {t.product}</div>}
+                <div className="text-gray-500 text-sm">{t.role}</div>
               </div>
 
               {/* Dots */}
               <div className="mt-6 flex gap-2">
-                {items.map((_, i) => (
+                {testimonials.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => setIndex(i)}
