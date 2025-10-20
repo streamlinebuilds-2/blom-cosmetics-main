@@ -1,3 +1,119 @@
+import type { Handler } from '@netlify/functions';
+import fetch from 'node-fetch';
+
+// Minimal invoice renderer (HTML) that looks up an order by many keys.
+// Params: m_payment_id (required), inline=1 (display in iframe), otherwise attachment download
+
+export const handler: Handler = async (event) => {
+  try {
+    const orderId = event.queryStringParameters?.m_payment_id || '';
+    const inline = event.queryStringParameters?.inline === '1' || !!event.queryStringParameters?.inline;
+    if (!orderId) return { statusCode: 400, body: 'm_payment_id required' };
+
+    const supaUrl = process.env.SUPABASE_URL;
+    const srk = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supaUrl || !srk) {
+      // Gracefully degrade if env not set
+      return { statusCode: 500, body: 'Server not configured' };
+    }
+
+    const headers = { apikey: srk, Authorization: `Bearer ${srk}` } as any;
+
+    // Try several keys commonly used for order identifiers
+    const endpoints = [
+      `${supaUrl}/rest/v1/orders?id=eq.${encodeURIComponent(orderId)}&select=*`,
+      `${supaUrl}/rest/v1/orders?order_number=eq.${encodeURIComponent(orderId)}&select=*`,
+      `${supaUrl}/rest/v1/orders?merchant_payment_id=eq.${encodeURIComponent(orderId)}&select=*`,
+      `${supaUrl}/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(orderId)}&select=*`
+    ];
+
+    let order: any = null;
+    for (const url of endpoints) {
+      const r = await fetch(url, { headers });
+      if (!r.ok) continue;
+      const j = await r.json();
+      if (Array.isArray(j) && j.length > 0) { order = j[0]; break; }
+    }
+
+    if (!order) {
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'text/plain' },
+        body: 'Order not found'
+      };
+    }
+
+    // Load order_items if table exists
+    let items: any[] = [];
+    try {
+      const ri = await fetch(`${supaUrl}/rest/v1/order_items?order_id=eq.${encodeURIComponent(order.id || orderId)}&select=*`, { headers });
+      if (ri.ok) items = await ri.json();
+    } catch {}
+
+    const currency = 'ZAR';
+    const fmt = (n: number) => `R${Number(n || 0).toFixed(2)}`;
+    const total = Number(order.total || order.amount || 0);
+
+    const html = `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BLOM Receipt ${orderId}</title>
+  <style>
+    body{font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";background:#f8fafc;color:#0f172a;margin:0;padding:24px}
+    .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;max-width:900px;margin:0 auto}
+    .hdr{padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center}
+    .title{font-weight:700;font-size:18px}
+    .muted{color:#64748b;font-size:12px}
+    .pad{padding:20px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}
+    th{background:#f8fafc;color:#0f172a}
+    .total{font-weight:700}
+  </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="hdr">
+        <div>
+          <div class="title">Invoice #${orderId}</div>
+          <div class="muted">Payment Receipt</div>
+        </div>
+        <div class="muted">${new Date(order.created_at || Date.now()).toLocaleString()}</div>
+      </div>
+      <div class="pad">
+        <div style="margin-bottom:16px">
+          <div><strong>Billed To</strong></div>
+          <div>${order.name_first || order.customer_name || ''} ${order.name_last || ''}</div>
+          <div>${order.email || order.buyer_email || ''}</div>
+        </div>
+        <table>
+          <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Amount</th></tr></thead>
+          <tbody>
+            ${items.map(it => {
+              const qty = Number(it.quantity || 1);
+              const price = Number(it.price || it.unit_price || 0);
+              return `<tr><td>${it.name || it.product_name || 'Item'}</td><td>${qty}</td><td>${fmt(price)}</td><td>${fmt(qty*price)}</td></tr>`;
+            }).join('') || `<tr><td>${order.item_name || 'Order'}</td><td>1</td><td>${fmt(total)}</td><td>${fmt(total)}</td></tr>`}
+            <tr><td colspan="3" class="total">Total</td><td class="total">${fmt(total)}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+  </html>`;
+
+    const headersOut: Record<string,string> = { 'Content-Type': 'text/html; charset=utf-8' };
+    if (!inline) {
+      headersOut['Content-Disposition'] = `attachment; filename=BLOM-Receipt-${orderId}.html`;
+    }
+    return { statusCode: 200, headers: headersOut, body: html };
+  } catch (e: any) {
+    return { statusCode: 500, body: e.message };
+  }
+};
+
 import { Handler } from '@netlify/functions';
 import React from 'react';
 
