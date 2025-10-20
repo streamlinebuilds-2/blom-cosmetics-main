@@ -149,6 +149,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     setStep('payment');
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
   };
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
@@ -731,7 +732,7 @@ export const CheckoutPage: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setStep('payment')}
+                          onClick={() => { setStep('payment'); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); } }}
                         >
                           <Edit className="h-4 w-4 mr-1" />
                           Edit
@@ -798,7 +799,7 @@ export const CheckoutPage: React.FC = () => {
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => setStep('payment')}
+                        onClick={() => { setStep('payment'); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); } }}
                       >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Payment
