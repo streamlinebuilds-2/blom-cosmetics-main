@@ -883,6 +883,102 @@ export const CheckoutPage: React.FC = () => {
               </Card>
             </div>
           </div>
+
+          {/* Recommended Products */}
+          <div className="mt-12">
+            <h3 className="text-2xl font-bold mb-6">Recommended for you</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Nail File Set */}
+              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="/nail-file-white.webp"
+                    alt="Nail File Set"
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Nail File (80/80 Grit)</h4>
+                    <p className="text-pink-500 font-bold">R35.00</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    cartStore.addItem({
+                      id: `item_${Date.now()}`,
+                      productId: 'nail-file',
+                      name: 'Nail File (80/80 Grit)',
+                      price: 35,
+                      image: '/nail-file-white.webp',
+                      quantity: 1
+                    });
+                  }}
+                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+
+              {/* Cuticle Oil */}
+              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="/cuticle-oil-white.webp"
+                    alt="Cuticle Oil"
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Cuticle Oil</h4>
+                    <p className="text-pink-500 font-bold">R140.00</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    cartStore.addItem({
+                      id: `item_${Date.now()}`,
+                      productId: 'cuticle-oil',
+                      name: 'Cuticle Oil',
+                      price: 140,
+                      image: '/cuticle-oil-white.webp',
+                      quantity: 1
+                    });
+                  }}
+                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+
+              {/* Top Coat */}
+              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="/top-coat-white.webp"
+                    alt="Top Coat"
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                  <div>
+                    <h4 className="font-semibold text-gray-900">Top Coat</h4>
+                    <p className="text-pink-500 font-bold">R190.00</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    cartStore.addItem({
+                      id: `item_${Date.now()}`,
+                      productId: 'top-coat',
+                      name: 'Top Coat',
+                      price: 190,
+                      image: '/top-coat-white.webp',
+                      quantity: 1
+                    });
+                  }}
+                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
         </Container>
       </main>
 
