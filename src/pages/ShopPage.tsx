@@ -584,7 +584,7 @@ export const ShopPage: React.FC = () => {
   }, []);
 
   const filteredProducts = allProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'all' ||
+    const matchesCategory = selectedCategory === 'all' || 
       product.category === selectedCategory;
     
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -617,13 +617,15 @@ export const ShopPage: React.FC = () => {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'grid-3':
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+        // On mobile show 2 columns, tablet 2, desktop 3
+        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
       case 'grid-2':
-        return 'grid-cols-1 sm:grid-cols-2';
+        // Consistent 2-column grid on mobile and tablet
+        return 'grid-cols-2 sm:grid-cols-2';
       case 'list':
         return 'grid-cols-1';
       default:
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
     }
   };
 
@@ -656,7 +658,7 @@ export const ShopPage: React.FC = () => {
       <Header showMobileMenu={true} />
 
       <main className="pt-8 pb-16">
-        <Container>
+          <Container>
           {/* Page Header - Clean & Modern */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Shop</h1>
@@ -682,48 +684,48 @@ export const ShopPage: React.FC = () => {
           {/* Category Pills - Mobile Optimized */}
           <div className="mb-4">
             <div className="flex flex-wrap gap-1.5">
-              {productCategories.map((category) => (
-                <button
-                  key={category.slug}
-                  onClick={() => setSelectedCategory(category.slug)}
+                      {productCategories.map((category) => (
+                        <button
+                          key={category.slug}
+                          onClick={() => setSelectedCategory(category.slug)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                    selectedCategory === category.slug
+                            selectedCategory === category.slug
                       ? 'bg-pink-400 text-white shadow-md'
                       : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                  }`}
-                >
+                          }`}
+                        >
                   {category.name}
                   <span className="ml-1 text-xs opacity-75">({category.count})</span>
-                </button>
-              ))}
-            </div>
-          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
           {/* Sticky Filter Bar - Mobile Optimized */}
           <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
             <div className="flex items-center justify-between gap-2">
               {/* Left: Sort & Filter */}
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <button
+                      <button
                   onClick={() => setShowFilters(!showFilters)}
                   className="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                >
+                      >
                   <Filter className="h-4 w-4" />
                   <span className="hidden sm:inline font-medium">Filters</span>
                   <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-                </button>
-                
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                      </button>
+
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
                   className="px-2 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none min-w-0 flex-1"
-                >
-                  {sortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
+                    >
+                      {sortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
                       Sort: {option.label}
-                    </option>
-                  ))}
-                </select>
+                        </option>
+                      ))}
+                    </select>
               </div>
 
               {/* Right: View Toggle & Count */}
@@ -732,24 +734,24 @@ export const ShopPage: React.FC = () => {
                   {sortedProducts.length} of {allProducts.length}
                 </span>
                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                  <button
-                    onClick={() => setViewMode('grid-3')}
+                      <button
+                        onClick={() => setViewMode('grid-3')}
                     className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
-                  >
+                      >
                     <Grid3X3 className="h-3 w-3" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('grid-2')}
+                      </button>
+                      <button
+                        onClick={() => setViewMode('grid-2')}
                     className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
-                  >
+                      >
                     <Grid2X2 className="h-3 w-3" />
-                  </button>
-                  <button
-                    onClick={() => setViewMode('list')}
+                      </button>
+                      <button
+                        onClick={() => setViewMode('list')}
                     className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
@@ -766,7 +768,7 @@ export const ShopPage: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
               <div className="space-y-4">
                 {/* In Stock Only */}
-                <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-medium text-gray-900 text-sm">Availability</h3>
                     <p className="text-xs text-gray-500">Show only in-stock items</p>
@@ -795,22 +797,22 @@ export const ShopPage: React.FC = () => {
 
           {/* Products Grid - Clean Modern Layout */}
           <div className={`grid ${getGridClasses()} gap-6`}>
-            {sortedProducts.map((product) => (
-              <ProductCard
+                {sortedProducts.map((product) => (
+                  <ProductCard
                 key={product.id}
-                id={product.id}
-                name={product.name}
-                slug={product.slug}
-                price={product.price}
-                compareAtPrice={product.compareAtPrice}
-                shortDescription={product.shortDescription}
-                images={product.images}
-                inStock={product.inStock}
-                badges={product.badges}
+                    id={product.id}
+                    name={product.name}
+                    slug={product.slug}
+                    price={product.price}
+                    compareAtPrice={product.compareAtPrice}
+                    shortDescription={product.shortDescription}
+                    images={product.images}
+                    inStock={product.inStock}
+                    badges={product.badges}
                 isListView={viewMode === 'list'}
-              />
-            ))}
-          </div>
+                  />
+                ))}
+              </div>
 
           {/* Empty State */}
           {sortedProducts.length === 0 && (
@@ -821,15 +823,15 @@ export const ShopPage: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
                 <p className="text-gray-500 mb-6">Try adjusting your filters or search terms</p>
-                <button
+                      <button
                   onClick={clearFilters}
                   className="px-6 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors font-medium"
                 >
                   Clear All Filters
-                </button>
-              </div>
+                    </button>
             </div>
-          )}
+          </div>
+        )}
         </Container>
       </main>
 
