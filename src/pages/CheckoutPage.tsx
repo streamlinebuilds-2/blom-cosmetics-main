@@ -766,7 +766,25 @@ export const CheckoutPage: React.FC = () => {
                               <p className="text-pink-400 font-bold">{formatPrice(item.price)}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-medium">Qty: {item.quantity}</p>
+                              <div className="inline-flex items-center gap-2 mb-1">
+                                <button
+                                  type="button"
+                                  aria-label="Decrease quantity"
+                                  onClick={() => handleQuantityChange(item.id, Math.max(1, item.quantity - 1))}
+                                  className="p-1.5 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </button>
+                                <span className="w-8 text-center font-medium">{item.quantity}</span>
+                                <button
+                                  type="button"
+                                  aria-label="Increase quantity"
+                                  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                  className="p-1.5 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </button>
+                              </div>
                               <p className="text-pink-400 font-bold">
                                 {formatPrice(item.price * item.quantity)}
                               </p>
@@ -820,8 +838,26 @@ export const CheckoutPage: React.FC = () => {
                           {item.variant && (
                             <p className="text-xs text-gray-500">{item.variant.title}</p>
                           )}
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm">Qty: {item.quantity}</span>
+                          <div className="flex items-center justify-between mt-1">
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                aria-label="Decrease quantity"
+                                onClick={() => handleQuantityChange(item.id, Math.max(1, item.quantity - 1))}
+                                className="p-1 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                              >
+                                <Minus className="h-3.5 w-3.5" />
+                              </button>
+                              <span className="w-7 text-center text-sm font-medium">{item.quantity}</span>
+                              <button
+                                type="button"
+                                aria-label="Increase quantity"
+                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                className="p-1 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
                             <span className="text-pink-400 font-bold text-sm">
                               {formatPrice(item.price * item.quantity)}
                             </span>
