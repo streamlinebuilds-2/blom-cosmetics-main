@@ -18,6 +18,10 @@ interface ProductCardProps {
   isListView?: boolean;
   // Enable homepage-only shine hover effect on image (no colorful hover image)
   hoverShine?: boolean;
+  // Discount information
+  discountPrice?: number;
+  discountBadge?: string;
+  discountBadgeColor?: string;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -32,7 +36,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   badges = [],
   className = '',
   isListView = false,
-  hoverShine = false
+  hoverShine = false,
+  discountPrice,
+  discountBadge,
+  discountBadgeColor
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const cardRef = React.useRef<HTMLElement | null>(null);
@@ -373,15 +380,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className="text-center mb-3 sm:mb-3 md:mb-4">
           <div className="flex items-center justify-center gap-2 sm:gap-3">
             <span className="text-xl sm:text-xl md:text-2xl font-bold text-gray-900">
-              {price === -1 ? 'Coming Soon' : formatPrice(price)}
+              {price === -1 ? 'Coming Soon' : formatPrice(discountPrice || price)}
             </span>
-            {compareAtPrice && (
+            {(compareAtPrice || discountPrice) && (
               <>
                 <span className="text-base sm:text-base md:text-lg text-gray-400 line-through">
-                  {formatPrice(compareAtPrice)}
+                  {formatPrice(compareAtPrice || price)}
                 </span>
-                <span className="text-xs sm:text-xs font-semibold text-green-600 bg-green-100 px-2 py-1 sm:px-2 sm:py-1 rounded-full">
-                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+                <span className={`text-xs sm:text-xs font-semibold text-white px-2 py-1 sm:px-2 sm:py-1 rounded-full ${
+                  discountBadgeColor || 'bg-green-500'
+                }`}>
+                  {discountBadge || (compareAtPrice ? `${Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF` : 'SALE')}
                 </span>
               </>
             )}

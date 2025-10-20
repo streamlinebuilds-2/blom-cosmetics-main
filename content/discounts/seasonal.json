@@ -1,0 +1,40 @@
+[
+  {
+    "id": "summer-collection",
+    "name": "Summer Collection Sale",
+    "description": "Bright summer colors at special prices",
+    "type": "percentage",
+    "value": 20,
+    "currency": "ZAR",
+    "scope": {
+      "products": ["core-acrylics", "nail-liquid-monomer", "top-coat"]
+    },
+    "conditions": {
+      "startDate": "2024-12-01T00:00:00Z",
+      "endDate": "2025-02-28T23:59:59Z"
+    },
+    "badge": {
+      "text": "20% OFF",
+      "color": "bg-yellow-500"
+    }
+  },
+  {
+    "id": "holiday-special",
+    "name": "Holiday Special",
+    "description": "Festive season discounts",
+    "type": "percentage",
+    "value": 25,
+    "currency": "ZAR",
+    "scope": {
+      "categories": ["gel-system", "prep-finishing"]
+    },
+    "conditions": {
+      "startDate": "2024-12-15T00:00:00Z",
+      "endDate": "2025-01-15T23:59:59Z"
+    },
+    "badge": {
+      "text": "25% OFF",
+      "color": "bg-red-500"
+    }
+  }
+]

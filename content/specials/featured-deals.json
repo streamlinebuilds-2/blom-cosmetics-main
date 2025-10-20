@@ -1,0 +1,54 @@
+[
+  {
+    "id": "acrylic-starter-kit",
+    "title": "Acrylic Starter Kit",
+    "subtitle": "Everything you need to get started",
+    "description": "Perfect for beginners - includes acrylic powder, monomer, brush, and forms",
+    "image": "https://res.cloudinary.com/blom-cosmetics/image/upload/f_auto,q_auto/v1/specials/acrylic-starter-kit",
+    "link": "/shop?category=acrylic-system",
+    "badge": "Popular",
+    "badgeColor": "bg-pink-500",
+    "price": "From R450",
+    "originalPrice": "R600",
+    "discount": "25% OFF"
+  },
+  {
+    "id": "professional-tools",
+    "title": "Professional Tools Bundle",
+    "subtitle": "Salon-quality equipment",
+    "description": "Complete set of professional nail tools for the serious technician",
+    "image": "https://res.cloudinary.com/blom-cosmetics/image/upload/f_auto,q_auto/v1/specials/professional-tools",
+    "link": "/shop?category=tools-essentials",
+    "badge": "Limited",
+    "badgeColor": "bg-blue-500",
+    "price": "R299",
+    "originalPrice": "R399",
+    "discount": "R100 OFF"
+  },
+  {
+    "id": "gel-collection",
+    "title": "Gel Collection",
+    "subtitle": "Long-lasting beauty",
+    "description": "Complete gel system with top coat and base coat for perfect manicures",
+    "image": "https://res.cloudinary.com/blom-cosmetics/image/upload/f_auto,q_auto/v1/specials/gel-collection",
+    "link": "/shop?category=gel-system",
+    "badge": "New",
+    "badgeColor": "bg-green-500",
+    "price": "R199",
+    "originalPrice": "R249",
+    "discount": "20% OFF"
+  },
+  {
+    "id": "furniture-showcase",
+    "title": "Salon Furniture",
+    "subtitle": "Professional workspace",
+    "description": "Beautiful manicure tables and salon furniture to create the perfect workspace",
+    "image": "https://res.cloudinary.com/blom-cosmetics/image/upload/f_auto,q_auto/v1/specials/furniture-showcase",
+    "link": "/shop?category=furniture",
+    "badge": "Premium",
+    "badgeColor": "bg-purple-500",
+    "price": "From R2,500",
+    "originalPrice": "From R3,200",
+    "discount": "22% OFF"
+  }
+]
