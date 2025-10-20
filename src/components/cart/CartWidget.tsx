@@ -61,16 +61,22 @@ export const CartWidget: React.FC = () => {
 
   const recommendedProducts = [
     {
-      id: 'rec1',
-      name: 'Nail File Set',
-      price: 89,
-      image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'
+      id: 'nail-file',
+      name: 'Nail File (80/80 Grit)',
+      price: 35,
+      image: '/nail-file-white.webp'
     },
     {
-      id: 'rec2',
+      id: 'cuticle-oil',
       name: 'Cuticle Oil',
-      price: 129,
-      image: 'https://images.pexels.com/photos/3997992/pexels-photo-3997992.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'
+      price: 140,
+      image: '/cuticle-oil-white.webp'
+    },
+    {
+      id: 'top-coat',
+      name: 'Top Coat',
+      price: 190,
+      image: '/top-coat-white.webp'
     }
   ];
 
