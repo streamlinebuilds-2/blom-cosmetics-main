@@ -11,6 +11,7 @@ import { wishlistStore } from '../lib/wishlist';
 import { updateSEO, productSEO, trackPageView } from '../lib/seo';
 import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { ShareButton } from '../components/ui/ShareButton';
+import { ProductReviews } from '../components/reviews/ProductReviews';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 import { 
   Heart, 
@@ -1954,6 +1955,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   </div>
                 </div>
               ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* Reviews (approved only) */}
+        <section className="section-padding">
+          <Container>
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+              {product && <ProductReviews productSlug={product.slug} />}
             </div>
           </Container>
         </section>
