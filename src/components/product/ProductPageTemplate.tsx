@@ -601,7 +601,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                   <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   <span className="text-sm sm:text-base">WhatsApp Support</span>
                 </Button>
-                <Button size="lg" className="bg-transparent hover:bg-pink-400 text-pink-400 hover:text-white font-bold py-3 px-6 rounded-full transition-all duration-300 border-2 border-pink-400 hover:border-transparent">
+                <Button size="lg" className="bg-transparent hover:bg-blue-100 text-black hover:text-black font-bold py-3 px-6 rounded-full transition-all duration-300 border-2 border-black hover:border-blue-100">
                   <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   <span className="text-sm sm:text-base">Call Us</span>
                 </Button>
