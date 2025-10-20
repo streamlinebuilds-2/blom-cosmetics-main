@@ -19,9 +19,9 @@ export const handler: Handler = async (event) => {
       return { statusCode: 500, body: 'Supabase not configured' };
     }
 
-    // Try multiple keys: merchant_payment_id (new), m_payment_id (legacy), id (fallback)
+    // Try multiple keys: merchant_payment_id (new), order_number (UI), m_payment_id (legacy), id (fallback), custom_str1
     const orFilter = encodeURIComponent(
-      `merchant_payment_id.eq.${id},m_payment_id.eq.${id},id.eq.${id}`
+      `merchant_payment_id.eq.${id},order_number.eq.${id},m_payment_id.eq.${id},custom_str1.eq.${id},id.eq.${id}`
     );
     const orderUrl = `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,subtotal,product_id)&or=(${orFilter})&limit=1`;
     const orderRes = await fetch(orderUrl, { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } });
