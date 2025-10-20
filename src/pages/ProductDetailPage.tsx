@@ -11,6 +11,7 @@ import { wishlistStore } from '../lib/wishlist';
 import { updateSEO, productSEO, trackPageView } from '../lib/seo';
 import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { ShareButton } from '../components/ui/ShareButton';
+import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 import { 
   Heart, 
   Share2, 
@@ -46,6 +47,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [allImages, setAllImages] = useState<string[]>([]);
+  const [discounts, setDiscounts] = useState<Discount[]>([]);
 
   // Product database - matches ShopPage products
   const productDatabase = {
@@ -1170,6 +1172,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   };
 
   useEffect(() => {
+    // Load discounts
+    loadDiscounts().then(setDiscounts).catch(console.error);
+    
     // Find product by slug
     const foundProduct = productDatabase[productSlug as keyof typeof productDatabase];
 
