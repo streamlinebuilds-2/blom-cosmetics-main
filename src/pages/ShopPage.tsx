@@ -557,8 +557,7 @@ export const ShopPage: React.FC = () => {
     { value: 'featured', label: 'Featured' },
     { value: 'name', label: 'Name A-Z' },
     { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'rating', label: 'Highest Rated' }
+    { value: 'price-high', label: 'Price: High to Low' }
   ];
 
   useEffect(() => {
@@ -607,8 +606,6 @@ export const ShopPage: React.FC = () => {
         return a.price - b.price;
       case 'price-high':
         return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
       default:
         return 0;
     }

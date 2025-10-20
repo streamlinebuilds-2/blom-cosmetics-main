@@ -4,7 +4,6 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { ReviewSection } from '../components/review/ReviewSection';
 import { PaymentMethods } from '../components/payment/PaymentMethods';
 import { StickyCart } from '../components/cart/StickyCart';
 import { cartStore, showNotification } from '../lib/cart';
@@ -13,7 +12,6 @@ import { updateSEO, productSEO, trackPageView } from '../lib/seo';
 import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { ShareButton } from '../components/ui/ShareButton';
 import { 
-  Star, 
   Heart, 
   Share2, 
   ShoppingCart, 
@@ -1362,8 +1360,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
             originalPrice: product.compareAtPrice,
             image: product.images[0],
             inStock: product.stock !== 'Out of Stock',
-            rating: product.rating,
-            reviewCount: product.reviewCount,
             category: product.category,
             brand: 'BLOM Cosmetics'
           }}
@@ -1465,23 +1461,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                 <div className="mb-8">
                   <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
                   <p className="text-lg text-gray-600 mb-6 leading-relaxed">{product.shortDescription}</p>
-                  
-                  {/* Rating */}
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="flex items-center gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-5 w-5 ${
-                            i < Math.floor(product.rating)
-                              ? 'fill-current text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-gray-600">({product.reviewCount} reviews)</span>
-                  </div>
 
                   {/* Price */}
                   <div className="flex items-baseline gap-4 mb-3">
@@ -1957,18 +1936,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                     />
                   </div>
                   <div className="p-6">
-                    <div className="flex items-center gap-1 mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(relatedProduct.rating)
-                              ? 'fill-current text-yellow-400'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
                     <h3 className="font-semibold text-lg mb-2 group-hover:text-pink-400 transition-colors">{relatedProduct.name}</h3>
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold text-pink-400">{formatPrice(relatedProduct.price)}</span>
@@ -2008,20 +1975,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
             </div>
           </Container>
         </section>
-
-        {/* Reviews Section */}
-        <ReviewSection
-          productName={product.name}
-          productImage={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-          productSlug={product.slug}
-          averageRating={product.rating}
-          reviewCount={product.reviewCount}
-          reviews={product.reviews}
-          onReviewSubmit={(reviewData) => {
-            console.log('New review submitted:', reviewData);
-            showNotification('Thank you for your review! It will be published after moderation.');
-          }}
-        />
 
         {/* Sticky Cart */}
         <StickyCart

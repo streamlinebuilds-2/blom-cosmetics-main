@@ -9,8 +9,6 @@ interface ProductStructuredDataProps {
     originalPrice?: number;
     image: string;
     inStock: boolean;
-    rating?: number;
-    reviewCount?: number;
     category: string;
     brand: string;
   };
@@ -39,18 +37,8 @@ export const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({ pr
         "@type": "Organization",
         "name": "BLOM Cosmetics"
       }
-    },
-    "aggregateRating": product.rating && product.reviewCount ? {
-      "@type": "AggregateRating",
-      "ratingValue": product.rating,
-      "reviewCount": product.reviewCount
-    } : undefined
+    }
   };
-
-  // Remove undefined properties
-  if (!structuredData.aggregateRating) {
-    delete structuredData.aggregateRating;
-  }
 
   return (
     <script
