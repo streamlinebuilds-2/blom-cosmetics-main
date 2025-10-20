@@ -353,7 +353,7 @@ export const CheckoutPage: React.FC = () => {
                               />
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="font-semibold text-gray-900">💅 Collect from BLOM HQ, Randfontein</span>
+                                  <span className="font-semibold text-gray-900">Collect from BLOM HQ, Randfontein</span>
                                   <span className="text-lg font-bold text-pink-500">FREE</span>
                                 </div>
                                 <p className="text-sm text-gray-600">Ready within 24 hours. We'll WhatsApp you when it's ready.</p>
@@ -381,7 +381,7 @@ export const CheckoutPage: React.FC = () => {
                               />
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="font-semibold text-gray-900">📦 Collect from Locker / Kiosk</span>
+                                  <span className="font-semibold text-gray-900">Collect from Locker / Kiosk</span>
                                   <span className="text-lg font-bold text-gray-900">R50</span>
                                 </div>
                                 <p className="text-sm text-gray-600">Choose your nearest Courier Guy Locker or Kiosk (2–4 business days).</p>
@@ -410,7 +410,7 @@ export const CheckoutPage: React.FC = () => {
                               />
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
-                                  <span className="font-semibold text-gray-900">🚚 Door-to-Door Delivery</span>
+                                  <span className="font-semibold text-gray-900">Door-to-Door Delivery</span>
                                   <span className="text-lg font-bold text-gray-900">
                                     {cartState.subtotal >= 1500 ? 'FREE' : 'R75'}
                                   </span>
