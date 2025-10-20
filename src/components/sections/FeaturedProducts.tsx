@@ -26,42 +26,17 @@ export const FeaturedProducts: React.FC = () => {
   };
 
   useEffect(() => {
-    // Use hardcoded bestseller products with old image format
+    // Use specially made bestseller products with special images
     const bestsellerProducts = [
       {
-        id: '1',
-        name: 'Cuticle Oil',
-        slug: 'cuticle-oil',
-        price: 140,
+        id: '2',
+        name: 'Vitamin Primer',
+        slug: 'vitamin-primer',
+        price: 210,
         compare_at_price: null,
-        short_description: 'Nourishing oil with Vitamin E, Jojoba & Soybean Oil.',
+        short_description: 'Essential nail preparation for lasting results',
         product_images: [
-          { image_url: '/cuticle-oil-white.webp', sort_order: 1 },
-          { image_url: '/cuticle-oil-colorful.webp', sort_order: 2 }
-        ]
-      },
-      {
-        id: '4',
-        name: 'Top Coat',
-        slug: 'top-coat',
-        price: 190,
-        compare_at_price: null,
-        short_description: 'Mirror shine, chip-resistant, professional finish.',
-        product_images: [
-          { image_url: '/top-coat-white.webp', sort_order: 1 },
-          { image_url: '/top-coat-colorful.webp', sort_order: 2 }
-        ]
-      },
-      {
-        id: '8',
-        name: 'Acetone (Remover)',
-        slug: 'acetone-remover',
-        price: 60,
-        compare_at_price: null,
-        short_description: 'Professional-grade, fast acting nail remover.',
-        product_images: [
-          { image_url: '/acetone-remover-white.webp', sort_order: 1 },
-          { image_url: '/acetone-remover-colorful.webp', sort_order: 2 }
+          { image_url: '/primer-01.webp', sort_order: 1 }
         ]
       },
       {
@@ -70,10 +45,20 @@ export const FeaturedProducts: React.FC = () => {
         slug: 'core-acrylics',
         price: 280,
         compare_at_price: null,
-        short_description: 'Professional acrylic powders in 13 beautiful colors.',
+        short_description: 'Professional grade acrylic powder for perfect sculpting',
         product_images: [
-          { image_url: '/core-acrylics-white.webp', sort_order: 1 },
-          { image_url: '/core-acrylics-colorful.webp', sort_order: 2 }
+          { image_url: '/acrylic-powder-01.webp', sort_order: 1 }
+        ]
+      },
+      {
+        id: '10',
+        name: 'Nail Liquid (Monomer)',
+        slug: 'nail-liquid-monomer',
+        price: 380,
+        compare_at_price: null,
+        short_description: 'High-quality monomer for smooth application',
+        product_images: [
+          { image_url: '/nail-liquid-monomer.webp', sort_order: 1 }
         ]
       }
     ];
@@ -117,23 +102,23 @@ export const FeaturedProducts: React.FC = () => {
     // Fallback to static data if database fails
     const fallbackProducts = [
       {
-        id: '1',
+        id: '2',
         slug: 'vitamin-primer',
         name: 'Vitamin Primer',
-        price: 299,
+        price: 210,
         image: '/primer-01.webp',
         description: 'Essential nail preparation for lasting results'
       },
       {
-        id: '2',
-        slug: 'crystal-clear-acrylic-56g',
-        name: 'Crystal Clear Acrylic (56 g)',
-        price: 450,
+        id: '9',
+        slug: 'core-acrylics',
+        name: 'Core Acrylics (56 g)',
+        price: 280,
         image: '/acrylic-powder-01.webp',
         description: 'Professional grade acrylic powder for perfect sculpting'
       },
       {
-        id: '3',
+        id: '10',
         slug: 'nail-liquid-monomer',
         name: 'Nail Liquid (Monomer)',
         price: 380,
