@@ -274,18 +274,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   // Grid view layout
   return (
     <article
-      className={`product-card group relative bg-white rounded-[20px] shadow-[0_4px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_24px_rgba(0,0,0,0.06)] transition-all duration-300 overflow-hidden cursor-pointer hover:-translate-y-1 ${className}`}
+      className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container with 3D Flip Effect */}
-      <div className="relative aspect-square overflow-hidden bg-[#fff7fb] product-card-flip-container p-6">
+      <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
         <div className="product-card-flip-inner">
           {/* Front Face - White Background Image */}
           <div className="product-card-flip-front">
             <img
               src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
               alt={name}
-              className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+              className="w-full h-full object-cover"
               loading="lazy"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
@@ -300,7 +300,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <img
                 src={images[1]}
                 alt={name}
-                className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.02]"
+                className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -318,75 +318,91 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         )}
 
-        {/* Soft capsule badges */}
-        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 space-y-1">
-          {(!inStock || price === -1) && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-[#fbd3e9] text-[#666]">Sold out</span>
-          )}
-          {badges.includes('New') && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-[#fbd3e9] text-[#666]">NEW</span>
-          )}
-          {badges.includes('Bestseller') && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-medium bg-pink-100 text-pink-700">Bestseller</span>
-          )}
-        </div>
+        {/* Bestseller Badge */}
+        {badges.includes('Bestseller') && (
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-pink-100 text-pink-600 px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+            BESTSELLER
+          </div>
+        )}
+
+        {/* New Badge */}
+        {badges.includes('New') && (
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-blue-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+            NEW
+          </div>
+        )}
+
+        {/* Sale Badge */}
+        {badges.includes('Sale') && (
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-red-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+            SALE
+          </div>
+        )}
 
 
         {/* Wishlist Heart */}
         <button
           type="button"
           onClick={handleWishlistToggle}
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center border border-gray-100 hover:shadow-sm transition"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
           aria-label="Toggle wishlist"
         >
-          <Heart className={`h-5 w-5 transition-colors ${
-            isWishlisted ? 'fill-pink-400 text-pink-400' : 'text-gray-600 group-hover:text-pink-400'
+          <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
+            isWishlisted 
+              ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
+              : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
           }`} />
         </button>
       </div>
 
       {/* Content */}
-      <div className="px-5 pt-4 pb-5 text-center">
+      <div className="p-3 sm:p-4 md:p-6">
         {/* Product Name */}
-        <h3 className="font-semibold text-[15px] md:text-[16px] leading-snug text-gray-900 mb-2">
+        <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem] text-center">
           {name}
         </h3>
 
         {/* Short Description */}
         {shortDescription && (
-          <p className="text-[12px] text-gray-500 mb-3 leading-relaxed">
+          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed text-center">
             {shortDescription}
           </p>
         )}
 
-        {/* Price */}
-        <div className="mb-4">
-          <span className="text-[15px] font-medium text-[#333]">
-            {price === -1 ? 'Coming Soon' : formatPrice(price)}
-          </span>
-          {compareAtPrice && price !== -1 && (
-            <span className="ml-2 text-[12px] text-gray-400 line-through align-middle">
-              {formatPrice(compareAtPrice)}
+        {/* Price - Centered */}
+        <div className="text-center mb-2 sm:mb-3 md:mb-4">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+              {price === -1 ? 'Coming Soon' : formatPrice(price)}
             </span>
-          )}
+            {compareAtPrice && (
+              <>
+                <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
+                  {formatPrice(compareAtPrice)}
+                </span>
+                <span className="text-[10px] sm:text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
+                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Add to Cart Button */}
-        <div>
+        {/* Add to Cart Button - Centered */}
+        <div className="text-center">
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={!inStock || price === -1}
-            className={`inline-flex items-center justify-center w-full md:w-auto px-6 py-2.5 rounded-full text-white font-semibold text-[13px] transition-all ${
-              (!inStock || price === -1)
-                ? 'bg-[#f2cbd8] cursor-not-allowed'
-                : 'hover:shadow-[0_10px_24px_rgba(248,182,227,0.45)]'
+            className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-3 sm:py-2.5 sm:px-5 md:py-3.5 md:px-8 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 ${
+              inStock && price !== -1
+                ? 'bg-pink-400 text-white hover:bg-pink-400 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}
-            style={{ backgroundImage: (!inStock || price === -1) ? 'none' : 'linear-gradient(135deg, #f8b6e3, #ffd6f0)' }}
             aria-disabled={!inStock || price === -1}
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            {price === -1 ? 'Coming Soon' : inStock ? 'Add to Cart' : 'Sold Out'}
+            <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+            {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
         </div>
       </div>
