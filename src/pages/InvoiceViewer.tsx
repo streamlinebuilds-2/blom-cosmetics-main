@@ -73,8 +73,16 @@ export default function InvoiceViewer() {
                   <h2 className="text-xl font-semibold text-gray-900 mb-2">Error</h2>
                   <p className="text-gray-600 mb-6">{error}</p>
                   <a 
+                    href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderId || 'BLOM-DEMO-ORDER')}&inline=1`}
+                    className="inline-flex items-center px-4 py-2 rounded-full font-semibold text-white transition-all bg-pink-400 hover:bg-pink-400 hover:shadow-lg active:scale-95 mr-3"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    View Demo Invoice
+                  </a>
+                  <a 
                     href="/account" 
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Account
