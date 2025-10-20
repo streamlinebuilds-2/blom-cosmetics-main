@@ -16,6 +16,8 @@ interface ProductCardProps {
   badges?: string[];
   className?: string;
   isListView?: boolean;
+  // Enable homepage-only shine hover effect on image (no colorful hover image)
+  hoverShine?: boolean;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -29,7 +31,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   inStock = true,
   badges = [],
   className = '',
-  isListView = false
+  isListView = false,
+  hoverShine = false
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const cardRef = React.useRef<HTMLElement | null>(null);
@@ -292,7 +295,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           {/* Back Face - Colorful Image */}
-          {images[1] && (
+          {!hoverShine && images[1] && (
             <div className="product-card-flip-back">
               <img
                 src={images[1]}
@@ -307,6 +310,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           )}
         </div>
+
+        {/* Hover Shine Effect (homepage best sellers only) */}
+        {hoverShine && (
+          <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="shine-bar absolute top-0 bottom-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
+          </div>
+        )}
 
         {/* Bestseller Badge */}
         {badges.includes('Bestseller') && (
@@ -403,6 +413,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        @keyframes shineMove {
+          0% { transform: translateX(-150%) skewX(-12deg); }
+          100% { transform: translateX(150%) skewX(-12deg); }
+        }
+        /* Trigger animation only on hover to avoid continuous motion */
+        .group:hover .shine-bar {
+          animation: shineMove 1.2s ease-in-out;
         }
       `}</style>
     </article>

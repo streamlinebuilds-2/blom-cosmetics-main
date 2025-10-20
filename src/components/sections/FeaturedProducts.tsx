@@ -150,6 +150,7 @@ export const FeaturedProducts: React.FC = () => {
                 images={[product.image]}
                 inStock={true}
                 badges={['Bestseller']}
+                hoverShine
               />
             ))}
           </div>
@@ -193,6 +194,7 @@ export const FeaturedProducts: React.FC = () => {
                 images={images}
                 inStock={true}
                 badges={['Bestseller']}
+                hoverShine
               />
             );
           })}
