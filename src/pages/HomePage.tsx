@@ -10,7 +10,6 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Star, Award, Users, Sparkles, Shield, Truck, RefreshCw, CheckCircle, Zap, Heart } from 'lucide-react';
-import { Testimonials } from '../components/sections/Testimonials';
 import { updateSEO, trackPageView } from '../lib/seo';
 
 export const HomePage: React.FC = () => {
@@ -157,7 +156,31 @@ export const HomePage: React.FC = () => {
 
         <MasterYourCraft />
 
-        <Testimonials />
+        {/* Customer Testimonials */}
+        <section className="py-20 bg-gray-50">
+          <Container>
+            <div className="text-center mb-12">
+              <h2 className="heading-with-stripe">What Our Customers Say</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {testimonials.map((testimonial) => (
+                <Card key={testimonial.id} className="testimonial-card">
+                  <CardContent className="p-6 text-center">
+                    <div className="flex justify-center mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                    <p className="text-gray-600 mb-4 italic">"{testimonial.content}"</p>
+                    <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                    <div className="text-sm text-gray-500">{testimonial.role}</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </Container>
+        </section>
       </main>
 
       <Footer />
