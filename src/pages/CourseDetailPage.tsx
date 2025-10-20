@@ -337,34 +337,11 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Validate all fields
-    const isValid = Object.entries(formData).every(([key, value]) => 
-      validateField(key, value)
-    );
-
-    if (!isValid || !selectedPackage || !selectedDate) {
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      // Simulate booking process
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Show success notification
-      showNotification('Booking successful! Check your email for confirmation.', 'success');
-      
-      // Reset form
-      setFormData({ name: '', email: '', phone: '', countryCode: '+27', terms: false });
-      setSelectedPackage('');
-      setSelectedDate('');
-      
-    } catch (error) {
-      showNotification('Booking failed. Please try again.', 'error');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Minimal validation for presentation
+    const isValid = Object.entries(formData).every(([key, value]) => validateField(key, value));
+    if (!isValid) { setIsSubmitting(false); return; }
+    // Jump straight to Checkout payment step (demo)
+    window.location.href = '/checkout?step=payment&item=online-course';
   };
 
   const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
@@ -712,42 +689,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
                 {/* Form Body */}
                 <div className="p-12">
                   <form onSubmit={handleSubmit} className="space-y-7">
-                    {/* Row 1: Date & Package */}
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                        <label className="block text-sm font-semibold text-gray-800 mb-3">
-                          Select Date <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                          value={selectedDate}
-                          onChange={(e) => setSelectedDate(e.target.value)}
-                          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
-                            required
-                          >
-                          <option value="">Choose a date...</option>
-                          {course.availableDates.map((date, index) => (
-                            <option key={index} value={date}>{date}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <div>
-                        <label className="block text-sm font-semibold text-gray-800 mb-3">
-                          Select Package <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                          value={selectedPackage}
-                          onChange={(e) => setSelectedPackage(e.target.value)}
-                          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base"
-                            required
-                          >
-                          <option value="">Choose a package...</option>
-                          {course.packages.map((pkg, index) => (
-                            <option key={index} value={pkg.name}>{pkg.name} Package - {pkg.price}</option>
-                          ))}
-                          </select>
-                        </div>
-                    </div>
+                    {/* Row 1: simplified intro removed (date & package not needed for online) */}
 
                     {/* Row 2: Name & Email */}
                     <div className="grid md:grid-cols-2 gap-6">

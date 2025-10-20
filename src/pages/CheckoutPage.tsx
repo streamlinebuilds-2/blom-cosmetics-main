@@ -12,7 +12,11 @@ import { validateMobileNumber, validateAddress, validatePickupPoint, formatMobil
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
-  const [step, setStep] = useState<'shipping' | 'payment' | 'review'>('shipping');
+  const [step, setStep] = useState<'shipping' | 'payment' | 'review'>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get('step');
+    return s === 'payment' ? 'payment' : 'shipping';
+  });
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'locker' | 'door-to-door'>('door-to-door');
