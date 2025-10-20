@@ -19,15 +19,19 @@ export const handler: Handler = async (event) => {
       return { statusCode: 500, body: 'Supabase not configured' };
     }
 
-    // Try multiple keys: merchant_payment_id (new), order_number (UI), m_payment_id (legacy), id (fallback), custom_str1
-    const orFilter = encodeURIComponent(
-      `merchant_payment_id.eq.${id},order_number.eq.${id},m_payment_id.eq.${id},custom_str1.eq.${id},id.eq.${id}`
-    );
-    const orderUrl = `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,subtotal,product_id)&or=(${orFilter})&limit=1`;
-    const orderRes = await fetch(orderUrl, { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } });
-    if (!orderRes.ok) return { statusCode: orderRes.status, body: await orderRes.text() };
-    const arr = await orderRes.json();
-    const order = arr?.[0];
+    // Try multiple keys sequentially to avoid DB errors when a column doesn't exist
+    const tryCols = ['merchant_payment_id','m_payment_id','custom_str1','id'];
+    let order: any = null;
+    for (const col of tryCols) {
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,subtotal,product_id)&${encodeURIComponent(col)}=eq.${encodeURIComponent(id)}&limit=1`;
+        const r = await fetch(url, { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } });
+        if (!r.ok) continue; // skip if column doesn't exist or other error
+        const j = await r.json();
+        if (Array.isArray(j) && j.length) { order = j[0]; break; }
+      } catch {}
+    }
+    
     if (!order) return { statusCode: 404, body: 'Order not found' };
 
     const items = (order.order_items || []).map((it: any) => ({
