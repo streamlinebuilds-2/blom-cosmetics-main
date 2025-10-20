@@ -22,6 +22,16 @@ const testimonials = [
     id: 4,
     name: 'Jaundré',
     image: '/jaundre.webp'
+  },
+  {
+    id: 5,
+    name: 'Emma Thompson',
+    image: '/testimonial-5.webp'
+  },
+  {
+    id: 6,
+    name: 'Lisa Rodriguez',
+    image: '/testimonial-4.webp'
   }
 ];
 
@@ -51,52 +61,24 @@ export const Testimonials: React.FC = () => {
         </div>
 
         <div 
-          className="relative max-w-4xl mx-auto"
+          className="relative max-w-6xl mx-auto overflow-hidden"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Mobile: Single image carousel */}
-          <div className="block md:hidden">
-            <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg max-w-sm mx-auto">
-              <img
-                src={testimonials[index].image}
-                alt={testimonials[index].name}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          </div>
-
-          {/* Desktop: Circular rotating carousel */}
-          <div className="hidden md:block relative w-96 h-96 mx-auto">
-            {testimonials.map((testimonial, i) => {
-              const angle = (i * 90) - (index * 90); // 90 degrees apart, rotated by current index
-              const radius = 150; // Distance from center
-              const x = Math.cos((angle * Math.PI) / 180) * radius;
-              const y = Math.sin((angle * Math.PI) / 180) * radius;
-              
-              return (
-                <div
-                  key={testimonial.id}
-                  className="absolute transition-all duration-1000 ease-in-out"
-                  style={{
-                    left: `calc(50% + ${x}px - 75px)`, // 75px is half the image width
-                    top: `calc(50% + ${y}px - 100px)`, // 100px is half the image height
-                    transform: 'translate(-50%, -50%)',
-                    zIndex: i === index ? 10 : 1,
-                  }}
-                >
-                  <div className="aspect-[9/16] w-32 rounded-xl overflow-hidden bg-gray-50 shadow-lg">
-                    <img
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
+          {/* Conveyor belt style carousel */}
+          <div className="flex transition-transform duration-1000 ease-in-out" style={{ transform: `translateX(-${index * 100}%)` }}>
+            {testimonials.map((testimonial) => (
+              <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
+                <div className="aspect-[9/16] max-w-xs mx-auto rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
           {/* Navigation */}
