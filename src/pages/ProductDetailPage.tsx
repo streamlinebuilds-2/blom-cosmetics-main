@@ -12,6 +12,7 @@ import { updateSEO, productSEO, trackPageView } from '../lib/seo';
 import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { ShareButton } from '../components/ui/ShareButton';
 import { ProductReviews } from '../components/reviews/ProductReviews';
+import { ReviewForm } from '../components/reviews/ReviewForm';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 import { 
   Heart, 
@@ -1965,6 +1966,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
             <div className="max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
               {product && <ProductReviews productSlug={product.slug} />}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-2">Write a review</h3>
+                {product && <ReviewForm productSlug={product.slug} />}
+              </div>
             </div>
           </Container>
         </section>
