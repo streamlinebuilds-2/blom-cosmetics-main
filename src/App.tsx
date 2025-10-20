@@ -32,6 +32,7 @@ import SimpleAccountPage from './pages/SimpleAccountPage';
 import DebugAccountPage from './pages/DebugAccountPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import InvoiceViewer from './pages/InvoiceViewer';
+import { DealsPage } from './pages/DealsPage';
 
 function App() {
   // Simple routing based on URL path
@@ -57,6 +58,10 @@ function App() {
   
   if (path === '/contact') {
     return <><ContactPage /><CartWidget /></>;
+  }
+  
+  if (path === '/deals') {
+    return <><DealsPage /><CartWidget /></>;
   }
   
   if (path === '/checkout') {

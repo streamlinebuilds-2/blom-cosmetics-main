@@ -12,16 +12,16 @@ export const ShopByCategory: React.FC = () => {
       description: 'Professional powders & liquids'
     },
     {
-      name: 'Cuticle Care',
+      name: 'Prep & Finish',
       icon: Droplet,
-      href: '/shop#cuticle-care',
+      href: '/shop#prep-finishing',
       image: '/cuticle-category.webp',
       description: 'Nourishing oils & treatments'
     },
     {
-      name: 'Nail Essentials',
+      name: 'Tools & Essentials',
       icon: Palette,
-      href: '/shop#nail-essentials',
+      href: '/shop#tools-essentials',
       image: '/nail-essentials-category.webp',
       description: 'Colors, glitters & finishes'
     },

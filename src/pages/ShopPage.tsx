@@ -820,6 +820,28 @@ export const ShopPage: React.FC = () => {
             </div>
           )}
 
+          {/* Category Sections for Anchor Navigation */}
+          {selectedCategory === 'acrylic-system' && (
+            <div id="acrylic-system" className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Acrylic System</h2>
+              <p className="text-gray-600 mb-6">Professional acrylic powders and liquid monomers for nail extensions and overlays.</p>
+            </div>
+          )}
+          
+          {selectedCategory === 'prep-finishing' && (
+            <div id="prep-finishing" className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Prep & Finish</h2>
+              <p className="text-gray-600 mb-6">Essential prep solutions, primers, and finishing products for professional nail care.</p>
+            </div>
+          )}
+          
+          {selectedCategory === 'tools-essentials' && (
+            <div id="tools-essentials" className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Tools & Essentials</h2>
+              <p className="text-gray-600 mb-6">Professional nail tools, files, brushes, and essential accessories for nail artistry.</p>
+            </div>
+          )}
+
           {/* Products Grid - Clean Modern Layout */}
           <div className={`grid ${getGridClasses()} gap-6`}>
                 {sortedProducts.map((product) => {
