@@ -331,29 +331,29 @@ export const AccountPage: React.FC = () => {
       <main className="section-padding">
         <Container>
           {/* Account Header */}
-          <div className="bg-gradient-to-r from-pink-400 to-blue-300 rounded-2xl p-8 text-white mb-8">
+          <div className="bg-blue-100 rounded-2xl p-8 text-gray-900 mb-8">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
               <div className="flex items-center gap-6 mb-6 md:mb-0">
-                <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-                  <User className="h-10 w-10 text-white" />
+                <div className="w-20 h-20 bg-blue-200 rounded-full flex items-center justify-center">
+                  <User className="h-10 w-10 text-blue-600" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold mb-2">Welcome back, {userData.name}!</h1>
-                  <p className="text-pink-100">Member since {userData.memberSince}</p>
+                  <p className="text-gray-600">Member since {userData.memberSince}</p>
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-6 text-center">
                 <div>
                   <div className="text-2xl font-bold">{userData.totalOrders}</div>
-                  <div className="text-pink-100 text-sm">Orders</div>
+                  <div className="text-gray-600 text-sm">Orders</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold">{formatPrice(userData.totalSpent)}</div>
-                  <div className="text-pink-100 text-sm">Total Spent</div>
+                  <div className="text-gray-600 text-sm">Total Spent</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold">{userData.loyaltyPoints}</div>
-                  <div className="text-pink-100 text-sm">Points</div>
+                  <div className="text-gray-600 text-sm">Points</div>
                 </div>
               </div>
             </div>
