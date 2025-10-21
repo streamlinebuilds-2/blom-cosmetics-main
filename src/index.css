@@ -1013,23 +1013,23 @@ html, body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
-/* Premium Shimmer effect - Luxurious light beam with card lift and flash finish */
+/* Premium Shimmer effect - Thin shine animation */
 .shimmer {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, 
-    transparent 0%, 
-    transparent 25%,
-    rgba(255, 255, 255, 0.3) 35%,
-    rgba(255, 255, 255, 0.8) 50%, 
-    rgba(255, 255, 255, 0.3) 65%,
-    transparent 75%,
-    transparent 100%
+  top: 0;
+  right: -150%;
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.4) 50%,
+    rgba(255,255,255,0) 100%
   );
-  transform: translate(-150%, -150%);
-  opacity: 0;
+  transform: skewX(-20deg);
+  z-index: 1;
   pointer-events: none;
-  animation-fill-mode: forwards;
+  opacity: 0.8;
 }
 
 /* Desktop - shimmer on hover only for the hovered card */
@@ -1037,8 +1037,7 @@ html, body {
   .best-seller-card:hover .shimmer,
   .course-card:hover .shimmer,
   .blog-card:hover .shimmer {
-    animation: luxurious-light-beam-premium 2.5s ease-in-out 1;
-    opacity: 1;
+    animation: thin-shine-animation 2.5s infinite;
   }
 
   /* Card lift effect during shimmer */
@@ -1054,8 +1053,7 @@ html, body {
   .course-card .shimmer,
   .blog-card .shimmer {
     animation: none;
-    transform: translate(-150%, -150%);
-    opacity: 0;
+    right: -150%;
   }
 }
 
@@ -1066,68 +1064,32 @@ html, body {
   }
 
   .best-seller-card .shimmer-container.shimmer-triggered .shimmer {
-    animation: luxurious-light-beam-premium 2.5s ease-in-out 1 !important;
-    opacity: 1 !important;
+    animation: thin-shine-animation 2.5s infinite !important;
   }
 
   /* Mobile shimmer on tap for all card types */
   .course-card:active .shimmer,
   .blog-card:active .shimmer,
   .best-seller-card:active .shimmer {
-    animation: luxurious-light-beam-premium 2.5s ease-in-out 1 !important;
-    opacity: 1 !important;
+    animation: thin-shine-animation 2.5s infinite !important;
   }
 }
 
 /* Course card shimmer on scroll (mobile) */
 .shimmer-on-scroll {
-  animation: luxurious-light-beam-premium 2.5s ease-in-out 1 !important;
-  opacity: 1 !important;
+  animation: thin-shine-animation 2.5s infinite !important;
 }
 
-/* Premium luxurious light beam animation with flash finish */
-@keyframes luxurious-light-beam-premium {
-  0% { 
-    transform: translate(-150%, -150%);
-    opacity: 0;
+/* Thin shine animation */
+@keyframes thin-shine-animation {
+  0% {
+    right: -150%;
   }
-  10% {
-    opacity: 0.3;
+  60% {
+    right: 150%;
   }
-  20% {
-    opacity: 0.6;
-  }
-  30% {
-    opacity: 0.8;
-  }
-  50% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 0.8;
-  }
-  80% {
-    opacity: 0.6;
-  }
-  90% {
-    opacity: 0.3;
-  }
-  95% {
-    /* Flash finish - bright white flash */
-    opacity: 1;
-    background: linear-gradient(135deg, 
-      transparent 0%, 
-      transparent 25%,
-      rgba(255, 255, 255, 0.9) 35%,
-      rgba(255, 255, 255, 1) 50%, 
-      rgba(255, 255, 255, 0.9) 65%,
-      transparent 75%,
-      transparent 100%
-    );
-  }
-  100% { 
-    transform: translate(150%, 150%);
-    opacity: 0;
+  100% {
+    right: 150%;
   }
 }
 
