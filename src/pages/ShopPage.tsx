@@ -222,6 +222,60 @@ export const ShopPage: React.FC = () => {
         { name: 'Lemon Glow', inStock: false, image: '/acrylic-powder-yellow.jpg' }
       ]
     },
+    
+    // Coming Soon Products
+    {
+      id: 'coming-soon-1',
+      name: 'Core Acrylics (56 g)',
+      slug: 'core-acrylics-coming-soon',
+      price: -1,
+      compareAtPrice: undefined,
+      short_description: 'Professional acrylic powders in 13 beautiful colors.',
+      shortDescription: 'Professional acrylic powders in 13 beautiful colors.',
+      description: 'Professional strength acrylic powders in 13 beautiful colors for creative nail art.',
+      images: ['/core-acrylics-white.webp', '/core-acrylics-colorful.webp'],
+      category: 'coming-soon',
+      rating: 0,
+      reviews: 0,
+      badges: ['Coming Soon'],
+      inStock: false,
+      variants: [
+        { name: 'Baby Blue', inStock: false, image: '/acrylic-powder-baby-blue.jpg' },
+        { name: 'Bubblegum Pink', inStock: false, image: '/acrylic-powder-bubblegum-pink.jpg' },
+        { name: 'Lavender', inStock: false, image: '/acrylic-powder-lavender.jpg' },
+        { name: 'Mint Green', inStock: false, image: '/acrylic-powder-mint-green.jpg' },
+        { name: 'Coral', inStock: false, image: '/acrylic-powder-coral.jpg' },
+        { name: 'Nude', inStock: false, image: '/acrylic-powder-nude.jpg' },
+        { name: 'White', inStock: false, image: '/acrylic-powder-white.jpg' },
+        { name: 'Black', inStock: false, image: '/acrylic-powder-black.jpg' },
+        { name: 'Red', inStock: false, image: '/acrylic-powder-red.jpg' },
+        { name: 'Purple', inStock: false, image: '/acrylic-powder-purple.jpg' },
+        { name: 'Gold', inStock: false, image: '/acrylic-powder-gold.jpg' },
+        { name: 'Silver', inStock: false, image: '/acrylic-powder-silver.jpg' },
+        { name: 'Clear', inStock: false, image: '/acrylic-powder-clear.jpg' }
+      ]
+    },
+    {
+      id: 'coming-soon-2',
+      name: 'Low Odour Nail Liquid',
+      slug: 'nail-liquid-monomer-coming-soon',
+      price: -1,
+      compareAtPrice: undefined,
+      short_description: 'A premium low-odour acrylic monomer designed for comfort and performance.',
+      shortDescription: 'A premium low-odour acrylic monomer designed for comfort and performance.',
+      description: 'A premium low-odour acrylic monomer designed for comfort and performance. Features low odour (no migraines), affordable luxury, HEMA-free, EMA monomer (safe formula), no MMA, and enhances salon experience.',
+      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
+      category: 'coming-soon',
+      rating: 0,
+      reviews: 87,
+      badges: ['Coming Soon'],
+      inStock: false,
+      variants: [
+        { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
+        { name: '500ml', inStock: false, price: -1, image: '/nail-liquid-monomer-colorful.webp' }
+      ]
+    },
+    
     // Coming Soon Products (Prices TBA) - HIDDEN
     // {
     //   id: '10',
