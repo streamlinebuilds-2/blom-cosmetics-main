@@ -119,7 +119,7 @@ export const AnnouncementSignup: React.FC = () => {
     <>
       {isBannerVisible && (
         <div 
-          className="bg-blue-100 text-gray-900 cursor-pointer md:cursor-default"
+          className="bg-pink-100 text-gray-900 cursor-pointer md:cursor-default"
           onClick={() => {
             // On mobile, clicking the banner opens the popup
             if (window.innerWidth < 768) {
@@ -130,12 +130,12 @@ export const AnnouncementSignup: React.FC = () => {
           <Container className="py-2 px-4">
             <div className="relative flex items-center justify-center gap-3">
               <p className="text-sm font-medium text-center announcement-text">
-                ✨ Join the BLOM Beauty Club & Get 15% Off Your First Order ✨
+                ✨ Join the BLOM Beauty Club & Get 10% Off Your First Order ✨
               </p>
               <Button
                 variant="secondary"
                 size="sm"
-                className="hidden md:block !py-1 !px-3 uppercase font-sans bg-blue-100 text-gray-800 border border-gray-800 hover:bg-gray-800 hover:text-blue-100 transition-all duration-200"
+                className="hidden md:block !py-1 !px-3 uppercase font-sans bg-pink-100 text-gray-800 border border-gray-800 hover:bg-gray-800 hover:text-pink-100 transition-all duration-200"
                 onClick={openPopup}
               >
                 JOIN NOW
@@ -192,7 +192,7 @@ export const AnnouncementSignup: React.FC = () => {
 
                 <div className="mb-4">
                   <h3 className="text-2xl font-bold text-gray-900 mb-1 text-center">Join Our Blom Beauty Club</h3>
-                  <p className="text-pink-500 font-semibold text-center text-base">Get 15% off + exclusive drops</p>
+                  <p className="text-pink-500 font-semibold text-center text-base">Get 10% off + exclusive drops</p>
                 </div>
 
                 <ul className="mb-4 space-y-2 text-sm text-gray-600">
@@ -200,7 +200,7 @@ export const AnnouncementSignup: React.FC = () => {
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
                       <span className="text-pink-500 font-bold text-xs">✓</span>
                     </div>
-                    <span>Instant 15% welcome code</span>
+                    <span>Instant 10% welcome code</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
@@ -333,7 +333,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
         disabled={submitting}
         className="w-full bg-pink-400 hover:bg-pink-400 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
       >
-        {submitting ? 'Joining...' : 'Join Now & Save 15%'}
+        {submitting ? 'Joining...' : 'Join Now & Save 10%'}
       </button>
     </form>
   );
