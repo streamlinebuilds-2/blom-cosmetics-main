@@ -66,9 +66,8 @@ export const CheckoutPage: React.FC = () => {
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
-  const [couponApplied, setCouponApplied] = useState(false);
-  const [couponDiscount, setCouponDiscount] = useState(0);
-  const [couponId, setCouponId] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ id: string; code: string } | null>(null);
+  const [discount, setDiscount] = useState(0);
   const [couponError, setCouponError] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
@@ -179,34 +178,29 @@ export const CheckoutPage: React.FC = () => {
     setCouponError('');
 
     try {
-      const response = await fetch('/.netlify/functions/apply-coupon', {
+      const res = await fetch('/.netlify/functions/apply-coupon', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          code: couponCode.trim().toUpperCase(),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          code: couponCode.trim().toUpperCase(), 
           customerId: null, // You can add user ID here if you have user authentication
           cart: cartState.items.map(item => ({
             id: item.id,
             quantity: item.quantity,
             price: item.price
           }))
-        }),
+        })
       });
-
-      const data = await response.json();
-
-      if (data.ok === false) {
-        setCouponError(data.error || 'Invalid coupon code');
-        return;
+      
+      const data = await res.json();
+      
+      if (!data.ok) { 
+        setCouponError(data.reason || data.error || 'Invalid coupon code'); 
+      } else {
+        setDiscount(data.discount || 0);
+        setAppliedCoupon({ id: data.coupon_id, code: couponCode.trim().toUpperCase() });
+        setCouponError('');
       }
-
-      // Apply the coupon
-      setCouponApplied(true);
-      setCouponDiscount(data.discount || 0);
-      setCouponId(data.coupon_id || null);
-      setCouponError('');
 
     } catch (error) {
       console.error('Coupon application error:', error);
@@ -217,9 +211,8 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const handleRemoveCoupon = () => {
-    setCouponApplied(false);
-    setCouponDiscount(0);
-    setCouponId(null);
+    setDiscount(0);
+    setAppliedCoupon(null);
     setCouponCode('');
     setCouponError('');
   };
@@ -245,9 +238,9 @@ export const CheckoutPage: React.FC = () => {
           quantity: item.quantity,
           price: item.price
         })),
-        couponCode: couponApplied ? couponCode : null,
-        couponId: couponId,
-        couponDiscount: couponDiscount,
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
+        couponId: appliedCoupon ? appliedCoupon.id : null,
+        couponDiscount: discount,
         shippingInfo: {
           ...shippingInfo,
           method: shippingMethod,
@@ -288,9 +281,9 @@ export const CheckoutPage: React.FC = () => {
         shipping: shippingCost,
         shippingMethod,
         shippingInfo,
-        couponCode: couponApplied ? couponCode : null,
-        couponId: couponId,
-        couponDiscount: couponDiscount,
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
+        couponId: appliedCoupon ? appliedCoupon.id : null,
+        couponDiscount: discount,
         timestamp: new Date().toISOString()
       }));
 
@@ -329,7 +322,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const shippingCost = calculateShipping();
-  const orderTotal = cartState.subtotal + shippingCost - couponDiscount;
+  const orderTotal = cartState.subtotal + shippingCost - discount;
 
   const provinces = [
     'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
@@ -945,7 +938,7 @@ export const CheckoutPage: React.FC = () => {
                   <div className="border-t pt-4">
                     <div className="space-y-3">
                       <h4 className="font-medium text-sm">Coupon Code</h4>
-                      {!couponApplied ? (
+                      {!appliedCoupon ? (
                         <div className="flex gap-2">
                           <input
                             type="text"
@@ -968,10 +961,10 @@ export const CheckoutPage: React.FC = () => {
                         <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                           <div>
                             <p className="text-sm font-medium text-green-800">
-                              Coupon Applied: {couponCode}
+                              Coupon Applied: {appliedCoupon.code}
                             </p>
                             <p className="text-xs text-green-600">
-                              Discount: -{formatPrice(couponDiscount)}
+                              Discount: -{formatPrice(discount)}
                             </p>
                           </div>
                           <button
@@ -1007,10 +1000,10 @@ export const CheckoutPage: React.FC = () => {
                         <span>-R75</span>
                       </div>
                     )}
-                    {couponApplied && couponDiscount > 0 && (
+                    {appliedCoupon && discount > 0 && (
                       <div className="flex justify-between text-sm text-green-600">
                         <span>Coupon Discount:</span>
-                        <span>-{formatPrice(couponDiscount)}</span>
+                        <span>-{formatPrice(discount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between font-bold text-lg border-t pt-2">
