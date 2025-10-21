@@ -281,7 +281,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   // Grid view layout
   return (
     <article
-      className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${className}`}
+      className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
       onClick={handleCardClick}
     >
       {/* Image Container with 3D Flip Effect */}
@@ -320,9 +320,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Hover Shine Effect (homepage best sellers only) */}
         {hoverShine && (
-          <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="shine-bar absolute top-0 bottom-0 -left-1/3 w-1/3 bg-gradient-to-r from-transparent via-white/40 to-transparent"></div>
-          </div>
+          <div className="shimmer"></div>
         )}
 
         {/* Bestseller Badge */}
