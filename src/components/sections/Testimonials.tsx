@@ -97,7 +97,7 @@ export const Testimonials: React.FC = () => {
         }
         
         .animate-scroll {
-          animation: scroll-left 60s linear infinite;
+          animation: scroll-left 40s linear infinite;
         }
         
         .paused {
