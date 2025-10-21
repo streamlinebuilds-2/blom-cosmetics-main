@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container } from '../layout/Container';
 
 const testimonials = [
@@ -36,10 +36,39 @@ const testimonials = [
 
 export const Testimonials: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const [animationProgress, setAnimationProgress] = useState(0);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    setIsPaused(!isPaused);
+    if (isPaused) {
+      // Resume animation from current position
+      setIsPaused(false);
+    } else {
+      // Pause animation and capture current position
+      setIsPaused(true);
+    }
   };
+
+  // Update animation progress periodically to track position
+  useEffect(() => {
+    if (!isPaused) {
+      const interval = setInterval(() => {
+        if (carouselRef.current) {
+          const computedStyle = window.getComputedStyle(carouselRef.current);
+          const transform = computedStyle.transform;
+          if (transform && transform !== 'none') {
+            const matrix = new DOMMatrix(transform);
+            const translateX = matrix.m41;
+            // Calculate progress percentage (0 to 1)
+            const progress = Math.abs(translateX) / (320 * 6); // 320px width * 6 items
+            setAnimationProgress(progress % 1); // Keep it between 0 and 1
+          }
+        }
+      }, 100);
+      
+      return () => clearInterval(interval);
+    }
+  }, [isPaused]);
 
   return (
     <section className="py-16">
@@ -54,7 +83,12 @@ export const Testimonials: React.FC = () => {
         >
           {/* Infinite scrolling carousel */}
           <div 
+            ref={carouselRef}
             className={`flex gap-6 ${isPaused ? 'paused' : 'animate-scroll'}`}
+            style={isPaused ? {
+              transform: `translateX(-${animationProgress * 50}%)`,
+              animationPlayState: 'paused'
+            } : {}}
           >
             {/* First set of testimonials */}
             {testimonials.map((testimonial) => (
@@ -100,10 +134,10 @@ export const Testimonials: React.FC = () => {
           animation: scroll-left 20s linear infinite;
         }
         
-        /* Mobile - even faster */
+        /* Mobile - 50% faster than desktop */
         @media (max-width: 768px) {
           .animate-scroll {
-            animation: scroll-left 15s linear infinite;
+            animation: scroll-left 10s linear infinite;
           }
         }
         
