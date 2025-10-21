@@ -87,7 +87,7 @@ html, body {
   transform: translateX(-50%);
   width: 80px;
   height: 4px;
-  background-color: #FF74A4;
+  background: linear-gradient(to right, #FF74A4, #60A5FA);
   border-radius: 2px;
 }
 
