@@ -200,14 +200,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       ingredients: {
         inci: [
           'Ethyl Acetate',
-          'Butyl Acetate',
-          'Nitrocellulose',
-          'Tocopheryl Acetate (Vitamin E)'
+          'Isopropylidenediphenyl bisoxyhydroxypropyl methacrylate',
+          'HEMA',
+          'Tocopherol',
+          'Panthenol',
+          'p-Hydroxyanisole',
+          'Hydroquinone'
         ],
         key: [
-          'Vitamin E – promotes nail health',
-          'Acid-free formula – safe for natural nails',
-          'Superior bonding agents – long-lasting adhesion'
+          'Ethyl Acetate – solvent for proper application',
+          'HEMA – adhesion promoter for long-lasting bonds',
+          'Tocopherol – Vitamin E for nail health',
+          'Panthenol – Vitamin B5 for nail strengthening',
+          'p-Hydroxyanisole – antioxidant preservative',
+          'Hydroquinone – stabilizer for product integrity'
         ]
       },
       details: {
