@@ -240,9 +240,11 @@ html, body {
 }
 
 .social-link:hover {
-  background: #FF5A8E;
+  background: transparent;
+  border: 2px solid #000000;
+  color: #000000;
   transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(255, 116, 164, 0.4);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .newsletter {
