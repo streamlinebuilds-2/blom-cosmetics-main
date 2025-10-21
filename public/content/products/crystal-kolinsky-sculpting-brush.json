@@ -3,14 +3,14 @@
   "slug": "crystal-kolinsky-sculpting-brush",
   "title": "Crystal Kolinsky Sculpting Brush",
   "subtitle": "Premium Kolinsky brush with floating glitter handle",
-  "price": -1,
+  "price": 384,
   "currency": "ZAR",
   "sku": "KOL-BRH-001",
   "status": "active",
-  "stock": 0,
+  "stock": 10,
   "category": "Tools & Essentials",
   "tags": ["brush", "kolinsky", "tools"],
-  "badges": ["Coming Soon"],
+  "badges": [],
   "thumbnail": "/acrylic-sculpture-brush-white.webp",
   "images": [
     "/acrylic-sculpture-brush-white.webp",
@@ -24,8 +24,8 @@
   },
   "rating": 4.9,
   "reviews": 23,
-  "compareAt": null,
-  "stockStatus": "Coming Soon",
+  "compareAt": 480,
+  "stockStatus": "In Stock",
   "features": [
     "100% Kolinsky hair",
     "Floating glitter handle",
@@ -49,7 +49,7 @@
     "claims": ["100% Kolinsky", "Professional Grade"]
   },
   "variants": [
-    { "name": "10mm", "inStock": false, "price": -1 }
+    { "name": "10mm", "inStock": true, "price": 384 }
   ],
   "createdAt": "2024-01-01T10:00:00Z",
   "updatedAt": "2024-01-01T10:00:00Z"

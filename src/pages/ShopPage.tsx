@@ -310,7 +310,7 @@ export const ShopPage: React.FC = () => {
       category: 'acrylic-system',
       rating: 0,
       reviews: 87,
-      badges: ['Coming Soon'],
+      badges: [],
       inStock: false,
       variants: [
         { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
