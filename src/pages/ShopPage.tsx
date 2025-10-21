@@ -3,8 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
-import { Button } from '../components/ui/Button';
-import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, X, ChevronDown, Tag } from 'lucide-react';
+import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, X, ChevronDown, Tag, BookOpen, Download } from 'lucide-react';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 
 export const ShopPage: React.FC = () => {
@@ -708,8 +707,8 @@ export const ShopPage: React.FC = () => {
           <div className="mb-4">
             <div className="flex items-center gap-2">
               <Tag className="h-4 w-4 text-pink-400" />
-              <input
-                type="text"
+                    <input
+                      type="text"
                 placeholder="Enter coupon code (e.g., WELCOME10)"
                 value={couponCode}
                 onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
@@ -780,8 +779,31 @@ export const ShopPage: React.FC = () => {
                     className={`p-1.5 rounded-md transition-colors ${
                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                     }`}
-                  >
+                      >
                     <List className="h-3 w-3" />
+                      </button>
+                </div>
+
+                {/* Catalogue Buttons */}
+                <div className="flex items-center gap-2 ml-2">
+                  <button
+                    onClick={() => window.open('https://heyzine.com/flip-book/6d112b7bc1.html', '_blank')}
+                    className="flex items-center gap-1 px-3 py-2 bg-transparent border-2 border-black text-black rounded-full hover:bg-black hover:text-white transition-all duration-200 text-sm font-medium"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span className="hidden sm:inline">Catalogue</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = '/catalogue.pdf';
+                      link.download = 'BLOM-Catalogue.pdf';
+                      link.click();
+                    }}
+                    className="p-2 bg-transparent border-2 border-gray-300 text-gray-600 rounded-full hover:border-black hover:text-black hover:bg-black hover:text-white transition-all duration-200"
+                    title="Download Catalogue PDF"
+                  >
+                    <Download className="h-4 w-4" />
                   </button>
                 </div>
               </div>
@@ -862,22 +884,22 @@ export const ShopPage: React.FC = () => {
                   });
                   
                   return (
-                    <ProductCard
+                  <ProductCard
                       key={product.id}
-                      id={product.id}
-                      name={product.name}
-                      slug={product.slug}
-                      price={product.price}
-                      compareAtPrice={product.compareAtPrice}
-                      shortDescription={product.shortDescription}
-                      images={product.images}
-                      inStock={product.inStock}
-                      badges={product.badges}
+                    id={product.id}
+                    name={product.name}
+                    slug={product.slug}
+                    price={product.price}
+                    compareAtPrice={product.compareAtPrice}
+                    shortDescription={product.shortDescription}
+                    images={product.images}
+                    inStock={product.inStock}
+                    badges={product.badges}
                       isListView={viewMode === 'list'}
                       discountPrice={pricing.finalPrice !== product.price ? pricing.finalPrice : undefined}
                       discountBadge={pricing.discount ? formatDiscountBadge(pricing.discount) : undefined}
                       discountBadgeColor={pricing.discount ? getDiscountBadgeColor(pricing.discount) : undefined}
-                    />
+                  />
                   );
                 })}
               </div>

@@ -63,6 +63,7 @@ export const Footer: React.FC = () => {
             <li><a href="/courses">Education</a></li>
             <li><a href="/pro-services">Professional Services</a></li>
             <li><a href="/careers">Careers</a></li>
+            <li><a href="https://heyzine.com/flip-book/6d112b7bc1.html" target="_blank" rel="noopener">View Catalogue</a></li>
           </ul>
         </div>
 
