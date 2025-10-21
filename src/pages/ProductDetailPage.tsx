@@ -291,6 +291,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       features: [
         'Mirror-like high gloss finish',
         'Chip-resistant formula',
+        'Non-wipe technology',
         'Works with gels and acrylics',
         'Long-lasting protection',
         'Professional salon quality'
@@ -298,7 +299,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       howToUse: [
         'Apply thin layer over cured gel or acrylic',
         'Cure under LED lamp for 60 seconds',
-        'Wipe with alcohol to remove sticky layer',
         'Enjoy long-lasting shine'
       ],
       ingredients: {
