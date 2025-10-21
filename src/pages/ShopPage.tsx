@@ -3,7 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
-import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, X, ChevronDown, Tag, BookOpen, Download } from 'lucide-react';
+import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 
 export const ShopPage: React.FC = () => {
@@ -20,7 +20,6 @@ export const ShopPage: React.FC = () => {
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
-  const [couponCode, setCouponCode] = useState('');
 
   // All BLOM products with detailed information - Final Product List
   const allProducts = [
@@ -703,28 +702,6 @@ export const ShopPage: React.FC = () => {
                     </div>
                   </div>
 
-          {/* Coupon Code Input */}
-          <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <Tag className="h-4 w-4 text-pink-400" />
-                    <input
-                      type="text"
-                placeholder="Enter coupon code (e.g., WELCOME10)"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
-              />
-              {couponCode && (
-                <button
-                  onClick={() => setCouponCode('')}
-                  className="px-2 py-2 text-gray-400 hover:text-gray-600"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
           {/* Sticky Filter Bar - Mobile Optimized */}
           <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
             <div className="flex items-center justify-between gap-2">
@@ -879,7 +856,6 @@ export const ShopPage: React.FC = () => {
                   
                   const pricing = computeFinalPrice(productItem, discounts, {
                     nowISO: new Date().toISOString(),
-                    couponCode: couponCode || undefined,
                     subtotal: sortedProducts.reduce((sum, p) => sum + p.price, 0)
                   });
                   
