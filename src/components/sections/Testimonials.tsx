@@ -37,6 +37,10 @@ const testimonials = [
 export const Testimonials: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
 
+  const handleClick = () => {
+    setIsPaused(!isPaused);
+  };
+
   return (
     <section className="py-16">
       <Container>
@@ -45,15 +49,16 @@ export const Testimonials: React.FC = () => {
         </div>
 
         <div 
-          className="relative overflow-hidden"
+          className="relative overflow-hidden cursor-pointer"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
+          onClick={handleClick}
         >
           {/* Infinite scrolling carousel */}
           <div 
             className={`flex gap-6 ${isPaused ? 'paused' : ''}`}
             style={{
-              animation: 'scroll-left 20s linear infinite',
+              animation: 'scroll-left 40s linear infinite',
               width: `${testimonials.length * 2 * 100}%` // Double the testimonials for seamless loop
             }}
           >
