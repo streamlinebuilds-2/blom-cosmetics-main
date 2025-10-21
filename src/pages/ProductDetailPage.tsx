@@ -528,9 +528,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       category: 'Acrylic System',
       shortDescription: 'Professional monomer for acrylic applications.',
       overview: 'Premium quality monomer formulated for optimal acrylic application. Low odor formula with superior clarity and strength. Essential for creating durable, beautiful acrylic enhancements.',
-      price: 350,
+      price: -1,
       compareAtPrice: null,
-      stock: 'In Stock',
+      stock: 'Coming Soon',
       images: [
         '/nail-liquid-monomer-white.webp',
         '/nail-liquid-monomer-colorful.webp'
@@ -567,8 +567,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         claims: ['Professional Grade', 'Low Odor', 'High Quality']
       },
       variants: [
-        { name: '250ml', image: '/nail-liquid-monomer-colorful.webp', price: 350 },
-        { name: '500ml', image: '/nail-liquid-monomer-white.webp', price: 550 }
+        { name: '250ml', image: '/nail-liquid-monomer-colorful.webp', price: -1 },
+        { name: '500ml', image: '/nail-liquid-monomer-white.webp', price: -1 }
       ],
       rating: 4.8,
       reviewCount: 94,
