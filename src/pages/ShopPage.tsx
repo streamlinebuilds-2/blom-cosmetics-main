@@ -333,9 +333,7 @@ export const ShopPage: React.FC = () => {
       badges: [],
       inStock: true,
       variants: [
-        { name: 'Size 8', price: 480, inStock: false },
-        { name: 'Size 10', price: 450, inStock: true },
-        { name: 'Size 12', price: 480, inStock: false }
+        { name: '10mm', price: 450, inStock: true }
       ]
     },
     {
@@ -354,8 +352,7 @@ export const ShopPage: React.FC = () => {
       badges: ['New'],
       inStock: true,
       variants: [
-        { name: '10mm', price: 320, inStock: true },
-        { name: '9mm', price: 300, inStock: true }
+        { name: '10mm', price: 320, inStock: true }
       ]
     },
     // Furniture Products

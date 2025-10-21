@@ -44,11 +44,13 @@
     "key": []
   },
   "details": {
-    "size": "Various sizes",
+    "size": "10mm",
     "shelfLife": "N/A",
     "claims": ["100% Kolinsky", "Professional Grade"]
   },
-  "variants": [],
+  "variants": [
+    { "name": "10mm", "inStock": false, "price": -1 }
+  ],
   "createdAt": "2024-01-01T10:00:00Z",
   "updatedAt": "2024-01-01T10:00:00Z"
 }

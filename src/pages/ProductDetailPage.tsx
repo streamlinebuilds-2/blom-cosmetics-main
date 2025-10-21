@@ -607,14 +607,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         key: []
       },
       details: {
-        size: 'Multiple sizes available',
+        size: '10mm',
         shelfLife: 'N/A',
         claims: ['100% Kolinsky', 'Professional Grade']
       },
       variants: [
-        { name: 'Size 8', price: 480, inStock: false },
-        { name: 'Size 10', price: 450, inStock: true },
-        { name: 'Size 12', price: 480, inStock: false }
+        { name: '10mm', price: 450, inStock: true }
       ],
       rating: 0,
       reviewCount: 23,
