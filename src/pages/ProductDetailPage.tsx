@@ -202,7 +202,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         inci: [
           'Ethyl Acetate',
           'Isopropylidenediphenyl bisoxyhydroxypropyl methacrylate',
-          'HEMA',
           'Tocopherol',
           'Panthenol',
           'p-Hydroxyanisole',
@@ -210,7 +209,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         ],
         key: [
           'Ethyl Acetate – solvent for proper application',
-          'HEMA – adhesion promoter for long-lasting bonds',
           'Tocopherol – Vitamin E for nail health',
           'Panthenol – Vitamin B5 for nail strengthening',
           'p-Hydroxyanisole – antioxidant preservative',

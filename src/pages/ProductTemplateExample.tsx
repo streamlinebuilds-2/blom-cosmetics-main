@@ -46,7 +46,7 @@ export const ProductTemplateExample: React.FC = () => {
     details: {
       size: "56g",
       shelfLife: "24 months",
-      claims: ["Vegan", "Cruelty-Free", "HEMA-Free"]
+      claims: ["Vegan", "Cruelty-Free"]
     },
     variants: ["56g", "28g"],
     related: ["snow-white-acrylic", "core-acrylics"],
