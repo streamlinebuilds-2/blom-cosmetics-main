@@ -5,7 +5,8 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
-import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft } from 'lucide-react';
+import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart } from 'lucide-react';
+import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 
@@ -17,6 +18,7 @@ export const CheckoutPage: React.FC = () => {
     return s === 'payment' ? 'payment' : 'shipping';
   });
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState<{[key: string]: boolean}>({});
   
   const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'door-to-door'>('door-to-door');
   
@@ -82,6 +84,32 @@ export const CheckoutPage: React.FC = () => {
       window.location.href = '/shop';
     }
   }, [cartState.items.length]);
+
+  // Check wishlist status for recommended products
+  useEffect(() => {
+    const recommendedProducts = ['nail-file', 'cuticle-oil', 'top-coat'];
+    const wishlistStatus: {[key: string]: boolean} = {};
+    recommendedProducts.forEach(productId => {
+      wishlistStatus[productId] = wishlistStore.isInWishlist(productId);
+    });
+    setIsWishlisted(wishlistStatus);
+  }, []);
+
+  const handleWishlistToggle = (productId: string, productName: string, productPrice: number, productImage: string) => {
+    const wishlistItem = {
+      id: productId,
+      productId: productId,
+      name: productName,
+      price: productPrice,
+      image: productImage,
+      slug: productId
+    };
+    wishlistStore.toggleItem(wishlistItem);
+    setIsWishlisted(prev => ({
+      ...prev,
+      [productId]: !prev[productId]
+    }));
+  };
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     cartStore.updateQuantity(itemId, newQuantity);
@@ -963,18 +991,33 @@ export const CheckoutPage: React.FC = () => {
             <h3 className="text-2xl font-bold mb-6">Recommended for you</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Nail File Set */}
-              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="/nail-file-white.webp"
-                    alt="Nail File Set"
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Nail File (80/80 Grit)</h4>
-                    <p className="text-pink-500 font-bold">R35.00</p>
+              <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src="/nail-file-white.webp"
+                      alt="Nail File Set"
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Nail File (80/80 Grit)</h4>
+                      <p className="text-gray-900 font-bold">R35.00</p>
+                    </div>
                   </div>
+                  
+                  {/* Wishlist Heart */}
+                  <button
+                    onClick={() => handleWishlistToggle('nail-file', 'Nail File (80/80 Grit)', 35, '/nail-file-white.webp')}
+                    className={`p-2 rounded-full transition-colors ${
+                      isWishlisted['nail-file']
+                        ? 'text-pink-500 bg-pink-50'
+                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
+                    }`}
+                  >
+                    <Heart className={`h-5 w-5 ${isWishlisted['nail-file'] ? 'fill-current' : ''}`} />
+                  </button>
                 </div>
+                
                 <button
                   onClick={() => {
                     cartStore.addItem({
@@ -985,25 +1028,40 @@ export const CheckoutPage: React.FC = () => {
                       image: '/nail-file-white.webp'
                     });
                   }}
-                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
-                  Add
+                  Add to Cart
                 </button>
               </div>
 
               {/* Cuticle Oil */}
-              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="/cuticle-oil-white.webp"
-                    alt="Cuticle Oil"
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Cuticle Oil</h4>
-                    <p className="text-pink-500 font-bold">R140.00</p>
+              <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src="/cuticle-oil-white.webp"
+                      alt="Cuticle Oil"
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Cuticle Oil</h4>
+                      <p className="text-gray-900 font-bold">R140.00</p>
+                    </div>
                   </div>
+                  
+                  {/* Wishlist Heart */}
+                  <button
+                    onClick={() => handleWishlistToggle('cuticle-oil', 'Cuticle Oil', 140, '/cuticle-oil-white.webp')}
+                    className={`p-2 rounded-full transition-colors ${
+                      isWishlisted['cuticle-oil']
+                        ? 'text-pink-500 bg-pink-50'
+                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
+                    }`}
+                  >
+                    <Heart className={`h-5 w-5 ${isWishlisted['cuticle-oil'] ? 'fill-current' : ''}`} />
+                  </button>
                 </div>
+                
                 <button
                   onClick={() => {
                     cartStore.addItem({
@@ -1014,25 +1072,40 @@ export const CheckoutPage: React.FC = () => {
                       image: '/cuticle-oil-white.webp'
                     });
                   }}
-                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
-                  Add
+                  Add to Cart
                 </button>
               </div>
 
               {/* Top Coat */}
-              <div className="bg-white rounded-xl shadow-sm p-4 flex items-center justify-between hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-4">
-                  <img
-                    src="/top-coat-white.webp"
-                    alt="Top Coat"
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Top Coat</h4>
-                    <p className="text-pink-500 font-bold">R190.00</p>
+              <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-4">
+                    <img
+                      src="/top-coat-white.webp"
+                      alt="Top Coat"
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Top Coat</h4>
+                      <p className="text-gray-900 font-bold">R190.00</p>
+                    </div>
                   </div>
+                  
+                  {/* Wishlist Heart */}
+                  <button
+                    onClick={() => handleWishlistToggle('top-coat', 'Top Coat', 190, '/top-coat-white.webp')}
+                    className={`p-2 rounded-full transition-colors ${
+                      isWishlisted['top-coat']
+                        ? 'text-pink-500 bg-pink-50'
+                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
+                    }`}
+                  >
+                    <Heart className={`h-5 w-5 ${isWishlisted['top-coat'] ? 'fill-current' : ''}`} />
+                  </button>
                 </div>
+                
                 <button
                   onClick={() => {
                     cartStore.addItem({
@@ -1043,9 +1116,9 @@ export const CheckoutPage: React.FC = () => {
                       image: '/top-coat-white.webp'
                     });
                   }}
-                  className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
+                  className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
-                  Add
+                  Add to Cart
                 </button>
               </div>
             </div>
