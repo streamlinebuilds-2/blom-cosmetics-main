@@ -117,7 +117,7 @@ const CoursesPage: React.FC = () => {
                     <img
                       src={course.image}
                       alt={course.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                     {/* Shimmer Effect */}
                     <div className="absolute inset-0 pointer-events-none">
@@ -171,7 +171,7 @@ const CoursesPage: React.FC = () => {
                     <img
                       src={course.image}
                       alt={course.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                     {/* Shimmer Effect */}
                     <div className="absolute inset-0 pointer-events-none">
@@ -191,15 +191,15 @@ const CoursesPage: React.FC = () => {
 
                     <div className="space-y-2 mb-6">
                       <div className="flex items-center gap-2 text-gray-700 text-sm">
-                        <Clock className="h-4 w-4 text-pink-500" />
+                        <Clock className="h-4 w-4 text-blue-500" />
                         <span>{course.duration}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-700 text-sm">
-                        <MapPin className="h-4 w-4 text-pink-500" />
+                        <MapPin className="h-4 w-4 text-blue-500" />
                         <span>{course.location}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-700 text-sm">
-                        <DollarSign className="h-4 w-4 text-pink-500" />
+                        <DollarSign className="h-4 w-4 text-blue-500" />
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-lg text-pink-500">R{course.price}</span>
                           {course.comparePrice && (
