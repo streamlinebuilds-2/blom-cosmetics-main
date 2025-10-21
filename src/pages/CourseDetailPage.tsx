@@ -60,7 +60,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           features: [
             '5-day comprehensive training',
             'Premium professional kit included',
-            'Certificate after you've completed your exam',
+            'Certificate after you\'ve completed your exam',
             'Course materials and handouts',
             'Bigger kit — electric e-file & LED lamp included'
           ],
