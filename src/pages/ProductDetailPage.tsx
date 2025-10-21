@@ -347,8 +347,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       howToUse: [
         'Apply over cured base color',
         'Use thin, even coats',
-        'Cure under LED lamp for 60 seconds',
-        'Seal with regular top coat if desired'
+        'Cure under LED lamp for 60 seconds'
       ],
       ingredients: {
         inci: [
