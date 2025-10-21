@@ -49,7 +49,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           features: [
             '5-day comprehensive training',
             'Basic starter kit included',
-            'Certificate of completion',
+            'Certificate after you've completed your exam',
             'Course materials and handouts'
           ]
         },
@@ -60,7 +60,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           features: [
             '5-day comprehensive training',
             'Premium professional kit included',
-            'Certificate of completion',
+            'Certificate after you've completed your exam',
             'Course materials and handouts',
             'Bigger kit — electric e-file & LED lamp included'
           ],
@@ -140,7 +140,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
             'Step-by-step guides',
             'Color theory basics',
             'Blending techniques',
-            'Certificate of completion'
+            'Certificate after you've completed your exam'
           ]
         }
       ],
@@ -213,7 +213,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
             'Holiday design templates',
             'Seasonal color palettes',
             'Festive techniques guide',
-            'Certificate of completion'
+            'Certificate after you've completed your exam'
           ],
           onSale: true
         }
