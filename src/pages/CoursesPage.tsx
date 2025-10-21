@@ -117,7 +117,7 @@ const CoursesPage: React.FC = () => {
                     <img
                       src={course.image}
                       alt={course.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                     />
                     {/* Shimmer Effect */}
                     <div className="absolute inset-0 pointer-events-none">
@@ -171,7 +171,7 @@ const CoursesPage: React.FC = () => {
                     <img
                       src={course.image}
                       alt={course.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-cover"
                     />
                     {/* Shimmer Effect */}
                     <div className="absolute inset-0 pointer-events-none">
