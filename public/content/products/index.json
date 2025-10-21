@@ -120,21 +120,6 @@
     "shortDescription": "Professional-grade, fast acting nail remover."
   },
   {
-    "slug": "core-acrylics",
-    "title": "Core Acrylics (56 g)",
-    "price": 280,
-    "thumbnail": "/core-acrylics-white.webp",
-    "images": ["/core-acrylics-white.webp", "/core-acrylics-colorful.webp"],
-    "badges": ["Bestseller"],
-    "status": "active",
-    "rating": 4.9,
-    "reviews": 156,
-    "compareAt": null,
-    "stockStatus": "In Stock",
-    "category": "acrylic-system",
-    "shortDescription": "Professional acrylic powders in 13 beautiful colors."
-  },
-  {
     "slug": "nail-liquid-monomer",
     "title": "Nail Liquid (Monomer)",
     "price": -1,
