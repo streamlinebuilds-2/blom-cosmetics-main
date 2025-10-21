@@ -64,6 +64,14 @@ export const CheckoutPage: React.FC = () => {
     provider: string;
   } | null>(null);
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponId, setCouponId] = useState<string | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+
   // Validation errors
   const [validationErrors, setValidationErrors] = useState<{
     mobile?: string;
@@ -161,6 +169,61 @@ export const CheckoutPage: React.FC = () => {
     setStep('review');
   };
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponError('');
+
+    try {
+      const response = await fetch('/.netlify/functions/apply-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          code: couponCode.trim().toUpperCase(),
+          customerId: null, // You can add user ID here if you have user authentication
+          cart: cartState.items.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price
+          }))
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok === false) {
+        setCouponError(data.error || 'Invalid coupon code');
+        return;
+      }
+
+      // Apply the coupon
+      setCouponApplied(true);
+      setCouponDiscount(data.discount || 0);
+      setCouponId(data.coupon_id || null);
+      setCouponError('');
+
+    } catch (error) {
+      console.error('Coupon application error:', error);
+      setCouponError('Failed to apply coupon. Please try again.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponApplied(false);
+    setCouponDiscount(0);
+    setCouponId(null);
+    setCouponCode('');
+    setCouponError('');
+  };
+
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     
@@ -182,6 +245,9 @@ export const CheckoutPage: React.FC = () => {
           quantity: item.quantity,
           price: item.price
         })),
+        couponCode: couponApplied ? couponCode : null,
+        couponId: couponId,
+        couponDiscount: couponDiscount,
         shippingInfo: {
           ...shippingInfo,
           method: shippingMethod,
@@ -222,6 +288,9 @@ export const CheckoutPage: React.FC = () => {
         shipping: shippingCost,
         shippingMethod,
         shippingInfo,
+        couponCode: couponApplied ? couponCode : null,
+        couponId: couponId,
+        couponDiscount: couponDiscount,
         timestamp: new Date().toISOString()
       }));
 
@@ -260,7 +329,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const shippingCost = calculateShipping();
-  const orderTotal = cartState.subtotal + shippingCost;
+  const orderTotal = cartState.subtotal + shippingCost - couponDiscount;
 
   const provinces = [
     'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
@@ -872,6 +941,54 @@ export const CheckoutPage: React.FC = () => {
                     ))}
                   </div>
 
+                  {/* Coupon Code */}
+                  <div className="border-t pt-4">
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-sm">Coupon Code</h4>
+                      {!couponApplied ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                            placeholder="Enter code"
+                            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                            disabled={isApplyingCoupon}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleApplyCoupon}
+                            disabled={isApplyingCoupon || !couponCode.trim()}
+                            className="px-4 py-2 bg-pink-400 text-white rounded-lg text-sm font-medium hover:bg-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {isApplyingCoupon ? 'Applying...' : 'Apply'}
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <div>
+                            <p className="text-sm font-medium text-green-800">
+                              Coupon Applied: {couponCode}
+                            </p>
+                            <p className="text-xs text-green-600">
+                              Discount: -{formatPrice(couponDiscount)}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleRemoveCoupon}
+                            className="text-green-600 hover:text-green-800 text-sm font-medium"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      )}
+                      {couponError && (
+                        <p className="text-red-600 text-xs">{couponError}</p>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Totals */}
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
@@ -888,6 +1005,12 @@ export const CheckoutPage: React.FC = () => {
                       <div className="flex justify-between text-xs text-green-600">
                         <span>✨ Free shipping applied!</span>
                         <span>-R75</span>
+                      </div>
+                    )}
+                    {couponApplied && couponDiscount > 0 && (
+                      <div className="flex justify-between text-sm text-green-600">
+                        <span>Coupon Discount:</span>
+                        <span>-{formatPrice(couponDiscount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between font-bold text-lg border-t pt-2">
