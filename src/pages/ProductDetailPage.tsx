@@ -474,7 +474,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       id: '8',
       name: 'Acetone (Remover)',
       slug: 'acetone-remover',
-      category: 'Tools & Essentials',
+      category: 'Coming Soon',
       shortDescription: 'Professional-grade, fast acting nail remover.',
       overview: 'Professional-grade acetone for fast and effective nail polish removal. Pure formula ensures quick removal of gel polish, acrylics, and regular polish without damaging the natural nail.',
       price: 60,
