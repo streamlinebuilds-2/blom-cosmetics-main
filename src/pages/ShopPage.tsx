@@ -5,7 +5,7 @@ import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
-import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
+// Discount system disabled
 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ export const ShopPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [discounts, setDiscounts] = useState<Discount[]>([]);
+  // Discount system disabled
 
   // All BLOM products with detailed information - Final Product List
   const allProducts = [
@@ -590,8 +590,7 @@ export const ShopPage: React.FC = () => {
     }
     window.scrollTo({ top: 0 });
 
-    // Load discounts
-    loadDiscounts().then(setDiscounts).catch(console.error);
+    // Discount system disabled
 
     // Simulate loading
     setTimeout(() => {
@@ -862,20 +861,6 @@ export const ShopPage: React.FC = () => {
           <div className={`grid ${getGridClasses()} gap-6`}>
                 {sortedProducts.map((product) => {
                   // Compute discount for this product
-                  const productItem: ProductItem = {
-                    slug: product.slug,
-                    category: product.category,
-                    type: 'product',
-                    price: product.price,
-                    currency: 'ZAR',
-                    quantity: 1
-                  };
-                  
-                  const pricing = computeFinalPrice(productItem, discounts, {
-                    nowISO: new Date().toISOString(),
-                    subtotal: sortedProducts.reduce((sum, p) => sum + p.price, 0)
-                  });
-                  
                   return (
                   <ProductCard
                       key={product.id}
@@ -889,9 +874,6 @@ export const ShopPage: React.FC = () => {
                     inStock={product.inStock}
                     badges={product.badges}
                       isListView={viewMode === 'list'}
-                      discountPrice={pricing.finalPrice !== product.price ? pricing.finalPrice : undefined}
-                      discountBadge={pricing.discount ? formatDiscountBadge(pricing.discount) : undefined}
-                      discountBadgeColor={pricing.discount ? getDiscountBadgeColor(pricing.discount) : undefined}
                   />
                   );
                 })}
