@@ -50,17 +50,11 @@ export const Testimonials: React.FC = () => {
 
         <div 
           className="relative overflow-hidden cursor-pointer"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
           onClick={handleClick}
         >
           {/* Infinite scrolling carousel */}
           <div 
-            className={`flex gap-6 ${isPaused ? 'paused' : ''}`}
-            style={{
-              animation: 'scroll-left 40s linear infinite',
-              width: `${testimonials.length * 2 * 100}%` // Double the testimonials for seamless loop
-            }}
+            className={`flex gap-6 ${isPaused ? 'paused' : 'animate-scroll'}`}
           >
             {/* First set of testimonials */}
             {testimonials.map((testimonial) => (
@@ -100,6 +94,10 @@ export const Testimonials: React.FC = () => {
           100% {
             transform: translateX(-50%);
           }
+        }
+        
+        .animate-scroll {
+          animation: scroll-left 60s linear infinite;
         }
         
         .paused {
