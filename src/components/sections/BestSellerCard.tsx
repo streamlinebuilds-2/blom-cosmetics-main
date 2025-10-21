@@ -45,7 +45,7 @@ export const BestSellerCard: React.FC<BestSellerCardProps> = ({
             // Remove class after animation completes to allow re-triggering
             setTimeout(() => {
               shimmerContainer.classList.remove('shimmer-triggered');
-            }, 2000);
+            }, 3000);
           }
         });
       },

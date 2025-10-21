@@ -73,7 +73,7 @@ const CoursesPage: React.FC = () => {
               if (shimmerContainer) {
                 shimmerContainer.style.opacity = '0';
               }
-            }, 4000);
+            }, 3000);
           }
         } else {
           // When element goes out of view, reset for re-triggering

@@ -1013,15 +1013,17 @@ html, body {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
-/* Premium Shimmer effect - Luxurious light beam */
+/* Premium Shimmer effect - Luxurious light beam with card lift and flash finish */
 .shimmer {
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, 
     transparent 0%, 
-    transparent 30%,
-    rgba(255, 255, 255, 0.6) 50%, 
-    transparent 70%,
+    transparent 25%,
+    rgba(255, 255, 255, 0.3) 35%,
+    rgba(255, 255, 255, 0.8) 50%, 
+    rgba(255, 255, 255, 0.3) 65%,
+    transparent 75%,
     transparent 100%
   );
   transform: translate(-150%, -150%);
@@ -1035,8 +1037,16 @@ html, body {
   .best-seller-card:hover .shimmer,
   .course-card:hover .shimmer,
   .blog-card:hover .shimmer {
-    animation: luxurious-light-beam 1.2s ease-in-out 1;
+    animation: luxurious-light-beam-premium 2.5s ease-in-out 1;
     opacity: 1;
+  }
+
+  /* Card lift effect during shimmer */
+  .best-seller-card:hover,
+  .course-card:hover,
+  .blog-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    transition: transform 0.3s ease-out;
   }
 
   /* Reset shimmer when not hovering */
@@ -1047,12 +1057,6 @@ html, body {
     transform: translate(-150%, -150%);
     opacity: 0;
   }
-
-  /* Hover effects for cards */
-  .course-card:hover,
-  .blog-card:hover {
-    transform: translateY(-2px);
-  }
 }
 
 /* Mobile - shimmer on tap/touch */
@@ -1062,7 +1066,7 @@ html, body {
   }
 
   .best-seller-card .shimmer-container.shimmer-triggered .shimmer {
-    animation: luxurious-light-beam 1.2s ease-in-out 1 !important;
+    animation: luxurious-light-beam-premium 2.5s ease-in-out 1 !important;
     opacity: 1 !important;
   }
 
@@ -1070,22 +1074,56 @@ html, body {
   .course-card:active .shimmer,
   .blog-card:active .shimmer,
   .best-seller-card:active .shimmer {
-    animation: luxurious-light-beam 1.2s ease-in-out 1 !important;
+    animation: luxurious-light-beam-premium 2.5s ease-in-out 1 !important;
     opacity: 1 !important;
   }
 }
 
-/* Fast, luxurious light beam animation */
-@keyframes luxurious-light-beam {
+/* Course card shimmer on scroll (mobile) */
+.shimmer-on-scroll {
+  animation: luxurious-light-beam-premium 2.5s ease-in-out 1 !important;
+  opacity: 1 !important;
+}
+
+/* Premium luxurious light beam animation with flash finish */
+@keyframes luxurious-light-beam-premium {
   0% { 
     transform: translate(-150%, -150%);
     opacity: 0;
   }
-  15% {
+  10% {
+    opacity: 0.3;
+  }
+  20% {
+    opacity: 0.6;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  50% {
     opacity: 1;
   }
-  85% {
+  70% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.3;
+  }
+  95% {
+    /* Flash finish - bright white flash */
     opacity: 1;
+    background: linear-gradient(135deg, 
+      transparent 0%, 
+      transparent 25%,
+      rgba(255, 255, 255, 0.9) 35%,
+      rgba(255, 255, 255, 1) 50%, 
+      rgba(255, 255, 255, 0.9) 65%,
+      transparent 75%,
+      transparent 100%
+    );
   }
   100% { 
     transform: translate(150%, 150%);
