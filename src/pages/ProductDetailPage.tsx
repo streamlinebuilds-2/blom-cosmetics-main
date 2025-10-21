@@ -581,8 +581,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       category: 'Tools & Essentials',
       shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
       overview: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work. Perfect precision and control for sculpting beautiful acrylic nails.',
-      price: 450,
-      compareAtPrice: null,
+      price: 384,
+      compareAtPrice: 480,
       stock: 'In Stock',
       images: [
         '/acrylic-sculpture-brush-white.webp',
@@ -612,7 +612,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
         claims: ['100% Kolinsky', 'Professional Grade']
       },
       variants: [
-        { name: '10mm', price: 450, inStock: true }
+        { name: '10mm', price: 384, inStock: true }
       ],
       rating: 0,
       reviewCount: 23,

@@ -321,8 +321,8 @@ export const ShopPage: React.FC = () => {
       id: '15',
       name: 'Crystal Kolinsky Sculpting Brush',
       slug: 'crystal-kolinsky-sculpting-brush',
-      price: 450,
-      compareAtPrice: undefined,
+      price: 384,
+      compareAtPrice: 480,
       short_description: 'Premium Kolinsky brush with floating glitter handle.',
       shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
       description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
@@ -333,7 +333,7 @@ export const ShopPage: React.FC = () => {
       badges: [],
       inStock: true,
       variants: [
-        { name: '10mm', price: 450, inStock: true }
+        { name: '10mm', price: 384, inStock: true }
       ]
     },
     {
