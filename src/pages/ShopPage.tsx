@@ -346,9 +346,30 @@ export const ShopPage: React.FC = () => {
         { name: 'Size 12', price: 480, inStock: false }
       ]
     },
+    {
+      id: '16',
+      name: 'Professional Detail Brush Set',
+      slug: 'professional-detail-brush-set',
+      price: 320,
+      compareAtPrice: undefined,
+      short_description: 'Professional detail brush set for precision nail art work.',
+      shortDescription: 'Professional detail brush set for precision nail art work.',
+      description: 'High-quality detail brush set featuring multiple sizes for intricate nail art designs. Perfect for fine lines, dots, and detailed artwork.',
+      images: ['/detail-brush-set-white.webp', '/detail-brush-set-colorful.webp'],
+      category: 'tools-essentials',
+      rating: 0,
+      reviews: 15,
+      badges: ['New'],
+      inStock: true,
+      variants: [
+        { name: 'Set of 3', price: 320, inStock: true },
+        { name: 'Set of 5', price: 450, inStock: true },
+        { name: 'Set of 7', price: 580, inStock: true }
+      ]
+    },
     // Furniture Products
     {
-      id: '13',
+      id: '17',
       name: 'Rose Petal Manicure Table',
       slug: 'rose-petal-manicure-table',
       price: 2590,
@@ -366,7 +387,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '14',
+      id: '18',
       name: 'Iris Manicure Table',
       slug: 'iris-manicure-table',
       price: 3490,
@@ -404,7 +425,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '16',
+      id: '19',
       name: 'Daisy Manicure Table',
       slug: 'daisy-manicure-table',
       price: 2700,
@@ -423,7 +444,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '17',
+      id: '20',
       name: 'Polish Garden (Gel Polish Rack)',
       slug: 'polish-garden-rack',
       price: 1150,
@@ -441,7 +462,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '18',
+      id: '21',
       name: 'Blossom Manicure Table',
       slug: 'blossom-manicure-table',
       price: 5200,
@@ -461,7 +482,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '19',
+      id: '22',
       name: 'Pearly Pedicure Station',
       slug: 'pearly-pedicure-station',
       price: 4800,
@@ -479,7 +500,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '20',
+      id: '23',
       name: 'Princess Dresser',
       slug: 'princess-dresser',
       price: 7400,
