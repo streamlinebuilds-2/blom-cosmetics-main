@@ -147,7 +147,7 @@ export const WishlistPage: React.FC = () => {
             <div className="flex items-center gap-4 mb-4">
               <Button
                 onClick={() => window.history.back()}
-                className="btn btn-outline flex items-center gap-2"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back
@@ -169,14 +169,14 @@ export const WishlistPage: React.FC = () => {
                 <div className="flex gap-3">
                   <Button
                     onClick={handleAddAllToCart}
-                    className="btn btn-primary flex items-center gap-2"
+                    className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Add All to Cart
                   </Button>
                   <Button
                     onClick={handleClearWishlist}
-                    className="btn btn-outline text-red-600 hover:text-red-700 hover:border-red-300 flex items-center gap-2"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-red-600 px-6 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
                     Clear All
@@ -192,8 +192,8 @@ export const WishlistPage: React.FC = () => {
             <Card className="text-center py-16">
               <CardContent>
                 <div className="max-w-md mx-auto">
-                  <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Heart className="h-10 w-10 text-pink-400" />
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Heart className="h-10 w-10 text-gray-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-3">Your wishlist is empty</h2>
                   <p className="text-gray-600 mb-8">
@@ -201,7 +201,7 @@ export const WishlistPage: React.FC = () => {
                   </p>
                   <Button
                     onClick={() => window.location.href = '/shop'}
-                    className="btn btn-primary btn-lg"
+                    className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-md font-medium transition-colors"
                   >
                     Continue Shopping
                   </Button>
@@ -212,11 +212,11 @@ export const WishlistPage: React.FC = () => {
             /* Wishlist Items */
             <div className="space-y-6">
               {/* Summary Card */}
-              <Card className="bg-gradient-to-r from-pink-50 to-blue-50 border-0">
+              <Card className="bg-gray-50 border-0">
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
                         <Package className="h-6 w-6 text-white" />
                       </div>
                       <div>
@@ -227,7 +227,7 @@ export const WishlistPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      <Star className="h-4 w-4 text-gray-400" />
                       <span>Save for later</span>
                     </div>
                   </div>
@@ -245,7 +245,7 @@ export const WishlistPage: React.FC = () => {
                           <img
                             src={item.image}
                             alt={item.name}
-                            className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                            className="w-full h-full object-cover cursor-pointer transition-opacity hover:opacity-90"
                             onClick={() => window.location.href = `/products/${item.slug}`}
                           />
                         </div>
@@ -255,13 +255,13 @@ export const WishlistPage: React.FC = () => {
                           <div className="flex justify-between items-start mb-4">
                             <div className="flex-1">
                               <h3 
-                                className="text-xl font-bold text-gray-900 mb-2 cursor-pointer hover:text-pink-600 transition-colors"
+                                className="text-xl font-bold text-gray-900 mb-2 cursor-pointer hover:text-gray-600 transition-colors"
                                 onClick={() => window.location.href = `/products/${item.slug}`}
                               >
                                 {item.name}
                               </h3>
                               <div className="flex items-center gap-2 mb-3">
-                                <span className="text-2xl font-bold text-pink-600">
+                                <span className="text-2xl font-bold text-gray-900">
                                   {formatPrice(item.price)}
                                 </span>
                                 <span className="text-sm text-gray-500">per item</span>
@@ -271,7 +271,7 @@ export const WishlistPage: React.FC = () => {
                             {/* Remove Button */}
                             <Button
                               onClick={() => handleRemoveFromWishlist(item)}
-                              className="p-2 text-white hover:text-red-500 hover:bg-red-50 bg-red-500 rounded-full transition-colors"
+                              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 bg-gray-100 rounded-full transition-colors"
                               aria-label={`Remove ${item.name} from wishlist`}
                             >
                               <Trash2 className="h-4 w-4" />
@@ -283,20 +283,20 @@ export const WishlistPage: React.FC = () => {
                             <div className="flex items-center gap-4">
                               <div className="flex items-center">
                                 <label className="text-sm font-medium text-gray-700 mr-3">Quantity:</label>
-                                <div className="flex items-center border border-gray-300 rounded-lg">
+                                <div className="flex items-center border border-gray-200 rounded-md">
                                   <button
                                     onClick={() => updateQuantity(item.id, (quantities[item.id] || 1) - 1)}
-                                    className="p-2 hover:bg-gray-100 transition-colors"
+                                    className="p-2 hover:bg-gray-50 transition-colors text-gray-600 hover:text-gray-900"
                                     disabled={(quantities[item.id] || 1) <= 1}
                                   >
                                     <Minus className="h-4 w-4" />
                                   </button>
-                                  <span className="px-4 py-2 font-medium min-w-[3rem] text-center">
+                                  <span className="px-3 py-2 font-medium min-w-[2.5rem] text-center text-gray-900">
                                     {quantities[item.id] || 1}
                                   </span>
                                   <button
                                     onClick={() => updateQuantity(item.id, (quantities[item.id] || 1) + 1)}
-                                    className="p-2 hover:bg-gray-100 transition-colors"
+                                    className="p-2 hover:bg-gray-50 transition-colors text-gray-600 hover:text-gray-900"
                                     disabled={(quantities[item.id] || 1) >= 99}
                                   >
                                     <Plus className="h-4 w-4" />
@@ -311,7 +311,7 @@ export const WishlistPage: React.FC = () => {
 
                             <Button
                               onClick={() => handleAddToCart(item)}
-                              className="btn btn-primary flex items-center gap-2"
+                              className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors flex items-center gap-2"
                             >
                               <ShoppingCart className="h-4 w-4" />
                               Add to Cart
@@ -335,7 +335,7 @@ export const WishlistPage: React.FC = () => {
                   </p>
                   <Button
                     onClick={() => window.location.href = '/shop'}
-                    className="btn btn-outline btn-lg"
+                    className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-md font-medium transition-colors"
                   >
                     Continue Shopping
                   </Button>
