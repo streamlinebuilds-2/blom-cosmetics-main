@@ -617,15 +617,15 @@ export const ShopPage: React.FC = () => {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'grid-3':
-        // On mobile show 1 column, tablet 2, desktop 3
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+        // On mobile show 2 columns, tablet 2, desktop 3
+        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
       case 'grid-2':
-        // On mobile show 1 column, tablet+ show 2 columns
-        return 'grid-cols-1 sm:grid-cols-2';
+        // On mobile show 2 columns, tablet+ show 2 columns
+        return 'grid-cols-2 sm:grid-cols-2';
       case 'list':
         return 'grid-cols-1';
       default:
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3';
+        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
     }
   };
 
