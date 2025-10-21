@@ -39,7 +39,7 @@ export const ShopPage: React.FC = () => {
       category: 'bundle-deals',
       rating: 0,
       reviews: 0,
-      badges: ['Bundle', 'Save 10%'],
+      badges: [],
       inStock: true,
       includedProducts: [
         { productId: '3', productName: 'Prep Solution (Nail Dehydrator)', quantity: 1 },
@@ -61,7 +61,7 @@ export const ShopPage: React.FC = () => {
       category: 'prep-finishing',
       rating: 0,
       reviews: 0,
-      badges: ['Bestseller'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
@@ -84,7 +84,7 @@ export const ShopPage: React.FC = () => {
       category: 'prep-finishing',
       rating: 0,
       reviews: 0,
-      badges: ['New'],
+      badges: [],
       inStock: true,
       variants: []
     },
@@ -118,7 +118,7 @@ export const ShopPage: React.FC = () => {
       category: 'gel-system',
       rating: 0,
       reviews: 201,
-      badges: ['Bestseller'],
+      badges: [],
       inStock: true,
       variants: []
     },
@@ -135,7 +135,7 @@ export const ShopPage: React.FC = () => {
       category: 'gel-system',
       rating: 0,
       reviews: 0,
-      badges: ['New'],
+      badges: [],
       inStock: true,
       variants: []
     },
@@ -189,7 +189,7 @@ export const ShopPage: React.FC = () => {
       category: 'Coming Soon',
       rating: 0,
       reviews: 112,
-      badges: ['Bestseller'],
+      badges: [],
       inStock: true,
       variants: []
     },
@@ -206,7 +206,7 @@ export const ShopPage: React.FC = () => {
       category: 'acrylic-system',
       rating: 0,
       reviews: 0,
-      badges: ['Bestseller'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.jpg' },
@@ -320,7 +320,7 @@ export const ShopPage: React.FC = () => {
       category: 'coming-soon',
       rating: 0,
       reviews: 87,
-      badges: ['Coming Soon'],
+      badges: [],
       inStock: false,
       variants: [
         { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
@@ -340,7 +340,7 @@ export const ShopPage: React.FC = () => {
       category: 'tools-essentials',
       rating: 0,
       reviews: 23,
-      badges: ['Professional'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Size 8', price: 480, inStock: false },
@@ -361,7 +361,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 12,
-      badges: ['Custom Built'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Standard', price: 2590, inStock: true }
@@ -379,7 +379,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 8,
-      badges: ['Custom Built'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'With wooden top', price: 3490, inStock: true },
@@ -398,7 +398,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 15,
-      badges: ['Custom Built', 'Popular'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'With wooden tops', price: 4500, inStock: true },
@@ -417,7 +417,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 10,
-      badges: ['Custom Built'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Wooden top', price: 2700, inStock: true },
@@ -436,7 +436,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 18,
-      badges: ['Space Saver'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Standard', price: 1150, inStock: true }
@@ -454,7 +454,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 6,
-      badges: ['Custom Built', 'Premium'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Wooden top', price: 5200, inStock: true },
@@ -474,7 +474,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 9,
-      badges: ['Custom Built', 'Complete Set'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Standard', price: 4800, inStock: true }
@@ -492,7 +492,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 0,
-      badges: ['Custom Built', 'LED Lighting'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Standard with LED', price: 7400, inStock: true, image: '/princess-dresser-colorful.webp' }
@@ -513,7 +513,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 0,
-      badges: ['Custom Built', 'Glass Top'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'With Glass Top', price: 4300, inStock: true, image: '/floral-manicure-table-colorful.webp' }
@@ -534,7 +534,7 @@ export const ShopPage: React.FC = () => {
       category: 'furniture',
       rating: 0,
       reviews: 0,
-      badges: ['Custom Built'],
+      badges: [],
       inStock: true,
       variants: [
         { name: 'Standard', price: 3700, inStock: true, image: '/orchid-manicure-table-colorful.webp' }

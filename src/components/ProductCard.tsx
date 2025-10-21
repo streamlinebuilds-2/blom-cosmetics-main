@@ -300,27 +300,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           {/* Hover Shine Effect (homepage best sellers only) */}
           <div className="shimmer"></div>
 
-          {/* Bestseller Badge */}
-          {badges.includes('Bestseller') && (
-            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-pink-100 text-pink-600 px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-              BESTSELLER
-            </div>
-          )}
-
-          {/* New Badge */}
-          {badges.includes('New') && (
-            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-blue-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-              NEW
-            </div>
-          )}
-
-          {/* Sale Badge */}
-          {badges.includes('Sale') && (
-            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-red-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-              SALE
-            </div>
-          )}
-
           {/* Wishlist Heart */}
           <button
             type="button"
@@ -368,27 +347,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </div>
             )}
           </div>
-
-          {/* Bestseller Badge */}
-          {badges.includes('Bestseller') && (
-            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-pink-100 text-pink-600 px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-              BESTSELLER
-            </div>
-          )}
-
-          {/* New Badge */}
-          {badges.includes('New') && (
-            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-blue-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-              NEW
-            </div>
-          )}
-
-          {/* Sale Badge */}
-          {badges.includes('Sale') && (
-            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-red-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-              SALE
-            </div>
-          )}
 
           {/* Wishlist Heart */}
           <button
