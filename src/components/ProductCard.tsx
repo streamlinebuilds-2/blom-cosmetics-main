@@ -390,7 +390,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   {formatPrice(compareAtPrice || price)}
                 </span>
                 <span className={`text-xs sm:text-xs font-semibold text-white px-2 py-1 sm:px-2 sm:py-1 rounded-full ${
-                  discountBadgeColor || 'bg-green-500'
+                  discountBadgeColor || 'bg-blue-400'
                 }`}>
                   {discountBadge || (compareAtPrice ? `${Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF` : 'SALE')}
                 </span>
