@@ -4,6 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
+import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 
 export const ShopPage: React.FC = () => {
@@ -667,19 +668,14 @@ export const ShopPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Modern Search Bar */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 border-0 bg-gray-50 rounded-xl focus:ring-2 focus:ring-pink-300 focus:bg-white outline-none transition-all"
-              />
-            </div>
-          </div>
+          {/* Professional Autocomplete Search */}
+          <AutocompleteSearch
+            products={allProducts}
+            onSearchChange={setSearchTerm}
+            searchTerm={searchTerm}
+            placeholder="Search products... (try 'brush', 'acrylic', 'primer')"
+            className="mb-6"
+          />
 
           {/* Category Pills - Mobile Optimized */}
           <div className="mb-4">
