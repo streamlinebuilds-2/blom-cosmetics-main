@@ -140,7 +140,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
             'Step-by-step guides',
             'Color theory basics',
             'Blending techniques',
-            'Certificate after you've completed your exam'
+            'Certificate after you\'ve completed your exam'
           ]
         }
       ],
@@ -213,7 +213,7 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
             'Holiday design templates',
             'Seasonal color palettes',
             'Festive techniques guide',
-            'Certificate after you've completed your exam'
+            'Certificate after you\'ve completed your exam'
           ],
           onSale: true
         }
