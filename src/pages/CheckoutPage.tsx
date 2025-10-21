@@ -5,10 +5,9 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
-import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, User, CreditCard as Edit, Trash2, Plus, Minus, ArrowLeft } from 'lucide-react';
+import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft } from 'lucide-react';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
-import { LockerPickerList } from '../components/checkout/LockerPickerList';
-import { validateMobileNumber, validateAddress, validatePickupPoint, formatMobileNumber } from '../lib/validation';
+import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -19,7 +18,7 @@ export const CheckoutPage: React.FC = () => {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   
-  const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'locker' | 'door-to-door'>('door-to-door');
+  const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'door-to-door'>('door-to-door');
   
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
@@ -49,20 +48,6 @@ export const CheckoutPage: React.FC = () => {
   // Address input for autocomplete
   const [addressInput, setAddressInput] = useState('');
 
-  // Pickup point data for locker/kiosk delivery
-  const [selectedPickupPoint, setSelectedPickupPoint] = useState<{
-    id: string;
-    name: string;
-    street_address: string;
-    local_area: string;
-    city: string;
-    zone: string;
-    code: string;
-    country: string;
-    lat: number;
-    lng: number;
-    provider: string;
-  } | null>(null);
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
@@ -102,10 +87,6 @@ export const CheckoutPage: React.FC = () => {
     cartStore.updateQuantity(itemId, newQuantity);
   };
 
-  const handleRemoveItem = (itemId: string) => {
-    cartStore.removeItem(itemId);
-  };
-
   // Handle address selection from autocomplete
   const handleAddressSelect = (suggestion: any) => {
     const { properties, geometry } = suggestion;
@@ -137,15 +118,8 @@ export const CheckoutPage: React.FC = () => {
       if (!addressValidation.isValid) {
         errors.address = addressValidation.errors;
       }
-    } else if (shippingMethod === 'locker') {
-      if (!selectedPickupPoint) {
-        errors.pickupPoint = ['Please select a pickup point'];
-      } else {
-        const pickupValidation = validatePickupPoint(selectedPickupPoint);
-        if (!pickupValidation.isValid) {
-          errors.pickupPoint = pickupValidation.errors;
-        }
-      }
+    } else if (shippingMethod === 'store-pickup') {
+      return validateAddress(deliveryAddress);
     }
 
     setValidationErrors(errors);
@@ -255,20 +229,6 @@ export const CheckoutPage: React.FC = () => {
             ship_to_country: deliveryAddress.country,
             ship_to_lat: deliveryAddress.lat,
             ship_to_lng: deliveryAddress.lng
-          }),
-          // Locker/Kiosk delivery fields
-          ...(shippingMethod === 'locker' && selectedPickupPoint && {
-            locker_id: selectedPickupPoint.id,
-            locker_name: selectedPickupPoint.name,
-            locker_street: selectedPickupPoint.street_address,
-            locker_suburb: selectedPickupPoint.local_area,
-            locker_city: selectedPickupPoint.city,
-            locker_zone: selectedPickupPoint.zone,
-            locker_postal_code: selectedPickupPoint.code,
-            locker_country: selectedPickupPoint.country,
-            locker_lat: selectedPickupPoint.lat,
-            locker_lng: selectedPickupPoint.lng,
-            locker_provider: selectedPickupPoint.provider
           })
         }
       };
@@ -316,18 +276,12 @@ export const CheckoutPage: React.FC = () => {
   // Calculate shipping cost
   const calculateShipping = () => {
     if (shippingMethod === 'store-pickup') return 0;
-    if (shippingMethod === 'locker') return 50;
     // Door-to-door: Free over R1500, otherwise R75 (use items subtotal)
     return cartState.subtotal >= 1500 ? 0 : 75;
   };
 
   const shippingCost = calculateShipping();
   const orderTotal = cartState.subtotal + shippingCost - discount;
-
-  const provinces = [
-    'Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal',
-    'Limpopo', 'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape'
-  ];
 
   const paymentMethods = [
     {
@@ -358,22 +312,22 @@ export const CheckoutPage: React.FC = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold mb-4">Checkout</h1>
             <div className="flex items-center justify-center gap-4">
-              <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-pink-400' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
+              <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
                   1
                 </div>
                 <span>Shipping</span>
               </div>
               <div className="w-8 h-px bg-gray-300"></div>
-              <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-pink-400' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
+              <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
                   2
                 </div>
                 <span>Payment</span>
               </div>
               <div className="w-8 h-px bg-gray-300"></div>
-              <div className={`flex items-center gap-2 ${step === 'review' ? 'text-pink-400' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
+              <div className={`flex items-center gap-2 ${step === 'review' ? 'text-gray-900' : 'text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
                   3
                 </div>
                 <span>Review</span>
@@ -396,7 +350,7 @@ export const CheckoutPage: React.FC = () => {
                       {/* Shipping Method Selection */}
                       <div>
                         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                          <Truck className="h-5 w-5 text-pink-500" />
+                          <Truck className="h-5 w-5 text-gray-500" />
                           Choose Your Delivery Option
                         </h3>
                         <div className="space-y-3">
@@ -404,9 +358,9 @@ export const CheckoutPage: React.FC = () => {
                           {/* Store Pickup */}
                           <label 
                             className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                              shippingMethod === 'store-pickup' 
-                                ? 'border-pink-500 bg-pink-50' 
-                                : 'border-gray-200 hover:border-pink-300'
+                              shippingMethod === 'store-pickup'
+                                ? 'border-gray-900 bg-gray-50' 
+                                : 'border-gray-200 hover:border-gray-300'
                             }`}
                           >
                             <div className="flex items-start gap-3">
@@ -421,39 +375,10 @@ export const CheckoutPage: React.FC = () => {
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Collect from BLOM HQ, Randfontein</span>
-                                  <span className="text-lg font-bold text-pink-500">FREE</span>
+                                  <span className="text-lg font-bold text-gray-900">FREE</span>
                                 </div>
                                 <p className="text-sm text-gray-600">Ready within 24 hours. We'll WhatsApp you when it's ready.</p>
-                                <span className="inline-block mt-2 px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">💗 Free Pickup</span>
-                              </div>
-                            </div>
-                          </label>
-
-                          {/* Locker/Kiosk */}
-                          <label 
-                            className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                              shippingMethod === 'locker' 
-                                ? 'border-pink-500 bg-pink-50' 
-                                : 'border-gray-200 hover:border-pink-300'
-                            }`}
-                          >
-                            <div className="flex items-start gap-3">
-                              <input
-                                type="radio"
-                                name="shippingMethod"
-                                value="locker"
-                                checked={shippingMethod === 'locker'}
-                                onChange={(e) => setShippingMethod(e.target.value as any)}
-                                className="mt-1"
-                              />
-                              <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="font-semibold text-gray-900">Collect from Locker / Kiosk</span>
-                                  <span className="text-lg font-bold text-gray-900">R50</span>
-                                </div>
-                                <p className="text-sm text-gray-600">Choose your nearest Courier Guy Locker or Kiosk (2–4 business days).</p>
-                                <p className="text-xs text-gray-500 mt-1">Your parcel will be safely stored — you'll get an SMS with a PIN when it's ready.</p>
-                                <span className="inline-block mt-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">💸 Most Affordable</span>
+                                <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free Pickup</span>
                               </div>
                             </div>
                           </label>
@@ -461,9 +386,9 @@ export const CheckoutPage: React.FC = () => {
                           {/* Door-to-Door */}
                           <label 
                             className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                              shippingMethod === 'door-to-door' 
-                                ? 'border-pink-500 bg-pink-50' 
-                                : 'border-gray-200 hover:border-pink-300'
+                              shippingMethod === 'door-to-door'
+                                ? 'border-gray-900 bg-gray-50' 
+                                : 'border-gray-200 hover:border-gray-300'
                             }`}
                           >
                             <div className="flex items-start gap-3">
@@ -484,7 +409,7 @@ export const CheckoutPage: React.FC = () => {
                                 </div>
                                 <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
                                 {cartState.subtotal >= 1500 && (
-                                  <span className="inline-block mt-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">⭐ Free over R1500</span>
+                                  <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free over R1500</span>
                                 )}
                                 {cartState.subtotal < 1500 && (
                                   <p className="text-xs text-gray-500 mt-1">Add R{(1500 - cartState.subtotal).toFixed(2)} more for free delivery!</p>
@@ -496,14 +421,6 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Locker/Kiosk Picker (only show if locker selected) */}
-                      {shippingMethod === 'locker' && (
-                        <LockerPickerList
-                          value={selectedPickupPoint}
-                          onChange={setSelectedPickupPoint}
-                        />
-                      )}
-                      
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
@@ -596,7 +513,7 @@ export const CheckoutPage: React.FC = () => {
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
                               <input
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none"
                                 value={deliveryAddress.street_address}
                                 onChange={(e) => setDeliveryAddress({...deliveryAddress, street_address: e.target.value})}
                                 placeholder="Auto-filled"
@@ -605,7 +522,7 @@ export const CheckoutPage: React.FC = () => {
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                               <input
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none"
                                 value={deliveryAddress.city}
                                 onChange={(e) => setDeliveryAddress({...deliveryAddress, city: e.target.value})}
                                 placeholder="Auto-filled"
@@ -614,7 +531,7 @@ export const CheckoutPage: React.FC = () => {
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">Province</label>
                               <input
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none"
                                 value={deliveryAddress.zone}
                                 onChange={(e) => setDeliveryAddress({...deliveryAddress, zone: e.target.value})}
                                 placeholder="Auto-filled"
@@ -623,7 +540,7 @@ export const CheckoutPage: React.FC = () => {
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
                               <input
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-400 focus:border-pink-400 outline-none"
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-400 focus:border-gray-400 outline-none"
                                 value={deliveryAddress.code}
                                 onChange={(e) => setDeliveryAddress({...deliveryAddress, code: e.target.value})}
                                 placeholder="Auto-filled"
@@ -632,12 +549,12 @@ export const CheckoutPage: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                          <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
                             <div className="flex items-center gap-2 mb-1">
-                              <MapPin className="h-4 w-4 text-blue-500" />
-                              <span className="text-sm font-medium text-blue-800">Address Tip</span>
+                              <MapPin className="h-4 w-4 text-gray-500" />
+                              <span className="text-sm font-medium text-gray-800">Address Tip</span>
                             </div>
-                            <p className="text-xs text-blue-700">
+                            <p className="text-xs text-gray-700">
                               Start typing your address above to get suggestions. This will auto-fill all the fields below for accurate delivery.
                             </p>
                           </div>
@@ -646,9 +563,9 @@ export const CheckoutPage: React.FC = () => {
 
                       {/* Validation Errors */}
                       {validationErrors.address && validationErrors.address.length > 0 && (
-                        <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                          <p className="text-red-600 text-sm font-medium mb-1">Please fix the following address issues:</p>
-                          <ul className="text-red-600 text-sm list-disc list-inside">
+                        <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+                          <p className="text-gray-800 text-sm font-medium mb-1">Please fix the following address issues:</p>
+                          <ul className="text-gray-700 text-sm list-disc list-inside">
                             {validationErrors.address.map((error, index) => (
                               <li key={index}>{error}</li>
                             ))}
@@ -657,9 +574,9 @@ export const CheckoutPage: React.FC = () => {
                       )}
 
                       {validationErrors.pickupPoint && validationErrors.pickupPoint.length > 0 && (
-                        <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                          <p className="text-red-600 text-sm font-medium mb-1">Please fix the following pickup point issues:</p>
-                          <ul className="text-red-600 text-sm list-disc list-inside">
+                        <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
+                          <p className="text-gray-800 text-sm font-medium mb-1">Please fix the following pickup point issues:</p>
+                          <ul className="text-gray-700 text-sm list-disc list-inside">
                             {validationErrors.pickupPoint.map((error, index) => (
                               <li key={index}>{error}</li>
                             ))}
@@ -701,7 +618,7 @@ export const CheckoutPage: React.FC = () => {
                             key={method.id}
                             className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                               paymentInfo.method === method.id
-                                ? 'border-pink-400 bg-pink-50'
+                                ? 'border-gray-400 bg-gray-50'
                                 : 'border-gray-200 hover:border-gray-300'
                             }`}
                             onClick={() => setPaymentInfo({...paymentInfo, method: method.id})}
@@ -713,7 +630,7 @@ export const CheckoutPage: React.FC = () => {
                                 value={method.id}
                                 checked={paymentInfo.method === method.id}
                                 onChange={(e) => setPaymentInfo({...paymentInfo, method: e.target.value})}
-                                className="text-pink-400"
+                                className="text-gray-400"
                               />
                               <method.icon className="h-5 w-5 text-gray-600" />
                               <div>
@@ -726,12 +643,12 @@ export const CheckoutPage: React.FC = () => {
                       </div>
 
                       {/* Security Notice */}
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <Shield className="h-5 w-5 text-blue-500" />
-                          <h3 className="font-medium text-blue-900">Secure Payment</h3>
+                          <Shield className="h-5 w-5 text-gray-500" />
+                          <h3 className="font-medium text-gray-900">Secure Payment</h3>
                         </div>
-                        <p className="text-sm text-blue-800">
+                        <p className="text-sm text-gray-700">
                           Your payment information is encrypted and secure. We use industry-standard 
                           SSL encryption to protect your data.
                         </p>
@@ -830,7 +747,7 @@ export const CheckoutPage: React.FC = () => {
                               {item.variant && (
                                 <p className="text-sm text-gray-500">{item.variant.title}</p>
                               )}
-                              <p className="text-pink-400 font-bold">{formatPrice(item.price)}</p>
+                              <p className="text-gray-900 font-bold">{formatPrice(item.price)}</p>
                             </div>
                             <div className="text-right">
                               <div className="inline-flex items-center gap-2 mb-1">
@@ -852,7 +769,7 @@ export const CheckoutPage: React.FC = () => {
                                   <Plus className="h-4 w-4" />
                                 </button>
                               </div>
-                              <p className="text-pink-400 font-bold">
+                              <p className="text-gray-900 font-bold">
                                 {formatPrice(item.price * item.quantity)}
                               </p>
                             </div>
@@ -925,7 +842,7 @@ export const CheckoutPage: React.FC = () => {
                                 <Plus className="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <span className="text-pink-400 font-bold text-sm">
+                            <span className="text-gray-900 font-bold text-sm">
                               {formatPrice(item.price * item.quantity)}
                             </span>
                           </div>
@@ -1065,8 +982,7 @@ export const CheckoutPage: React.FC = () => {
                       productId: 'nail-file',
                       name: 'Nail File (80/80 Grit)',
                       price: 35,
-                      image: '/nail-file-white.webp',
-                      quantity: 1
+                      image: '/nail-file-white.webp'
                     });
                   }}
                   className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
@@ -1095,8 +1011,7 @@ export const CheckoutPage: React.FC = () => {
                       productId: 'cuticle-oil',
                       name: 'Cuticle Oil',
                       price: 140,
-                      image: '/cuticle-oil-white.webp',
-                      quantity: 1
+                      image: '/cuticle-oil-white.webp'
                     });
                   }}
                   className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
@@ -1125,8 +1040,7 @@ export const CheckoutPage: React.FC = () => {
                       productId: 'top-coat',
                       name: 'Top Coat',
                       price: 190,
-                      image: '/top-coat-white.webp',
-                      quantity: 1
+                      image: '/top-coat-white.webp'
                     });
                   }}
                   className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-full font-semibold transition-colors"
