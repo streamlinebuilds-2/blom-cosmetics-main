@@ -402,23 +402,22 @@ export const ShopPage: React.FC = () => {
     },
     {
       id: '16',
-      name: 'Professional Detail Brush Set',
-      slug: 'professional-detail-brush-set',
+      name: 'Professional Detail Brush',
+      slug: 'professional-detail-brush',
       price: 320,
       compareAtPrice: undefined,
-      short_description: 'Professional detail brush set for precision nail art work.',
-      shortDescription: 'Professional detail brush set for precision nail art work.',
-      description: 'High-quality detail brush set featuring multiple sizes for intricate nail art designs. Perfect for fine lines, dots, and detailed artwork.',
-      images: ['/detail-brush-set-white.webp', '/detail-brush-set-colorful.webp'],
+      short_description: 'High-quality detail brush for intricate nail art designs. Perfect for fine lines, dots, and detailed artwork.',
+      shortDescription: 'High-quality detail brush for intricate nail art designs. Perfect for fine lines, dots, and detailed artwork.',
+      description: 'High-quality detail brush for intricate nail art designs. Perfect for fine lines, dots, and detailed artwork. Professional grade with precise control.',
+      images: ['/detail-brush-white.webp', '/detail-brush-colorful.webp'],
       category: 'tools-essentials',
       rating: 0,
       reviews: 15,
       badges: ['New'],
       inStock: true,
       variants: [
-        { name: 'Set of 3', price: 320, inStock: true },
-        { name: 'Set of 5', price: 450, inStock: true },
-        { name: 'Set of 7', price: 580, inStock: true }
+        { name: '10mm', price: 320, inStock: true },
+        { name: '9mm', price: 300, inStock: true }
       ]
     },
     // Furniture Products
