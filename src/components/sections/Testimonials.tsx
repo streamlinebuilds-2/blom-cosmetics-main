@@ -101,7 +101,7 @@ export const Testimonials: React.FC = () => {
         }
         
         .paused {
-          animation-play-state: paused;
+          animation-play-state: paused !important;
         }
       `}</style>
     </section>
