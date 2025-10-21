@@ -669,7 +669,10 @@ export const ShopPage: React.FC = () => {
     
     const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
     
-    return matchesCategory && matchesSearch && matchesStock;
+    // Exclude archived products
+    const isNotArchived = product.category !== 'archived';
+    
+    return matchesCategory && matchesSearch && matchesStock && isNotArchived;
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
