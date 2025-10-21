@@ -155,51 +155,11 @@ export function computeFinalPrice(
 
 /**
  * Load discounts from content directory
+ * Discount system is currently disabled
  */
 export async function loadDiscounts(): Promise<Discount[]> {
-  try {
-    // Try to load from static imports first
-    const discountModules = await Promise.allSettled([
-      import('../../content/discounts/weekly-specials.json'),
-      import('../../content/discounts/seasonal.json'),
-      import('../../content/discounts/coupons.json')
-    ]);
-    
-    const discounts: Discount[] = [];
-    
-    discountModules.forEach(result => {
-      if (result.status === 'fulfilled' && result.value.default) {
-        discounts.push(...result.value.default);
-      }
-    });
-    
-    return discounts;
-  } catch (error) {
-    console.warn('Could not load discounts from static imports, trying fetch:', error);
-    
-    // Fallback to fetch if static imports fail
-    try {
-      const responses = await Promise.allSettled([
-        fetch('/content/discounts/weekly-specials.json'),
-        fetch('/content/discounts/seasonal.json'),
-        fetch('/content/discounts/coupons.json')
-      ]);
-      
-      const discounts: Discount[] = [];
-      
-      for (const response of responses) {
-        if (response.status === 'fulfilled' && response.value.ok) {
-          const data = await response.value.json();
-          discounts.push(...data);
-        }
-      }
-      
-      return discounts;
-    } catch (fetchError) {
-      console.error('Failed to load discounts:', fetchError);
-      return [];
-    }
-  }
+  // Discount system is disabled - return empty array
+  return [];
 }
 
 /**
