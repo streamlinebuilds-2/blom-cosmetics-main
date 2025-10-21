@@ -48,6 +48,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [thumbnailScrollIndex, setThumbnailScrollIndex] = useState(0);
   const [allImages, setAllImages] = useState<string[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
 
@@ -1227,6 +1228,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
     return unsubscribe;
   }, [productSlug]);
 
+  // Auto-scroll thumbnail carousel to keep selected image visible
+  useEffect(() => {
+    if (allImages.length <= 4) return;
+    
+    // If selected image is beyond current view, scroll to show it
+    if (selectedImage < thumbnailScrollIndex) {
+      setThumbnailScrollIndex(selectedImage);
+    } else if (selectedImage >= thumbnailScrollIndex + 4) {
+      setThumbnailScrollIndex(selectedImage - 3);
+    }
+  }, [selectedImage, allImages.length, thumbnailScrollIndex]);
+
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -1277,6 +1290,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
   const prevImage = () => {
     if (!product) return;
     setSelectedImage((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const nextThumbnail = () => {
+    if (allImages.length <= 4) return;
+    setThumbnailScrollIndex((prev) => Math.min(prev + 1, allImages.length - 4));
+  };
+
+  const prevThumbnail = () => {
+    if (allImages.length <= 4) return;
+    setThumbnailScrollIndex((prev) => Math.max(prev - 1, 0));
   };
 
   const toggleAccordion = (section: string) => {
@@ -1447,24 +1470,76 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
                   </button>
                 </div>
 
-                {/* Thumbnail Images */}
+                {/* Thumbnail Images - Mobile Carousel */}
                 {allImages.length > 1 && (
-                  <div className="flex gap-3">
-                    {allImages.map((image: string, index: number) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImage(index)}
-                        className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
-                          selectedImage === index ? 'border-pink-400' : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <img
-                          src={image || `https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`}
-                          alt={`${product.name} ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+                  <div className="relative">
+                    {/* Desktop: Show all thumbnails */}
+                    <div className="hidden md:flex gap-3">
+                      {allImages.map((image: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImage(index)}
+                          className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors ${
+                            selectedImage === index ? 'border-pink-400' : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <img
+                            src={image || `https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`}
+                            alt={`${product.name} ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Mobile: Sliding carousel showing 4 at a time */}
+                    <div className="md:hidden relative">
+                      {/* Navigation arrows */}
+                      {allImages.length > 4 && (
+                        <>
+                          <button
+                            onClick={prevThumbnail}
+                            disabled={thumbnailScrollIndex === 0}
+                            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all ${
+                              thumbnailScrollIndex === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:scale-110'
+                            }`}
+                          >
+                            <ChevronLeft className="h-4 w-4 text-gray-700" />
+                          </button>
+                          <button
+                            onClick={nextThumbnail}
+                            disabled={thumbnailScrollIndex >= allImages.length - 4}
+                            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg transition-all ${
+                              thumbnailScrollIndex >= allImages.length - 4 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-white hover:scale-110'
+                            }`}
+                          >
+                            <ChevronRight className="h-4 w-4 text-gray-700" />
+                          </button>
+                        </>
+                      )}
+
+                      {/* Thumbnail container */}
+                      <div className="flex gap-3 overflow-hidden">
+                        {allImages.slice(thumbnailScrollIndex, thumbnailScrollIndex + 4).map((image: string, index: number) => {
+                          const actualIndex = thumbnailScrollIndex + index;
+                          return (
+                            <button
+                              key={actualIndex}
+                              onClick={() => setSelectedImage(actualIndex)}
+                              className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-colors flex-shrink-0 ${
+                                selectedImage === actualIndex ? 'border-pink-400' : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <img
+                                src={image || `https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop`}
+                                alt={`${product.name} ${actualIndex + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
