@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from '../layout/Container';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const testimonials = [
   {
@@ -36,22 +35,7 @@ const testimonials = [
 ];
 
 export const Testimonials: React.FC = () => {
-  const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-
-  const prev = () => setIndex((i) => (i - 1 + testimonials.length) % testimonials.length);
-  const next = () => setIndex((i) => (i + 1) % testimonials.length);
-
-  // Auto-scroll effect
-  useEffect(() => {
-    if (isPaused) return;
-    
-    const interval = setInterval(() => {
-      setIndex((i) => (i + 1) % testimonials.length);
-    }, 3000); // Change every 3 seconds
-
-    return () => clearInterval(interval);
-  }, [isPaused]);
 
   return (
     <section className="py-16">
@@ -61,15 +45,35 @@ export const Testimonials: React.FC = () => {
         </div>
 
         <div 
-          className="relative max-w-6xl mx-auto overflow-hidden"
+          className="relative overflow-hidden"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Conveyor belt style carousel */}
-          <div className="flex transition-transform duration-1000 ease-in-out" style={{ transform: `translateX(-${index * 100}%)` }}>
+          {/* Infinite scrolling carousel */}
+          <div 
+            className={`flex gap-6 ${isPaused ? 'paused' : ''}`}
+            style={{
+              animation: 'scroll-left 20s linear infinite',
+              width: `${testimonials.length * 2 * 100}%` // Double the testimonials for seamless loop
+            }}
+          >
+            {/* First set of testimonials */}
             {testimonials.map((testimonial) => (
-              <div key={testimonial.id} className="w-full flex-shrink-0 px-4">
-                <div className="aspect-[9/16] max-w-xs mx-auto rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
+              <div key={`first-${testimonial.id}`} className="flex-shrink-0 w-80">
+                <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            ))}
+            {/* Duplicate set for seamless loop */}
+            {testimonials.map((testimonial) => (
+              <div key={`second-${testimonial.id}`} className="flex-shrink-0 w-80">
+                <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
                   <img
                     src={testimonial.image}
                     alt={testimonial.name}
@@ -80,44 +84,23 @@ export const Testimonials: React.FC = () => {
               </div>
             ))}
           </div>
-
-          {/* Navigation */}
-          <div className="flex items-center justify-between mt-6">
-            <button 
-              onClick={prev} 
-              className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors"
-              aria-label="Previous testimonial"
-            >
-              <ChevronLeft className="h-6 w-6 text-gray-600" />
-            </button>
-
-            {/* Dots */}
-            <div className="flex gap-2">
-              {testimonials.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setIndex(i)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    i === index ? 'bg-pink-400' : 'bg-gray-300'
-                  }`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-
-            <button 
-              onClick={next} 
-              className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight className="h-6 w-6 text-gray-600" />
-            </button>
-          </div>
         </div>
       </Container>
+
+      <style jsx>{`
+        @keyframes scroll-left {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        
+        .paused {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 };
-
-
-
