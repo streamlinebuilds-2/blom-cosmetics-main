@@ -111,7 +111,7 @@ class CartStore {
     this.state.subtotal = this.state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     // Free shipping over R1500
-    this.state.shipping = this.state.subtotal >= 500 ? 0 : 50;
+    this.state.shipping = this.state.subtotal >= 1500 ? 0 : 120;
     
     // 15% VAT
     this.state.tax = Math.round((this.state.subtotal + this.state.shipping) * 0.15);
