@@ -29,7 +29,6 @@ export const ShopPage: React.FC = () => {
       name: 'Prep & Primer Bundle',
       slug: 'prep-primer-bundle',
       price: 370,
-      compareAtPrice: 410,
       short_description: 'Essential prep duo - Dehydrator & Primer - save R40!',
       shortDescription: 'Essential prep duo - Dehydrator & Primer - save R40!',
       description: 'Perfect nail preparation starts here. Get both our Prep Solution and Vitamin Primer together and save.',
