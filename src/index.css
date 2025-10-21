@@ -1161,3 +1161,8 @@ html, body {
     transform: scale(1.05);
   }
 }
+
+/* Ensure blue-100 class is defined to prevent pink fallback */
+.bg-blue-100 {
+  background-color: #dbeafe !important;
+}
