@@ -186,11 +186,11 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Professional-grade, fast acting nail remover.',
       description: 'Professional-grade acetone for fast and effective nail polish removal.',
       images: ['/acetone-remover-white.webp', '/acetone-remover-colorful.webp'],
-      category: 'Coming Soon',
+      category: 'archived',
       rating: 0,
       reviews: 112,
       badges: [],
-      inStock: true,
+      inStock: false,
       variants: []
     },
     {
