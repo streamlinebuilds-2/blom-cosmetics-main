@@ -299,6 +299,41 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           />
           {/* Hover Shine Effect (homepage best sellers only) */}
           <div className="shimmer"></div>
+
+          {/* Bestseller Badge */}
+          {badges.includes('Bestseller') && (
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-pink-100 text-pink-600 px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+              BESTSELLER
+            </div>
+          )}
+
+          {/* New Badge */}
+          {badges.includes('New') && (
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-blue-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+              NEW
+            </div>
+          )}
+
+          {/* Sale Badge */}
+          {badges.includes('Sale') && (
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-red-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+              SALE
+            </div>
+          )}
+
+          {/* Wishlist Heart */}
+          <button
+            type="button"
+            onClick={handleWishlistToggle}
+            className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
+            aria-label="Toggle wishlist"
+          >
+            <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
+              isWishlisted 
+                ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
+                : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
+            }`} />
+          </button>
         </div>
       ) : (
         <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
@@ -333,45 +368,43 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </div>
             )}
           </div>
+
+          {/* Bestseller Badge */}
+          {badges.includes('Bestseller') && (
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-pink-100 text-pink-600 px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+              BESTSELLER
+            </div>
+          )}
+
+          {/* New Badge */}
+          {badges.includes('New') && (
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-blue-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+              NEW
+            </div>
+          )}
+
+          {/* Sale Badge */}
+          {badges.includes('Sale') && (
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-red-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
+              SALE
+            </div>
+          )}
+
+          {/* Wishlist Heart */}
+          <button
+            type="button"
+            onClick={handleWishlistToggle}
+            className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
+            aria-label="Toggle wishlist"
+          >
+            <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
+              isWishlisted 
+                ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
+                : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
+            }`} />
+          </button>
         </div>
       )}
-
-        {/* Bestseller Badge */}
-        {badges.includes('Bestseller') && (
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-pink-100 text-pink-600 px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-            BESTSELLER
-          </div>
-        )}
-
-        {/* New Badge */}
-        {badges.includes('New') && (
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-blue-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-            NEW
-          </div>
-        )}
-
-        {/* Sale Badge */}
-        {badges.includes('Sale') && (
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 md:top-4 md:left-4 bg-red-500 text-white px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full text-[10px] sm:text-xs font-bold uppercase shadow-md">
-            SALE
-          </div>
-        )}
-
-
-        {/* Wishlist Heart */}
-        <button
-          type="button"
-          onClick={handleWishlistToggle}
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
-          aria-label="Toggle wishlist"
-        >
-          <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
-            isWishlisted 
-              ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
-              : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
-          }`} />
-        </button>
-      </div>
 
       {/* Content */}
       <div className="p-4 sm:p-4 md:p-6">
