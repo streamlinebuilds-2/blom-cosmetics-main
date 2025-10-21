@@ -284,44 +284,57 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
       onClick={handleCardClick}
     >
-      {/* Image Container with 3D Flip Effect */}
-      <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
-        <div className="product-card-flip-inner">
-          {/* Front Face - White Background Image */}
-          <div className="product-card-flip-front">
-            <img
-              src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-              alt={name}
-              className="w-full h-full object-cover"
-              loading="lazy"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-              }}
-            />
-          </div>
-
-          {/* Back Face - Colorful Image */}
-          {!hoverShine && images[1] && (
-            <div className="product-card-flip-back">
+      {/* Image Container - Static for best sellers, Flip for others */}
+      {hoverShine ? (
+        <div className="relative aspect-square overflow-hidden bg-gray-50">
+          <img
+            src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+            alt={name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+            }}
+          />
+          {/* Hover Shine Effect (homepage best sellers only) */}
+          <div className="shimmer"></div>
+        </div>
+      ) : (
+        <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
+          <div className="product-card-flip-inner">
+            {/* Front Face - White Background Image */}
+            <div className="product-card-flip-front">
               <img
-                src={images[1]}
+                src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
                 alt={name}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+                  target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
                 }}
               />
             </div>
-          )}
-        </div>
 
-        {/* Hover Shine Effect (homepage best sellers only) */}
-        {hoverShine && (
-          <div className="shimmer"></div>
-        )}
+            {/* Back Face - Colorful Image */}
+            {images[1] && (
+              <div className="product-card-flip-back">
+                <img
+                  src={images[1]}
+                  alt={name}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
         {/* Bestseller Badge */}
         {badges.includes('Bestseller') && (
