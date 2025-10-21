@@ -47,10 +47,10 @@ export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug =
           price: 'R7,200',
           kitValue: 'R3,200',
           features: [
-            '5-day comprehensive training',
-            'Basic starter kit included',
-            'Certificate after you've completed your exam',
-            'Course materials and handouts'
+          '5-day comprehensive training',
+          'Basic starter kit included',
+          'Certificate after you\'ve completed your exam',
+          'Course materials and handouts'
           ]
         },
         {
