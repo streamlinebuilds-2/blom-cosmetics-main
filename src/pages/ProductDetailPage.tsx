@@ -618,6 +618,44 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       reviewCount: 23,
       reviews: []
     },
+    'professional-detail-brush': {
+      id: '16',
+      name: 'Professional Detail Brush',
+      slug: 'professional-detail-brush',
+      category: 'Tools & Essentials',
+      shortDescription: 'High-quality detail brush for intricate nail art designs. Perfect for fine lines, dots, and detailed artwork.',
+      overview: 'The Professional Detail Brush is designed for nail artists who demand precision and control. This high-quality brush features fine bristles that hold their shape perfectly, making it ideal for intricate nail art designs, fine lines, dots, and detailed artwork. Whether you\'re creating delicate floral patterns or precise geometric designs, this brush delivers professional results every time.',
+      price: 320,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: ['/detail-brush-white.webp', '/detail-brush-colorful.webp'],
+      features: [
+        'Fine bristles for precise control',
+        'Perfect for intricate nail art designs',
+        'Ideal for fine lines, dots, and detailed artwork',
+        'Professional grade quality',
+        'Maintains shape and flexibility'
+      ],
+      howToUse: [
+        'Clean brush thoroughly before first use',
+        'Use with gel polish or acrylic paint for best results',
+        'Work in small sections for detailed designs',
+        'Clean immediately after use with brush cleaner',
+        'Store upright to maintain brush shape'
+      ],
+      details: {
+        material: 'Synthetic bristles',
+        size: '10mm',
+        shelfLife: 'N/A',
+        claims: ['Professional Grade', 'Precision Control']
+      },
+      variants: [
+        { name: '10mm', price: 320, inStock: true }
+      ],
+      rating: 0,
+      reviewCount: 15,
+      reviews: []
+    },
     'rose-petal-manicure-table': {
       id: '13',
       name: 'Rose Petal Manicure Table',
