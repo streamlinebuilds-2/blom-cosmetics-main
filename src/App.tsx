@@ -30,6 +30,8 @@ import CheckoutCancel from './pages/CheckoutCancel';
 import AuthTestPage from './pages/AuthTestPage';
 import SimpleAccountPage from './pages/SimpleAccountPage';
 import DebugAccountPage from './pages/DebugAccountPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import InvoiceViewer from './pages/InvoiceViewer';
 import { DealsPage } from './pages/DealsPage';
@@ -112,6 +114,10 @@ function App() {
   if (path === '/checkout/cancel') { return <><CheckoutCancel /><CartWidget /></>; }
   
   if (path === '/auth-test') { return <><AuthTestPage /></>; }
+
+  if (path === '/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
+
+  if (path === '/auth/callback') { return <><AuthCallbackPage /><CartWidget /></>; }
 
   if (path === '/payment-success') { return <><PaymentSuccess /><CartWidget /></>; }
   if (path === '/payment-cancelled') { return <><PaymentCancelled /><CartWidget /></>; }
