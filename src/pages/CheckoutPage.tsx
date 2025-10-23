@@ -5,7 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
-import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart } from 'lucide-react';
+import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2 } from 'lucide-react';
 import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
@@ -113,6 +113,10 @@ export const CheckoutPage: React.FC = () => {
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     cartStore.updateQuantity(itemId, newQuantity);
+  };
+
+  const handleRemoveItem = (itemId: string) => {
+    cartStore.removeItem(itemId);
   };
 
   // Handle address selection from autocomplete
@@ -304,8 +308,8 @@ export const CheckoutPage: React.FC = () => {
   // Calculate shipping cost
   const calculateShipping = () => {
     if (shippingMethod === 'store-pickup') return 0;
-    // Door-to-door: Free over R1500, otherwise R75 (use items subtotal)
-    return cartState.subtotal >= 1500 ? 0 : 75;
+    // Door-to-door: Free over R1500, otherwise R120 (use items subtotal)
+    return cartState.subtotal >= 1500 ? 0 : 120;
   };
 
   const shippingCost = calculateShipping();
@@ -341,21 +345,21 @@ export const CheckoutPage: React.FC = () => {
             <h1 className="text-4xl font-bold mb-4">Checkout</h1>
             <div className="flex items-center justify-center gap-4">
               <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
                   1
                 </div>
                 <span>Shipping</span>
               </div>
               <div className="w-8 h-px bg-gray-300"></div>
               <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
                   2
                 </div>
                 <span>Payment</span>
               </div>
               <div className="w-8 h-px bg-gray-300"></div>
               <div className={`flex items-center gap-2 ${step === 'review' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-gray-900 text-white' : 'bg-gray-200'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
                   3
                 </div>
                 <span>Review</span>
@@ -870,9 +874,19 @@ export const CheckoutPage: React.FC = () => {
                                 <Plus className="h-3.5 w-3.5" />
                               </button>
                             </div>
-                            <span className="text-gray-900 font-bold text-sm">
-                              {formatPrice(item.price * item.quantity)}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-900 font-bold text-sm">
+                                {formatPrice(item.price * item.quantity)}
+                              </span>
+                              <button
+                                type="button"
+                                aria-label="Remove item"
+                                onClick={() => handleRemoveItem(item.id)}
+                                className="p-1 rounded-full hover:bg-red-50 text-red-500 hover:text-red-700 transition-colors"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -1028,7 +1042,7 @@ export const CheckoutPage: React.FC = () => {
                       image: '/nail-file-white.webp'
                     });
                   }}
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                  className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add to Cart
                 </button>
@@ -1072,7 +1086,7 @@ export const CheckoutPage: React.FC = () => {
                       image: '/cuticle-oil-white.webp'
                     });
                   }}
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                  className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add to Cart
                 </button>
@@ -1116,7 +1130,7 @@ export const CheckoutPage: React.FC = () => {
                       image: '/top-coat-white.webp'
                     });
                   }}
-                  className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                  className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add to Cart
                 </button>
