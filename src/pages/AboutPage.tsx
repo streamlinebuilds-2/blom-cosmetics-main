@@ -44,7 +44,7 @@ export const AboutPage: React.FC = () => {
       id: 2,
       name: 'Anna-Marie Ernst',
       role: 'Administration & Client Care',
-      bio: 'Anna-Marie is the heart and backbone of our team. As BLOM's dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
+      bio: 'Anna-Marie is the heart and backbone of our team. As BLOM\'s dedicated admin, she ensures every detail runs smoothly, from bookings to logistics. Her caring nature, precision, and organizational talent keep the business balanced and structured, while her warmth inspires both our team and our clients every day.',
       image: '/anna-marie-ernst.webp',
       badges: ['Client Care', 'Admin', 'Logistics']
     }
