@@ -436,7 +436,7 @@ export const CheckoutPage: React.FC = () => {
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Door-to-Door Delivery</span>
                                   <span className="text-lg font-bold text-gray-900">
-                                    {cartState.subtotal >= 1500 ? 'FREE' : 'R75'}
+                                    {cartState.subtotal >= 1500 ? 'FREE' : 'R120'}
                                   </span>
                                 </div>
                                 <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
@@ -956,7 +956,7 @@ export const CheckoutPage: React.FC = () => {
                     {shippingMethod === 'door-to-door' && cartState.subtotal >= 1500 && (
                       <div className="flex justify-between text-xs text-green-600">
                         <span>✨ Free shipping applied!</span>
-                        <span>-R75</span>
+                        <span>-R120</span>
                       </div>
                     )}
                     {appliedCoupon && discount > 0 && (
