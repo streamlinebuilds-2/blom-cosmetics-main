@@ -102,7 +102,8 @@ export const SignupPage: React.FC = () => {
         email: formData.email,
         password: formData.password,
         options: {
-          data: { name: formData.name, phone: formData.phone }
+          data: { name: formData.name, phone: formData.phone },
+          emailRedirectTo: `${window.location.origin}/account`
         }
       });
 
