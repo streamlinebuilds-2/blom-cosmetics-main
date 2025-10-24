@@ -4,7 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { updatePassword } from '../lib/auth';
+import { supabase } from '../lib/supabase';
 import { Eye, EyeOff, CheckCircle, AlertCircle } from 'lucide-react';
 
 export const ResetPasswordPage: React.FC = () => {
@@ -58,7 +58,16 @@ export const ResetPasswordPage: React.FC = () => {
     setStatus({ type: null, message: '' });
 
     try {
-      await updatePassword(formData.password);
+      const { error } = await supabase.auth.updateUser({ password: formData.password });
+      
+      if (error) {
+        setStatus({ 
+          type: 'error', 
+          message: error.message || 'Failed to update password. Please try again.' 
+        });
+        return;
+      }
+
       setStatus({ 
         type: 'success', 
         message: 'Password updated successfully! Redirecting to your account...' 
