@@ -112,6 +112,16 @@ export const SignupPage: React.FC = () => {
         return;
       }
 
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        setStatus({ 
+          type: 'success', 
+          message: 'Account created! Please check your email and click the confirmation link to activate your account. You can then log in.' 
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const user = data.user;
       if (user) {
         await supabase.from('profiles').upsert({
@@ -122,7 +132,7 @@ export const SignupPage: React.FC = () => {
         }, { onConflict: 'id' });
       }
 
-      setStatus({ type: 'success', message: 'Account created successfully! Please log in to continue…' });
+      setStatus({ type: 'success', message: 'Account created successfully! Redirecting to your account...' });
       setIsSubmitting(false);
       // Send new users to Log in, then back to account after auth
       setTimeout(() => { window.location.href = '/login?redirect=/account'; }, 600);

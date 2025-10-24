@@ -116,6 +116,7 @@ function App() {
   if (path === '/auth-test') { return <><AuthTestPage /></>; }
 
   if (path === '/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
+  if (path === '/account/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
 
   if (path === '/auth/callback') { return <><AuthCallbackPage /><CartWidget /></>; }
 
