@@ -94,7 +94,11 @@ export const AboutPage: React.FC = () => {
         <section className="bg-gradient-to-br from-pink-50 to-blue-50 section-padding">
           <Container>
             <div className="text-center max-w-4xl mx-auto">
-              {/* Content removed as requested */}
+              <h1 className="heading-with-stripe">About BLOM</h1>
+              <p className="text-xl text-gray-600 leading-relaxed mt-6">
+                Discover the story behind South Africa's most trusted nail care brand, 
+                where passion meets professionalism and beauty blooms.
+              </p>
             </div>
           </Container>
         </section>

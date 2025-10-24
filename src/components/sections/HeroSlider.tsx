@@ -133,10 +133,11 @@ export const HeroSlider: React.FC = () => {
               <img
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
-                className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'}`}
+                className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'} blur-sm`}
               />
             </picture>
-            {/* Overlay removed for a cleaner image presentation */}
+            {/* Subtle overlay to improve text readability */}
+            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
           </div>
         ))}
       </div>

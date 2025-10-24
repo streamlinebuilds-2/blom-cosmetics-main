@@ -324,7 +324,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       )}
       {success && (
         <div className="text-sm font-semibold text-green-600 bg-green-50 border border-green-200 rounded-lg p-3">
-          Thanks! Check your inbox for your code.
+          🎉 Welcome to the BLOM Beauty Club! Check your email for your 10% discount code.
         </div>
       )}
 

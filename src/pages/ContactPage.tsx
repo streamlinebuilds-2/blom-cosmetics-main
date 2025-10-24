@@ -395,6 +395,184 @@ export const ContactPage: React.FC = () => {
           </Container>
         </section>
 
+        {/* Contact Form Section */}
+        <section id="contact-form" className="section-padding">
+          <Container>
+            <div className="max-w-2xl mx-auto">
+              {/* Contact Form */}
+              <div>
+                <Card className="shadow-lg border-0">
+                  <CardContent className="pt-10 pb-8 px-8">
+                    {/* Form Header */}
+                    <div className="text-center mb-8">
+                      <h2 className="text-3xl font-bold text-gray-900 mb-3">Send us a Message</h2>
+                      <p className="text-gray-600">
+                        Fill out the form below and we'll get back to you within 1 business day.
+                      </p>
+                    </div>
+                    
+                    <form id="contact-form" onSubmit={handleSubmit} className="space-y-8">
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label htmlFor="name" className="block text-sm font-semibold text-gray-800 mb-2">
+                            Full Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            id="name"
+                            name="full_name"
+                            value={formData.name}
+                            onChange={(e) => {
+                              setFormData(prev => ({ ...prev, name: e.target.value }));
+                              if (validationErrors.name) {
+                                setValidationErrors(prev => ({ ...prev, name: '' }));
+                              }
+                            }}
+                            required
+                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                            placeholder="Enter your full name"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
+                            Email Address <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={(e) => {
+                              setFormData(prev => ({ ...prev, email: e.target.value }));
+                              if (validationErrors.email) {
+                                setValidationErrors(prev => ({ ...prev, email: '' }));
+                              }
+                            }}
+                            required
+                            className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                            placeholder="Enter your email address"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label htmlFor="subject" className="block text-sm font-semibold text-gray-800 mb-2">
+                          Subject <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          id="subject"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, subject: e.target.value }));
+                            if (validationErrors.subject) {
+                              setValidationErrors(prev => ({ ...prev, subject: '' }));
+                            }
+                          }}
+                          required
+                          className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all"
+                        >
+                          <option value="">Select a subject</option>
+                          <option value="general">General Inquiry</option>
+                          <option value="order">Order Support</option>
+                          <option value="product">Product Question</option>
+                          <option value="course">Course Information</option>
+                          <option value="partnership">Partnership</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label htmlFor="message" className="block text-sm font-semibold text-gray-800 mb-2">
+                          Message <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          id="message"
+                          name="message"
+                          rows={6}
+                          value={formData.message}
+                          onChange={(e) => {
+                            setFormData(prev => ({ ...prev, message: e.target.value }));
+                            if (validationErrors.message) {
+                              setValidationErrors(prev => ({ ...prev, message: '' }));
+                            }
+                          }}
+                          required
+                          className="input-field focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all resize-none"
+                          placeholder="Tell us how we can help you..."
+                        />
+                      </div>
+
+                      {/* File Upload */}
+                      <div>
+                        <label htmlFor="attachment" className="block text-sm font-semibold text-gray-800 mb-2">
+                          Attachment (Optional)
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="file"
+                            id="attachment"
+                            name="attachment"
+                            onChange={handleFileChange}
+                            className="hidden"
+                            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+                          />
+                          <label
+                            htmlFor="attachment"
+                            className="flex items-center justify-center gap-2 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-pink-400 hover:bg-pink-50 transition-all"
+                          >
+                            <Upload className="h-5 w-5 text-gray-400" />
+                            <span className="text-gray-600">
+                              {selectedFile ? selectedFile.name : 'Click to upload a file'}
+                            </span>
+                          </label>
+                        </div>
+                        {selectedFile && (
+                          <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                            <Paperclip className="h-4 w-4" />
+                            <span>{selectedFile.name}</span>
+                            <button
+                              type="button"
+                              onClick={handleRemoveFile}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        )}
+                        <p className="text-xs text-gray-500 mt-1">
+                          Supported formats: JPG, PNG, PDF, DOC, DOCX (Max 10MB)
+                        </p>
+                      </div>
+
+                      {/* Submit Button */}
+                      <div className="text-center">
+                        <Button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isSubmitting ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                              Sending...
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Send className="h-4 w-4" />
+                              Send Message
+                            </div>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </Container>
+        </section>
+
         {/* Contact Methods Section */}
         <section className="section-padding bg-gray-50">
           <Container>
