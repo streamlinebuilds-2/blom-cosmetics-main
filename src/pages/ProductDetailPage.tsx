@@ -656,6 +656,64 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlu
       reviewCount: 15,
       reviews: []
     },
+    'glitter-acrylic': {
+      id: '17',
+      name: 'Glitter Acrylic',
+      slug: 'glitter-acrylic',
+      category: 'Acrylic System',
+      shortDescription: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
+      overview: 'This glitter-acrylic blend looks like a soft, opalescent crushed-ice mix — a dreamy combination of translucent and iridescent shards suspended in clear acrylic. The mix features fine to medium reflective flakes that shift between white-silver, icy blue, and lilac hues, giving it a prismatic, pearl-crystal effect.',
+      price: 250,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/glitter-acrylic-white.webp',
+        '/glitter-acrylic-colorful.webp'
+      ],
+      features: [
+        'Opalescent crushed-ice effect',
+        'Prismatic pearl-crystal finish',
+        'Fine to medium reflective flakes',
+        'White-silver, icy blue, and lilac hues',
+        'Cool-toned base with sparkle',
+        'Smooth application with dimensional depth',
+        'Reflects light like crushed diamonds',
+        'Perfect for encapsulated designs'
+      ],
+      howToUse: [
+        'Apply over nail form or natural nail',
+        'Sculpt to desired shape and length',
+        'File and shape as needed',
+        'Buff to smooth finish',
+        'Apply top coat for protection'
+      ],
+      ingredients: {
+        inci: [
+          'Polymethyl Methacrylate',
+          'Ethyl Methacrylate',
+          'Glitter Particles',
+          'Iridescent Pigments'
+        ],
+        key: [
+          'Polymethyl Methacrylate – creates strong structure',
+          'Glitter Particles – adds dimensional sparkle',
+          'Iridescent Pigments – creates color-shifting effect',
+          'Professional grade – salon quality results'
+        ]
+      },
+      details: {
+        size: '56g',
+        finish: 'Prismatic shimmer',
+        texture: 'Smooth with dimensional depth',
+        claims: ['Professional Grade', 'Prismatic Effect', 'Dimensional Sparkle']
+      },
+      variants: [
+        { name: '56g', inStock: true, price: 250 }
+      ],
+      rating: 4.8,
+      reviewCount: 156,
+      reviews: []
+    },
     'rose-petal-manicure-table': {
       id: '13',
       name: 'Rose Petal Manicure Table',

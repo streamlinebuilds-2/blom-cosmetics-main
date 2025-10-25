@@ -355,9 +355,28 @@ export const ShopPage: React.FC = () => {
         { name: '10mm', price: 320, inStock: true }
       ]
     },
-    // Furniture Products
     {
       id: '17',
+      name: 'Glitter Acrylic',
+      slug: 'glitter-acrylic',
+      price: 250,
+      compareAtPrice: undefined,
+      short_description: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
+      shortDescription: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
+      description: 'This glitter-acrylic blend looks like a soft, opalescent crushed-ice mix — a dreamy combination of translucent and iridescent shards suspended in clear acrylic. Features fine to medium reflective flakes that shift between white-silver, icy blue, and lilac hues.',
+      images: ['/glitter-acrylic-white.webp', '/glitter-acrylic-colorful.webp'],
+      category: 'acrylic-system',
+      rating: 4.8,
+      reviews: 156,
+      badges: ['New'],
+      inStock: true,
+      variants: [
+        { name: '56g', price: 250, inStock: true }
+      ]
+    },
+    // Furniture Products
+    {
+      id: '18',
       name: 'Rose Petal Manicure Table',
       slug: 'rose-petal-manicure-table',
       price: 2590,
