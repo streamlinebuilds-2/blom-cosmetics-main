@@ -24,13 +24,23 @@ const testimonials = [
   },
   {
     id: 5,
-    name: 'Emma Thompson',
-    image: '/testimonial-5.webp'
+    name: 'Lisa Rodriguez',
+    image: '/testimonial-4.webp'
   },
   {
     id: 6,
-    name: 'Lisa Rodriguez',
-    image: '/testimonial-4.webp'
+    name: 'Review 1',
+    image: '/review-1.webp'
+  },
+  {
+    id: 7,
+    name: 'Review 2',
+    image: '/review-2.webp'
+  },
+  {
+    id: 8,
+    name: 'Review 3',
+    image: '/review-3.webp'
   }
 ];
 
