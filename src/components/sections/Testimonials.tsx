@@ -9,36 +9,31 @@ const testimonials = [
   },
   {
     id: 2,
-    name: 'Jessica Chen',
-    image: '/testimonial-6.webp'
-  },
-  {
-    id: 3,
     name: 'Michelle Adams',
     image: '/michelle.webp'
   },
   {
-    id: 4,
+    id: 3,
     name: 'Jaundré',
     image: '/jaundre.webp'
   },
   {
-    id: 5,
+    id: 4,
     name: 'Lisa Rodriguez',
     image: '/testimonial-4.webp'
   },
   {
-    id: 6,
+    id: 5,
     name: 'Review 1',
     image: '/review-1.webp'
   },
   {
-    id: 7,
+    id: 6,
     name: 'Review 2',
     image: '/review-2.webp'
   },
   {
-    id: 8,
+    id: 7,
     name: 'Review 3',
     image: '/review-3.webp'
   }
