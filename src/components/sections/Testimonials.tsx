@@ -97,13 +97,13 @@ export const Testimonials: React.FC = () => {
         }
         
         .animate-scroll {
-          animation: scroll-left 20s linear infinite;
+          animation: scroll-left 30s linear infinite;
         }
         
-        /* Mobile - 50% faster than desktop */
+        /* Mobile - slightly faster than desktop */
         @media (max-width: 768px) {
           .animate-scroll {
-            animation: scroll-left 10s linear infinite;
+            animation: scroll-left 20s linear infinite;
           }
         }
         
