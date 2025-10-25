@@ -30,8 +30,7 @@ import CheckoutCancel from './pages/CheckoutCancel';
 import AuthTestPage from './pages/AuthTestPage';
 import SimpleAccountPage from './pages/SimpleAccountPage';
 import DebugAccountPage from './pages/DebugAccountPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
-import { AuthCallbackPage } from './pages/AuthCallbackPage';
+import { AuthResetPage } from './pages/AuthResetPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import InvoiceViewer from './pages/InvoiceViewer';
 import { DealsPage } from './pages/DealsPage';
@@ -117,6 +116,7 @@ function App() {
 
   if (path === '/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
   if (path === '/account/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
+  if (path === '/auth/reset') { return <><AuthResetPage /><CartWidget /></>; }
 
   if (path === '/auth/callback') { return <><AuthCallbackPage /><CartWidget /></>; }
 
