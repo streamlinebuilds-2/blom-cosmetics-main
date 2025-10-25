@@ -41,9 +41,16 @@ const testimonials = [
 
 export const Testimonials: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   const handleClick = () => {
-    setIsPaused(!isPaused);
+    if (isPaused) {
+      // Resume animation
+      setIsPaused(false);
+    } else {
+      // Pause animation by removing the animation class
+      setIsPaused(true);
+    }
   };
 
   return (
@@ -59,7 +66,8 @@ export const Testimonials: React.FC = () => {
         >
           {/* Infinite scrolling carousel */}
           <div 
-            className={`flex gap-6 ${isPaused ? 'paused' : 'animate-scroll'}`}
+            ref={carouselRef}
+            className={`flex gap-6 ${isPaused ? '' : 'animate-scroll'}`}
           >
             {/* First set of testimonials */}
             {testimonials.map((testimonial) => (
@@ -102,18 +110,14 @@ export const Testimonials: React.FC = () => {
         }
         
         .animate-scroll {
-          animation: scroll-left 30s linear infinite;
+          animation: scroll-left 20s linear infinite;
         }
         
-        /* Mobile - slightly faster than desktop */
+        /* Mobile - 50% faster than desktop */
         @media (max-width: 768px) {
           .animate-scroll {
-            animation: scroll-left 20s linear infinite;
+            animation: scroll-left 13.33s linear infinite;
           }
-        }
-        
-        .paused {
-          animation-play-state: paused !important;
         }
       `}</style>
     </section>
