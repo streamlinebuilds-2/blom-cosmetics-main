@@ -34,6 +34,8 @@ import { AuthResetPage } from './pages/AuthResetPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
 import InvoiceViewer from './pages/InvoiceViewer';
 import { DealsPage } from './pages/DealsPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
+import { AuthCallbackPage } from './pages/AuthCallbackPage';
 
 function App() {
   // Simple routing based on URL path
