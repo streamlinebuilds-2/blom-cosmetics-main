@@ -395,8 +395,64 @@ export const ContactPage: React.FC = () => {
           </Container>
         </section>
 
+        {/* Contact Methods Section */}
+        <section className="section-padding bg-gray-50">
+          <Container>
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* WhatsApp Card */}
+              <Card className="text-center p-8 hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <MessageCircle className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">WhatsApp</h3>
+                <p className="text-gray-600 mb-6">Fastest reply - usually within minutes</p>
+                <a 
+                  href="https://wa.me/27795483317" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  CHAT NOW
+                </a>
+              </Card>
+
+              {/* Email Card */}
+              <Card className="text-center p-8 hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Mail className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Email</h3>
+                <p className="text-gray-600 mb-6">We reply within 1 business day</p>
+                <ClickableContact 
+                  type="email" 
+                  value="shopblomcosmetics@gmail.com"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  SEND EMAIL
+                </ClickableContact>
+              </Card>
+
+              {/* Phone Card */}
+              <Card className="text-center p-8 hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Phone className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Phone</h3>
+                <p className="text-gray-600 mb-6">Mon-Fri 08:00-17:00, Sat 09:00-14:00</p>
+                <ClickableContact 
+                  type="phone" 
+                  value="+27 79 548 3317"
+                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-pink-600 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  CALL NOW
+                </ClickableContact>
+              </Card>
+            </div>
+          </Container>
+        </section>
+
         {/* Contact Form Section */}
-        <section id="contact-form" className="section-padding">
+        <section id="contact-form" className="section-padding bg-gray-50">
           <Container>
             <div className="max-w-2xl mx-auto">
               {/* Contact Form */}
