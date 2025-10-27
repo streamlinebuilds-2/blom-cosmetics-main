@@ -1,147 +1,130 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { CartWidget } from './components/cart/CartWidget';
+import ErrorBoundary from './components/ErrorBoundary';
+import { LoadingSpinner } from './components/LoadingSpinner';
+
+// Eager loaded pages (critical for initial load)
 import { HomePage } from './pages/HomePage';
 import { ShopPage } from './pages/ShopPage';
-import CoursesPage from './pages/CoursesPage';
-import { BlogPage } from './pages/BlogPage';
-import { CourseDetailPage } from './pages/CourseDetailPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { ProductDetailPage } from './pages/ProductDetailPage';
 import { CheckoutPage } from './pages/CheckoutPage';
-import { OrderConfirmationPage } from './pages/OrderConfirmationPage';
-import { CartWidget } from './components/cart/CartWidget';
-import { ProductTemplateExample } from './pages/ProductTemplateExample';
-import { PrivacyPage } from './pages/PrivacyPage';
-import { TermsPage } from './pages/TermsPage';
-import { ReturnsPage } from './pages/ReturnsPage';
-import { CookiePolicyPage } from './pages/CookiePolicyPage';
-import { AccountPage } from './pages/AccountPage';
-import AccountPageMinimal from './pages/AccountPageMinimal';
-import AccountPageFullCore from './pages/AccountPageFullCore';
-import ErrorBoundary from './components/ErrorBoundary';
-import OrderDetailPage from './pages/OrderDetailPage';
-import PaymentSuccess from './pages/PaymentSuccess';
-import PaymentCancelled from './pages/PaymentCancelled';
-import { WishlistPage } from './pages/WishlistPage';
-import { LoginPage } from './pages/LoginPage';
-import { SignupPage } from './pages/SignupPage';
-import CheckoutSuccess from './pages/CheckoutSuccess';
-import CheckoutCancel from './pages/CheckoutCancel';
-import AuthTestPage from './pages/AuthTestPage';
-import SimpleAccountPage from './pages/SimpleAccountPage';
-import DebugAccountPage from './pages/DebugAccountPage';
-import { AuthResetPage } from './pages/AuthResetPage';
-import { TrackOrderPage } from './pages/TrackOrderPage';
-import InvoiceViewer from './pages/InvoiceViewer';
-import { DealsPage } from './pages/DealsPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
-import { AuthCallbackPage } from './pages/AuthCallbackPage';
+
+// Lazy loaded pages (loaded on demand)
+const CoursesPage = lazy(() => import('./pages/CoursesPage').then(m => ({ default: m.default })));
+const BlogPage = lazy(() => import('./pages/BlogPage').then(m => ({ default: m.BlogPage })));
+const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage').then(m => ({ default: m.CourseDetailPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage').then(m => ({ default: m.ProductDetailPage })));
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage').then(m => ({ default: m.OrderConfirmationPage })));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })));
+const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })));
+const ReturnsPage = lazy(() => import('./pages/ReturnsPage').then(m => ({ default: m.ReturnsPage })));
+const CookiePolicyPage = lazy(() => import('./pages/CookiePolicyPage').then(m => ({ default: m.CookiePolicyPage })));
+const AccountPageFullCore = lazy(() => import('./pages/AccountPageFullCore'));
+const OrderDetailPage = lazy(() => import('./pages/OrderDetailPage'));
+const PaymentSuccess = lazy(() => import('./pages/PaymentSuccess'));
+const PaymentCancelled = lazy(() => import('./pages/PaymentCancelled'));
+const WishlistPage = lazy(() => import('./pages/WishlistPage').then(m => ({ default: m.WishlistPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const SignupPage = lazy(() => import('./pages/SignupPage').then(m => ({ default: m.SignupPage })));
+const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
+const CheckoutCancel = lazy(() => import('./pages/CheckoutCancel'));
+const AuthResetPage = lazy(() => import('./pages/AuthResetPage').then(m => ({ default: m.AuthResetPage })));
+const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage').then(m => ({ default: m.TrackOrderPage })));
+const InvoiceViewer = lazy(() => import('./pages/InvoiceViewer'));
+const DealsPage = lazy(() => import('./pages/DealsPage').then(m => ({ default: m.DealsPage })));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
+const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })));
+const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample').then(m => ({ default: m.ProductTemplateExample })));
+
+// Wrapper component with Suspense for lazy loading
+const PageWithCart = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
+    <CartWidget />
+  </>
+);
 
 function App() {
-  // Simple routing based on URL path
-  const path = window.location.pathname;
-  const params = new URLSearchParams(window.location.search);
-  const accountMinimal = params.get('minimal') === '1';
-  
-  if (path === '/shop') {
-    return <><ShopPage /><CartWidget /></>;
-  }
-  
-  if (path === '/courses') {
-    return <><CoursesPage /><CartWidget /></>;
-  }
-  
-  if (path === '/blog') {
-    return <><BlogPage /><CartWidget /></>;
-  }
-  
-  if (path === '/about') {
-    return <><AboutPage /><CartWidget /></>;
-  }
-  
-  if (path === '/contact') {
-    return <><ContactPage /><CartWidget /></>;
-  }
-  
-  if (path === '/deals') {
-    return <><DealsPage /><CartWidget /></>;
-  }
-  
-  if (path === '/checkout') {
-    return <><CheckoutPage /><CartWidget /></>;
-  }
-
-  if (path === '/privacy') { return <><PrivacyPage /><CartWidget /></>; }
-
-  if (path === '/terms') { return <><TermsPage /><CartWidget /></>; }
-
-  if (path === '/returns') { return <><ReturnsPage /><CartWidget /></>; }
-
-  if (path === '/cookie-policy') { return <><CookiePolicyPage /><CartWidget /></>; }
-
-  // Default to FULL account page; use ?minimal=1 to load minimal fallback
-  if (path === '/account') {
-    return <>{!accountMinimal ? (
-      <ErrorBoundary>
-        <AccountPageFullCore />
-      </ErrorBoundary>
-    ) : (
-      <AccountPageMinimal />
-    )}<CartWidget /></>;
-  }
-
-  if (path.startsWith('/orders/')) {
-    const id = path.split('/orders/')[1];
-    return <><OrderDetailPage orderId={id} /><CartWidget /></>;
-  }
-  
-  if (path === '/simple-account') { return <><SimpleAccountPage /></>; }
-  
-  if (path === '/debug-account') { return <><DebugAccountPage /></>; }
-
-  if (path === '/wishlist') { return <><WishlistPage /><CartWidget /></>; }
-  
-  if (path === '/login') { return <><LoginPage /><CartWidget /></>; }
-  
-  if (path === '/signup') { return <><SignupPage /><CartWidget /></>; }
-  
-  if (path === '/order-confirmation') { return <><OrderConfirmationPage /><CartWidget /></>; }
-
-  if (path === '/track-order') { return <><TrackOrderPage /></>; }
-
-  if (path === '/invoice') { return <><InvoiceViewer /></>; }
-
-  if (path === '/checkout/success') { return <><CheckoutSuccess /><CartWidget /></>; }
-  if (path === '/checkout/cancel') { return <><CheckoutCancel /><CartWidget /></>; }
-  
-  if (path === '/auth-test') { return <><AuthTestPage /></>; }
-
-  if (path === '/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
-  if (path === '/account/reset-password') { return <><ResetPasswordPage /><CartWidget /></>; }
-  if (path === '/auth/reset') { return <><AuthResetPage /><CartWidget /></>; }
-
-  if (path === '/auth/callback') { return <><AuthCallbackPage /><CartWidget /></>; }
-
-  if (path === '/payment-success') { return <><PaymentSuccess /><CartWidget /></>; }
-  if (path === '/payment-cancelled') { return <><PaymentCancelled /><CartWidget /></>; }
-  
-  if (path === '/product-template-example') { return <><ProductTemplateExample /><CartWidget /></>; }
-  
-  if (path.startsWith('/courses/')) {
-    const courseSlug = path.split('/courses/')[1];
-    return <><CourseDetailPage courseSlug={courseSlug} /><CartWidget /></>;
-  }
-  
-  if (path.startsWith('/products/')) {
-    const productSlug = path.split('/products/')[1];
-    return <><ProductDetailPage productSlug={productSlug} /><CartWidget /></>;
-  }
-
   return (
-    <>
-      <HomePage />
-      <CartWidget />
-    </>
+    <BrowserRouter>
+      <ErrorBoundary>
+        <Routes>
+          {/* Homepage */}
+          <Route path="/" element={<PageWithCart><HomePage /></PageWithCart>} />
+          
+          {/* Shop */}
+          <Route path="/shop" element={<PageWithCart><ShopPage /></PageWithCart>} />
+          
+          {/* Courses */}
+          <Route path="/courses" element={<PageWithCart><CoursesPage /></PageWithCart>} />
+          <Route path="/courses/:slug" element={<PageWithCart><CourseDetailPage /></PageWithCart>} />
+          
+          {/* Products */}
+          <Route path="/products/:slug" element={<PageWithCart><ProductDetailPage /></PageWithCart>} />
+          
+          {/* Blog */}
+          <Route path="/blog" element={<PageWithCart><BlogPage /></PageWithCart>} />
+          
+          {/* About */}
+          <Route path="/about" element={<PageWithCart><AboutPage /></PageWithCart>} />
+          
+          {/* Contact */}
+          <Route path="/contact" element={<PageWithCart><ContactPage /></PageWithCart>} />
+          
+          {/* Deals */}
+          <Route path="/deals" element={<PageWithCart><DealsPage /></PageWithCart>} />
+          
+          {/* Checkout */}
+          <Route path="/checkout" element={<PageWithCart><CheckoutPage /></PageWithCart>} />
+          <Route path="/checkout/success" element={<PageWithCart><CheckoutSuccess /></PageWithCart>} />
+          <Route path="/checkout/cancel" element={<PageWithCart><CheckoutCancel /></PageWithCart>} />
+          
+          {/* Legal Pages */}
+          <Route path="/privacy" element={<PageWithCart><PrivacyPage /></PageWithCart>} />
+          <Route path="/terms" element={<PageWithCart><TermsPage /></PageWithCart>} />
+          <Route path="/returns" element={<PageWithCart><ReturnsPage /></PageWithCart>} />
+          <Route path="/cookie-policy" element={<PageWithCart><CookiePolicyPage /></PageWithCart>} />
+          
+          {/* Account */}
+          <Route 
+            path="/account" 
+            element={
+              <PageWithCart>
+                <ErrorBoundary>
+                  <AccountPageFullCore />
+                </ErrorBoundary>
+              </PageWithCart>
+            } 
+          />
+          
+          {/* Orders */}
+          <Route path="/orders/:id" element={<PageWithCart><OrderDetailPage /></PageWithCart>} />
+          <Route path="/order-confirmation" element={<PageWithCart><OrderConfirmationPage /></PageWithCart>} />
+          <Route path="/track-order" element={<TrackOrderPage />} />
+          <Route path="/invoice" element={<InvoiceViewer />} />
+          
+          {/* Wishlist */}
+          <Route path="/wishlist" element={<PageWithCart><WishlistPage /></PageWithCart>} />
+          
+          {/* Auth */}
+          <Route path="/login" element={<PageWithCart><LoginPage /></PageWithCart>} />
+          <Route path="/signup" element={<PageWithCart><SignupPage /></PageWithCart>} />
+          <Route path="/reset-password" element={<PageWithCart><ResetPasswordPage /></PageWithCart>} />
+          <Route path="/account/reset-password" element={<PageWithCart><ResetPasswordPage /></PageWithCart>} />
+          <Route path="/auth/reset" element={<PageWithCart><AuthResetPage /></PageWithCart>} />
+          <Route path="/auth/callback" element={<PageWithCart><AuthCallbackPage /></PageWithCart>} />
+          
+          {/* Payment */}
+          <Route path="/payment-success" element={<PageWithCart><PaymentSuccess /></PageWithCart>} />
+          <Route path="/payment-cancelled" element={<PageWithCart><PaymentCancelled /></PageWithCart>} />
+          
+          {/* Template/Dev */}
+          <Route path="/product-template-example" element={<PageWithCart><ProductTemplateExample /></PageWithCart>} />
+        </Routes>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 }
 

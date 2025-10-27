@@ -134,6 +134,9 @@ export const HeroSlider: React.FC = () => {
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
                 className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'} blur-[0.5px]`}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding={index === currentSlide ? 'sync' : 'async'}
+                fetchPriority={index === 0 ? 'high' : 'low'}
               />
             </picture>
             {/* Subtle overlay to improve text readability */}

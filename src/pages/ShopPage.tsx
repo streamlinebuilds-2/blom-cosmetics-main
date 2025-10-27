@@ -5,10 +5,12 @@ import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
+import { supabase } from '../lib/supabase';
 // Discount system disabled
 
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
+  const [productsFromDB, setProductsFromDB] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
     if (typeof window !== 'undefined') {
@@ -22,8 +24,55 @@ export const ShopPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   // Discount system disabled
 
-  // All BLOM products with detailed information - Final Product List
-  const allProducts = [
+  // Load products from Supabase
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('status', 'active')
+          .order('name');
+        
+        if (error) {
+          console.error('Error loading products:', error);
+          // Fallback to empty array if Supabase fails
+          setProductsFromDB([]);
+        } else {
+          // Transform Supabase data to match the old product format
+          const transformed = (data || []).map(p => ({
+            id: p.id,
+            name: p.name,
+            slug: p.slug || p.id,
+            price: p.price || (p.price_cents / 100),
+            compareAtPrice: p.compare_at_price || (p.compare_at_price_cents ? p.compare_at_price_cents / 100 : undefined),
+            short_description: p.short_desc || p.description_short || '',
+            shortDescription: p.short_desc || p.description_short || '',
+            description: p.overview || p.description_full || '',
+            images: p.thumbnail_url ? [p.thumbnail_url, ...(p.gallery_urls || [])] : ['/placeholder-product.webp'],
+            category: p.category || 'uncategorized',
+            rating: 0,
+            reviews: 0,
+            badges: p.claims || [],
+            inStock: (p.stock_qty || 0) > 0,
+            variants: []
+          }));
+          setProductsFromDB(transformed);
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading products:', err);
+        setProductsFromDB([]);
+        setLoading(false);
+      }
+    }
+    
+    loadProducts();
+  }, []);
+
+  // Fallback: Keep hardcoded products for now until migration is complete
+  // This ensures the shop still works even if Supabase is empty
+  const hardcodedProducts = [
     // Bundle Deals
     {
       id: 'bundle-1',
@@ -570,6 +619,9 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     }
   ];
+
+  // Use products from Supabase if available, otherwise fallback to hardcoded
+  const allProducts = productsFromDB.length > 0 ? productsFromDB : hardcodedProducts;
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
