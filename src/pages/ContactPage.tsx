@@ -513,7 +513,7 @@ export const ContactPage: React.FC = () => {
                             type="file"
                             id="attachment"
                             name="attachment"
-                            onChange={handleFileChange}
+                            onChange={handleFileUpload}
                             className="hidden"
                             accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
                           />
