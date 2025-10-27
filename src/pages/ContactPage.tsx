@@ -523,21 +523,25 @@ export const ContactPage: React.FC = () => {
                           >
                             <Upload className="h-5 w-5 text-gray-400" />
                             <span className="text-gray-600">
-                              {selectedFile ? selectedFile.name : 'Click to upload a file'}
+                              Click to upload a file
                             </span>
                           </label>
                         </div>
-                        {selectedFile && (
-                          <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
-                            <Paperclip className="h-4 w-4" />
-                            <span>{selectedFile.name}</span>
-                            <button
-                              type="button"
-                              onClick={handleRemoveFile}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <X className="h-4 w-4" />
-                            </button>
+                        {attachedFiles.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {attachedFiles.map((file, index) => (
+                              <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                                <Paperclip className="h-4 w-4" />
+                                <span>{file.name}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => removeFile(index)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ))}
                           </div>
                         )}
                         <p className="text-xs text-gray-500 mt-1">
