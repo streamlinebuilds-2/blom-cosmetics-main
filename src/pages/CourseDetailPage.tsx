@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -17,11 +18,9 @@ import {
   CreditCard
 } from 'lucide-react';
 
-interface CourseDetailPageProps {
-  courseSlug?: string;
-}
-
-export const CourseDetailPage: React.FC<CourseDetailPageProps> = ({ courseSlug = 'professional-acrylic-training' }) => {
+export const CourseDetailPage: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const courseSlug = slug || 'professional-acrylic-training';
   // Course data
   const courses = {
     'professional-acrylic-training': {

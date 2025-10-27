@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -35,11 +36,9 @@ import {
   ArrowLeft
 } from 'lucide-react';
 
-interface ProductDetailPageProps {
-  productSlug: string;
-}
-
-export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({ productSlug }) => {
+export const ProductDetailPage: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const productSlug = slug || '';
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState('');
   const [quantity, setQuantity] = useState(1);

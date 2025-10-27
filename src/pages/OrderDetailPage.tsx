@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -12,7 +13,9 @@ type Order = {
   created_at: string;
 };
 
-export default function OrderDetailPage({ orderId }: { orderId: string }) {
+export default function OrderDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const orderId = id || '';
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
