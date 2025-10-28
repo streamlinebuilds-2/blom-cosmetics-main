@@ -2075,7 +2075,17 @@ export const ProductDetailPage: React.FC = () => {
               {product && <ProductReviews productSlug={product.slug} />}
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-2">Write a review</h3>
-                {product && <ReviewForm productSlug={product.slug} />}
+                {product && (
+                  <ReviewForm
+                    productSlug={product.slug}
+                    product={{
+                      name: product.name,
+                      price: product.price,
+                      compareAtPrice: product.compareAtPrice,
+                      image: product.images?.[0]
+                    }}
+                  />
+                )}
               </div>
             </div>
           </Container>
