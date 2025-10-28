@@ -2102,12 +2102,12 @@ export const ProductDetailPage: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-3 px-6 rounded-full transition-all duration-300 border-2 border-transparent hover:border-black">
-                  <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   <span className="text-sm sm:text-base">WhatsApp Support</span>
+                  <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
                 </Button>
                 <Button size="lg" className="bg-transparent hover:bg-blue-100 text-black hover:text-black font-bold py-3 px-6 rounded-full transition-all duration-300 border-2 border-black hover:border-blue-100">
-                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   <span className="text-sm sm:text-base">Call Us</span>
+                  <Phone className="h-4 w-4 sm:h-5 sm:w-5 ml-2" />
                 </Button>
               </div>
             </div>
