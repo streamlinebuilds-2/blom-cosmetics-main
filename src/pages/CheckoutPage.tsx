@@ -318,24 +318,49 @@ export const CheckoutPage: React.FC = () => {
         }
       };
 
-      // Step 3: Call PayFast redirect function
-      const response = await fetch('/.netlify/functions/payfast-redirect', {
+      // Step 3: Use PayFast checkout function to get signed form data
+      const pfResponse = await fetch('/.netlify/functions/payfast-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(paymentData)
+        body: JSON.stringify({
+          order_id: orderId,
+          order_number: orderData.merchant_payment_id,
+          total_cents: totalCents,
+          customer_email: shippingInfo.email
+        })
       });
 
-      if (!response.ok) {
-        throw new Error('Payment initiation failed');
+      if (!pfResponse.ok) {
+        const pfError = await pfResponse.json().catch(() => ({ error: 'PayFast initiation failed' }));
+        throw new Error(pfError.error || 'Payment initiation failed');
       }
 
-      // Get the HTML response and render it (it will auto-submit)
-      const html = await response.text();
+      const pfData = await pfResponse.json();
+      const pfUrl = pfData.endpoint || pfData.payfast_url || 'https://www.payfast.co.za/eng/process';
+      // PayFast checkout returns all params directly (not in 'fields' property)
+      const pfFields = { ...pfData };
+      delete pfFields.endpoint;
+      delete pfFields.payfast_url;
+
+      // Create and submit PayFast form
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = pfUrl;
       
-      // Replace current page with the HTML that will auto-submit to PayFast
-      document.open();
-      document.write(html);
-      document.close();
+      // Add all PayFast fields as hidden inputs (including signature)
+      Object.entries(pfFields).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = key;
+          input.value = String(value);
+          form.appendChild(input);
+        }
+      });
+
+      // Append form to body and submit
+      document.body.appendChild(form);
+      form.submit();
       
     } catch (error: any) {
       console.error('Order processing failed:', error);
