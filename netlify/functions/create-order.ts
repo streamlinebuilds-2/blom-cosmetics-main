@@ -40,6 +40,12 @@ export const handler: Handler = async (event) => {
     const discountCents = Math.round(Number(discount || 0) * 100);
     const totalCents = Math.round(Number(total || 0) * 100);
 
+    // Generate unique merchant payment ID for PayFast
+    function generateMerchantPaymentId() {
+      return 'BLM-' + Math.random().toString(36).substr(2, 12).toUpperCase();
+    }
+    const merchantPaymentId = generateMerchantPaymentId();
+
     // Build delivery method and address
     const isCollection = shippingMethod === 'store-pickup';
     const deliveryMethod = isCollection ? 'collection' : 'delivery';
@@ -61,20 +67,22 @@ export const handler: Handler = async (event) => {
     const { data: order, error: orderError } = await admin
       .from('orders')
       .insert([{
-        user_id: userId,
-        status: 'unpaid', // Changed from 'pending' to 'unpaid' as per user's request
+        user_id: userId || null,
+        m_payment_id: merchantPaymentId,
+        merchant_payment_id: merchantPaymentId,
+        status: 'unpaid',
         channel: 'website',
         customer_name: customerName || 'Guest',
         customer_email: customerEmail,
         customer_phone: customerPhone || '',
         delivery_method: deliveryMethod,
-        shipping_address: shippingAddress, // Using the new structured shipping_address
-        collection_slot: null, // Placeholder for collection slot
-        collection_location: null, // Placeholder for collection location
+        shipping_address: shippingAddress,
+        collection_slot: null,
+        collection_location: null,
         subtotal_cents: subtotalCents,
         shipping_cents: shippingCents,
         discount_cents: discountCents,
-        tax_cents: 0, // Assuming 0 tax for now
+        tax_cents: 0,
         total_cents: totalCents,
         currency: 'ZAR',
         placed_at: new Date().toISOString()
@@ -111,17 +119,51 @@ export const handler: Handler = async (event) => {
       console.warn(`Order ${order.id} created but items insertion failed:`, itemsError.message);
     }
 
-    // Log for admin visibility
-    console.log(`✅ Order created: ${order.id} | Customer: ${customerEmail} | Total: R${(totalCents / 100).toFixed(2)} | Items: ${items.length}`);
+    // Create payment row for admin tracking
+    await admin
+      .from('payments')
+      .insert([{
+        order_id: order.id,
+        provider: 'payfast',
+        amount_cents: totalCents,
+        status: 'pending',
+        provider_txn_id: null,
+        raw: null
+      }])
+      .catch((err: any) => {
+        console.warn('Payment row creation skipped:', err.message);
+      });
+
+    // Build PayFast form parameters
+    const siteUrl = process.env.SITE_BASE_URL || process.env.URL || 'https://blom-cosmetics.co.za';
+    const n8nHost = process.env.N8N_ITN_URL || 'https://n8n.yourdomain.com';
+
+    const pfParams = {
+      merchant_id: process.env.PAYFAST_MERCHANT_ID!,
+      merchant_key: process.env.PAYFAST_MERCHANT_KEY!,
+      return_url: `${siteUrl}/checkout/return`,
+      cancel_url: `${siteUrl}/checkout/cancel`,
+      notify_url: n8nHost,
+      name_first: customerName?.split(' ')[0] || '',
+      name_last: customerName?.split(' ').slice(1).join(' ') || '',
+      email_address: customerEmail,
+      m_payment_id: merchantPaymentId,
+      amount: (totalCents / 100).toFixed(2),
+      item_name: 'BLOM Order',
+      item_description: `BLOM order ${merchantPaymentId}`
+    };
+
+    console.log(`✅ Order created: ${order.id} | Merchant ID: ${merchantPaymentId} | Customer: ${customerEmail} | Total: R${(totalCents / 100).toFixed(2)} | Items: ${items.length}`);
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        success: true,
+        ok: true,
         order_id: order.id,
+        merchant_payment_id: merchantPaymentId,
         total_cents: totalCents,
-        message: `Order ${order.id} created. Ready for PayFast payment.`
+        pf: pfParams
       })
     };
   } catch (err: any) {
