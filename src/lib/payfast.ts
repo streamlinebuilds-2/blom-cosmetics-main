@@ -163,6 +163,45 @@ class PayFastService {
   }
 
   /**
+   * Hosted checkout via serverless signature
+   * Calls Netlify function to get signed fields and auto-submits the PayFast form.
+   */
+  async hostedCheckout(params: {
+    orderId: string;
+    totalCents: number;
+    customerEmail: string;
+    orderNumber?: string;
+  }): Promise<void> {
+    const res = await fetch('/.netlify/functions/payfast-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: params.orderId,
+        order_number: params.orderNumber || params.orderId,
+        total_cents: params.totalCents,
+        customer_email: params.customerEmail,
+      })
+    })
+    if (!res.ok) throw new Error('Failed to create PayFast checkout')
+    const data = await res.json()
+    const form = document.createElement('form')
+    form.method = 'POST'
+    form.action = data.endpoint || (this.config.sandbox ? this.sandboxUrl : this.liveUrl)
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === 'endpoint') return
+      if (value === undefined || value === null) return
+      const input = document.createElement('input')
+      input.type = 'hidden'
+      input.name = key
+      input.value = String(value)
+      form.appendChild(input)
+    })
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
+  }
+
+  /**
    * Validate PayFast ITN (Instant Transaction Notification)
    */
   async validateITN(itnData: Record<string, string>): Promise<boolean> {
