@@ -13,15 +13,38 @@ const cancelUrl = process.env.PAYFAST_CANCEL_URL || (process.env.SITE_BASE_URL |
 const notifyUrl = process.env.PAYFAST_NOTIFY_URL || process.env.N8N_ITN_URL || 'https://n8n.example.com/webhook/payfast-itn'
 
 function sign(fields: Record<string, any>, passphrase?: string): string {
-  const pairs = Object.entries(fields)
-    .filter(([, v]) => v !== undefined && v !== null && v !== '')
-    .map(([k, v]) => `${k}=${encodeURIComponent(String(v)).replace(/%20/g, '+')}`)
-    .sort()
-  let str = pairs.join('&')
-  if (passphrase) {
-    str += `&passphrase=${encodeURIComponent(passphrase).replace(/%20/g, '+')}`
+  // PayFast signature: specific fields in specific order, with spaces as +
+  // https://www.payfast.co.za/integrate/display/Help/Hosted+Integration
+  const signatureFields = [
+    'merchant_id',
+    'merchant_key',
+    'return_url',
+    'cancel_url',
+    'notify_url',
+    'name_first',
+    'name_last',
+    'email_address',
+    'm_payment_id',
+    'amount',
+    'item_name',
+    'custom_str1'
+  ]
+
+  const parts: string[] = []
+  for (const key of signatureFields) {
+    const val = fields[key]
+    if (val !== undefined && val !== null && val !== '') {
+      // Use encodeURIComponent and replace %20 with +
+      parts.push(`${key}=${encodeURIComponent(String(val)).replace(/%20/g, '+')}`)
+    }
   }
-  return crypto.createHash('md5').update(str).digest('hex')
+
+  let baseString = parts.join('&')
+  if (passphrase) {
+    baseString += `&passphrase=${encodeURIComponent(passphrase).replace(/%20/g, '+')}`
+  }
+
+  return crypto.createHash('md5').update(baseString).digest('hex')
 }
 
 export const handler: Handler = async (event) => {
