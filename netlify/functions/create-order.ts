@@ -1,8 +1,19 @@
 import type { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 const SUPABASE_URL = process.env.SUPABASE_URL!;
 const SRK = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+
+// Create Supabase client with serverless-friendly config
+const admin = createClient(SUPABASE_URL, SRK, {
+  auth: { persistSession: false }
+});
+
+function generateMerchantPaymentId() {
+  const rand = crypto.randomBytes(6).toString('hex').toUpperCase();
+  return `BLM-${rand}`;
+}
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -10,6 +21,7 @@ export const handler: Handler = async (event) => {
   }
 
   try {
+    const body = JSON.parse(event.body || '{}');
     const {
       items,
       shippingInfo,
@@ -22,28 +34,37 @@ export const handler: Handler = async (event) => {
       customerName,
       customerPhone,
       deliveryAddress,
-      userId
-    } = JSON.parse(event.body || '{}');
+      userId,
+      customerId // Also accept customerId as fallback
+    } = body;
 
     if (!items || !customerEmail || total === undefined) {
       return {
         statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'Missing required fields: items, customerEmail, total' })
       };
     }
 
     // Validate items have required fields
+    if (!Array.isArray(items) || items.length === 0) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Items array is required and must not be empty' })
+      };
+    }
+
     for (const item of items) {
       if (!item.name || item.price === undefined) {
-        console.error('Invalid item:', item);
+        console.error('Invalid item:', JSON.stringify(item, null, 2));
         return {
           statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ error: `Item missing required fields: name="${item.name}", price=${item.price}` })
         };
       }
     }
-
-    const admin = createClient(SUPABASE_URL, SRK);
 
     // Convert amounts to cents for precision
     const subtotalCents = Math.round(Number(subtotal || 0) * 100);
@@ -52,10 +73,10 @@ export const handler: Handler = async (event) => {
     const totalCents = Math.round(Number(total || 0) * 100);
 
     // Generate unique merchant payment ID for PayFast
-    function generateMerchantPaymentId() {
-      return 'BLM-' + Math.random().toString(36).substr(2, 12).toUpperCase();
-    }
     const merchantPaymentId = generateMerchantPaymentId();
+    
+    // Use userId or customerId (fallback)
+    const finalUserId = userId || customerId || null;
 
     // Build delivery method and address
     const isCollection = shippingMethod === 'store-pickup';
@@ -78,13 +99,14 @@ export const handler: Handler = async (event) => {
     const { data: order, error: orderError } = await admin
       .from('orders')
       .insert([{
-        user_id: userId || null,
+        user_id: finalUserId,
         m_payment_id: merchantPaymentId,
         merchant_payment_id: merchantPaymentId,
         status: 'pending',
+        payment_status: 'unpaid',
         channel: 'website',
         customer_name: customerName || 'Guest',
-        customer_email: customerEmail,
+        customer_email: (customerEmail || '').toLowerCase(),
         customer_phone: customerPhone || '',
         delivery_method: deliveryMethod,
         shipping_address: shippingAddress,
@@ -102,10 +124,19 @@ export const handler: Handler = async (event) => {
       .single();
 
     if (orderError || !order) {
-      console.error('Order creation error:', orderError);
+      console.error('Order creation error:', JSON.stringify(orderError, null, 2));
+      console.error('Order payload attempted:', JSON.stringify({
+        user_id: finalUserId,
+        merchant_payment_id: merchantPaymentId,
+        status: 'pending',
+        payment_status: 'unpaid',
+        customer_email: customerEmail,
+        total_cents: totalCents
+      }, null, 2));
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: `Failed to create order: ${orderError?.message}` })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: `Failed to create order: ${orderError?.message || 'Unknown error'}` })
       };
     }
 
@@ -126,12 +157,21 @@ export const handler: Handler = async (event) => {
       .insert(orderItemsData);
 
     if (itemsError) {
-      console.error('Order items insertion error:', itemsError);
-      console.warn(`Order ${order.id} created but items insertion failed:`, itemsError.message);
+      console.error('Order items insertion error:', JSON.stringify(itemsError, null, 2));
+      console.error('Items payload attempted:', JSON.stringify(orderItemsData, null, 2));
+      // Still return error - items are critical
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          error: `Order created but items failed: ${itemsError.message}`,
+          order_id: order.id
+        })
+      };
     }
 
-    // Create payment row for admin tracking
-    await admin
+    // Create payment row for admin tracking (non-blocking)
+    admin
       .from('payments')
       .insert([{
         order_id: order.id,
@@ -140,7 +180,9 @@ export const handler: Handler = async (event) => {
         status: 'pending',
         provider_txn_id: null,
         raw: null
-      }]);
+      }])
+      .then(() => console.log(`Payment row created for order ${order.id}`))
+      .catch((err: any) => console.warn(`Payment row creation skipped:`, err?.message));
 
     // Build PayFast form parameters
     const siteUrl = process.env.SITE_BASE_URL || process.env.URL || 'https://blom-cosmetics.co.za';
