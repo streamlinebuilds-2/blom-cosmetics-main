@@ -252,8 +252,17 @@ export const CheckoutPage: React.FC = () => {
       });
 
       if (!createOrderRes.ok) {
-        const errData = await createOrderRes.json();
-        throw new Error(errData.error || 'Failed to create order');
+        let errorMessage = 'Failed to create order';
+        try {
+          const errData = await createOrderRes.json();
+          errorMessage = errData.error || errData.details?.message || errorMessage;
+          console.error('Create order error:', errData);
+        } catch (e) {
+          console.error('Failed to parse error response:', e);
+          errorMessage = `Server error: ${createOrderRes.status} ${createOrderRes.statusText}`;
+        }
+        alert(`Checkout Error: ${errorMessage}`);
+        throw new Error(errorMessage);
       }
 
       const orderData = await createOrderRes.json();

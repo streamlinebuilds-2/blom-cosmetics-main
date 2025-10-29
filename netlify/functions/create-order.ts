@@ -131,12 +131,31 @@ export const handler: Handler = async (event) => {
         status: 'pending',
         payment_status: 'unpaid',
         customer_email: customerEmail,
-        total_cents: totalCents
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        delivery_method: deliveryMethod,
+        total_cents: totalCents,
+        subtotal_cents: subtotalCents,
+        shipping_cents: shippingCents,
+        discount_cents: discountCents
       }, null, 2));
+      
+      // Return the actual error details from Supabase
+      const errorMessage = orderError?.message || orderError?.details || orderError?.hint || 'Unknown error';
+      const fullError = {
+        message: errorMessage,
+        code: orderError?.code,
+        details: orderError?.details,
+        hint: orderError?.hint
+      };
+      
       return {
-        statusCode: 500,
+        statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: `Failed to create order: ${orderError?.message || 'Unknown error'}` })
+        body: JSON.stringify({ 
+          error: `Failed to create order: ${errorMessage}`,
+          details: fullError
+        })
       };
     }
 
