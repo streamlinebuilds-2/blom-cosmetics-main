@@ -20,43 +20,68 @@ import {
 } from 'lucide-react';
 
 export const OrderConfirmationPage: React.FC = () => {
-  const [orderData] = useState({
-    orderNumber: 'BLOM-' + Date.now().toString().slice(-6),
-    orderDate: new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }),
-    estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }),
-    total: 648.50,
-    items: [
-      {
-        id: '1',
-        name: 'Vitamin Primer',
-        variant: '15ml',
-        quantity: 2,
-        price: 299,
-        image: 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop'
+  const [orderData, setOrderData] = useState<any>(null);
+
+  useEffect(() => {
+    // Try to get order from localStorage (from checkout)
+    const pendingOrder = localStorage.getItem('blom_pending_order');
+    if (pendingOrder) {
+      try {
+        const order = JSON.parse(pendingOrder);
+        setOrderData({
+          orderNumber: order.orderId,
+          orderDate: new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          total: order.total,
+          items: order.cartItems.map((item: any) => ({
+            id: item.productId,
+            name: item.name,
+            variant: item.variant?.title || '',
+            quantity: item.quantity,
+            price: item.price,
+            image: item.image
+          })),
+          shipping: {
+            name: (order.shippingInfo?.firstName || '') + ' ' + (order.shippingInfo?.lastName || ''),
+            address: order.shippingInfo?.ship_to_street || order.shippingInfo?.address || '',
+            city: order.shippingInfo?.ship_to_city || order.shippingInfo?.city || '',
+            province: order.shippingInfo?.ship_to_zone || order.shippingInfo?.province || '',
+            postalCode: order.shippingInfo?.ship_to_postal_code || order.shippingInfo?.postalCode || '',
+            phone: order.shippingInfo?.phone || '',
+            email: order.shippingInfo?.email || ''
+          },
+          shippingMethod: order.shippingMethod || 'door-to-door',
+          payment: {
+            method: 'PayFast',
+            last4: '****'
+          }
+        });
+        // Clear localStorage after reading
+        localStorage.removeItem('blom_pending_order');
+      } catch (e) {
+        console.error('Failed to parse pending order:', e);
+        // Fallback to demo data
+        setOrderData({
+          orderNumber: 'BLOM-' + Date.now().toString().slice(-6),
+          orderDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          total: 648.50,
+          items: [{ id: '1', name: 'Sample Product', variant: '', quantity: 1, price: 648.50, image: '' }],
+          shipping: { name: 'Customer', address: '', city: '', province: '', postalCode: '', phone: '', email: '' },
+          shippingMethod: 'door-to-door',
+          payment: { method: 'PayFast', last4: '****' }
+        });
       }
-    ],
-    shipping: {
-      name: 'John Doe',
-      address: '123 Main Street',
-      city: 'Cape Town',
-      province: 'Western Cape',
-      postalCode: '8001',
-      phone: '+27 21 123 4567',
-      email: 'john@example.com'
-    },
-    payment: {
-      method: 'PayFast',
-      last4: '4242'
     }
-  });
+  }, []);
 
   const recommendedProducts = [
     {
@@ -87,7 +112,7 @@ export const OrderConfirmationPage: React.FC = () => {
       status: 'completed',
       title: 'Order Placed',
       description: 'Your order has been successfully placed',
-      date: orderData.orderDate,
+      date: orderData?.orderDate,
       icon: CheckCircle
     },
     {
@@ -108,15 +133,15 @@ export const OrderConfirmationPage: React.FC = () => {
       status: 'pending',
       title: 'Delivered',
       description: 'Your order will be delivered',
-      date: orderData.estimatedDelivery,
+      date: orderData?.estimatedDelivery,
       icon: MapPin
     }
   ];
 
   useEffect(() => {
     // Send confirmation email (simulate)
-    console.log('Sending confirmation email to:', orderData.shipping.email);
-  }, []);
+    console.log('Sending confirmation email to:', orderData?.shipping?.email);
+  }, [orderData]);
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
@@ -134,7 +159,7 @@ export const OrderConfirmationPage: React.FC = () => {
             <h1 className="text-4xl font-extrabold text-gray-900 mb-2">Payment Successful</h1>
             <p className="text-lg text-gray-600 mb-4">Thank you for your order! A confirmation email has been sent to you.</p>
             <p className="text-lg text-gray-500">
-              Order #{orderData.orderNumber} • Placed on {orderData.orderDate}
+              Order #{orderData?.orderNumber} • Placed on {orderData?.orderDate}
             </p>
           </div>
 
@@ -183,7 +208,7 @@ export const OrderConfirmationPage: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {orderData.items.map((item) => (
+                    {orderData?.items.map((item: any) => (
                       <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
                         <img
                           src={item.image}
@@ -208,7 +233,7 @@ export const OrderConfirmationPage: React.FC = () => {
                   <div className="border-t pt-4 mt-4">
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total Paid:</span>
-                      <span>{formatPrice(orderData.total)}</span>
+                      <span>{formatPrice(orderData?.total || 0)}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -222,18 +247,18 @@ export const OrderConfirmationPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <p className="font-medium">{orderData.shipping.name}</p>
-                      <p>{orderData.shipping.address}</p>
-                      <p>{orderData.shipping.city}, {orderData.shipping.province}</p>
-                      <p>{orderData.shipping.postalCode}</p>
+                      <p className="font-medium">{orderData?.shipping?.name}</p>
+                      <p>{orderData?.shipping?.address}</p>
+                      <p>{orderData?.shipping?.city}, {orderData?.shipping?.province}</p>
+                      <p>{orderData?.shipping?.postalCode}</p>
                       <div className="pt-2 border-t mt-3">
                         <p className="text-sm text-gray-600 flex items-center gap-2">
                           <Phone className="h-4 w-4" />
-                          {orderData.shipping.phone}
+                          {orderData?.shipping?.phone}
                         </p>
                         <p className="text-sm text-gray-600 flex items-center gap-2">
                           <Mail className="h-4 w-4" />
-                          {orderData.shipping.email}
+                          {orderData?.shipping?.email}
                         </p>
                       </div>
                     </div>
@@ -246,9 +271,9 @@ export const OrderConfirmationPage: React.FC = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
-                      <p className="font-medium">{orderData.payment.method}</p>
+                      <p className="font-medium">{orderData?.payment?.method}</p>
                       <p className="text-sm text-gray-600">
-                        Card ending in {orderData.payment.last4}
+                        Card ending in {orderData?.payment?.last4}
                       </p>
                       <div className="pt-2 border-t mt-3">
                         <p className="text-sm text-green-600 font-medium">
@@ -264,14 +289,14 @@ export const OrderConfirmationPage: React.FC = () => {
               <Card>
                 <CardContent className="flex flex-wrap gap-3 justify-center">
                   <a
-                    href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderData.orderNumber)}`}
+                    href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderData?.orderNumber || '')}`}
                     target="_blank" rel="noopener"
                     className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     <Download className="h-4 w-4 mr-2" /> View Invoice
                   </a>
                   <a
-                    href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderData.orderNumber)}`}
+                    href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderData?.orderNumber || '')}`}
                     className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     <Download className="h-4 w-4 mr-2" /> Download PDF
@@ -282,12 +307,14 @@ export const OrderConfirmationPage: React.FC = () => {
                   >
                     Print Invoice
                   </button>
-                  <a
-                    href="/track-order"
-                    className="inline-flex items-center px-4 py-2 rounded-md bg-pink-400 text-white hover:bg-pink-500"
-                  >
-                    <Package className="h-4 w-4 mr-2" /> Track My Order
-                  </a>
+                  {orderData?.shippingMethod === 'door-to-door' && (
+                    <a
+                      href="/track-order"
+                      className="inline-flex items-center px-4 py-2 rounded-md bg-pink-400 text-white hover:bg-pink-500"
+                    >
+                      <Package className="h-4 w-4 mr-2" /> Track My Order
+                    </a>
+                  )}
                   <a
                     href="/shop"
                     className="inline-flex items-center px-4 py-2 rounded-md bg-gray-900 text-white hover:bg-black"
@@ -309,19 +336,19 @@ export const OrderConfirmationPage: React.FC = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Order Number:</span>
-                      <span className="font-medium">{orderData.orderNumber}</span>
+                      <span className="font-medium">{orderData?.orderNumber}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Order Date:</span>
-                      <span>{orderData.orderDate}</span>
+                      <span>{orderData?.orderDate}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Estimated Delivery:</span>
-                      <span>{orderData.estimatedDelivery}</span>
+                      <span>{orderData?.estimatedDelivery}</span>
                     </div>
                     <div className="flex justify-between font-bold text-lg border-t pt-2">
                       <span>Total:</span>
-                      <span>{formatPrice(orderData.total)}</span>
+                      <span>{formatPrice(orderData?.total || 0)}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -366,7 +393,7 @@ export const OrderConfirmationPage: React.FC = () => {
                   <Mail className="h-8 w-8 text-blue-500 mx-auto mb-3" />
                   <h4 className="font-medium mb-2">Confirmation Email Sent</h4>
                   <p className="text-sm text-gray-600 mb-4">
-                    We've sent a confirmation email to {orderData.shipping.email}
+                    We've sent a confirmation email to {orderData?.shipping?.email}
                   </p>
                   <p className="text-xs text-gray-500">
                     Check your spam folder if you don't see it in your inbox
