@@ -1,7 +1,8 @@
 import type { Handler } from '@netlify/functions'
 import crypto from 'crypto'
 
-const IS_LIVE = process.env.PF_ENV === 'live' // set PF_ENV=live in Netlify when going live
+// Always use live PayFast - sandbox is not used in production
+// const IS_LIVE = process.env.PF_ENV === 'live' // Not used - always live
 const PF_MERCHANT_ID = process.env.PF_MERCHANT_ID!      // live or sandbox
 const PF_MERCHANT_KEY = process.env.PF_MERCHANT_KEY!    // live or sandbox
 const PF_PASSPHRASE = process.env.PF_PASSPHRASE || ''   // ONLY if enabled in dashboard
@@ -81,9 +82,8 @@ export const handler: Handler = async (event) => {
     const { baseString, signature } = buildSignature(pfParams, PF_PASSPHRASE || undefined)
 
     // Return all fields + signature + endpoint to the frontend
-    const endpoint = IS_LIVE
-      ? 'https://www.payfast.co.za/eng/process'
-      : 'https://sandbox.payfast.co.za/eng/process'
+    // Always use live PayFast endpoint - no sandbox redirects
+    const endpoint = 'https://www.payfast.co.za/eng/process'
 
     const payload = { endpoint, fields: { ...pfParams, signature } }
 
