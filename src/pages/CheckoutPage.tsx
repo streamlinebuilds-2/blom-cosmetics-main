@@ -319,52 +319,66 @@ export const CheckoutPage: React.FC = () => {
       };
 
       // Step 3: Use PayFast checkout function to get signed form data
+      // Send in the format backend expects: m_payment_id, amount, name_first, etc.
+      const pfRequestBody = {
+        m_payment_id: orderData.merchant_payment_id,
+        amount: (totalCents / 100).toFixed(2),
+        name_first: shippingInfo.firstName,
+        name_last: shippingInfo.lastName,
+        email_address: shippingInfo.email,
+        item_name: `BLOM Order ${orderData.merchant_payment_id}`,
+        order_id: orderId
+      };
+      
+      console.log('🔍 PayFast request:', pfRequestBody);
+      
       const pfResponse = await fetch('/.netlify/functions/payfast-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          totalCents: totalCents,
-          itemName: `BLOM Order ${orderData.merchant_payment_id}`,
-          merchantPaymentId: orderData.merchant_payment_id,
-          orderId: orderId,
-          customer: {
-            firstName: shippingInfo.firstName,
-            lastName: shippingInfo.lastName,
-            email: shippingInfo.email
-          }
-          // debug: true, // uncomment once to inspect baseString in network response
-        })
+        body: JSON.stringify(pfRequestBody)
       });
 
       if (!pfResponse.ok) {
         const pfError = await pfResponse.json().catch(() => ({ error: 'PayFast initiation failed' }));
+        console.error('❌ PayFast checkout error:', pfError);
+        alert(`PayFast Error: ${JSON.stringify(pfError, null, 2)}`);
         throw new Error(pfError.error || 'Payment initiation failed');
       }
 
       const pfData = await pfResponse.json();
-      const pfUrl = pfData.endpoint || 'https://www.payfast.co.za/eng/process';
-      // PayFast checkout returns fields in 'fields' property
-      const pfFields = pfData.fields || {};
-
-      // Create and submit PayFast form
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = pfUrl;
+      console.log('✅ PayFast response:', pfData);
       
-      // Add all PayFast fields as hidden inputs (including signature)
-      Object.entries(pfFields).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = key;
-          input.value = String(value);
-          form.appendChild(input);
-        }
-      });
-
-      // Append form to body and submit
-      document.body.appendChild(form);
-      form.submit();
+      // New format: backend returns a redirect URL with all params already encoded
+      const redirectUrl = pfData.redirect || pfData.url;
+      
+      if (!redirectUrl) {
+        // Fallback: if old format (endpoint + fields), build form as before
+        const pfUrl = pfData.endpoint || 'https://www.payfast.co.za/eng/process';
+        const pfFields = pfData.fields || {};
+        
+        console.log('🚀 Submitting to (fallback):', pfUrl);
+        
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = pfUrl;
+        
+        Object.entries(pfFields).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = String(value);
+            form.appendChild(input);
+          }
+        });
+        
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        // New format: simple redirect to pre-built URL
+        console.log('🚀 Redirecting to PayFast:', redirectUrl);
+        window.location.href = redirectUrl;
+      }
       
     } catch (error: any) {
       console.error('Order processing failed:', error);
