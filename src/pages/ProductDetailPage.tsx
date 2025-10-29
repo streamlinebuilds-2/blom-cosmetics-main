@@ -416,8 +416,8 @@ export const ProductDetailPage: React.FC = () => {
         claims: ['Professional Grade', 'Washable', 'Durable']
       },
       variants: [
-        { name: 'Single File', image: '/nail-file-colorful.webp' },
-        { name: '5-Pack Bundle', image: '/nail-file-white.webp' }
+        { name: 'Single File', price: 35, image: '/nail-file-colorful.webp' },
+        { name: '5-Pack Bundle', price: 160, image: '/nail-file-white.webp' }
       ],
       rating: 4.5,
       reviewCount: 67,
