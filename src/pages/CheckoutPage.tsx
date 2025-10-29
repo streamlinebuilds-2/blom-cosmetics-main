@@ -9,6 +9,8 @@ import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edi
 import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
+import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../hooks/useAuth';
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -72,6 +74,8 @@ export const CheckoutPage: React.FC = () => {
     cvv: '',
     cardName: ''
   });
+
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
@@ -242,7 +246,8 @@ export const CheckoutPage: React.FC = () => {
           total: orderTotal,
           customerEmail: shippingInfo.email,
           customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
-          customerPhone: shippingInfo.phone
+          customerPhone: shippingInfo.phone,
+          customerId: userId // Add userId here
         })
       });
 

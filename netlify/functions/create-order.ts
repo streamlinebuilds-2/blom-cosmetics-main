@@ -21,7 +21,8 @@ export const handler: Handler = async (event) => {
       customerEmail,
       customerName,
       customerPhone,
-      deliveryAddress
+      deliveryAddress,
+      userId
     } = JSON.parse(event.body || '{}');
 
     if (!items || !customerEmail || total === undefined) {
@@ -60,19 +61,20 @@ export const handler: Handler = async (event) => {
     const { data: order, error: orderError } = await admin
       .from('orders')
       .insert([{
-        status: 'unpaid',
+        user_id: userId,
+        status: 'unpaid', // Changed from 'pending' to 'unpaid' as per user's request
         channel: 'website',
         customer_name: customerName || 'Guest',
         customer_email: customerEmail,
         customer_phone: customerPhone || '',
         delivery_method: deliveryMethod,
-        shipping_address: shippingAddress,
-        collection_slot: null,
-        collection_location: null,
+        shipping_address: shippingAddress, // Using the new structured shipping_address
+        collection_slot: null, // Placeholder for collection slot
+        collection_location: null, // Placeholder for collection location
         subtotal_cents: subtotalCents,
         shipping_cents: shippingCents,
         discount_cents: discountCents,
-        tax_cents: 0,
+        tax_cents: 0, // Assuming 0 tax for now
         total_cents: totalCents,
         currency: 'ZAR',
         placed_at: new Date().toISOString()
