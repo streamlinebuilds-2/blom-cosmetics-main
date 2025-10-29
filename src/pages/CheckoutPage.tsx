@@ -227,10 +227,54 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      // Generate order ID
-      const orderId = `BLOM-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
-      
-      // Prepare payment data with all shipping fields
+      // Step 1: Create order in Supabase
+      const createOrderRes = await fetch('/.netlify/functions/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: cartState.items,
+          shippingInfo: {
+            ship_to_street: deliveryAddress.street_address,
+            ship_to_suburb: deliveryAddress.local_area,
+            ship_to_city: deliveryAddress.city,
+            ship_to_zone: deliveryAddress.zone,
+            ship_to_postal_code: deliveryAddress.code
+          },
+          shippingMethod,
+          subtotal: cartState.subtotal,
+          shipping: shippingCost,
+          discount,
+          total: orderTotal,
+          customerEmail: shippingInfo.email,
+          customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
+          customerPhone: shippingInfo.phone
+        })
+      });
+
+      if (!createOrderRes.ok) {
+        const errData = await createOrderRes.json();
+        throw new Error(errData.error || 'Failed to create order');
+      }
+
+      const orderData = await createOrderRes.json();
+      const orderId = orderData.order_id;
+      const totalCents = orderData.total_cents;
+
+      // Store order locally before redirecting
+      localStorage.setItem('blom_pending_order', JSON.stringify({
+        orderId,
+        cartItems: cartState.items,
+        total: orderTotal,
+        shipping: shippingCost,
+        shippingMethod,
+        shippingInfo,
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
+        couponId: appliedCoupon ? appliedCoupon.id : null,
+        couponDiscount: discount,
+        timestamp: new Date().toISOString()
+      }));
+
+      // Step 2: Prepare PayFast payment with order ID
       const paymentData = {
         m_payment_id: orderId,
         amount: orderTotal,
@@ -265,21 +309,7 @@ export const CheckoutPage: React.FC = () => {
         }
       };
 
-      // Store order locally before redirecting
-      localStorage.setItem('blom_pending_order', JSON.stringify({
-        orderId,
-        cartItems: cartState.items,
-        total: orderTotal,
-        shipping: shippingCost,
-        shippingMethod,
-        shippingInfo,
-        couponCode: appliedCoupon ? appliedCoupon.code : null,
-        couponId: appliedCoupon ? appliedCoupon.id : null,
-        couponDiscount: discount,
-        timestamp: new Date().toISOString()
-      }));
-
-      // Call Netlify function - it will return HTML that auto-submits to PayFast
+      // Step 3: Call PayFast redirect function
       const response = await fetch('/.netlify/functions/payfast-redirect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
