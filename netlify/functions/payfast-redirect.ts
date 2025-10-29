@@ -2,7 +2,7 @@ import { Handler } from '@netlify/functions';
 import crypto from 'crypto';
 
 // Env configuration per spec
-const PF_BASE = process.env.PAYFAST_BASE || 'https://sandbox.payfast.co.za';
+const PF_BASE = process.env.PAYFAST_BASE || 'https://www.payfast.co.za';
 const SITE_BASE_URL = process.env.SITE_BASE_URL || process.env.URL || '';
 const RETURN_URL = `${SITE_BASE_URL}/payment-success`;
 const CANCEL_URL = `${SITE_BASE_URL}/payment-cancelled`;

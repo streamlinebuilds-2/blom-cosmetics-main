@@ -33,7 +33,7 @@ export interface PayFastConfig {
 
 class PayFastService {
   private config: PayFastConfig;
-  private readonly sandboxUrl = 'https://sandbox.payfast.co.za/eng/process';
+  private readonly sandboxUrl = 'https://www.payfast.co.za/eng/process';
   private readonly liveUrl = 'https://www.payfast.co.za/eng/process';
 
   constructor(config: PayFastConfig) {
@@ -216,9 +216,7 @@ class PayFastService {
       }
 
       // Verify with PayFast servers
-      const verifyUrl = this.config.sandbox 
-        ? 'https://sandbox.payfast.co.za/eng/query/validate'
-        : 'https://www.payfast.co.za/eng/query/validate';
+      const verifyUrl = 'https://www.payfast.co.za/eng/query/validate';
 
       const response = await fetch(verifyUrl, {
         method: 'POST',
