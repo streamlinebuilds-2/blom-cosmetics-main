@@ -1,5 +1,4 @@
 import type { Handler } from '@netlify/functions';
-import fetch from 'node-fetch';
 
 const API = 'https://api.shiplogic.com/v2';
 

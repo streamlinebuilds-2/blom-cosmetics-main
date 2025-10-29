@@ -1,5 +1,4 @@
 import type { Handler } from '@netlify/functions';
-import fetch from 'node-fetch';
 
 // Approve/publish a review from n8n. Requires Netlify env vars:
 // SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY

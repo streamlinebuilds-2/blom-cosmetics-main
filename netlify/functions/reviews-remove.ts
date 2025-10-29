@@ -1,5 +1,4 @@
 import type { Handler } from '@netlify/functions';
-import fetch from 'node-fetch';
 
 // Remove a published review by ID or a combination of keys.
 // Requires x-review-token header to match N8N_REVIEW_TOKEN.

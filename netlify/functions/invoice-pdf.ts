@@ -1,5 +1,4 @@
 import type { Handler } from '@netlify/functions';
-import fetch from 'node-fetch';
 import React from 'react';
 
 const SUPABASE_URL = process.env.SUPABASE_URL as string;
