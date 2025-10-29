@@ -7,6 +7,7 @@ import { User, Mail, Phone, Calendar, Package, Heart, Settings } from 'lucide-re
 import { authService, AuthState } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { wishlistStore } from '../lib/wishlist';
+import { fetchMyOrders } from '../lib/fetchMyOrders';
 
 export default function AccountPageFullCore() {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'wishlist' | 'settings'>('profile');
@@ -53,26 +54,23 @@ export default function AccountPageFullCore() {
       if (!authState.user) return;
       setOrdersLoading(true);
       setOrdersError(null);
-      const userEmail = authState.user.email?.toLowerCase();
-      const { data, error } = await supabase
-        .from('orders')
-        .select('id,status,total,created_at,merchant_payment_id')
-        .or(`user_id.eq.${authState.user.id},customer_email.eq.${userEmail}`)
-        .order('created_at', { ascending: false });
-      if (error) {
-        setOrdersError(error.message);
-        setOrders([]);
-      } else {
-        // Normalize totals to numbers
+      
+      try {
+        const data = await fetchMyOrders();
+        // Normalize totals to numbers (use total_cents if total is null)
         const normalized = (data || []).map((o: any) => ({
           id: String(o.id),
           status: String(o.status || 'unknown'),
-          total: Number(o.total || 0),
+          total: Number(o.total || (o.total_cents ? o.total_cents / 100 : 0)),
           created_at: String(o.created_at || new Date().toISOString())
         }));
         setOrders(normalized);
+      } catch (error: any) {
+        setOrdersError(error.message);
+        setOrders([]);
+      } finally {
+        setOrdersLoading(false);
       }
-      setOrdersLoading(false);
     })();
   }, [authState.user?.id]);
 
