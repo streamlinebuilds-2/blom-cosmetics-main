@@ -24,6 +24,9 @@ export const handler: Handler = async (event) => {
       return { statusCode: 500, body: 'Missing Supabase config' }
     }
 
+    // Helper: check if string is valid UUID
+    const isUUID = (v: any) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v || ''))
+
     // Calculate total
     const amount = items.reduce((sum: number, it: any) => sum + Number(it.price) * Number(it.qty), 0).toFixed(2)
     const m_payment_id = `BL-${Date.now().toString(16).toUpperCase()}`
@@ -67,16 +70,39 @@ export const handler: Handler = async (event) => {
       return { statusCode: 500, body: 'Order created but response empty' }
     }
 
-    // Insert order items
-    const itemsPayload = items.map((it: any) => ({
-      order_id: order.id,
-      product_id: it.product_id || null,
-      product_name: it.product_name || null,
-      sku: it.sku || null,
-      quantity: it.qty,
-      unit_price: Number(it.price),
-      line_total: Number((Number(it.price) * Number(it.qty)).toFixed(2))
-    }))
+    // 1) Resolve product UUIDs by SKU (only for items without a valid UUID)
+    const skus = [...new Set(items.filter((it: any) => !isUUID(it.product_id) && it.sku).map((it: any) => it.sku))]
+    let skuMap: Record<string, string> = {}
+    if (skus.length) {
+      const skuQuery = skus.map((s) => encodeURIComponent(s)).join(',')
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,sku&sku=in.(${skuQuery})`, {
+        headers: {
+          apikey: SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`
+        }
+      })
+      if (res.ok) {
+        const rows = await res.json()
+        skuMap = Object.fromEntries(rows.map((r: any) => [r.sku, r.id]))
+      }
+    }
+
+    // 2) Build order items with resolved product UUIDs
+    const itemsPayload = items.map((it: any) => {
+      const product_uuid = isUUID(it.product_id) ? it.product_id : it.sku && skuMap[it.sku] ? skuMap[it.sku] : null
+
+      const qty = Number(it.qty)
+      const unit = Number(it.price)
+      return {
+        order_id: order.id,
+        product_id: product_uuid,
+        product_name: it.product_name || null,
+        sku: it.sku || null,
+        quantity: qty,
+        unit_price: unit,
+        line_total: Number((qty * unit).toFixed(2))
+      }
+    })
 
     const oiRes = await fetch(`${SUPABASE_URL}/rest/v1/order_items`, {
       method: 'POST',
