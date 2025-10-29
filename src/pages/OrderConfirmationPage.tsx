@@ -307,14 +307,6 @@ export const OrderConfirmationPage: React.FC = () => {
                   >
                     Print Invoice
                   </button>
-                  {orderData?.shippingMethod === 'door-to-door' && (
-                    <a
-                      href="/track-order"
-                      className="inline-flex items-center px-4 py-2 rounded-md bg-pink-400 text-white hover:bg-pink-500"
-                    >
-                      <Package className="h-4 w-4 mr-2" /> Track My Order
-                    </a>
-                  )}
                   <a
                     href="/shop"
                     className="inline-flex items-center px-4 py-2 rounded-md bg-gray-900 text-white hover:bg-black"
