@@ -3,7 +3,11 @@ import crypto from 'crypto'
 import querystring from 'querystring'
 
 // Use your existing env var names with fallbacks
-const pfBase = process.env.PAYFAST_BASE || 'https://www.payfast.co.za'
+let pfBase = process.env.PAYFAST_BASE || 'https://www.payfast.co.za'
+// Strip /eng/process if it's already there (to avoid duplicates)
+if (pfBase.endsWith('/eng/process')) {
+  pfBase = pfBase.replace(/\/eng\/process$/, '')
+}
 const returnUrl = process.env.PAYFAST_RETURN_URL || (process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za') + '/checkout/return'
 const cancelUrl = process.env.PAYFAST_CANCEL_URL || (process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za') + '/checkout/cancel'
 const notifyUrl = process.env.PAYFAST_NOTIFY_URL || process.env.N8N_ITN_URL || 'https://n8n.example.com/webhook/payfast-itn'
