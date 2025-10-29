@@ -14,15 +14,18 @@
   "dependencies": {
     "@react-google-maps/api": "^2.20.7",
     "@react-pdf/renderer": "^4.3.1",
+    "@sparticuz/chromium": "^141.0.0",
     "@supabase/supabase-js": "^2.57.4",
     "crypto-js": "^4.2.0",
     "lucide-react": "^0.344.0",
+    "puppeteer-core": "^24.27.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "@netlify/functions": "^2.0.0",
     "@types/crypto-js": "^4.2.2",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
@@ -39,7 +42,6 @@
     "tsx": "^4.19.2",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.3.0",
-    "vite": "^5.4.2",
-    "@netlify/functions": "^2.0.0"
+    "vite": "^5.4.2"
   }
 }
