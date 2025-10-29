@@ -129,10 +129,7 @@ export const handler: Handler = async (event) => {
         status: 'pending',
         provider_txn_id: null,
         raw: null
-      }])
-      .catch((err: any) => {
-        console.warn('Payment row creation skipped:', err.message);
-      });
+      }]);
 
     // Build PayFast form parameters
     const siteUrl = process.env.SITE_BASE_URL || process.env.URL || 'https://blom-cosmetics.co.za';
