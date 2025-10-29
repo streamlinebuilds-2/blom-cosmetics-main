@@ -11,5 +11,3 @@ export const handler: Handler = async () => {
     })
   }
 }
-
-export default handler
