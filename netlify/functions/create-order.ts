@@ -140,17 +140,31 @@ export const handler: Handler = async (event) => {
       };
     }
 
+    // Helper to check if string is a valid UUID
+    function isUUID(str: string | null | undefined): boolean {
+      if (!str) return false;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      return uuidRegex.test(str);
+    }
+
     // Insert order items with exact schema
-    const orderItemsData = items.map((item: any) => ({
-      order_id: order.id,
-      product_id: item.productId || null,
-      sku: item.sku || null,
-      name: item.name,
-      variant: item.variant?.title || null,
-      qty: item.quantity || 1,
-      unit_price_cents: Math.round(Number(item.price || 0) * 100),
-      line_total_cents: Math.round((item.quantity || 1) * Number(item.price || 0) * 100)
-    }));
+    // Note: productId from cart might be a slug, not UUID, so validate before inserting
+    const orderItemsData = items.map((item: any) => {
+      const productId = item.productId;
+      // Only set product_id if it's a valid UUID, otherwise null (slug-based products)
+      const validProductId = isUUID(productId) ? productId : null;
+      
+      return {
+        order_id: order.id,
+        product_id: validProductId,
+        sku: item.sku || null,
+        name: item.name,
+        variant: item.variant?.title || null,
+        qty: item.quantity || 1,
+        unit_price_cents: Math.round(Number(item.price || 0) * 100),
+        line_total_cents: Math.round((item.quantity || 1) * Number(item.price || 0) * 100)
+      };
+    });
 
     const { error: itemsError } = await admin
       .from('order_items')
