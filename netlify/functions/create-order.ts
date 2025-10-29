@@ -32,6 +32,17 @@ export const handler: Handler = async (event) => {
       };
     }
 
+    // Validate items have required fields
+    for (const item of items) {
+      if (!item.name || item.price === undefined) {
+        console.error('Invalid item:', item);
+        return {
+          statusCode: 400,
+          body: JSON.stringify({ error: `Item missing required fields: name="${item.name}", price=${item.price}` })
+        };
+      }
+    }
+
     const admin = createClient(SUPABASE_URL, SRK);
 
     // Convert amounts to cents for precision
