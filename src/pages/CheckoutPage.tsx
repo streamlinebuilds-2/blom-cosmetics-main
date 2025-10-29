@@ -233,13 +233,8 @@ export const CheckoutPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items: cartState.items,
-          shippingInfo: {
-            ship_to_street: deliveryAddress.street_address,
-            ship_to_suburb: deliveryAddress.local_area,
-            ship_to_city: deliveryAddress.city,
-            ship_to_zone: deliveryAddress.zone,
-            ship_to_postal_code: deliveryAddress.code
-          },
+          shippingInfo,
+          deliveryAddress,
           shippingMethod,
           subtotal: cartState.subtotal,
           shipping: shippingCost,

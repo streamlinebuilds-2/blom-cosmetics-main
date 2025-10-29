@@ -20,7 +20,8 @@ export const handler: Handler = async (event) => {
       total,
       customerEmail,
       customerName,
-      customerPhone
+      customerPhone,
+      deliveryAddress
     } = JSON.parse(event.body || '{}');
 
     if (!items || !customerEmail || total === undefined) {
@@ -32,28 +33,52 @@ export const handler: Handler = async (event) => {
 
     const admin = createClient(SUPABASE_URL, SRK);
 
-    // Create order
-    const { data: order, error: orderError } = await admin.from('orders').insert([{
-      status: 'pending',
-      email: customerEmail,
-      customer_email: customerEmail,
-      customer_name: customerName || 'Guest',
-      customer_mobile: customerPhone || '',
-      shipping_method: shippingMethod === 'store-pickup' ? 'collection' : 'delivery',
-      ship_to_street: shippingInfo?.ship_to_street || '',
-      ship_to_suburb: shippingInfo?.ship_to_suburb || '',
-      ship_to_city: shippingInfo?.ship_to_city || '',
-      ship_to_zone: shippingInfo?.ship_to_zone || '',
-      ship_to_postal_code: shippingInfo?.ship_to_postal_code || '',
-      subtotal: Number(subtotal || 0),
-      shipping: Number(shipping || 0),
-      discount: Number(discount || 0),
-      total: Number(total || 0),
-      total_cents: Math.round(Number(total || 0) * 100),
-      currency: 'ZAR',
-      created_at: new Date().toISOString(),
-      payment_status: 'unpaid'
-    }]).select().single();
+    // Convert amounts to cents for precision
+    const subtotalCents = Math.round(Number(subtotal || 0) * 100);
+    const shippingCents = Math.round(Number(shipping || 0) * 100);
+    const discountCents = Math.round(Number(discount || 0) * 100);
+    const totalCents = Math.round(Number(total || 0) * 100);
+
+    // Build delivery method and address
+    const isCollection = shippingMethod === 'store-pickup';
+    const deliveryMethod = isCollection ? 'collection' : 'delivery';
+    
+    const shippingAddress = isCollection
+      ? null
+      : {
+          line1: deliveryAddress?.street_address || shippingInfo?.ship_to_street || '',
+          line2: '',
+          suburb: deliveryAddress?.local_area || shippingInfo?.ship_to_suburb || '',
+          city: deliveryAddress?.city || shippingInfo?.ship_to_city || '',
+          province: deliveryAddress?.zone || shippingInfo?.ship_to_zone || '',
+          postal_code: deliveryAddress?.code || shippingInfo?.ship_to_postal_code || '',
+          country: 'ZA',
+          notes: ''
+        };
+
+    // Create order with exact schema
+    const { data: order, error: orderError } = await admin
+      .from('orders')
+      .insert([{
+        status: 'unpaid',
+        channel: 'website',
+        customer_name: customerName || 'Guest',
+        customer_email: customerEmail,
+        customer_phone: customerPhone || '',
+        delivery_method: deliveryMethod,
+        shipping_address: shippingAddress,
+        collection_slot: null,
+        collection_location: null,
+        subtotal_cents: subtotalCents,
+        shipping_cents: shippingCents,
+        discount_cents: discountCents,
+        tax_cents: 0,
+        total_cents: totalCents,
+        currency: 'ZAR',
+        placed_at: new Date().toISOString()
+      }])
+      .select()
+      .single();
 
     if (orderError || !order) {
       console.error('Order creation error:', orderError);
@@ -63,7 +88,7 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Insert order items
+    // Insert order items with exact schema
     const orderItemsData = items.map((item: any) => ({
       order_id: order.id,
       product_id: item.productId || null,
@@ -71,10 +96,8 @@ export const handler: Handler = async (event) => {
       name: item.name,
       variant: item.variant?.title || null,
       qty: item.quantity || 1,
-      quantity: item.quantity || 1,
-      unit_price: Number(item.price || 0),
-      price: Number(item.price || 0),
-      subtotal: (item.quantity || 1) * Number(item.price || 0)
+      unit_price_cents: Math.round(Number(item.price || 0) * 100),
+      line_total_cents: Math.round((item.quantity || 1) * Number(item.price || 0) * 100)
     }));
 
     const { error: itemsError } = await admin
@@ -83,9 +106,11 @@ export const handler: Handler = async (event) => {
 
     if (itemsError) {
       console.error('Order items insertion error:', itemsError);
-      // Order was created but items failed; log but don't fail
       console.warn(`Order ${order.id} created but items insertion failed:`, itemsError.message);
     }
+
+    // Log for admin visibility
+    console.log(`✅ Order created: ${order.id} | Customer: ${customerEmail} | Total: R${(totalCents / 100).toFixed(2)} | Items: ${items.length}`);
 
     return {
       statusCode: 200,
@@ -93,7 +118,8 @@ export const handler: Handler = async (event) => {
       body: JSON.stringify({
         success: true,
         order_id: order.id,
-        total_cents: Math.round(Number(total || 0) * 100)
+        total_cents: totalCents,
+        message: `Order ${order.id} created. Ready for PayFast payment.`
       })
     };
   } catch (err: any) {
