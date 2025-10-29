@@ -70,7 +70,7 @@ export const handler: Handler = async (event) => {
         user_id: userId || null,
         m_payment_id: merchantPaymentId,
         merchant_payment_id: merchantPaymentId,
-        status: 'unpaid',
+        status: 'pending',
         channel: 'website',
         customer_name: customerName || 'Guest',
         customer_email: customerEmail,
