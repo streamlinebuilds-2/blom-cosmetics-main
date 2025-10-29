@@ -52,7 +52,23 @@ export const handler: Handler = async (event) => {
     } = body
 
     if (!totalCents || !itemName || !customer?.email || !merchantPaymentId) {
-      return { statusCode: 400, body: 'Missing required fields' }
+      const missing = [];
+      if (!totalCents) missing.push('totalCents');
+      if (!itemName) missing.push('itemName');
+      if (!customer?.email) missing.push('customer.email');
+      if (!merchantPaymentId) missing.push('merchantPaymentId');
+      
+      console.error('Missing required fields:', missing);
+      console.error('Received body:', JSON.stringify(body, null, 2));
+      
+      return { 
+        statusCode: 400, 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          error: `Missing required fields: ${missing.join(', ')}`,
+          received: { totalCents, itemName, customer, merchantPaymentId }
+        })
+      }
     }
 
     const amount = (Number(totalCents) / 100).toFixed(2) // "123.45"
