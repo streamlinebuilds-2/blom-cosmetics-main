@@ -323,10 +323,16 @@ export const CheckoutPage: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          order_id: orderId,
-          order_number: orderData.merchant_payment_id,
-          total_cents: totalCents,
-          customer_email: shippingInfo.email
+          totalCents: totalCents,
+          itemName: `BLOM Order ${orderData.merchant_payment_id}`,
+          merchantPaymentId: orderData.merchant_payment_id,
+          orderId: orderId,
+          customer: {
+            firstName: shippingInfo.firstName,
+            lastName: shippingInfo.lastName,
+            email: shippingInfo.email
+          }
+          // debug: true, // uncomment once to inspect baseString in network response
         })
       });
 
@@ -336,11 +342,9 @@ export const CheckoutPage: React.FC = () => {
       }
 
       const pfData = await pfResponse.json();
-      const pfUrl = pfData.endpoint || pfData.payfast_url || 'https://www.payfast.co.za/eng/process';
-      // PayFast checkout returns all params directly (not in 'fields' property)
-      const pfFields = { ...pfData };
-      delete pfFields.endpoint;
-      delete pfFields.payfast_url;
+      const pfUrl = pfData.endpoint || 'https://www.payfast.co.za/eng/process';
+      // PayFast checkout returns fields in 'fields' property
+      const pfFields = pfData.fields || {};
 
       // Create and submit PayFast form
       const form = document.createElement('form');
