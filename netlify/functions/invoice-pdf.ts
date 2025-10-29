@@ -8,286 +8,319 @@ function ZAR(n: number) {
   return `R${Number(n || 0).toFixed(2)}`;
 }
 
+function formatDate(date: string | undefined | null): string {
+  if (!date) return new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  return new Date(date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatTime(date: string | undefined | null): string {
+  if (!date) return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return new Date(date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+}
+
 export const handler: Handler = async (event) => {
   try {
-    const id = event.queryStringParameters?.m_payment_id;
+    const id = event.queryStringParameters?.m_payment_id || event.queryStringParameters?.id;
     const asInline = event.queryStringParameters?.inline === '1' || event.queryStringParameters?.inline === 'true';
-    if (!id) return { statusCode: 400, body: 'Missing m_payment_id' };
+    if (!id) return { statusCode: 400, body: 'Missing m_payment_id or id' };
 
     if (!SUPABASE_URL || !SRK) {
       return { statusCode: 500, body: 'Supabase not configured' };
     }
 
-    // Try multiple keys sequentially to avoid DB errors when a column doesn't exist
-    const tryCols = ['merchant_payment_id','m_payment_id','custom_str1','id'];
+    // Try multiple ways to find the order
+    const tryCols = ['merchant_payment_id', 'm_payment_id', 'custom_str1', 'id'];
     let order: any = null;
+    let orderItems: any[] = [];
+
     for (const col of tryCols) {
       try {
-        const url = `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(name,quantity,unit_price,subtotal,product_id)&${encodeURIComponent(col)}=eq.${encodeURIComponent(id)}&limit=1`;
+        // First try to get order with order_items relation
+        const url = `${SUPABASE_URL}/rest/v1/orders?select=*,order_items(*)&${encodeURIComponent(col)}=eq.${encodeURIComponent(id)}&limit=1`;
         const r = await fetch(url, { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } });
-        if (!r.ok) continue; // skip if column doesn't exist or other error
+        if (!r.ok) continue;
         const j = await r.json();
-        if (Array.isArray(j) && j.length) { order = j[0]; break; }
-      } catch {}
+        if (Array.isArray(j) && j.length) {
+          order = j[0];
+          orderItems = order.order_items || [];
+          break;
+        }
+      } catch (e) {
+        // Try without relation
+        try {
+          const url = `${SUPABASE_URL}/rest/v1/orders?select=*&${encodeURIComponent(col)}=eq.${encodeURIComponent(id)}&limit=1`;
+          const r = await fetch(url, { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } });
+          if (!r.ok) continue;
+          const j = await r.json();
+          if (Array.isArray(j) && j.length) {
+            order = j[0];
+            // Try to fetch items separately
+            try {
+              const itemsUrl = `${SUPABASE_URL}/rest/v1/order_items?select=*&order_id=eq.${encodeURIComponent(order.id)}`;
+              const itemsRes = await fetch(itemsUrl, { headers: { apikey: SRK, Authorization: `Bearer ${SRK}` } });
+              if (itemsRes.ok) {
+                const itemsData = await itemsRes.json();
+                orderItems = Array.isArray(itemsData) ? itemsData : [];
+              }
+            } catch {}
+            break;
+          }
+        } catch {}
+      }
     }
-    
-    // DEMO fallback: if not found, synthesize a demo invoice so the presentation works
-    if (!order) {
-      const demoItems = [
-        { name: 'Vitamin Primer', qty: 1, unit: 210, total: 210 },
-        { name: 'Prep Solution (Nail Dehydrator)', qty: 1, unit: 160, total: 160 }
-      ];
-      const demoSubtotal = demoItems.reduce((s, i) => s + i.total, 0);
-      const demoShipping = 50;
-      const demoGrand = demoSubtotal + demoShipping;
 
-      const { Document, Page, Text, View, StyleSheet, renderToBuffer } = await import('@react-pdf/renderer');
-      const styles = StyleSheet.create({ page: { padding: 40, fontFamily: 'Helvetica' }, row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 } });
-      const DemoDoc = () => (
-        React.createElement(Document, null,
-          React.createElement(Page, { size: 'A4' as any, style: styles.page },
-            React.createElement(Text, { style: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 } }, `Invoice #${id}`),
-            React.createElement(Text, { style: { color: '#6b7280', marginBottom: 16 } }, 'Payment Receipt (Demo)'),
-            ...demoItems.map((it, idx) => React.createElement(View, { key: String(idx), style: styles.row },
-              React.createElement(Text, null, it.name),
-              React.createElement(Text, null, `${it.qty} x R${it.unit.toFixed(2)}`),
-              React.createElement(Text, null, `R${it.total.toFixed(2)}`)
-            )),
-            React.createElement(View, { style: { borderTop: 1, borderColor: '#e5e7eb', paddingTop: 8, marginTop: 8 } },
-              React.createElement(View, { style: styles.row }, React.createElement(Text, null, 'Subtotal'), React.createElement(Text, null, `R${demoSubtotal.toFixed(2)}`)),
-              React.createElement(View, { style: styles.row }, React.createElement(Text, null, 'Shipping'), React.createElement(Text, null, `R${demoShipping.toFixed(2)}`)),
-              React.createElement(View, { style: styles.row }, React.createElement(Text, { style: { fontWeight: 'bold' } }, 'Total'), React.createElement(Text, { style: { fontWeight: 'bold' } }, `R${demoGrand.toFixed(2)}`))
-            )
-          )
-        )
-      );
-      const buf = await renderToBuffer(React.createElement(DemoDoc));
+    // If still no order, return error instead of demo
+    if (!order) {
       return {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/pdf',
-          'Content-Disposition': `${asInline ? 'inline' : 'attachment'}; filename="BLOM-Receipt-${id}.pdf"`
-        },
-        body: Buffer.from(buf).toString('base64'),
-        isBase64Encoded: true
+        statusCode: 404,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: `Order not found: ${id}` })
       };
     }
 
-    const items = (order.order_items || []).map((it: any) => ({
-      name: it.name || `Product ${it.product_id}` || 'Item',
+    // Extract items from order
+    const items = (orderItems.length > 0 ? orderItems : order.order_items || []).map((it: any) => ({
+      name: it.name || `Product ${it.product_id || 'Unknown'}` || 'Item',
       qty: Number(it.quantity ?? 1),
-      unit: Number(it.unit_price ?? 0),
-      total: Number(it.subtotal ?? (Number(it.quantity ?? 1) * Number(it.unit_price ?? 0)))
+      unit: Number(it.unit_price ?? it.price ?? 0),
+      total: Number(it.subtotal ?? it.total_price ?? (Number(it.quantity ?? 1) * Number(it.unit_price ?? it.price ?? 0)))
     }));
-    const subtotal = items.reduce((s: number, i: any) => s + i.total, 0);
-    const shipping = Number(order.shipping ?? 0);
-    const grand = Number(order.total_amount ?? subtotal + shipping);
 
-    const { Document, Page, Text, View, StyleSheet, Font, renderToBuffer /*, Image*/ } = await import('@react-pdf/renderer');
+    // Calculate totals
+    const subtotal = items.reduce((s: number, i: any) => s + i.total, 0);
+    const shipping = Number(order.shipping_cost ?? order.shipping ?? 0);
+    const discount = Number(order.coupon_discount ?? order.discount ?? 0);
+    const grand = Number(order.total_amount ?? (subtotal + shipping - discount));
+
+    // Customer address formatting
+    const getCustomerAddress = () => {
+      const method = order.shipping_method || '';
+      if (method.toLowerCase().includes('pickup') || method.toLowerCase().includes('collect')) {
+        return {
+          type: 'Store Pickup',
+          hashtag: order.locker_name ? `${order.locker_name}, ${order.locker_street || ''}`.trim() : 'BLOM HQ, 34 Horingbek St, Randfontein 1759'
+        };
+      }
+      // Door-to-door
+      const parts = [];
+      if (order.ship_to_street) parts.push(order.ship_to_street);
+      if (order.ship_to_suburb) parts.push(order.ship_to_suburb);
+      if (order.ship_to_city) parts.push(order.ship_to_city);
+      if (order.ship_to_zone) parts.push(order.ship_to_zone);
+      if (order.ship_to_postal_code) parts.push(order.ship_to_postal_code);
+      return {
+        type: 'Door-to-Door Delivery',
+        address: parts.length > 0 ? parts.join(', ') : 'Address not provided'
+      };
+    };
+
+    const customerAddr = getCustomerAddress();
+
+    const { Document, Page, Text, View, StyleSheet, renderToBuffer } = await import('@react-pdf/renderer');
 
     const styles = StyleSheet.create({
-      page: { 
-        padding: 40, 
-        backgroundColor: '#f8fafc',
+      page: {
+        padding: 40,
+        backgroundColor: '#ffffff',
         fontFamily: 'Helvetica'
       },
-      header: { 
-        marginBottom: 24,
+      header: {
+        marginBottom: 30,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-start'
+        alignItems: 'flex-start',
+        borderBottom: 2,
+        borderColor: '#FF74A4',
+        paddingBottom: 20
       },
       brandSection: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12
       },
-      logo: { 
-        width: 48, 
-        height: 48, 
-        backgroundColor: '#3b82f6',
-        borderRadius: 8,
+      logo: {
+        width: 56,
+        height: 56,
+        backgroundColor: '#FF74A4',
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center'
+      },
+      logoText: {
+        color: 'white',
+        fontSize: 28,
+        fontWeight: 'bold'
       },
       brandInfo: {
         flex: 1
       },
-      brandName: { 
-        fontSize: 20, 
+      brandName: {
+        fontSize: 24,
         fontWeight: 'bold',
         color: '#1f2937',
-        marginBottom: 2
+        marginBottom: 4
       },
       receiptTitle: {
-        fontSize: 14,
-        color: '#3b82f6',
-        fontWeight: 500
+        fontSize: 13,
+        color: '#FF74A4',
+        fontWeight: 600
       },
       orderInfo: {
         textAlign: 'right',
         gap: 4
       },
-      orderMeta: { 
-        fontSize: 11, 
+      orderMeta: {
+        fontSize: 10,
         color: '#6b7280',
-        marginBottom: 2
+        marginBottom: 3
       },
       statusPaid: {
         fontSize: 11,
-        color: '#1f2937',
-        fontWeight: 600
+        color: '#059669',
+        fontWeight: 'bold',
+        backgroundColor: '#d1fae5',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4
       },
       contentCards: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 20,
+        marginBottom: 24,
         gap: 16
       },
       card: {
-        backgroundColor: 'white',
+        backgroundColor: '#f9fafb',
         borderRadius: 8,
         padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        border: 1,
+        borderColor: '#e5e7eb',
         flex: 1
       },
-      cardTitle: { 
-        fontSize: 12, 
+      cardTitle: {
+        fontSize: 11,
         fontWeight: 'bold',
         color: '#1f2937',
-        marginBottom: 8
+        marginBottom: 10,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
       },
-      cardText: { 
-        fontSize: 10, 
+      cardText: {
+        fontSize: 10,
         color: '#374151',
-        marginBottom: 3,
-        lineHeight: 1.4
+        marginBottom: 4,
+        lineHeight: 1.5
       },
       itemsCard: {
-        backgroundColor: 'white',
+        backgroundColor: '#f9fafb',
         borderRadius: 8,
-        padding: 16,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        marginBottom: 20
+        padding: 20,
+        border: 1,
+        borderColor: '#e5e7eb',
+        marginBottom: 24
       },
       itemsTitle: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 'bold',
         color: '#1f2937',
-        marginBottom: 12
+        marginBottom: 14,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
       },
-      tableHeader: { 
-        flexDirection: 'row', 
-        borderBottom: 1, 
-        paddingBottom: 8, 
-        borderColor: '#e5e7eb',
-        marginBottom: 8
+      tableHeader: {
+        flexDirection: 'row',
+        borderBottom: 2,
+        paddingBottom: 10,
+        borderColor: '#FF74A4',
+        marginBottom: 10
       },
-      th: { 
-        fontSize: 10, 
-        flex: 1, 
+      th: {
+        fontSize: 9,
+        flex: 2,
         fontWeight: 'bold',
-        color: '#374151'
+        color: '#1f2937',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
       },
       thRight: {
-        fontSize: 10,
+        fontSize: 9,
         flex: 1,
         fontWeight: 'bold',
-        color: '#374151',
-        textAlign: 'right'
+        color: '#1f2937',
+        textAlign: 'right',
+        textTransform: 'uppercase',
+        letterSpacing: 0.5
       },
-      row: { 
-        flexDirection: 'row', 
-        paddingVertical: 8, 
-        borderBottom: 1, 
+      row: {
+        flexDirection: 'row',
+        paddingVertical: 10,
+        borderBottom: 1,
         borderColor: '#f3f4f6'
       },
-      td: { 
-        fontSize: 10, 
-        flex: 1,
-        color: '#374151'
+      td: {
+        fontSize: 10,
+        flex: 2,
+        color: '#374151',
+        lineHeight: 1.4
       },
-      tdRight: { 
-        fontSize: 10, 
+      tdRight: {
+        fontSize: 10,
         flex: 1,
         color: '#374151',
         textAlign: 'right'
       },
       totalsSection: {
-        marginTop: 12,
-        paddingTop: 12,
-        borderTop: 1,
+        marginTop: 16,
+        paddingTop: 16,
+        borderTop: 2,
         borderColor: '#e5e7eb'
       },
-      totalRow: { 
-        flexDirection: 'row', 
-        marginBottom: 6,
+      totalRow: {
+        flexDirection: 'row',
+        marginBottom: 8,
         justifyContent: 'space-between'
       },
-      totalLabel: { 
+      totalLabel: {
         fontSize: 10,
-        color: '#374151'
+        color: '#6b7280'
       },
-      totalValue: { 
+      totalValue: {
         fontSize: 10,
-        color: '#374151'
+        color: '#374151',
+        fontWeight: 500
       },
       grandTotalRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingTop: 8,
-        borderTop: 1,
-        borderColor: '#e5e7eb'
+        paddingTop: 12,
+        marginTop: 8,
+        borderTop: 2,
+        borderColor: '#FF74A4'
       },
       grandTotalLabel: {
-        fontSize: 11,
+        fontSize: 12,
         fontWeight: 'bold',
         color: '#1f2937'
       },
       grandTotalValue: {
-        fontSize: 11,
+        fontSize: 14,
         fontWeight: 'bold',
-        color: '#1f2937'
+        color: '#FF74A4'
       },
-      footer: { 
-        position: 'absolute' as const, 
-        bottom: 24, 
-        left: 40, 
+      footer: {
+        position: 'absolute' as const,
+        bottom: 30,
+        left: 40,
         right: 40,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        borderTop: 1,
+        borderColor: '#e5e7eb',
+        paddingTop: 16
       },
       footerText: {
-        fontSize: 9, 
-        color: '#9ca3af'
-      },
-      actionButtons: {
-        flexDirection: 'row',
-        gap: 8
-      },
-      button: {
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 6,
-        fontSize: 9,
-        fontWeight: 'bold'
-      },
-      primaryButton: {
-        backgroundColor: '#3b82f6',
-        color: 'white'
-      },
-      secondaryButton: {
-        backgroundColor: 'white',
-        color: '#3b82f6',
-        borderWidth: 1,
-        borderColor: '#3b82f6'
+        fontSize: 8,
+        color: '#9ca3af',
+        textAlign: 'center',
+        lineHeight: 1.5
       }
     });
 
@@ -298,58 +331,57 @@ export const handler: Handler = async (event) => {
     const InvoiceDoc = () => (
       React.createElement(Document, null,
         React.createElement(Page, { size: 'A4' as any, style: styles.page },
-          // Header Section
+          // Header
           React.createElement(View, { style: styles.header },
-            // Brand Section (Left)
             React.createElement(View, { style: styles.brandSection },
               React.createElement(View, { style: styles.logo },
-                React.createElement(Text, { style: { color: 'white', fontSize: 20, fontWeight: 'bold' } }, 'B')
+                React.createElement(Text, { style: styles.logoText }, 'B')
               ),
               React.createElement(View, { style: styles.brandInfo },
                 React.createElement(Text, { style: styles.brandName }, 'BLOM Cosmetics'),
-                React.createElement(Text, { style: styles.receiptTitle }, 'Payment Receipt')
+                React.createElement(Text, { style: styles.receiptTitle }, 'INVOICE / RECEIPT')
               )
             ),
-            // Order Info Section (Right)
             React.createElement(View, { style: styles.orderInfo },
-              React.createElement(Text, { style: styles.orderMeta }, `Order: ${order.merchant_payment_id}`),
-              React.createElement(Text, { style: styles.orderMeta }, `Date: ${new Date(order.created_at || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`),
-              React.createElement(Text, { style: styles.orderMeta }, `${new Date(order.created_at || Date.now()).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })}`),
-              React.createElement(Text, { style: styles.statusPaid }, 'Status: PAID')
+              React.createElement(Text, { style: styles.orderMeta }, `Order #${order.merchant_payment_id || id}`),
+              React.createElement(Text, { style: styles.orderMeta }, `Date: ${formatDate(order.created_at)}`),
+              React.createElement(Text, { style: styles.orderMeta }, `Time: ${formatTime(order.created_at)}`),
+              React.createElement(View, { style: { marginTop: 4 } },
+                React.createElement(Text, { style: styles.statusPaid }, order.status === 'paid' ? 'PAID' : order.status?.toUpperCase() || 'PENDING')
+              )
             )
           ),
 
-          // Content Cards Section
+          // Customer & Merchant Info
           React.createElement(View, { style: styles.contentCards },
-            // Bill To Card
             React.createElement(View, { style: styles.card },
               React.createElement(Text, { style: styles.cardTitle }, 'Bill To'),
               React.createElement(Text, { style: styles.cardText }, order.customer_name || 'Customer'),
               React.createElement(Text, { style: styles.cardText }, order.customer_email || ''),
-              React.createElement(Text, { style: styles.cardText }, 'South Africa')
+              React.createElement(Text, { style: styles.cardText }, order.customer_mobile || ''),
+              React.createElement(View, { style: { marginTop: 6, paddingTop: 6, borderTop: 1, borderColor: '#e5e7eb' } },
+                React.createElement(Text, { style: [styles.cardText, { fontWeight: 'bold' }] }, customerAddr.type),
+                React.createElement(Text, { style: styles.cardText }, customerAddr.address || customerAddr.hashtag || '')
+              )
             ),
-            // Merchant Card
             React.createElement(View, { style: styles.card },
-              React.createElement(Text, { style: styles.cardTitle }, 'Merchant'),
+              React.createElement(Text, { style: styles.cardTitle }, 'From'),
               React.createElement(Text, { style: styles.cardText }, 'BLOM Cosmetics (Pty) Ltd'),
-              React.createElement(Text, { style: styles.cardText }, 'VAT: 0000000000'),
-              React.createElement(Text, { style: styles.cardText }, brandEmail)
+              React.createElement(Text, { style: styles.cardText }, brandAddress),
+              React.createElement(Text, { style: styles.cardText }, `Email: ${brandEmail}`),
+              React.createElement(Text, { style: styles.cardText }, `Phone: ${brandPhone}`)
             )
           ),
 
-          // Items Section
+          // Items Table
           React.createElement(View, { style: styles.itemsCard },
-            React.createElement(Text, { style: styles.itemsTitle }, 'Items'),
-            
-            // Table Header
+            React.createElement(Text, { style: styles.itemsTitle }, 'Order Items'),
             React.createElement(View, { style: styles.tableHeader },
-              React.createElement(Text, { style: styles.th }, 'Item'),
+              React.createElement(Text, { style: styles.th }, 'Description'),
               React.createElement(Text, { style: styles.thRight }, 'Qty'),
-              React.createElement(Text, { style: styles.thRight }, 'Unit'),
+              React.createElement(Text, { style: styles.thRight }, 'Unit Price'),
               React.createElement(Text, { style: styles.thRight }, 'Total')
             ),
-            
-            // Table Rows
             ...items.map((it: any, idx: number) => (
               React.createElement(View, { key: String(idx), style: styles.row },
                 React.createElement(Text, { style: styles.td }, it.name),
@@ -359,18 +391,26 @@ export const handler: Handler = async (event) => {
               )
             )),
 
-            // Totals Section
+            // Totals
             React.createElement(View, { style: styles.totalsSection },
               React.createElement(View, { style: styles.totalRow },
                 React.createElement(Text, { style: styles.totalLabel }, 'Subtotal'),
                 React.createElement(Text, { style: styles.totalValue }, ZAR(subtotal))
               ),
-              React.createElement(View, { style: styles.totalRow },
-                React.createElement(Text, { style: styles.totalLabel }, 'Shipping'),
-                React.createElement(Text, { style: styles.totalValue }, shipping === 0 ? 'FREE' : ZAR(shipping))
-              ),
+              ...(shipping > 0 ? [
+                React.createElement(View, { key: 'shipping', style: styles.totalRow },
+                  React.createElement(Text, { style: styles.totalLabel }, 'Shipping'),
+                  React.createElement(Text, { style: styles.totalValue }, ZAR(shipping))
+                )
+              ] : []),
+              ...(discount > 0 ? [
+                React.createElement(View, { key: 'discount', style: styles.totalRow },
+                  React.createElement(Text, { style: [styles.totalLabel, { color: '#059669' }] }, 'Discount'),
+                  React.createElement(Text, { style: [styles.totalValue, { color: '#059669' }] }, `-${ZAR(discount)}`)
+                )
+              ] : []),
               React.createElement(View, { style: styles.grandTotalRow },
-                React.createElement(Text, { style: styles.grandTotalLabel }, 'Total'),
+                React.createElement(Text, { style: styles.grandTotalLabel }, 'Total Amount'),
                 React.createElement(Text, { style: styles.grandTotalValue }, ZAR(grand))
               )
             )
@@ -378,7 +418,12 @@ export const handler: Handler = async (event) => {
 
           // Footer
           React.createElement(View, { style: styles.footer },
-            React.createElement(Text, { style: styles.footerText }, 'Thank you for your order! This receipt was generated automatically.')
+            React.createElement(Text, { style: styles.footerText },
+              'Thank you for your order! This invoice was automatically generated.\n'
+            ),
+            React.createElement(Text, { style: styles.footerText },
+              'For any queries, please contact us at shopblomcosmetics@gmail.com or +27 79 548 3317'
+            )
           )
         )
       )
@@ -390,17 +435,18 @@ export const handler: Handler = async (event) => {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `${asInline ? 'inline' : 'attachment'}; filename="BLOM-Receipt-${id}.pdf"`,
+        'Content-Disposition': `${asInline ? 'inline' : 'attachment'}; filename="BLOM-Invoice-${order.merchant_payment_id || id}.pdf"`,
         'Cache-Control': 'private, max-age=0, no-store',
       },
       body: Buffer.from(buf).toString('base64'),
       isBase64Encoded: true,
     };
   } catch (err: any) {
-    return { statusCode: 500, body: `Invoice error: ${err.message}` };
+    console.error('Invoice generation error:', err);
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: `Invoice error: ${err.message}`, stack: process.env.NODE_ENV === 'development' ? err.stack : undefined })
+    };
   }
 };
-
-// Single export already declared above
-
-
