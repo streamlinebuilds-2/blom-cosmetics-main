@@ -53,10 +53,11 @@ export default function AccountPageFullCore() {
       if (!authState.user) return;
       setOrdersLoading(true);
       setOrdersError(null);
+      const userEmail = authState.user.email?.toLowerCase();
       const { data, error } = await supabase
         .from('orders')
-        .select('id,status,total,created_at')
-        .eq('user_id', authState.user.id)
+        .select('id,status,total,created_at,merchant_payment_id')
+        .or(`user_id.eq.${authState.user.id},customer_email.eq.${userEmail}`)
         .order('created_at', { ascending: false });
       if (error) {
         setOrdersError(error.message);
