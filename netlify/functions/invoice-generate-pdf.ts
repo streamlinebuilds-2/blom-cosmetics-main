@@ -6,6 +6,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const SITE = (process.env.SITE_BASE_URL || process.env.SITE_URL || "https://blom-cosmetics.co.za").replace(/\/+$/, '')
 const BUCKET = "invoices" // must exist
+const LOGO_URL = "https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png"
 
 const money = (n: any) => "R " + Number(n || 0).toFixed(2)
 
@@ -23,10 +24,10 @@ export const handler = async (event: any) => {
     if (!id) return { statusCode: 400, body: "m_payment_id required" }
 
     // 1) Fetch order + items
-    const [order] = await sbGet(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,status,created_at,invoice_url`)
+    const [order] = (await sbGet(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,status,created_at,invoice_url`)) as any[]
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
-    const items = await sbGet(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`)
+    const items = (await sbGet(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`)) as any[]
 
     // 2) Build PDF in-memory
     const pdf = await PDFDocument.create()
@@ -44,12 +45,21 @@ export const handler = async (event: any) => {
     const line = (x1: number, y1: number, x2: number, y2: number) =>
       page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1, color: rgb(0.9, 0.92, 0.95) })
 
+    // Logo (best-effort)
+    try {
+      const logoBuf = await (await fetch(LOGO_URL)).arrayBuffer()
+      // try PNG first, fallback to JPG
+      const logoImg = await pdf.embedPng(logoBuf).catch(async () => pdf.embedJpg(logoBuf))
+      const logoW = 120
+      const logoH = (logoImg.height / logoImg.width) * logoW
+      page.drawImage(logoImg, { x: left, y: y - logoH, width: logoW, height: logoH })
+    } catch {}
+
     // Header
-    text("INVOICE", left, y, 20, true)
+    text("INVOICE", right - 150, y, 20, true)
     y -= 8
-    text(`Invoice #: ${id}`, left, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
-    text(`Date: ${new Date(order.created_at).toLocaleString()}`, left, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
-    text(SITE.replace(/^https?:\/\//, ''), right - 200, y + 14, 10, false, rgb(0.35, 0.38, 0.45))
+    text(`Invoice #: ${id}`, right - 150, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
+    text(`Date: ${new Date(order.created_at).toLocaleString()}`, right - 150, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
 
     y -= 22
     line(left, y, right, y)

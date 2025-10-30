@@ -158,7 +158,7 @@ export const handler: Handler = async (event) => {
     ;(async () => {
       try {
         const base = SITE
-        await fetch(`${base}/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(m_payment_id)}`)
+        await fetch(`${base}/.netlify/functions/invoice-generate-pdf?m_payment_id=${encodeURIComponent(m_payment_id)}`)
         console.log('Invoice generated')
       } catch (e: any) {
         console.warn('Invoice gen failed:', e?.message)
