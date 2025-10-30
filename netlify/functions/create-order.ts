@@ -31,13 +31,31 @@ export const handler: Handler = async (event) => {
     const amount = items.reduce((sum: number, it: any) => sum + Number(it.price) * Number(it.qty), 0).toFixed(2)
     const m_payment_id = `BL-${Date.now().toString(16).toUpperCase()}`
 
+    // Resolve authenticated user (if Authorization header present)
+    let authUserId: string | null = null
+    try {
+      const authHeader = (event.headers?.authorization || (event.headers as any)?.Authorization) as string | undefined
+      if (authHeader && authHeader.toLowerCase().startsWith('bearer ')) {
+        const uRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: authHeader
+          }
+        })
+        if (uRes.ok) {
+          const u = await uRes.json()
+          authUserId = u?.id || null
+        }
+      }
+    } catch {}
+
     // Insert order
     const orderPayload = [{
       status: 'pending',
       total: Number(amount),
       m_payment_id,
       client_order_ref: client_order_ref || null,
-      user_id: buyer.user_id || null,
+      user_id: authUserId || buyer.user_id || null,
       buyer_name: buyer.name || null,
       buyer_email: buyer.email || null,
       buyer_phone: buyer.phone || null,
