@@ -2,21 +2,18 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 import fetch from "node-fetch"
 
-const SUPABASE_URL = process.env.SUPABASE_URL!
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const SB_URL = process.env.SUPABASE_URL!
+const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const SITE = (process.env.SITE_BASE_URL || process.env.SITE_URL || "https://blom-cosmetics.co.za").replace(/\/+$/, '')
 const BUCKET = "invoices" // must exist
 const LOGO_URL = "https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png"
 
+const PROVINCES: Record<string, string> = { WC: 'Western Cape', GP: 'Gauteng', KZN: 'KwaZulu-Natal', EC: 'Eastern Cape', FS: 'Free State', LP: 'Limpopo', MP: 'Mpumalanga', NC: 'Northern Cape', NW: 'North West' }
+const COUNTRY = (c?: string) => (c === 'ZA' ? 'South Africa' : c || '')
 const money = (n: any) => "R " + Number(n || 0).toFixed(2)
 
-async function sbGet(path: string) {
-  const res = await fetch(`${SUPABASE_URL}${path}`, {
-    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
-  })
-  if (!res.ok) throw new Error(await res.text())
-  return res.json()
-}
+const sb = (path: string, init?: any) =>
+  fetch(`${SB_URL}${path}`, { ...init, headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, ...(init?.headers || {}) } })
 
 export const handler = async (event: any) => {
   try {
@@ -24,10 +21,14 @@ export const handler = async (event: any) => {
     if (!id) return { statusCode: 400, body: "m_payment_id required" }
 
     // 1) Fetch order + items
-    const [order] = (await sbGet(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,status,created_at,invoice_url`)) as any[]
+    const oRes = await sb(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,order_number,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,status,created_at,invoice_url`)
+    const [order] = (await oRes.json()) as any[]
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
-    const items = (await sbGet(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`)) as any[]
+    const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`)
+    const items = (await iRes.json()) as any[]
+
+    const orderNumber = order.order_number || id
 
     // 2) Build PDF in-memory
     const pdf = await PDFDocument.create()
@@ -55,38 +56,37 @@ export const handler = async (event: any) => {
       page.drawImage(logoImg, { x: left, y: y - logoH, width: logoW, height: logoH })
     } catch {}
 
-    // Header
-    text("INVOICE", right - 150, y, 20, true)
+    // Header (RECEIPT)
+    text("RECEIPT", right - 150, y, 20, true)
     y -= 8
-    text(`Invoice #: ${id}`, right - 150, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
+    text(`Order #: ${orderNumber}`, right - 150, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
     text(`Date: ${new Date(order.created_at).toLocaleString()}`, right - 150, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
 
     y -= 22
     line(left, y, right, y)
     y -= 16
 
-    // Customer / Fulfillment
+    // Customer / Fulfillment (method stacked above address)
     text("Customer", left, y, 12, true)
     text("Fulfillment", right - 200, y, 12, true)
     y -= 14
     text(order.buyer_name || "-", left, y)
-    text(order.fulfillment_method || "-", right - 200, y)
+    text(String(order.fulfillment_method || '-').toUpperCase(), right - 200, y)
     y -= 14
-    text(order.buyer_email || "-", left, y)
-    if (order.collection_location) text(String(order.collection_location), right - 200, y)
-    y -= 14
-    text(order.buyer_phone || "", left, y)
-    y -= 16
-
-    if (order.delivery_address) {
-      const addr = JSON.stringify(order.delivery_address, null, 2)
-      const lines = addr.split("\n")
-      lines.forEach((ln: string) => {
-        text(ln, left, y, 9, false, rgb(0.4, 0.45, 0.52))
-        y -= 11
-      })
-      y -= 8
+    text(order.buyer_email || "-", left, y, 10, false, rgb(0.28, 0.33, 0.40))
+    const a = order.delivery_address || {}
+    const lines = [
+      a.line1,
+      [a.city, a.postal_code].filter(Boolean).join(' '),
+      [PROVINCES[a.province as string] ?? a.province, COUNTRY(a.country)].filter(Boolean).join(', ')
+    ].filter(Boolean)
+    let yAddr = y
+    for (const ln of lines) {
+      text(String(ln), right - 200, yAddr, 9, false, rgb(0.4, 0.45, 0.52))
+      yAddr -= 11
     }
+    y -= 12
+    y = Math.min(y, yAddr - 8)
 
     line(left, y, right, y)
     y -= 18
@@ -124,12 +124,12 @@ export const handler = async (event: any) => {
     const bytes = await pdf.save() // Uint8Array
 
     // 3) Upload (UPSERT) to Supabase Storage
-    const filename = `${id}.pdf`
-    const upload = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(filename)}`, {
+    const filename = `${orderNumber}.pdf`
+    const upload = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(filename)}`, {
       method: "POST",
       headers: {
-        apikey: SERVICE_KEY,
-        Authorization: `Bearer ${SERVICE_KEY}`,
+        apikey: SB_KEY,
+        Authorization: `Bearer ${SB_KEY}`,
         "Content-Type": "application/pdf",
         "x-upsert": "true"
       },
@@ -141,16 +141,14 @@ export const handler = async (event: any) => {
       return { statusCode: 500, body: "UPLOAD_FAILED" }
     }
 
-    const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(filename)}`
+    const publicUrl = `${SB_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(filename)}`
 
-    // 4) Save invoice_url once
-    if (!order.invoice_url) {
-      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
-        method: "PATCH",
-        headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ invoice_url: publicUrl })
-      })
-    }
+    // 4) Persist invoice_url and order_number
+    await sb(`/rest/v1/orders?id=eq.${order.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invoice_url: publicUrl, order_number: orderNumber })
+    })
 
     return { statusCode: 200, body: JSON.stringify({ url: publicUrl }) }
   } catch (e: any) {
