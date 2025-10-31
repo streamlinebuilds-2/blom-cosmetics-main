@@ -9,16 +9,22 @@ export async function submitReview(form: {
   is_verified_buyer?: boolean;
   order_id?: string;
 }) {
-  const url = 'https://dockerfile-1n82.onrender.com/webhook/reviews-intake';
+  const url = 'https://blom-admin-1.netlify.app/.netlify/functions/reviews-intake';
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      ...form,
-      created_at: new Date().toISOString()
+      product_id: form.product_slug, // product_slug can be used as product_id
+      name: form.reviewer_name,
+      rating: form.rating || 0,
+      title: form.title,
+      body: form.body
     })
   });
-  if (!res.ok) throw new Error('Failed to submit review');
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || 'Failed to submit review');
+  }
   try { return await res.json(); } catch { return { ok: true }; }
 }
 
