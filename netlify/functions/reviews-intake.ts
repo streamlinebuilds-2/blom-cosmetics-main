@@ -77,9 +77,24 @@ export const handler: Handler = async (e) => {
         .eq("id", rawProd)
         .single();
 
-      if (!pe && p?.slug) {
-        product_slug = p.slug;
+      if (pe || !p?.slug) {
+        return { 
+          statusCode: 400, 
+          headers: CORS, 
+          body: JSON.stringify({ error: "Invalid product_id (UUID not found in database)" }) 
+        };
       }
+
+      product_slug = p.slug;
+    }
+
+    // Ensure product_slug is set (double-check before insert)
+    if (!product_slug || product_slug.trim().length === 0) {
+      return { 
+        statusCode: 400, 
+        headers: CORS, 
+        body: JSON.stringify({ error: "Failed to resolve product_slug" }) 
+      };
     }
 
     // Map fields (accept both naming conventions)
