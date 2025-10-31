@@ -7,14 +7,28 @@ export const handler: Handler = async (event) => {
       return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
-    const { product_id, name, rating, title, body } = JSON.parse(event.body || '{}');
+    let payload;
+    try {
+      payload = JSON.parse(event.body || '{}');
+    } catch (e) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Invalid JSON in request body' })
+      };
+    }
+
+    const { product_id, name, rating, title, body } = payload;
 
     // Validate required fields
     if (!product_id || !name || typeof rating !== 'number') {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'product_id, name, and rating are required' })
+        body: JSON.stringify({ 
+          error: 'Missing required fields',
+          details: `product_id: ${!!product_id}, name: ${!!name}, rating: ${typeof rating}`
+        })
       };
     }
 
@@ -24,6 +38,15 @@ export const handler: Handler = async (event) => {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ error: 'rating must be between 1 and 5' })
+      };
+    }
+
+    // Validate body is not empty (required by database schema)
+    if (!body || typeof body !== 'string' || body.trim().length === 0) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'Review body is required and cannot be empty' })
       };
     }
 
@@ -64,10 +87,10 @@ export const handler: Handler = async (event) => {
     const reviewPayload = {
       product_slug,
       product_id: isUUID ? product_id : null,
-      reviewer_name: name,
+      reviewer_name: name.trim(),
       reviewer_email: null,
-      title: title || null,
-      body: body || '',
+      title: title ? title.trim() : null,
+      body: body.trim(),
       rating: Math.round(rating),
       photos: [],
       is_verified_buyer: false,

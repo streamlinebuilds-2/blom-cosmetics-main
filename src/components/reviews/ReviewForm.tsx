@@ -55,11 +55,16 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
       for (const p of photos) {
         // 5MB limit
         if (p.size > 5 * 1024 * 1024) continue;
-        const url = await uploadToCloudinary(p);
-        photoUrls.push(url);
+        try {
+          const url = await uploadToCloudinary(p);
+          photoUrls.push(url);
+        } catch (photoError) {
+          console.error('Photo upload failed:', photoError);
+          // Continue without this photo
+        }
       }
 
-      await submitReview({
+      const reviewData = {
         product_slug: productSlug,
         reviewer_name: String(fd.get('name') || 'Anonymous'),
         reviewer_email: String(fd.get('email') || ''),
@@ -69,15 +74,22 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
         is_verified_buyer: Boolean(fd.get('verified')),
         order_id: String(fd.get('order_id') || ''),
         photos: photoUrls
-      });
+      };
+
+      console.log('Submitting review:', { ...reviewData, photos: photoUrls.length });
+
+      await submitReview(reviewData);
 
       setStatus('done');
       setPhotos([]);
       setPhotoPreviews([]);
       setRating(0);
       (e.target as HTMLFormElement).reset();
-    } catch {
+    } catch (error: any) {
+      console.error('Review submission error:', error);
       setStatus('error');
+      // Store error message for display
+      setErrors({ body: error.message || 'Failed to submit review. Please try again.' });
     }
   }
 
@@ -341,13 +353,17 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
                   </div>
                 )}
                 {status === 'error' && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 bg-red-500 rounded-full flex items-center justify-center mt-0.5">
                       <X className="w-5 h-5 text-white" />
                     </div>
-                    <div>
-                      <p className="font-semibold text-red-900">Something went wrong</p>
-                      <p className="text-sm text-red-700">Please try again later.</p>
+                    <div className="flex-1">
+                      <p className="font-semibold text-red-900 mb-1">Something went wrong</p>
+                      <p className="text-sm text-red-700">
+                        {errors.body && errors.body !== 'Please share a few words about your experience' 
+                          ? errors.body 
+                          : 'Please try again later. Check the console for details.'}
+                      </p>
                     </div>
                   </div>
                 )}
