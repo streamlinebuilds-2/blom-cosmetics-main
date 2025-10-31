@@ -18,8 +18,40 @@ async function fetchJson(url: string) {
 
 export const handler = async (event: any) => {
   try {
-    const m_payment_id = event.queryStringParameters?.m_payment_id
-    if (!m_payment_id) return { statusCode: 400, body: "m_payment_id required" }
+    // Accept m_payment_id from body, query, or header — any of these
+    const contentType = event.headers['content-type'] || '';
+    let body: any = {};
+
+    if (event.httpMethod === 'GET') {
+      body = {};
+    } else if (contentType.includes('application/json')) {
+      body = event.body ? JSON.parse(event.body) : {};
+    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      body = Object.fromEntries(new URLSearchParams(event.body || ''));
+    } else {
+      // try parse anyway
+      try {
+        body = event.body ? JSON.parse(event.body) : {};
+      } catch {
+        body = {};
+      }
+    }
+
+    const q = event.queryStringParameters || {};
+    const m_payment_id =
+      body.m_payment_id ||
+      q.m_payment_id ||
+      event.headers['x-m-payment-id'];
+
+    if (!m_payment_id) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ error: 'm_payment_id is required' }),
+      };
+    }
+
+    const site_url = body.site_url || q.site_url || SITE;
 
     // 1) Load order + items
     const [order] = await fetchJson(
@@ -153,7 +185,19 @@ export const handler = async (event: any) => {
       })
     }
 
-    return { statusCode: 200, body: JSON.stringify({ url: publicUrl }) }
+    const fileName = `invoices/${m_payment_id}.pdf`;
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        ok: true,
+        m_payment_id,
+        invoice_path: fileName,
+        invoice_url: publicUrl,
+        site_url,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    }
   } catch (e: any) {
     console.error(e)
     return { statusCode: 500, body: e?.message ?? "Error" }
