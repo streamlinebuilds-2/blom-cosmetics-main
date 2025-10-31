@@ -22,11 +22,15 @@ export async function submitReview(form: {
   }
 
   const payload = {
-    product_id: form.product_slug, // product_slug can be used as product_id
+    product_id: form.product_slug, // product_slug can be used as product_id (or can use product_slug field)
     name: form.reviewer_name || 'Anonymous',
+    email: form.reviewer_email || null,
     rating: form.rating,
     title: form.title || null,
-    body: form.body.trim()
+    body: form.body.trim(),
+    photos: form.photos || [],
+    is_verified_buyer: form.is_verified_buyer || false,
+    order_id: form.order_id || null
   };
 
   console.log('Sending review to:', url);
