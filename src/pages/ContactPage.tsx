@@ -230,7 +230,7 @@ export const ContactPage: React.FC = () => {
     script.textContent = `
       const CLOUD_NAME = "dd89enrjz";
       const UPLOAD_PRESET = "blom_unsigned";
-      const WEBHOOK = "https://dockerfile-1n82.onrender.com/webhook/contact-us-capture";
+      const CONTACT_INTAKE_URL = "https://blom-admin-1.netlify.app/.netlify/functions/contact-intake";
 
       // --- upload one file to Cloudinary (unsigned) ---
       async function uploadToCloudinary(file){
@@ -252,7 +252,7 @@ export const ContactPage: React.FC = () => {
         return j.secure_url;
       }
 
-      // --- build payload and send to your webhook ---
+      // --- build payload and send to contact-intake ---
       async function submitContactForm(e){
         e.preventDefault();
         console.log('Form submitted, starting Cloudinary upload...');
@@ -262,41 +262,52 @@ export const ContactPage: React.FC = () => {
         const fd = new FormData(form);
         const qs = new URLSearchParams(location.search);
 
-        const payload = {
-          source: "contact_form",
-          channel: "website",
-          full_name: fd.get("full_name")?.toString().trim(),
-          email: fd.get("email")?.toString().trim().toLowerCase(),
-          phone: fd.get("phone")?.toString().trim(),
-          inquiry_type: fd.get("inquiry_type") || "General Inquiry",
-          subject: fd.get("subject")?.toString().trim(),
-          message: fd.get("message")?.toString().trim(),
-          consent_terms: !!fd.get("agree_terms"),
+        // Get product_slug and order_id from URL params or form if available
+        const product_slug = qs.get("product_slug") || fd.get("product_slug")?.toString() || null;
+        const order_id = qs.get("order_id") || fd.get("order_id")?.toString() || null;
 
-          page_url: location.href,
-          referrer: document.referrer || "",
-          utm_source: qs.get("utm_source") || "",
-          utm_medium: qs.get("utm_medium") || "",
-          utm_campaign: qs.get("utm_campaign") || "",
-          utm_term: qs.get("utm_term") || "",
-          utm_content: qs.get("utm_content") || "",
+        // Build name from full_name
+        const fullName = fd.get("full_name")?.toString().trim() || "";
+        const name = fullName || fd.get("name")?.toString().trim() || "";
 
-          attachments: []
-        };
-
-        console.log('Payload before file upload:', payload);
-
-        // upload files → gather URLs
+        // Upload files first → gather Cloudinary URLs
         const fileInput = document.getElementById("attachments");
-        const urls = [];
+        const cloudinaryUrls = [];
         if (fileInput && fileInput.files?.length) {
           console.log('Files to upload:', fileInput.files.length);
           for (const f of fileInput.files) {
-            const url = await uploadToCloudinary(f);
-            urls.push({ url });
+            try {
+              const url = await uploadToCloudinary(f);
+              cloudinaryUrls.push(url);
+            } catch (err) {
+              console.error('Failed to upload file:', f.name, err);
+              // Continue with other files
+            }
           }
         }
-        payload.attachments = urls;
+
+        const payload = {
+          name: name,
+          email: fd.get("email")?.toString().trim().toLowerCase() || "",
+          phone: fd.get("phone")?.toString().trim() || "",
+          subject: fd.get("subject")?.toString().trim() || "",
+          message: fd.get("message")?.toString().trim() || "",
+          product_slug: product_slug,
+          order_id: order_id,
+          source: "website",
+          images: cloudinaryUrls, // Array of Cloudinary secure URLs
+          meta: {
+            userAgent: navigator.userAgent,
+            inquiry_type: fd.get("inquiry_type")?.toString() || "",
+            page_url: location.href,
+            referrer: document.referrer || "",
+            utm_source: qs.get("utm_source") || "",
+            utm_medium: qs.get("utm_medium") || "",
+            utm_campaign: qs.get("utm_campaign") || "",
+            utm_term: qs.get("utm_term") || "",
+            utm_content: qs.get("utm_content") || "",
+          }
+        };
 
         console.log('Final payload:', payload);
 
@@ -306,17 +317,26 @@ export const ContactPage: React.FC = () => {
         btn.disabled = true; btn.textContent = "Sending…";
 
         try {
-          console.log('Sending to webhook:', WEBHOOK);
-          const r = await fetch(WEBHOOK, {
+          console.log('Sending to contact-intake:', CONTACT_INTAKE_URL);
+          const r = await fetch(CONTACT_INTAKE_URL, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(payload)
           });
-          console.log('Webhook response:', r.status, r.statusText);
+          console.log('Contact intake response:', r.status, r.statusText);
+          
+          const responseText = await r.text();
+          console.log('Response body:', responseText);
+          
           if (!r.ok) {
-            const errorText = await r.text();
-            console.error('Webhook error:', errorText);
-            throw new Error(\`Webhook failed: \${r.status} \${errorText}\`);
+            let errorMessage = 'Failed to send message';
+            try {
+              const errorData = JSON.parse(responseText);
+              errorMessage = errorData.error || errorData.message || errorMessage;
+            } catch {
+              errorMessage = responseText || errorMessage;
+            }
+            throw new Error(errorMessage);
           }
           
           // Show success modal
@@ -325,7 +345,7 @@ export const ContactPage: React.FC = () => {
           form.reset();
         } catch (err) {
           console.error('Submission error:', err);
-          alert("Couldn't send right now — please try again. Error: " + err.message);
+          alert("Couldn't send right now — please try again. Error: " + (err.message || err));
         } finally {
           btn.disabled = false; btn.textContent = txt;
         }
