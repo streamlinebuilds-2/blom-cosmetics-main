@@ -16,7 +16,7 @@ export default function AccountPageFullCore() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [orders, setOrders] = useState<Array<{ id: string; status: string; total: number; created_at: string }>>([]);
+  const [orders, setOrders] = useState<Array<{ id: string; m_payment_id?: string | null; order_number?: string | null; order_display?: string | null; status: string; total: number; created_at: string; invoice_url?: string | null; buyer_name?: string | null; buyer_email?: string | null }>>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
@@ -60,9 +60,15 @@ export default function AccountPageFullCore() {
         // Normalize totals to numbers (use total_cents if total is null)
         const normalized = (data || []).map((o: any) => ({
           id: String(o.id),
+          m_payment_id: o.m_payment_id || null,
+          order_number: o.order_number || null,
+          order_display: o.order_display || null,
           status: String(o.status || 'unknown'),
           total: Number(o.total || (o.total_cents ? o.total_cents / 100 : 0)),
-          created_at: String(o.created_at || new Date().toISOString())
+          created_at: String(o.created_at || new Date().toISOString()),
+          invoice_url: o.invoice_url || null,
+          buyer_name: o.buyer_name || null,
+          buyer_email: o.buyer_email || null
         }));
         setOrders(normalized);
       } catch (error: any) {
@@ -240,24 +246,38 @@ export default function AccountPageFullCore() {
                     <div className="text-gray-600">No orders yet.</div>
                   ) : (
                     <div className="space-y-4">
-                      {orders.map((o) => (
-                        <div key={o.id} className="border rounded-lg p-5">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                            <div>
-                              <div className="font-semibold">Order {o.id}</div>
-                              <div className="text-sm text-gray-500">Placed on {new Date(o.created_at).toLocaleDateString()}</div>
+                      {orders.map((o) => {
+                        const orderRef = (o as any).order_display || (o as any).m_payment_id || (o as any).order_number || o.id;
+                        return (
+                          <div key={o.id} className="border rounded-lg p-5">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                              <div>
+                                <div className="font-semibold">Order {orderRef}</div>
+                                <div className="text-sm text-gray-500">Placed on {new Date(o.created_at).toLocaleDateString()}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-bold">R{o.total.toFixed(2)}</div>
+                                <div className="text-sm text-gray-500 capitalize">{o.status}</div>
+                              </div>
                             </div>
-                            <div className="text-right">
-                              <div className="font-bold">R{o.total.toFixed(2)}</div>
-                              <div className="text-sm text-gray-500 capitalize">{o.status}</div>
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              <Button variant="outline" size="sm" onClick={() => (window.location.href = `/orders/${o.id}`)}>View Details</Button>
+                              {orderRef && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => {
+                                    const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderRef)}`;
+                                    window.open(url, '_blank');
+                                  }}
+                                >
+                                  Download Receipt
+                                </Button>
+                              )}
                             </div>
                           </div>
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `/orders/${o.id}`)}>View Details</Button>
-                            <Button variant="outline" size="sm" onClick={() => (window.location.href = `/invoice-pdf/${o.id}`)}>Download Invoice</Button>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
