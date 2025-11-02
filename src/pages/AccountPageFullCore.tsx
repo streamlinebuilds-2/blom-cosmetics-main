@@ -262,12 +262,12 @@ export default function AccountPageFullCore() {
                             </div>
                             <div className="mt-4 flex flex-wrap gap-2">
                               <Button variant="outline" size="sm" onClick={() => (window.location.href = `/orders/${o.id}`)}>View Details</Button>
-                              {orderRef && (
+                              {(o as any).m_payment_id && (
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
                                   onClick={() => {
-                                    const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderRef)}`;
+                                    const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent((o as any).m_payment_id)}`;
                                     window.open(url, '_blank');
                                   }}
                                 >

@@ -217,12 +217,11 @@ export default function OrderDetailPage() {
                 <Button variant="outline" onClick={() => (window.location.href = '/account?full=1&tab=orders')}>
                   Back to orders
                 </Button>
-                {(order.m_payment_id || order.order_number) && (
+                {order.m_payment_id && (
                   <Button 
                     variant="outline"
                     onClick={() => {
-                      const orderRef = order.m_payment_id || order.order_number;
-                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderRef!)}`;
+                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(order.m_payment_id)}`;
                       window.open(url, '_blank');
                     }}
                   >
