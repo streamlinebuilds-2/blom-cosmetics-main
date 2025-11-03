@@ -193,13 +193,17 @@ export const handler = async (event: any) => {
     drawLine(left, y, right, y)
     y -= 14
 
-    // Rows (better alignment)
+    // Rows (better alignment) - Calculate line_total if missing
     items.forEach((it: any) => {
       const name = it.product_name || it.sku || "-"
+      const qty = Number(it.quantity || 0)
+      const unit = Number(it.unit_price || 0)
+      const lineTotal = it.line_total ? Number(it.line_total) : (qty * unit)
+      
       drawText(name, left, y, 10)
-      drawRightText(String(it.quantity), right - 150, y, 10)
-      drawRightText(money(it.unit_price), right - 90, y, 10)
-      drawRightText(money(it.line_total), right - 20, y, 10)
+      drawRightText(String(qty), right - 150, y, 10)
+      drawRightText(money(unit), right - 90, y, 10)
+      drawRightText(money(lineTotal), right - 20, y, 10)
       y -= 16
       if (y < 140) {
         // new page indicator if needed

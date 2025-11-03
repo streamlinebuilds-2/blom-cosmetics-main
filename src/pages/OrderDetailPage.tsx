@@ -108,14 +108,19 @@ export default function OrderDetailPage() {
           buyer_email: orderData.buyer_email || null,
           fulfillment_method: orderData.fulfillment_method || null,
           delivery_address: orderData.delivery_address || null,
-          items: (itemsData || []).map((item: any) => ({
-            id: String(item.id),
-            product_name: item.product_name || null,
-            sku: item.sku || null,
-            quantity: Number(item.quantity || 0),
-            unit_price: Number(item.unit_price || 0),
-            line_total: Number(item.line_total || 0),
-          })),
+          items: (itemsData || []).map((item: any) => {
+            const qty = Number(item.quantity || 0);
+            const unit = Number(item.unit_price || 0);
+            const lineTotal = item.line_total ? Number(item.line_total) : (qty * unit);
+            return {
+              id: String(item.id),
+              product_name: item.product_name || null,
+              sku: item.sku || null,
+              quantity: qty,
+              unit_price: unit,
+              line_total: lineTotal,
+            };
+          }),
         });
       } catch (err: any) {
         setError(err.message || 'Failed to load order');
