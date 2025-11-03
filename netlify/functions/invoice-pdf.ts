@@ -239,8 +239,9 @@ export const handler = async (event: any) => {
 
     const pdfBytes = await pdf.save() // Uint8Array
 
-    // 3) Upload to Supabase Storage
-    const filename = `${m_payment_id}.pdf`
+    // 3) Upload to Supabase Storage with version/cache-busting
+    const version = q.v || q.version || body.v || Date.now().toString()
+    const filename = version ? `${m_payment_id}-v${version}.pdf` : `${m_payment_id}.pdf`
     const upRes = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(filename)}`, {
       method: "POST",
       headers: {
@@ -260,14 +261,12 @@ export const handler = async (event: any) => {
 
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(filename)}`
 
-    // 4) Save invoice_url on order if empty
-    if (!order.invoice_url) {
-      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
-        method: "PATCH",
-        headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ invoice_url: publicUrl })
-      })
-    }
+    // 4) Save invoice_url on order (always update with latest version)
+    await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
+      method: "PATCH",
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ invoice_url: publicUrl })
+    })
 
     // 5) Return PDF directly (always return PDF, not JSON)
     // Use Content-Disposition: attachment to force download

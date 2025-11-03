@@ -267,7 +267,9 @@ export default function OrderDetailPage() {
                   <Button 
                     variant="outline"
                     onClick={async () => {
-                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(order.m_payment_id)}&download=1`;
+                      // Add cache-busting version to force fresh PDF
+                      const v = Date.now();
+                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(order.m_payment_id)}&download=1&v=${v}`;
                       
                       // Fetch and trigger download
                       try {

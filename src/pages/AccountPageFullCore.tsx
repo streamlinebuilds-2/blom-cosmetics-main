@@ -268,7 +268,9 @@ export default function AccountPageFullCore() {
                                   size="sm" 
                                   onClick={async () => {
                                     const mPaymentId = (o as any).m_payment_id;
-                                    const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(mPaymentId)}&download=1`;
+                                    // Add cache-busting version to force fresh PDF
+                                    const v = Date.now();
+                                    const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(mPaymentId)}&download=1&v=${v}`;
                                     
                                     // Fetch and trigger download
                                     try {
