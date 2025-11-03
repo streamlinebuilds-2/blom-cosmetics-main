@@ -149,71 +149,112 @@ export default function OrderDetailPage() {
               <Button variant="outline" onClick={() => (window.location.href = '/account?full=1&tab=orders')}>Back to orders</Button>
             </div>
           ) : (
-            <div className="max-w-4xl mx-auto bg-white rounded-xl border p-6 space-y-6">
-              <div className="flex items-center justify-between">
+            <div className="max-w-4xl mx-auto bg-white rounded-xl border p-8 space-y-6">
+              {/* Header section matching PDF layout */}
+              <div className="flex items-start justify-between pb-6 border-b">
+                {/* Left: Receipt title and details */}
                 <div>
-                  <h1 className="text-2xl font-bold">
-                    Order {order.order_number || order.m_payment_id || order.id}
-                  </h1>
-                  <div className="text-sm text-gray-500 mt-1">{new Date(order.created_at).toLocaleString()}</div>
+                  <h1 className="text-3xl font-bold mb-3">RECEIPT</h1>
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <div>Receipt #: {order.m_payment_id || order.order_number || order.id}</div>
+                    <div>Date: {new Date(order.created_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}</div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-semibold text-lg">R{order.total.toFixed(2)}</div>
-                  <div className="text-sm text-gray-500 capitalize">{order.status}</div>
+                
+                {/* Right: Logo */}
+                <div className="flex-shrink-0">
+                  <img 
+                    src="https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png" 
+                    alt="BLOM Cosmetics" 
+                    className="h-20 w-auto object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
                 </div>
               </div>
 
-              {(order.buyer_name || order.buyer_email) && (
-                <div className="border-t pt-4">
-                  <h2 className="font-semibold mb-2">Customer Information</h2>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    {order.buyer_name && <div><strong>Name:</strong> {order.buyer_name}</div>}
-                    {order.buyer_email && <div><strong>Email:</strong> {order.buyer_email}</div>}
-                    {order.fulfillment_method && <div><strong>Fulfillment:</strong> {order.fulfillment_method}</div>}
+              {/* Customer / Fulfillment section matching PDF */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b">
+                <div>
+                  <h2 className="font-bold text-base mb-3">Customer</h2>
+                  <div className="space-y-1.5 text-sm">
+                    <div className="font-medium">{order.buyer_name || "-"}</div>
+                    <div className="text-gray-600">{order.buyer_email || "-"}</div>
+                    {order.buyer_phone && <div className="text-gray-600">{order.buyer_phone}</div>}
                   </div>
                 </div>
-              )}
-
-              <div className="border-t pt-4">
-                <h2 className="font-semibold mb-4">Order Items</h2>
-                {order.items && order.items.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2 px-3 font-semibold">Item</th>
-                          <th className="text-right py-2 px-3 font-semibold">Qty</th>
-                          <th className="text-right py-2 px-3 font-semibold">Unit</th>
-                          <th className="text-right py-2 px-3 font-semibold">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {order.items.map((item) => (
-                          <tr key={item.id} className="border-b">
-                            <td className="py-2 px-3">
-                              <div className="font-medium">{item.product_name || item.sku || 'Unknown Item'}</div>
-                              {item.sku && <div className="text-xs text-gray-500">SKU: {item.sku}</div>}
-                            </td>
-                            <td className="text-right py-2 px-3">{item.quantity}</td>
-                            <td className="text-right py-2 px-3">R{item.unit_price.toFixed(2)}</td>
-                            <td className="text-right py-2 px-3 font-medium">R{item.line_total.toFixed(2)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                      <tfoot>
-                        <tr className="border-t-2">
-                          <td colSpan={3} className="text-right py-2 px-3 font-semibold">Total</td>
-                          <td className="text-right py-2 px-3 font-bold text-lg">R{order.total.toFixed(2)}</td>
-                        </tr>
-                      </tfoot>
-                    </table>
+                <div>
+                  <h2 className="font-bold text-base mb-3">Fulfillment</h2>
+                  <div className="space-y-1.5 text-sm">
+                    <div className="font-medium uppercase">{order.fulfillment_method || "-"}</div>
+                    {order.delivery_address && order.fulfillment_method === 'delivery' && (
+                      <div className="text-gray-600 space-y-0.5">
+                        {order.delivery_address.line1 || order.delivery_address.street_address ? (
+                          <>
+                            <div>{order.delivery_address.line1 || order.delivery_address.street_address}</div>
+                            <div>{[order.delivery_address.city, order.delivery_address.postal_code || order.delivery_address.code].filter(Boolean).join(' ')}</div>
+                            <div>{[order.delivery_address.province, order.delivery_address.country].filter(Boolean).join(', ')}</div>
+                          </>
+                        ) : null}
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <p className="text-gray-600">No items found for this order.</p>
-                )}
+                </div>
               </div>
 
-              <div className="flex gap-2 pt-4 border-t">
+              {/* Order Items table matching PDF */}
+              <div className="pb-6 border-b">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b pb-2">
+                      <th className="text-left py-2.5 px-3 text-sm font-bold">Item</th>
+                      <th className="text-right py-2.5 px-3 text-sm font-bold">Qty</th>
+                      <th className="text-right py-2.5 px-3 text-sm font-bold">Unit</th>
+                      <th className="text-right py-2.5 px-3 text-sm font-bold">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.items && order.items.length > 0 ? (
+                      order.items.map((item) => (
+                        <tr key={item.id} className="border-b">
+                          <td className="py-3 px-3 text-sm">
+                            <div className="font-medium">{item.product_name || item.sku || 'Unknown Item'}</div>
+                          </td>
+                          <td className="text-right py-3 px-3 text-sm">{item.quantity}</td>
+                          <td className="text-right py-3 px-3 text-sm">R {item.unit_price.toFixed(2)}</td>
+                          <td className="text-right py-3 px-3 text-sm font-medium">R {item.line_total.toFixed(2)}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="py-4 text-center text-gray-600 text-sm">No items found for this order.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                  <tfoot>
+                    <tr className="border-t-2">
+                      <td colSpan={2} className="py-3 px-3"></td>
+                      <td className="text-right py-3 px-3 text-base font-bold">Total</td>
+                      <td className="text-right py-3 px-3 text-base font-bold">R {order.total.toFixed(2)}</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+
+              {/* Footer with contact info matching PDF */}
+              <div className="pt-6 border-t space-y-4">
+                <div className="text-sm text-gray-600 space-y-2">
+                  <div className="font-medium">Thank you for your purchase!</div>
+                  <div>Questions? Contact us:</div>
+                  <div>Email: support@blom-cosmetics.co.za</div>
+                  <div>Phone: +27 (0) 82 000 0000</div>
+                </div>
+                <div className="text-right text-sm text-gray-600">blom-cosmetics.co.za</div>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-2 pt-6">
                 <Button variant="outline" onClick={() => (window.location.href = '/account?full=1&tab=orders')}>
                   Back to orders
                 </Button>
