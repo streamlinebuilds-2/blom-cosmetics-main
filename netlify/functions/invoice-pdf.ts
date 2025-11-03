@@ -92,23 +92,33 @@ export const handler = async (event: any) => {
     const drawLine = (x1: number, y1: number, x2: number, y2: number) => {
       page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1, color: rgb(0.9, 0.92, 0.95) })
     }
+    
+    const drawRightText = (text: string, x: number, yPos: number, size = 12, bold = false, color = rgb(0.1, 0.1, 0.15)) => {
+      const textWidth = (bold ? fontBold : font).widthOfTextAtSize(String(text), size)
+      page.drawText(String(text), { x: x - textWidth, y: yPos, size, font: bold ? fontBold : font, color })
+    }
 
-    // D - Logo (best-effort, won't fail if logo missing)
+    // D - Logo on the right side (best-effort, won't fail if logo missing)
+    let logoHeight = 0
     try {
       const logoRes = await fetch(LOGO_URL)
       if (logoRes.ok) {
         const logoBuf = await logoRes.arrayBuffer()
         try {
           const logoImg = await pdf.embedPng(logoBuf)
-          const logoW = 120
-          const logoH = (logoImg.height / logoImg.width) * logoW
-          page.drawImage(logoImg, { x: left, y: y - logoH - 10, width: logoW, height: logoH })
+          const logoW = 140
+          logoHeight = (logoImg.height / logoImg.width) * logoW
+          const logoX = right - logoW
+          const logoY = y - logoHeight
+          page.drawImage(logoImg, { x: logoX, y: logoY, width: logoW, height: logoHeight })
         } catch {
           // Try JPG if PNG fails
           const logoImg = await pdf.embedJpg(logoBuf)
-          const logoW = 120
-          const logoH = (logoImg.height / logoImg.width) * logoW
-          page.drawImage(logoImg, { x: left, y: y - logoH - 10, width: logoW, height: logoH })
+          const logoW = 140
+          logoHeight = (logoImg.height / logoImg.width) * logoW
+          const logoX = right - logoW
+          const logoY = y - logoHeight
+          page.drawImage(logoImg, { x: logoX, y: logoY, width: logoW, height: logoHeight })
         }
       }
     } catch (e) {
@@ -116,61 +126,82 @@ export const handler = async (event: any) => {
       // Continue without logo
     }
 
-    // Header
-    drawText("INVOICE", left, y, 20, true)
-    y -= 8
-    drawText(`Invoice #: ${m_payment_id}`, left, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
-    drawText(`Date: ${new Date(order.created_at).toLocaleString()}`, left, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
-    drawText(SITE.replace(/^https?:\/\//, "") || "BLOM Cosmetics", right - 200, y + 14, 10, false, rgb(0.35, 0.38, 0.45))
-
-    y -= 22
-    drawLine(left, y, right, y)
-    y -= 16
-
-    // Customer / Fulfillment
-    drawText("Customer", left, y, 12, true)
-    drawText("Fulfillment", right - 200, y, 12, true)
-    y -= 14
-
-    drawText(order.buyer_name || "-", left, y)
-    drawText(order.fulfillment_method || "-", right - 200, y)
-    y -= 14
-
-    drawText(order.buyer_email || "-", left, y)
-    if (order.collection_location) drawText(String(order.collection_location), right - 200, y)
-    y -= 14
-
-    drawText(order.buyer_phone || "", left, y)
-    y -= 16
-
-    if (order.delivery_address) {
-      const addr = JSON.stringify(order.delivery_address, null, 2)
-      drawText(addr, left, y, 9, false, rgb(0.4, 0.45, 0.52))
-      y -= Math.min(100, (addr.split("\n").length + 1) * 11) // avoid overflow
+    // Header - RECEIPT title and details on the LEFT (top left corner)
+    drawText("RECEIPT", left, y, 24, true)
+    y -= 10
+    drawText(`Receipt #: ${m_payment_id}`, left, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
+    drawText(`Date: ${new Date(order.created_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}`, left, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
+    
+    // Adjust y based on logo height to ensure proper spacing
+    if (logoHeight > 0) {
+      y = Math.min(y, 800 - logoHeight - 15)
+    } else {
+      y -= 8
     }
-
-    y -= 6
+    
+    y -= 18
     drawLine(left, y, right, y)
     y -= 18
 
-    // Table headers
-    drawText("Item", left, y, 12, true)
-    drawText("Qty", right - 200, y, 12, true)
-    drawText("Unit", right - 140, y, 12, true)
-    drawText("Total", right - 70, y, 12, true)
-    y -= 10
-    drawLine(left, y, right, y)
-    y -= 12
+    // Customer / Fulfillment section (cleaner layout)
+    drawText("Customer", left, y, 12, true)
+    drawText("Fulfillment", right - 200, y, 12, true)
+    y -= 16
 
-    // Rows
+    // Customer details
+    drawText(order.buyer_name || "-", left, y, 11)
+    drawText(String(order.fulfillment_method || '-').toUpperCase(), right - 200, y, 11)
+    y -= 14
+
+    drawText(order.buyer_email || "-", left, y, 10, false, rgb(0.4, 0.45, 0.52))
+    if (order.collection_location) {
+      drawText(String(order.collection_location), right - 200, y, 10, false, rgb(0.4, 0.45, 0.52))
+    }
+    y -= 14
+
+    drawText(order.buyer_phone || "", left, y, 10, false, rgb(0.4, 0.45, 0.52))
+    
+    // Delivery address on right if provided
+    if (order.delivery_address && order.fulfillment_method === 'delivery') {
+      const addr = order.delivery_address
+      const addrLines = [
+        addr.line1 || addr.street_address,
+        [addr.city, addr.postal_code || addr.code].filter(Boolean).join(' '),
+        [addr.province, addr.country].filter(Boolean).join(', ')
+      ].filter(Boolean)
+      
+      let addrY = y
+      addrLines.forEach((line: string) => {
+        if (line) {
+          drawText(line, right - 200, addrY, 9, false, rgb(0.4, 0.45, 0.52))
+          addrY -= 11
+        }
+      })
+      y = Math.min(y, addrY - 4)
+    }
+    
+    y -= 12
+    drawLine(left, y, right, y)
+    y -= 20
+
+    // Table headers (with better spacing)
+    drawText("Item", left, y, 11, true)
+    drawRightText("Qty", right - 150, y, 11, true)
+    drawRightText("Unit", right - 90, y, 11, true)
+    drawRightText("Total", right - 20, y, 11, true)
+    y -= 8
+    drawLine(left, y, right, y)
+    y -= 14
+
+    // Rows (better alignment)
     items.forEach((it: any) => {
       const name = it.product_name || it.sku || "-"
-      drawText(name, left, y)
-      drawText(String(it.quantity), right - 200, y)
-      drawText(money(it.unit_price), right - 140, y)
-      drawText(money(it.line_total), right - 70, y)
+      drawText(name, left, y, 10)
+      drawRightText(String(it.quantity), right - 150, y, 10)
+      drawRightText(money(it.unit_price), right - 90, y, 10)
+      drawRightText(money(it.line_total), right - 20, y, 10)
       y -= 16
-      if (y < 120) {
+      if (y < 140) {
         // new page indicator if needed
         drawLine(left, y + 8, right, y + 8)
         page.drawText(`Continued…`, { x: left, y, size: 10, font, color: rgb(0.5, 0.5, 0.55) })
@@ -178,15 +209,29 @@ export const handler = async (event: any) => {
       }
     })
 
-    y -= 6
+    y -= 8
+    drawLine(left, y, right, y)
+    y -= 18
+    
+    // Total row (more prominent)
+    drawText("Total", right - 90, y, 13, true)
+    drawRightText(money(order.total), right - 20, y, 13, true)
+
+    // Footer with contact information
+    y -= 32
     drawLine(left, y, right, y)
     y -= 16
-    drawText("Total", right - 140, y, 12, true)
-    drawText(money(order.total), right - 70, y, 12, true)
-
-    // Footer
-    y -= 24
+    
     drawText("Thank you for your purchase!", left, y, 10, false, rgb(0.35, 0.38, 0.45))
+    y -= 12
+    drawText("Questions? Contact us:", left, y, 9, false, rgb(0.4, 0.45, 0.52))
+    y -= 11
+    drawText("Email: support@blom-cosmetics.co.za", left, y, 9, false, rgb(0.4, 0.45, 0.52))
+    y -= 11
+    drawText("Phone: +27 (0) 82 000 0000", left, y, 9, false, rgb(0.4, 0.45, 0.52))
+    
+    // Website in bottom right
+    drawRightText(SITE.replace(/^https?:\/\//, "") || "blom-cosmetics.co.za", right, y - 11, 9, false, rgb(0.4, 0.45, 0.52))
 
     const pdfBytes = await pdf.save() // Uint8Array
 
