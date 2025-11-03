@@ -5,6 +5,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const SITE = process.env.SITE_BASE_URL || process.env.SITE_URL || "https://blom-cosmetics.co.za"
 const BUCKET = "invoices" // make sure this bucket exists and is public
+const LOGO_URL = "https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png"
 
 function money(n: any) {
   return "R " + Number(n || 0).toFixed(2)
@@ -63,6 +64,17 @@ export const handler = async (event: any) => {
       `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`
     )
 
+    // C - Fix: Compute total from items if order.total is missing/zero
+    const computedTotal = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unit_price || 0)), 0)
+    order.total = Number(order.total) > 0 ? Number(order.total) : computedTotal
+
+    // Also fix line_total if missing for items
+    items.forEach((it: any) => {
+      if (!it.line_total || Number(it.line_total) === 0) {
+        it.line_total = Number(it.quantity || 0) * Number(it.unit_price || 0)
+      }
+    })
+
     // 2) Build a clean PDF (no Chromium)
     const pdf = await PDFDocument.create()
     const page = pdf.addPage([595.28, 841.89]) // A4 (pt)
@@ -79,6 +91,29 @@ export const handler = async (event: any) => {
     }
     const drawLine = (x1: number, y1: number, x2: number, y2: number) => {
       page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1, color: rgb(0.9, 0.92, 0.95) })
+    }
+
+    // D - Logo (best-effort, won't fail if logo missing)
+    try {
+      const logoRes = await fetch(LOGO_URL)
+      if (logoRes.ok) {
+        const logoBuf = await logoRes.arrayBuffer()
+        try {
+          const logoImg = await pdf.embedPng(logoBuf)
+          const logoW = 120
+          const logoH = (logoImg.height / logoImg.width) * logoW
+          page.drawImage(logoImg, { x: left, y: y - logoH - 10, width: logoW, height: logoH })
+        } catch {
+          // Try JPG if PNG fails
+          const logoImg = await pdf.embedJpg(logoBuf)
+          const logoW = 120
+          const logoH = (logoImg.height / logoImg.width) * logoW
+          page.drawImage(logoImg, { x: left, y: y - logoH - 10, width: logoW, height: logoH })
+        }
+      }
+    } catch (e) {
+      console.warn('Logo embedding failed:', e)
+      // Continue without logo
     }
 
     // Header
@@ -185,18 +220,21 @@ export const handler = async (event: any) => {
       })
     }
 
-    const fileName = `invoices/${m_payment_id}.pdf`;
-
+    // 5) Return PDF directly (always return PDF, not JSON)
+    // Use Content-Disposition: attachment to force download
+    const forceDownload = q.download === '1' || body.download === true || event.headers['x-download'] === '1'
+    const disposition = forceDownload ? 'attachment' : 'inline'
+    
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        ok: true,
-        m_payment_id,
-        invoice_path: fileName,
-        invoice_url: publicUrl,
-        site_url,
-      }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `${disposition}; filename="${filename}"`,
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*'
+      },
+      body: Buffer.from(pdfBytes).toString('base64'),
+      isBase64Encoded: true
     }
   } catch (e: any) {
     console.error(e)

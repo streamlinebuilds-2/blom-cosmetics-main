@@ -220,9 +220,31 @@ export default function OrderDetailPage() {
                 {order.m_payment_id && (
                   <Button 
                     variant="outline"
-                    onClick={() => {
-                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(order.m_payment_id)}`;
-                      window.open(url, '_blank');
+                    onClick={async () => {
+                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(order.m_payment_id)}&download=1`;
+                      
+                      // Fetch and trigger download
+                      try {
+                        const response = await fetch(url);
+                        if (response.ok) {
+                          const blob = await response.blob();
+                          const downloadUrl = window.URL.createObjectURL(blob);
+                          const link = document.createElement('a');
+                          link.href = downloadUrl;
+                          link.download = `BLOM-Receipt-${order.m_payment_id}.pdf`;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                          window.URL.revokeObjectURL(downloadUrl);
+                        } else {
+                          // Fallback to opening in new tab
+                          window.open(url, '_blank');
+                        }
+                      } catch (error) {
+                        console.error('Download failed:', error);
+                        // Fallback to opening in new tab
+                        window.open(url, '_blank');
+                      }
                     }}
                   >
                     Download Receipt

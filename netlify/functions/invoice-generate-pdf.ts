@@ -28,6 +28,17 @@ export const handler = async (event: any) => {
     const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`)
     const items = (await iRes.json()) as any[]
 
+    // C - Fix: Compute total from items if order.total is missing/zero
+    const computedTotal = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unit_price || 0)), 0)
+    order.total = Number(order.total) > 0 ? Number(order.total) : computedTotal
+
+    // Also fix line_total if missing for items
+    items.forEach((it: any) => {
+      if (!it.line_total || Number(it.line_total) === 0) {
+        it.line_total = Number(it.quantity || 0) * Number(it.unit_price || 0)
+      }
+    })
+
     const orderNumber = order.order_number || id
 
     // 2) Build PDF in-memory
