@@ -217,8 +217,8 @@ export const handler = async (event: any) => {
     drawLine(left, y, right, y)
     y -= 18
     
-    // Total row (more prominent)
-    drawText("Total", right - 90, y, 13, true)
+    // Total row (more prominent) - Move "Total" label further left to avoid overlap
+    drawText("Total", right - 140, y, 13, true)
     drawRightText(money(order.total), right - 20, y, 13, true)
 
     // Footer with contact information
