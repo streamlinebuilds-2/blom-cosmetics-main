@@ -164,115 +164,54 @@ export const handler: Handler = async (event) => {
       lng: deliveryAddr.lng || null
     } : null
 
-    // Insert order minimal first (avoid BEFORE INSERT triggers that select users)
-    const orderPayload = [{
-      status: 'pending',
-      payment_status: 'unpaid',  // Will be updated to 'paid' by payfast-itn
-      channel: 'website',
-      order_number,
-      subtotal_cents,
-      shipping_cents,
-      discount_cents,
-      tax_cents,
-      total_cents,
-      total: total_cents / 100,
-      m_payment_id,
-      client_order_ref: client_order_ref || null,
-      user_id: authUserId || buyer.user_id || null,
-      fulfillment_method: fulfillment.method === 'store-pickup' ? 'collection' : 'delivery',
-      delivery_address: deliveryAddressJson,  // JSON object for admin
-      collection_location: fulfillment.collection_location || null
-    }]
-
-    const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
-      method: 'POST',
-      headers: {
-        apikey: SERVICE_KEY,
-        Authorization: `Bearer ${SERVICE_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=representation'
-      },
-      body: JSON.stringify(orderPayload)
-    })
-
-    if (!orderRes.ok) {
-      const err = await orderRes.text()
-      console.error('Order creation error:', err)
-      return { statusCode: 400, body: err }
-    }
-
-    const orders = await orderRes.json()
-    const order = orders[0]
-
-    if (!order) {
-      return { statusCode: 500, body: 'Order created but response empty' }
-    }
-
-    // 0) Backfill buyer details via PATCH to avoid BEFORE INSERT trigger touching users
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
-        method: 'PATCH',
-        headers: {
-          apikey: SERVICE_KEY,
-          Authorization: `Bearer ${SERVICE_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          buyer_name: buyer.name || null,
-          buyer_email: buyer.email || null,
-          buyer_phone: buyer.phone || null
-        })
-      })
-    } catch {}
-
-    // 1) Resolve product UUIDs by SKU (only for items without a valid UUID)
-    const skus = [...new Set(items.filter((it: any) => !isUUID(it.product_id) && it.sku).map((it: any) => it.sku))]
-    let skuMap: Record<string, string> = {}
-    if (skus.length) {
-      const skuQuery = skus.map((s) => encodeURIComponent(s)).join(',')
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,sku&sku=in.(${skuQuery})`, {
-        headers: {
-          apikey: SERVICE_KEY,
-          Authorization: `Bearer ${SERVICE_KEY}`
-        }
-      })
-      if (res.ok) {
-        const rows = await res.json()
-        skuMap = Object.fromEntries(rows.map((r: any) => [r.sku, r.id]))
-      }
-    }
-
-    // 2) Build order items with resolved product UUIDs
-    const itemsPayload = items.map((it: any) => {
-      const product_uuid = isUUID(it.product_id) ? it.product_id : it.sku && skuMap[it.sku] ? skuMap[it.sku] : null
-      const qty = Number(it.quantity || it.qty || 1)
-      const unit = Number(it.unit_price || it.price)
-      return {
-        order_id: order.id,
-        product_id: product_uuid,
-        product_name: it.product_name || it.name || null,
-        sku: it.sku || null,
-        quantity: qty,
-        unit_price: unit,
-        line_total: Number((qty * unit).toFixed(2))
-      }
-    })
-
-    const oiRes = await fetch(`${SUPABASE_URL}/rest/v1/order_items`, {
+    // Use RPC to bypass check constraints and BEFORE INSERT triggers
+    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
       method: 'POST',
       headers: {
         apikey: SERVICE_KEY,
         Authorization: `Bearer ${SERVICE_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(itemsPayload)
+      body: JSON.stringify({
+        p_order_number: order_number,
+        p_m_payment_id: m_payment_id,
+        p_buyer_email: buyer.email || '',
+        p_buyer_name: buyer.name || '',
+        p_buyer_phone: buyer.phone || '',
+        p_channel: 'website',
+        p_items: items.map((it: any) => ({
+          product_id: it.product_id,
+          product_name: it.product_name || it.name,
+          sku: it.sku || null,
+          quantity: it.quantity,
+          unit_price: it.unit_price
+        })),
+        p_subtotal_cents: subtotal_cents,
+        p_shipping_cents: shipping_cents,
+        p_discount_cents: discount_cents,
+        p_tax_cents: tax_cents,
+        p_fulfillment_method: fulfillment.method === 'store-pickup' ? 'collection' : 'delivery',
+        p_delivery_address: deliveryAddressJson,
+        p_collection_location: fulfillment.collection_location || (fulfillment.method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null)
+      })
     })
 
-    if (!oiRes.ok) {
-      const err = await oiRes.text()
-      console.error('Order items creation error:', err)
-      return { statusCode: 400, body: err }
+    if (!rpcRes.ok) {
+      const err = await rpcRes.text()
+      console.error('Order creation RPC error:', err)
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'ORDER_CREATE_FAILED', message: err }) }
     }
+
+    const rpcData = await rpcRes.json()
+    const orderRow = Array.isArray(rpcData) ? rpcData[0] : rpcData
+    
+    if (!orderRow || !orderRow.order_id) {
+      return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'ORDER_CREATE_FAILED', message: 'RPC returned empty' }) }
+    }
+
+    const order = { id: orderRow.order_id }
+
+    // Items are already inserted by the RPC, so we skip the separate order_items insert
 
     return {
       statusCode: 200,
