@@ -22,12 +22,30 @@ export default function CheckoutSuccess() {
       for (let i = 0; i < 8; i++) {
         const { data, error } = await supabase
           .from('orders')
-          .select('status, payment_status')
+          .select('status, payment_status, m_payment_id, buyer_name, buyer_email, buyer_phone')
           .eq('id', orderId)
           .maybeSingle();
         if (!error && data) {
           if (data.status === 'paid' || data.payment_status === 'paid') {
             setStatus('paid');
+            // Notify admin pipeline (n8n) via order-status function
+            try {
+              await fetch('/.netlify/functions/order-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  m_payment_id: data.m_payment_id || orderId,
+                  status: 'paid',
+                  buyer_name: data.buyer_name || '',
+                  buyer_email: data.buyer_email || '',
+                  buyer_phone: data.buyer_phone || '',
+                  site_url: window.location.origin
+                })
+              });
+              console.log('D: order-status posted for paid order', data.m_payment_id || orderId);
+            } catch (e) {
+              console.warn('order-status send failed', e);
+            }
             return;
           }
         }

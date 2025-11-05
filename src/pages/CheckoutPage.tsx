@@ -447,12 +447,6 @@ export const CheckoutPage: React.FC = () => {
       name: 'PayFast',
       description: 'Secure payment via PayFast (Cards, EFT, etc.)',
       icon: CreditCard
-    },
-    {
-      id: 'eft',
-      name: 'Direct EFT',
-      description: 'Electronic Funds Transfer',
-      icon: CreditCard
     }
   ];
 
@@ -837,34 +831,61 @@ export const CheckoutPage: React.FC = () => {
                     <h2 className="text-2xl font-bold">Review Your Order</h2>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Shipping Address */}
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium">Shipping Address</h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setStep('shipping')}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
+                    {/* Fulfillment summary */}
+                    {shippingMethod === 'store-pickup' ? (
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-medium">Collection</h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setStep('shipping')}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <p className="font-medium">Collect from BLOM HQ, Randfontein</p>
+                          <p className="mt-2 text-sm text-gray-600">
+                            <Mail className="h-4 w-4 inline mr-1" />
+                            {shippingInfo.email}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <Phone className="h-4 w-4 inline mr-1" />
+                            {shippingInfo.phone}
+                          </p>
+                        </div>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="font-medium">{shippingInfo.firstName} {shippingInfo.lastName}</p>
-                        <p>{shippingInfo.address}</p>
-                        <p>{shippingInfo.city}, {shippingInfo.province} {shippingInfo.postalCode}</p>
-                        <p>{shippingInfo.country}</p>
-                        <p className="mt-2 text-sm text-gray-600">
-                          <Mail className="h-4 w-4 inline mr-1" />
-                          {shippingInfo.email}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          <Phone className="h-4 w-4 inline mr-1" />
-                          {shippingInfo.phone}
-                        </p>
+                    ) : (
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-medium">Shipping Address</h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setStep('shipping')}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        </div>
+                        <div className="bg-gray-50 rounded-lg p-4">
+                          <p className="font-medium">{shippingInfo.firstName} {shippingInfo.lastName}</p>
+                          <p>{deliveryAddress.street_address}</p>
+                          <p>{deliveryAddress.city}, {deliveryAddress.zone} {deliveryAddress.code}</p>
+                          <p>{deliveryAddress.country}</p>
+                          <p className="mt-2 text-sm text-gray-600">
+                            <Mail className="h-4 w-4 inline mr-1" />
+                            {shippingInfo.email}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            <Phone className="h-4 w-4 inline mr-1" />
+                            {shippingInfo.phone}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Payment Method */}
                     <div>

@@ -184,16 +184,7 @@ export const handler: Handler = async (event) => {
       buyer_phone: buyer.phone || null,
       fulfillment_method: fulfillment.method || 'door-to-door',
       delivery_address: deliveryAddressJson,  // JSON object for admin
-      collection_location: fulfillment.collection_location || null,
-      // Additional fields for admin app compatibility
-      ship_to_street: deliveryAddr.street_address || null,
-      ship_to_suburb: deliveryAddr.local_area || null,
-      ship_to_city: deliveryAddr.city || null,
-      ship_to_zone: deliveryAddr.zone || null,
-      ship_to_postal_code: deliveryAddr.code || null,
-      ship_to_country: deliveryAddr.country || 'ZA',
-      ship_to_lat: deliveryAddr.lat || null,
-      ship_to_lng: deliveryAddr.lng || null
+      collection_location: fulfillment.collection_location || null
     }]
 
     const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {

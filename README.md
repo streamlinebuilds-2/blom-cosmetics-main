@@ -113,6 +113,20 @@ src/
 
 ## Environment Variables
 
+These must be set in Netlify (and locally for `netlify dev`):
+
+- SUPABASE_URL
+- SUPABASE_SERVICE_ROLE_KEY
+- PAYFAST_MERCHANT_ID
+- PAYFAST_MERCHANT_KEY
+- PAYFAST_PASSPHRASE (or PF_PASSPHRASE)
+- SITE_BASE_URL (or SITE_URL)
+- N8N_ORDER_STATUS_WEBHOOK (preferred) or N8N_BASE (fallback)
+
+Notes:
+- order-status function forwards to `N8N_ORDER_STATUS_WEBHOOK` if set, otherwise `${N8N_BASE}/webhook/order-status-update`.
+- PayFast functions read PAYFAST_* (PF_* as fallbacks) and SITE_* for URLs.
+
 Required in `.env`:
 - `VITE_SUPABASE_URL` - Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` - Supabase anonymous key
