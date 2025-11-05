@@ -164,7 +164,7 @@ export const handler: Handler = async (event) => {
       lng: deliveryAddr.lng || null
     } : null
 
-    // Insert order with all fields for admin app
+    // Insert order minimal first (avoid BEFORE INSERT triggers that select users)
     const orderPayload = [{
       status: 'pending',
       payment_status: 'unpaid',  // Will be updated to 'paid' by payfast-itn
@@ -179,9 +179,6 @@ export const handler: Handler = async (event) => {
       m_payment_id,
       client_order_ref: client_order_ref || null,
       user_id: authUserId || buyer.user_id || null,
-      buyer_name: buyer.name || null,
-      buyer_email: buyer.email || null,
-      buyer_phone: buyer.phone || null,
       fulfillment_method: fulfillment.method || 'door-to-door',
       delivery_address: deliveryAddressJson,  // JSON object for admin
       collection_location: fulfillment.collection_location || null
@@ -210,6 +207,23 @@ export const handler: Handler = async (event) => {
     if (!order) {
       return { statusCode: 500, body: 'Order created but response empty' }
     }
+
+    // 0) Backfill buyer details via PATCH to avoid BEFORE INSERT trigger touching users
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
+        method: 'PATCH',
+        headers: {
+          apikey: SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          buyer_name: buyer.name || null,
+          buyer_email: buyer.email || null,
+          buyer_phone: buyer.phone || null
+        })
+      })
+    } catch {}
 
     // 1) Resolve product UUIDs by SKU (only for items without a valid UUID)
     const skus = [...new Set(items.filter((it: any) => !isUUID(it.product_id) && it.sku).map((it: any) => it.sku))]
