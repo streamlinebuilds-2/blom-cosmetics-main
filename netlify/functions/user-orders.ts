@@ -17,7 +17,7 @@ export const handler: Handler = async (event) => {
     }
 
     // Fetch orders from Supabase
-    const url = `${process.env.SUPABASE_URL}/rest/v1/orders`
+  const url = `${process.env.SUPABASE_URL}/rest/v1/orders`
       + `?select=*,order_items(name,quantity,unit_price,total_price,product_id)`
       + `&user_id=eq.${encodeURIComponent(userId)}`
       + `&order=created_at.desc`;
@@ -41,22 +41,22 @@ export const handler: Handler = async (event) => {
     const orders = await response.json();
 
     // Format orders for frontend
-    const formattedOrders = orders.map((order: any) => ({
+  const formattedOrders = orders.map((order: any) => {
+    const addr = order.delivery_address || null;
+    const shippingAddress = addr && addr.street_address ? `${addr.street_address}, ${addr.local_area || ''}, ${addr.city || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null;
+    return {
       id: order.merchant_payment_id,
       date: order.created_at,
       status: order.status || 'pending',
-      total: parseFloat(order.total_amount || 0),
+      total: parseFloat(order.total_amount || order.total || 0),
       items: order.order_items?.length || 0,
       trackingNumber: order.tracking_number || null,
       shippingMethod: order.shipping_method || 'Standard',
-      shippingAddress: order.ship_to_street ? 
-        `${order.ship_to_street}, ${order.ship_to_suburb}, ${order.ship_to_city}` : 
-        null,
-      pickupPoint: order.locker_name ? 
-        `${order.locker_name}, ${order.street_address}` : 
-        null,
+      shippingAddress,
+      pickupPoint: order.collection_location || null,
       orderItems: order.order_items || []
-    }));
+    }
+  });
 
     return {
       statusCode: 200,

@@ -87,27 +87,17 @@ async function upsertOrder({
     customer_mobile: shippingInfo?.phone ?? null,
     shipping_method: shippingInfo?.method ?? null,
     shipping_cost: shippingInfo?.cost ?? 0,
-    // Door-to-door delivery fields
-    ship_to_street: shippingInfo?.ship_to_street ?? null,
-    ship_to_suburb: shippingInfo?.ship_to_suburb ?? null,
-    ship_to_city: shippingInfo?.ship_to_city ?? null,
-    ship_to_zone: shippingInfo?.ship_to_zone ?? null,
-    ship_to_postal_code: shippingInfo?.ship_to_postal_code ?? null,
-    ship_to_country: shippingInfo?.ship_to_country ?? null,
-    ship_to_lat: shippingInfo?.ship_to_lat ?? null,
-    ship_to_lng: shippingInfo?.ship_to_lng ?? null,
-    // Locker/Kiosk delivery fields
-    locker_id: shippingInfo?.locker_id ?? null,
-    locker_name: shippingInfo?.locker_name ?? null,
-    locker_street: shippingInfo?.locker_street ?? null,
-    locker_suburb: shippingInfo?.locker_suburb ?? null,
-    locker_city: shippingInfo?.locker_city ?? null,
-    locker_zone: shippingInfo?.locker_zone ?? null,
-    locker_postal_code: shippingInfo?.locker_postal_code ?? null,
-    locker_country: shippingInfo?.locker_country ?? null,
-    locker_lat: shippingInfo?.locker_lat ?? null,
-    locker_lng: shippingInfo?.locker_lng ?? null,
-    locker_provider: shippingInfo?.locker_provider ?? null,
+    // Delivery address JSON (schema-safe)
+    delivery_address: shippingInfo?.method === 'door-to-door' ? {
+      street_address: shippingInfo?.ship_to_street ?? null,
+      local_area: shippingInfo?.ship_to_suburb ?? null,
+      city: shippingInfo?.ship_to_city ?? null,
+      zone: shippingInfo?.ship_to_zone ?? null,
+      code: shippingInfo?.ship_to_postal_code ?? null,
+      country: shippingInfo?.ship_to_country ?? null,
+      lat: shippingInfo?.ship_to_lat ?? null,
+      lng: shippingInfo?.ship_to_lng ?? null
+    } : null,
     updated_at: new Date().toISOString()
   } as Record<string, any>;
 
