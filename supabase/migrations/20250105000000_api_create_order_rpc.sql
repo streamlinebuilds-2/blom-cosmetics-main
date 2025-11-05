@@ -55,7 +55,7 @@ BEGIN
   ) VALUES (
     p_order_number,
     p_m_payment_id,
-    'unpaid',  -- Start as unpaid
+    'placed',  -- Status must be from allowed list: placed, paid, packed, shipped, delivered, cancelled, refunded
     'unpaid',  -- Payment status
     p_channel,
     p_buyer_email,
