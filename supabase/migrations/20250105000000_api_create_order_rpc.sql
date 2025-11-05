@@ -27,7 +27,6 @@ AS $$
 DECLARE
   v_order_id uuid;
   v_total_cents int;
-  r jsonb;
 BEGIN
   v_total_cents := p_subtotal_cents + p_shipping_cents + p_tax_cents - p_discount_cents;
   
@@ -87,13 +86,13 @@ BEGIN
   )
   SELECT
     v_order_id,
-    (r->>'product_id')::uuid,
-    r->>'product_name',
-    r->>'sku',
-    (r->>'quantity')::int,
-    (r->>'unit_price')::numeric,
-    ((r->>'quantity')::int * (r->>'unit_price')::numeric)
-  FROM jsonb_array_elements(p_items) r;
+    (item_data->>'product_id')::uuid,
+    item_data->>'product_name',
+    item_data->>'sku',
+    (item_data->>'quantity')::int,
+    (item_data->>'unit_price')::numeric,
+    ((item_data->>'quantity')::int * (item_data->>'unit_price')::numeric)
+  FROM jsonb_array_elements(p_items) AS item_data;
   
   RETURN QUERY SELECT v_order_id, p_order_number, p_m_payment_id, v_total_cents;
 END;
