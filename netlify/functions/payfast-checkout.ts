@@ -84,6 +84,9 @@ export const handler: Handler = async (event) => {
       order_id = body.order_id
     }
 
+    // Capture coupon code if provided to pass through PayFast (ITN -> mark used)
+    const couponCode: string | undefined = body.coupon?.code || body.couponCode || undefined
+
     // Validate required fields
     if (!m_payment_id || !amount || !email_address) {
       return {
@@ -108,7 +111,8 @@ export const handler: Handler = async (event) => {
       name_first: name_first || '',
       name_last: name_last || '',
       email_address,
-      ...(order_id && { custom_str1: order_id })
+      ...(order_id && { custom_str1: order_id }),
+      ...(couponCode && { custom_str2: String(couponCode).toUpperCase() })
     }
 
     const signature = sign(fields, process.env.PAYFAST_PASSPHRASE || process.env.PF_PASSPHRASE || undefined)

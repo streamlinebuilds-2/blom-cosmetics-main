@@ -268,24 +268,32 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      // Step 1: Create order in Supabase
+      // Step 1: Create order in Supabase (new payload)
       const createOrderRes = await fetch('/.netlify/functions/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: cartState.items,
-          shippingInfo,
-          deliveryAddress,
-          shippingMethod,
-          subtotal: cartState.subtotal,
-          shipping: shippingCost,
-          discount,
-          total: orderTotal,
-          customerEmail: shippingInfo.email,
-          customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
-          customerPhone: shippingInfo.phone,
-          customerId: userId, // Add userId here
-          coupon_code: appliedCoupon ? appliedCoupon.code : null // Store coupon code for marking as used on payment
+          buyer: {
+            email: shippingInfo.email,
+            name: `${shippingInfo.firstName} ${shippingInfo.lastName}`.trim(),
+            phone: shippingInfo.phone
+          },
+          shipping: {
+            method: shippingMethod,
+            address: shippingMethod === 'door-to-door' ? deliveryAddress : null
+          },
+          items: cartState.items.map((it) => ({
+            product_id: it.productId || it.id,
+            name: it.name,
+            unit_price: it.price,
+            quantity: it.quantity,
+          })),
+          totals: {
+            subtotal_cents: Math.round(cartState.subtotal * 100),
+            shipping_cents: Math.round(shippingCost * 100),
+            tax_cents: 0
+          },
+          coupon: appliedCoupon ? { code: appliedCoupon.code } : null
         })
       });
 
@@ -311,20 +319,19 @@ export const CheckoutPage: React.FC = () => {
       localStorage.setItem('blom_pending_order', JSON.stringify({
         orderId,
         cartItems: cartState.items,
-        total: orderTotal,
+        total: totalCents / 100,
         shipping: shippingCost,
         shippingMethod,
         shippingInfo,
         couponCode: appliedCoupon ? appliedCoupon.code : null,
-        couponId: appliedCoupon ? appliedCoupon.id : null,
-        couponDiscount: discount,
+        couponDiscount: orderData.discount_cents ? orderData.discount_cents / 100 : discount,
         timestamp: new Date().toISOString()
       }));
 
       // Step 2: Prepare PayFast payment with order ID
       const paymentData = {
         m_payment_id: orderId,
-        amount: orderTotal,
+        amount: (totalCents / 100).toFixed(2),
         item_name: `BLOM Order (${cartState.items.length} items)`,
         name_first: shippingInfo.firstName,
         name_last: shippingInfo.lastName,
@@ -335,9 +342,7 @@ export const CheckoutPage: React.FC = () => {
           quantity: item.quantity,
           price: item.price
         })),
-        couponCode: appliedCoupon ? appliedCoupon.code : null,
-        couponId: appliedCoupon ? appliedCoupon.id : null,
-        couponDiscount: discount,
+        coupon: appliedCoupon ? { code: appliedCoupon.code } : null,
         shippingInfo: {
           ...shippingInfo,
           method: shippingMethod,
@@ -365,7 +370,8 @@ export const CheckoutPage: React.FC = () => {
         name_last: shippingInfo.lastName,
         email_address: shippingInfo.email,
         item_name: `BLOM Order ${orderData.merchant_payment_id}`,
-        order_id: orderId
+        order_id: orderId,
+        coupon: appliedCoupon ? { code: appliedCoupon.code } : null
       };
       
       console.log('🔍 PayFast request:', pfRequestBody);

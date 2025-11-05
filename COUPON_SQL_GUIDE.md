@@ -267,19 +267,6 @@ SELECT
 FROM public.coupons
 WHERE used_count > 0
 ORDER BY used_count DESC;
-
--- See orders that used coupons
-SELECT 
-  o.id,
-  o.m_payment_id,
-  o.coupon_code,
-  o.total,
-  o.created_at,
-  c.percent as coupon_percent
-FROM public.orders o
-LEFT JOIN public.coupons c ON c.code = o.coupon_code
-WHERE o.coupon_code IS NOT NULL
-ORDER BY o.created_at DESC;
 ```
 
 ## Typical Workflow

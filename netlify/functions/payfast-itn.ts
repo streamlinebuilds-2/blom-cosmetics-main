@@ -108,21 +108,9 @@ export const handler: Handler = async (event) => {
     // 3) Mark order as paid (idempotent - only if not already paid)
     let couponCode: string | null = null
     if (order.status !== 'paid') {
-      // Fetch full order to check for coupon_code
-      const fullOrderRes = await fetch(
-        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}&select=id,coupon_code`,
-        {
-          headers: {
-            apikey: SERVICE_KEY,
-            Authorization: `Bearer ${SERVICE_KEY}`
-          }
-        }
-      )
-      if (fullOrderRes.ok) {
-        const fullOrders = await fullOrderRes.json()
-        if (fullOrders[0]?.coupon_code) {
-          couponCode = fullOrders[0].coupon_code
-        }
+      // Coupon code arrives from PayFast custom field if present
+      if (data.custom_str2) {
+        couponCode = String(data.custom_str2)
       }
 
       const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {

@@ -8,12 +8,21 @@ export const handler: Handler = async (event) => {
 
     const body = JSON.parse(event.body || '{}')
     
+    // New canonical payload
+    // {
+    //   buyer: { email, name, phone },
+    //   shipping: { method, address },
+    //   items: [ { product_id, name, unit_price, quantity } ],
+    //   totals: { subtotal_cents, shipping_cents, tax_cents },
+    //   coupon: { code } | null
+    // }
+    
     // Support both formats: new (CheckoutPage) and legacy (admin)
     let items = body.items || []
     let buyer: any = body.buyer || {}
     let fulfillment: any = body.fulfillment || {}
     const client_order_ref = body.client_order_ref || null
-    const coupon_code = body.coupon_code || null
+    const coupon = body.coupon || null
     
     // Map CheckoutPage format to expected format
     if (body.customerEmail || body.customerName) {
@@ -25,7 +34,16 @@ export const handler: Handler = async (event) => {
       }
     }
     
-    if (body.deliveryAddress || body.shippingMethod) {
+    if (body.shipping || body.deliveryAddress || body.shippingMethod) {
+      // Preferred new shape
+      if (body.shipping) {
+        fulfillment = {
+          method: body.shipping.method,
+          delivery_address: body.shipping.address || null,
+          collection_location: body.shipping.method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
+        }
+      }
+      
       const method = body.shippingMethod || 'door-to-door'
       const deliveryAddr = body.deliveryAddress || {}
       
@@ -43,12 +61,12 @@ export const handler: Handler = async (event) => {
       }
     }
     
-    // Map cart items format if needed
-    if (items.length > 0 && items[0].quantity !== undefined && items[0].qty === undefined) {
+    // Map cart items format if needed (legacy cart shape)
+    if (items.length > 0 && items[0].quantity !== undefined && items[0].unit_price === undefined) {
       items = items.map((it: any) => ({
         product_id: it.productId || it.id,
-        qty: it.quantity,
-        price: it.price,
+        quantity: it.quantity,
+        unit_price: it.unit_price ?? it.price,
         product_name: it.name,
         sku: it.sku || null
       }))
@@ -68,19 +86,52 @@ export const handler: Handler = async (event) => {
     // Helper: check if string is valid UUID
     const isUUID = (v: any) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v || ''))
 
-    // Calculate total - use provided total if available, otherwise calculate from items
-    let amount: number
-    if (body.total !== undefined) {
-      amount = Number(body.total)
-    } else {
-      const subtotal = items.reduce((sum: number, it: any) => sum + Number(it.price) * Number(it.qty || it.quantity || 1), 0)
-      const shipping = Number(body.shipping || 0)
-      const discount = Number(body.discount || 0)
-      amount = subtotal + shipping - discount
+    // Totals in cents (strict)
+    let subtotal_cents = Number(body.totals?.subtotal_cents)
+    let shipping_cents = Number(body.totals?.shipping_cents || 0)
+    let tax_cents = Number(body.totals?.tax_cents || 0)
+
+    if (!Number.isFinite(subtotal_cents)) {
+      // Derive from items if not provided
+      subtotal_cents = items.reduce((sum: number, it: any) => sum + Math.round(Number(it.unit_price) * 100) * Number(it.quantity || 1), 0)
     }
-    
-    const amountStr = amount.toFixed(2)
+
+    // Validate/compute discount via RPC if coupon present
+    let discount_cents = 0
+    if (coupon?.code) {
+      try {
+        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
+          method: 'POST',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            p_code: String(coupon.code).toUpperCase(),
+            p_email: buyer.email || body.customerEmail || '',
+            p_product_subtotal_cents: subtotal_cents
+          })
+        })
+        if (!rpcRes.ok) {
+          const txt = await rpcRes.text()
+          return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'COUPON_INVALID', message: txt }) }
+        }
+        const rpcData = await rpcRes.json()
+        const row = Array.isArray(rpcData) ? rpcData[0] : rpcData
+        if (!row?.valid) {
+          return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'COUPON_INVALID', message: row?.message || 'Coupon invalid' }) }
+        }
+        discount_cents = Number(row.discount_cents) || 0
+      } catch (e: any) {
+        return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'COUPON_INVALID', message: e?.message || 'Coupon invalid' }) }
+      }
+    }
+
+    const total_cents = Math.max(0, subtotal_cents + shipping_cents + tax_cents - discount_cents)
+    const amountStr = (total_cents / 100).toFixed(2)
     const m_payment_id = `BL-${Date.now().toString(16).toUpperCase()}`
+    const order_number = `BL-${Date.now().toString(36).toUpperCase()}`
 
     // Resolve authenticated user (if Authorization header present)
     let authUserId: string | null = null
@@ -114,14 +165,17 @@ export const handler: Handler = async (event) => {
     } : null
 
     // Insert order with all fields for admin app
-    const orderTotal = Number(amount)
-    const orderTotalCents = Math.round(orderTotal * 100)
-    
     const orderPayload = [{
       status: 'pending',
       payment_status: 'unpaid',  // Will be updated to 'paid' by payfast-itn
-      total: orderTotal,
-      total_cents: orderTotalCents,  // For admin app
+      channel: 'website',
+      order_number,
+      subtotal_cents,
+      shipping_cents,
+      discount_cents,
+      tax_cents,
+      total_cents,
+      total: total_cents / 100,
       m_payment_id,
       client_order_ref: client_order_ref || null,
       user_id: authUserId || buyer.user_id || null,
@@ -131,7 +185,6 @@ export const handler: Handler = async (event) => {
       fulfillment_method: fulfillment.method || 'door-to-door',
       delivery_address: deliveryAddressJson,  // JSON object for admin
       collection_location: fulfillment.collection_location || null,
-      coupon_code: coupon_code || null,
       // Additional fields for admin app compatibility
       ship_to_street: deliveryAddr.street_address || null,
       ship_to_suburb: deliveryAddr.local_area || null,
@@ -187,13 +240,12 @@ export const handler: Handler = async (event) => {
     // 2) Build order items with resolved product UUIDs
     const itemsPayload = items.map((it: any) => {
       const product_uuid = isUUID(it.product_id) ? it.product_id : it.sku && skuMap[it.sku] ? skuMap[it.sku] : null
-
-      const qty = Number(it.qty)
-      const unit = Number(it.price)
+      const qty = Number(it.quantity || it.qty || 1)
+      const unit = Number(it.unit_price || it.price)
       return {
         order_id: order.id,
         product_id: product_uuid,
-        product_name: it.product_name || null,
+        product_name: it.product_name || it.name || null,
         sku: it.sku || null,
         quantity: qty,
         unit_price: unit,
@@ -222,10 +274,12 @@ export const handler: Handler = async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         order_id: order.id,
+        order_number,
         m_payment_id,
-        merchant_payment_id: m_payment_id,  // For CheckoutPage compatibility
+        merchant_payment_id: m_payment_id,
         amount: amountStr,
-        total_cents: orderTotalCents  // For CheckoutPage PayFast calculation
+        total_cents,
+        discount_cents
       })
     }
   } catch (e: any) {

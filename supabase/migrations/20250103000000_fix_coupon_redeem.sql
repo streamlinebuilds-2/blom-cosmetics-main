@@ -2,18 +2,7 @@
 -- Returns clear error when order < R500
 -- Enforces single-use, email locking, expiry, and minimum order
 
--- Ensure orders table has coupon_code column (if it doesn't exist)
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns 
-    WHERE table_schema = 'public' 
-    AND table_name = 'orders' 
-    AND column_name = 'coupon_code'
-  ) THEN
-    ALTER TABLE public.orders ADD COLUMN coupon_code text;
-  END IF;
-END $$;
+-- Note: Do not add coupon_code column; coupon tracking is handled via RPC and PayFast custom fields.
 
 CREATE OR REPLACE FUNCTION public.redeem_coupon(
   p_code text,
