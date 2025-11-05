@@ -179,7 +179,7 @@ export const handler: Handler = async (event) => {
       m_payment_id,
       client_order_ref: client_order_ref || null,
       user_id: authUserId || buyer.user_id || null,
-      fulfillment_method: fulfillment.method || 'door-to-door',
+      fulfillment_method: fulfillment.method === 'store-pickup' ? 'collection' : 'delivery',
       delivery_address: deliveryAddressJson,  // JSON object for admin
       collection_location: fulfillment.collection_location || null
     }]
