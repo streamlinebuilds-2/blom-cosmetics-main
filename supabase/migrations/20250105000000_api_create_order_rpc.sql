@@ -74,7 +74,7 @@ BEGIN
   )
   RETURNING id INTO v_order_id;
   
-  -- Insert order items
+  -- Insert order items (allow NULL product_id when not a valid UUID)
   INSERT INTO public.order_items (
     order_id,
     product_id,
@@ -86,7 +86,11 @@ BEGIN
   )
   SELECT
     v_order_id,
-    (item_data->>'product_id')::uuid,
+    CASE 
+      WHEN item_data->>'product_id' ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' 
+      THEN (item_data->>'product_id')::uuid
+      ELSE NULL
+    END,
     item_data->>'product_name',
     item_data->>'sku',
     (item_data->>'quantity')::int,
