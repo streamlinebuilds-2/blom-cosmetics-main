@@ -106,7 +106,25 @@ export const handler: Handler = async (event) => {
     }
 
     // 3) Mark order as paid (idempotent - only if not already paid)
+    let couponCode: string | null = null
     if (order.status !== 'paid') {
+      // Fetch full order to check for coupon_code
+      const fullOrderRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}&select=id,coupon_code`,
+        {
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`
+          }
+        }
+      )
+      if (fullOrderRes.ok) {
+        const fullOrders = await fullOrderRes.json()
+        if (fullOrders[0]?.coupon_code) {
+          couponCode = fullOrders[0].coupon_code
+        }
+      }
+
       const updateRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
         method: 'PATCH',
         headers: {
@@ -127,6 +145,30 @@ export const handler: Handler = async (event) => {
       }
 
       console.log('Order marked as paid:', order.id)
+
+      // 3b) Mark coupon as used if payment successful and coupon was applied
+      if (couponCode) {
+        ;(async () => {
+          try {
+            const markRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/mark_coupon_used`, {
+              method: 'POST',
+              headers: {
+                apikey: SERVICE_KEY,
+                Authorization: `Bearer ${SERVICE_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ p_code: couponCode })
+            })
+            if (markRes.ok) {
+              console.log('Coupon marked as used:', couponCode)
+            } else {
+              console.warn('Failed to mark coupon as used:', await markRes.text())
+            }
+          } catch (e: any) {
+            console.warn('Coupon marking failed:', e?.message)
+          }
+        })()
+      }
     }
 
     // 4) Insert payment record (non-blocking, for admin tracking)

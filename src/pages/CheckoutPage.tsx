@@ -9,7 +9,7 @@ import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edi
 import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 
 export const CheckoutPage: React.FC = () => {
@@ -184,31 +184,68 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
+    // Client-side check: block if cart < R500
+    const productSubtotalCents = Math.round(cartState.subtotal * 100);
+    if (productSubtotalCents < 50000) {
+      setCouponError('Order must be over R500 (product total, excl. shipping).');
+      return;
+    }
+
     setIsApplyingCoupon(true);
     setCouponError('');
 
     try {
-      const res = await fetch('/.netlify/functions/apply-coupon', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          code: couponCode.trim().toUpperCase(), 
-          customerId: null, // You can add user ID here if you have user authentication
-          cart: cartState.items.map(item => ({
-            id: item.id,
-            quantity: item.quantity,
-            price: item.price
-          }))
-        })
-      });
+      // Calculate product subtotal in cents (excluding shipping)
+      const productSubtotal = Math.round(cartState.subtotal * 100);
       
+      // Get Supabase URL and key
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env.SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseAnonKey) {
+        setCouponError('Configuration error. Please try again.');
+        return;
+      }
+
+      // Call RPC directly
+      const res = await fetch(`${supabaseUrl}/rest/v1/rpc/redeem_coupon`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          p_code: couponCode.trim().toUpperCase(),
+          p_email: shippingInfo.email || '',
+          p_product_subtotal_cents: productSubtotal, // EXCLUDE shipping
+        }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Coupon RPC error:', errorText);
+        setCouponError('Failed to validate coupon. Please try again.');
+        return;
+      }
+
       const data = await res.json();
       
-      if (!data.ok) { 
-        setCouponError(data.reason || data.error || 'Invalid coupon code'); 
+      // RPC returns array with single row
+      const result = Array.isArray(data) ? data[0] : data;
+      
+      if (!result.valid) {
+        setCouponError(result.message || 'Invalid coupon code');
+        setDiscount(0);
+        setAppliedCoupon(null);
       } else {
-        setDiscount(data.discount || 0);
-        setAppliedCoupon({ id: data.coupon_id, code: couponCode.trim().toUpperCase() });
+        // Convert discount_cents to rands
+        const discountAmount = result.discount_cents / 100;
+        setDiscount(discountAmount);
+        setAppliedCoupon({ 
+          id: couponCode.trim().toUpperCase(), // Store code as ID for now
+          code: couponCode.trim().toUpperCase() 
+        });
         setCouponError('');
       }
 
@@ -247,7 +284,8 @@ export const CheckoutPage: React.FC = () => {
           customerEmail: shippingInfo.email,
           customerName: `${shippingInfo.firstName} ${shippingInfo.lastName}`,
           customerPhone: shippingInfo.phone,
-          customerId: userId // Add userId here
+          customerId: userId, // Add userId here
+          coupon_code: appliedCoupon ? appliedCoupon.code : null // Store coupon code for marking as used on payment
         })
       });
 

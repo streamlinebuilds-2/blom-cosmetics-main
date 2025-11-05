@@ -10,7 +10,8 @@ export const handler: Handler = async (event) => {
       items = [],
       buyer = {},
       fulfillment = {},
-      client_order_ref
+      client_order_ref,
+      coupon_code = null
     } = JSON.parse(event.body || '{}')
 
     if (!items.length) {
@@ -61,7 +62,8 @@ export const handler: Handler = async (event) => {
       buyer_phone: buyer.phone || null,
       fulfillment_method: fulfillment.method || null,
       delivery_address: fulfillment.delivery_address || null,
-      collection_location: fulfillment.collection_location || null
+      collection_location: fulfillment.collection_location || null,
+      coupon_code: coupon_code || null
     }]
 
     const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
