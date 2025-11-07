@@ -16,6 +16,7 @@ type InBody = {
   rating?: number;            // 1..5
   title?: string;
   comment?: string;           // review body
+  body?: string;              // review body (matches original)
 };
 
 const handler: Handler = async (event) => {
@@ -41,12 +42,12 @@ const handler: Handler = async (event) => {
   const reviewer_email = (payload.email || "").trim();
   const rating = Number(payload.rating ?? 0);
   const title = (payload.title || "").trim();
-  const comment = (payload.comment || "").trim();
+  const comment = (payload.comment || payload.body || "").trim();
 
   // Required checks
   if (!product_id_raw) return { statusCode: 400, body: "product_id is required" };
-  if (!reviewer_name) return { statusCode: 400, body: "name is required" };
-  if (!reviewer_email) return { statusCode: 400, body: "email is required" };
+  if (!reviewer_name || reviewer_name.length === 0) return { statusCode: 400, body: "name is required and cannot be empty" };
+  if (!reviewer_email || reviewer_email.length === 0) return { statusCode: 400, body: "email is required and cannot be empty" };
   if (!(rating >= 1 && rating <= 5)) return { statusCode: 400, body: "rating must be 1..5" };
 
   // Resolve product_id: if slug provided, map to UUID
