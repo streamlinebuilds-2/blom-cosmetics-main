@@ -4,10 +4,10 @@ import { CartWidget } from './components/cart/CartWidget';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LoadingSpinner } from './components/LoadingSpinner';
 
-// Eager loaded pages (critical for initial load)
-import { HomePage } from './pages/HomePage';
-import { ShopPage } from './pages/ShopPage';
-import { CheckoutPage } from './pages/CheckoutPage';
+// Eager loaded pages (critical for initial load) → switch to lazy to enable route-level code splitting
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const ShopPage = lazy(() => import('./pages/ShopPage').then(m => ({ default: m.ShopPage })));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
 
 // Lazy loaded pages (loaded on demand)
 const CoursesPage = lazy(() => import('./pages/CoursesPage').then(m => ({ default: m.default })));
@@ -38,6 +38,28 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m 
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })));
 const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample').then(m => ({ default: m.ProductTemplateExample })));
 
+/**
+ * Prefetch next likely routes on idle to improve perceived performance.
+ * This downloads route chunks after initial render without blocking LCP.
+ */
+const PrefetchRoutes: React.FC = () => {
+  React.useEffect(() => {
+    const idle = (cb: () => void) =>
+      'requestIdleCallback' in window
+        ? (window as any).requestIdleCallback(cb)
+        : setTimeout(cb, 1500);
+
+    idle(() => {
+      // Prefetch heavy routes and frequently used pages
+      import('./pages/ShopPage');
+      import('./pages/ProductDetailPage');
+      import('./pages/CheckoutPage');
+    });
+  }, []);
+
+  return null;
+};
+
 // Wrapper component with Suspense for lazy loading
 const PageWithCart = ({ children }: { children: React.ReactNode }) => (
   <>
@@ -50,6 +72,7 @@ function App() {
   return (
     <BrowserRouter>
       <ErrorBoundary>
+        <PrefetchRoutes />
         <Routes>
           {/* Homepage */}
           <Route path="/" element={<PageWithCart><HomePage /></PageWithCart>} />

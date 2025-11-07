@@ -7,6 +7,42 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
+# Performance caching headers
+# Long-lived cache for versioned static assets (Vite outputs to /assets)
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Also cache top-level hashed JS/CSS if emitted
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Fonts
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "font/woff2"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Short cache for HTML shell to allow quick content updates
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=300, must-revalidate"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

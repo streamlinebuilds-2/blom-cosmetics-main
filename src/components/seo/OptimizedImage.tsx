@@ -45,13 +45,17 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     return 'BLOM Cosmetics - Premium Nail Care Products South Africa';
   };
 
-  // Ensure proper image URL
-  const imageUrl = src.startsWith('http') ? src : `https://blom-cosmetics.co.za${src}`;
+  // Ensure proper image URL (respect current origin at runtime, fallback to Netlify URL)
+  const site =
+    typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://cute-stroopwafel-203cac.netlify.app';
+  const imageUrl = src.startsWith('http') ? src : `${site}${src}`;
 
   return (
     <>
       <img
-        src={src}
+        src={imageUrl}
         alt={generateAltText()}
         title={generateTitle()}
         className={className}
@@ -59,6 +63,10 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         height={height}
         loading={priority ? 'eager' : loading}
         decoding="async"
+        // Hint browser for above-the-fold media to improve LCP
+        fetchPriority={priority ? 'high' : 'auto'}
+        // Provide generic responsive sizing to reduce layout shifts
+        sizes="(max-width: 768px) 100vw, 50vw"
         style={{
           maxWidth: '100%',
           height: 'auto'
