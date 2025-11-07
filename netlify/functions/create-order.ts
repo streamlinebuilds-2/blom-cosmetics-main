@@ -110,7 +110,7 @@ export const handler: Handler = async (event) => {
           body: JSON.stringify({
             p_code: String(coupon.code).toUpperCase(),
             p_email: buyer.email || body.customerEmail || '',
-            p_product_subtotal_cents: subtotal_cents
+            p_order_total_cents: subtotal_cents
           })
         })
         if (!rpcRes.ok) {

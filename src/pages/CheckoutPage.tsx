@@ -218,7 +218,7 @@ export const CheckoutPage: React.FC = () => {
         body: JSON.stringify({
           p_code: couponCode.trim().toUpperCase(),
           p_email: shippingInfo.email || '',
-          p_product_subtotal_cents: productSubtotal, // EXCLUDE shipping
+          p_order_total_cents: productSubtotal, // EXCLUDE shipping
         }),
       });
 
