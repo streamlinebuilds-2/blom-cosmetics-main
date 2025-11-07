@@ -21,15 +21,15 @@ export async function submitReview(form: {
     throw new Error('Please write a review');
   }
 
+  // Conform to admin function spec: send product_slug and comment (maps to reviewer columns server-side)
   const payload = {
-    product_id: form.product_slug, // product_slug can be used as product_id (or can use product_slug field)
-    name: form.reviewer_name || 'Anonymous',
-    email: form.reviewer_email || null,
+    product_slug: form.product_slug,              // e.g. "cuticle-oil"
+    name: form.reviewer_name || 'Anonymous',     // maps → reviewer_name
+    email: form.reviewer_email || null,          // maps → reviewer_email
     rating: form.rating,
     title: form.title || null,
-    body: form.body.trim(),
-    photos: form.photos || [],
-    is_verified_buyer: form.is_verified_buyer || false,
+    comment: form.body.trim(),                   // prefer "comment"; function also accepts "body"
+    // Optionals not strictly required for intake
     order_id: form.order_id || null
   };
 
