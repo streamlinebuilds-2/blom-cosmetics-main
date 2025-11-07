@@ -33,14 +33,15 @@ const handler: Handler = async (event) => {
 
   // enforce JSON parsing even if Content-Type is wrong
   let bodyText = event.body || "";
-  if (!bodyText && event.isBase64Encoded && event.body) {
+  if (event.isBase64Encoded && event.body) {
     bodyText = Buffer.from(event.body, "base64").toString("utf8");
   }
 
   let inBody: InBody;
   try {
     inBody = JSON.parse(bodyText || "{}");
-  } catch {
+  } catch (e) {
+    console.error('JSON parse error:', e, 'bodyText:', bodyText);
     return { statusCode: 400, body: "Invalid JSON" };
   }
 
@@ -53,11 +54,13 @@ const handler: Handler = async (event) => {
   const title = (inBody.title || "").toString().trim();
   const comment = (inBody.comment || inBody.body || "").toString().trim();
 
+  console.log('Parsed inputs:', { productIdRaw, reviewer_name, reviewer_email, rating, title, comment });
+
   // Validate
   if (!productIdRaw) return { statusCode: 400, body: "product_id (or product_slug) is required" };
-  if (!reviewer_name) return { statusCode: 400, body: "name is required" };
-  if (!reviewer_email) return { statusCode: 400, body: "email is required" };
-  if (!(rating >= 1 && rating <= 5)) return { statusCode: 400, body: "rating must be 1..5" };
+  if (!reviewer_name || reviewer_name.length === 0) return { statusCode: 400, body: `name is required and cannot be empty (got: "${reviewer_name}")` };
+  if (!reviewer_email || reviewer_email.length === 0) return { statusCode: 400, body: `email is required and cannot be empty (got: "${reviewer_email}")` };
+  if (!(rating >= 1 && rating <= 5)) return { statusCode: 400, body: `rating must be 1..5 (got: ${rating})` };
 
   // Resolve product_id (slug -> uuid)
   let product_id = productIdRaw;
@@ -96,6 +99,8 @@ const handler: Handler = async (event) => {
       source: "storefront",
     },
   ];
+
+  console.log('Inserting review:', insertBody[0]);
 
   const insRes = await fetch(`${SUPABASE_URL}/rest/v1/product_reviews`, {
     method: "POST",
