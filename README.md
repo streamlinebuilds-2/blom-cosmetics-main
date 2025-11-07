@@ -145,3 +145,5 @@ The project builds to static files in `dist/` folder and can be deployed to any 
 ---
 
 Note: Repository synchronized with remote on 2025-09-30.
+
+<!-- Test commit for push verification -->
