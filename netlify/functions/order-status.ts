@@ -5,7 +5,7 @@ function getWebhookUrl(): string {
   const base = process.env.N8N_BASE
   if (direct) return direct
   if (base) return `${base.replace(/\/$/, '')}/webhook/order-status-update`
-  throw new Error('Missing N8N webhook env (N8N_ORDER_STATUS_WEBHOOK or N8N_BASE)')
+  return 'https://dockerfile-1n82.onrender.com/webhook/order-status-update'
 }
 
 export const handler: Handler = async (event) => {

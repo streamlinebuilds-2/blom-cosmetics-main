@@ -80,7 +80,7 @@ export const handler: Handler = async (event) => {
     const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!SUPABASE_URL || !SERVICE_KEY) {
-      return { statusCode: 500, body: 'Missing Supabase config' }
+      return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Missing Supabase config', missing: { SUPABASE_URL: !SUPABASE_URL, SERVICE_KEY: !SERVICE_KEY } }) }
     }
 
     // Helper: check if string is valid UUID

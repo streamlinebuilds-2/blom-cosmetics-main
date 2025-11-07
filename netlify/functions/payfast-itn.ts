@@ -4,7 +4,7 @@ import crypto from 'crypto'
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const PF_PASSPHRASE = process.env.PAYFAST_PASSPHRASE || process.env.PF_PASSPHRASE || ''
-const SITE = process.env.SITE_BASE_URL || process.env.SITE_URL || 'https://blom-cosmetics.co.za'
+const SITE = process.env.SITE_URL || 'https://cute-stroopwafel-203cac.netlify.app'
 
 function validateSignature(params: Record<string, any>, passphrase?: string): boolean {
   // PayFast signature validation: specific fields in specific order
@@ -57,7 +57,7 @@ export const handler: Handler = async (event) => {
 
     if (!SUPABASE_URL || !SERVICE_KEY) {
       console.error('Missing Supabase config')
-      return { statusCode: 500, body: 'Config error' }
+      return { statusCode: 500, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Missing Supabase config', missing: { SUPABASE_URL: !SUPABASE_URL, SERVICE_KEY: !SERVICE_KEY } }) }
     }
 
     // 1) Validate signature
@@ -198,7 +198,8 @@ export const handler: Handler = async (event) => {
     // 6) Forward to n8n (non-blocking fan-out)
     ;(async () => {
       try {
-        await fetch('https://dockerfile-1n82.onrender.com/webhook/payfast-itn', {
+        const n8nUrl = process.env.N8N_ORDER_STATUS_WEBHOOK || `${process.env.N8N_BASE || 'https://dockerfile-1n82.onrender.com'}/webhook/payfast-itn`
+        await fetch(n8nUrl, {
           method: 'POST',
           headers: { 'content-type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams(data).toString()

@@ -58,14 +58,14 @@ class PayFastService {
       price: number;
     }>;
   }): PayFastPaymentData {
-    const baseUrl = window.location.origin;
-    
+    const baseUrl = process.env.SITE_URL || window.location.origin;
+
     const paymentData: PayFastPaymentData = {
       merchant_id: this.config.merchantId,
       merchant_key: this.config.merchantKey,
       return_url: `${baseUrl}/order-confirmation`,
       cancel_url: `${baseUrl}/checkout`,
-      notify_url: `${baseUrl}/api/payfast/itn`,
+      notify_url: `${baseUrl}/.netlify/functions/payfast-itn`,
       name_first: orderData.customerInfo.firstName,
       name_last: orderData.customerInfo.lastName,
       email_address: orderData.customerInfo.email,
@@ -180,6 +180,7 @@ class PayFastService {
         order_number: params.orderNumber || params.orderId,
         total_cents: params.totalCents,
         customer_email: params.customerEmail,
+        site_url: process.env.SITE_URL || window.location.origin,
       })
     })
     if (!res.ok) throw new Error('Failed to create PayFast checkout')
@@ -208,7 +209,7 @@ class PayFastService {
     try {
       // Verify signature
       const { signature, ...dataToVerify } = itnData;
-      const calculatedSignature = this.generateSignature(dataToVerify as PayFastPaymentData);
+      const calculatedSignature = this.generateSignature(dataToVerify as unknown as PayFastPaymentData);
       
       if (signature !== calculatedSignature) {
         console.error('PayFast ITN signature mismatch');
