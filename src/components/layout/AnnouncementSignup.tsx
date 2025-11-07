@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
 import { X } from 'lucide-react';
+import { postJson } from '../../lib/api';
 
 declare global {
   interface Window {
@@ -234,39 +235,77 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Idempotent protection: track recent submissions by email
+  const recentSubmissions = useRef<Record<string, number>>({});
+
+  // Environment override for webhook URL
+  const WEBHOOK_URL = import.meta.env.VITE_N8N_BEAUTY_CLUB_WEBHOOK || 'https://dockerfile-1n82.onrender.com/webhook/beauty-club-signup';
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(false);
 
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+    const trimmedEmail = email.trim();
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
     const isValidPhone = /^[\+]?[0-9\s\-\(\)]{10,}$/.test(phone.trim());
-    
+
     if (!isValidEmail || !isValidPhone || !consent) {
       setError('Please enter a valid email, phone number, and accept the privacy terms.');
       return;
     }
 
+    // Idempotent check: prevent duplicate submissions within 60 seconds
+    const now = Date.now();
+    const lastSubmission = recentSubmissions.current[trimmedEmail];
+    if (lastSubmission && (now - lastSubmission) < 60000) {
+      console.info('Signup submission blocked: duplicate email within 60s');
+      setError('Please wait before submitting again.');
+      return;
+    }
+
     setSubmitting(true);
+    console.info('Starting Beauty Club signup submission');
+
     try {
-      // Replace with your provider (Mailchimp, Supabase, API route, etc.)
-      await new Promise((res) => setTimeout(res, 800));
-      setSuccess(true);
-      
-      // Mark user as signed up to hide popup and banner permanently
-      try {
-        localStorage.setItem('blom_user_signed_up', 'true');
-        sessionStorage.setItem('signup_popup_closed', '1');
-        sessionStorage.setItem('signup_banner_closed', '1');
-      } catch (error) {
-        console.warn('Could not save signup status:', error);
+      const payload = {
+        first_name: '', // Not collected in current form
+        email: trimmedEmail,
+        consent: true,
+        source: 'popup'
+      };
+
+      console.info('Sending POST to webhook:', WEBHOOK_URL, 'with payload:', payload);
+
+      const response = await postJson(WEBHOOK_URL, payload);
+      const responseText = await response.text();
+
+      console.info('Webhook response status:', response.status, 'body:', responseText);
+
+      if (response.ok) {
+        console.info('Beauty Club signup successful');
+        setSuccess(true);
+        recentSubmissions.current[trimmedEmail] = now;
+
+        // Mark user as signed up to hide popup and banner permanently
+        try {
+          localStorage.setItem('blom_user_signed_up', 'true');
+          sessionStorage.setItem('signup_popup_closed', '1');
+          sessionStorage.setItem('signup_banner_closed', '1');
+        } catch (error) {
+          console.warn('Could not save signup status:', error);
+        }
+
+        setTimeout(() => {
+          onSuccess();
+        }, 900);
+      } else {
+        console.info('Beauty Club signup failed with status:', response.status, 'response:', responseText);
+        setError(`Signup failed (${response.status}). Please try again.`);
       }
-      
-      setTimeout(() => {
-        onSuccess();
-      }, 900);
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      console.info('Beauty Club signup error:', err);
+      setError('Network error. Please check your connection and try again.');
     } finally {
       setSubmitting(false);
     }
@@ -287,6 +326,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
           required
+          disabled={submitting}
         />
       </div>
 
@@ -303,6 +343,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
           onChange={(e) => setPhone(e.target.value)}
           autoComplete="tel"
           required
+          disabled={submitting}
         />
       </div>
 
@@ -313,6 +354,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
           onChange={(e) => setConsent(e.target.checked)}
           className="mt-1 rounded border-gray-300 text-pink-400 focus:ring-pink-300 w-4 h-4"
           required
+          disabled={submitting}
         />
         <span>I agree to receive marketing emails and accept the <a href="/privacy" className="text-pink-500 hover:text-pink-600 underline">Privacy Policy</a>.</span>
       </label>
@@ -335,6 +377,32 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       >
         {submitting ? 'Joining...' : 'Join Now & Save 10%'}
       </button>
+
+      {/* Dev-only test harness */}
+      {import.meta.env.DEV && (
+        <button
+          type="button"
+          onClick={() => {
+            console.log('Dev test: Sending sample payload to webhook');
+            postJson(WEBHOOK_URL, {
+              first_name: 'Test',
+              email: 'test@example.com',
+              consent: true,
+              source: 'popup'
+            }).then(async (res) => {
+              const text = await res.text();
+              console.log('Test response:', res.status, text);
+              alert(`Test result: ${res.status} - ${text}`);
+            }).catch(err => {
+              console.error('Test error:', err);
+              alert('Test error: ' + err.message);
+            });
+          }}
+          className="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-xl transition-all text-sm"
+        >
+          🧪 Test Webhook (Dev Only)
+        </button>
+      )}
     </form>
   );
 };
