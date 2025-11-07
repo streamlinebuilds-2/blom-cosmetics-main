@@ -21,20 +21,29 @@ export async function submitReview(form: {
     throw new Error('Please write a review');
   }
 
-  // Conform to admin function spec: send product_slug and comment (maps to reviewer columns server-side)
-  const payload = {
-    product_slug: form.product_slug,              // e.g. "cuticle-oil"
-    name: form.reviewer_name || 'Anonymous',     // maps → reviewer_name
-    email: form.reviewer_email || null,          // maps → reviewer_email
-    rating: form.rating,
-    title: form.title || null,
-    comment: form.body.trim(),                   // prefer "comment"; function also accepts "body"
-    // Optionals not strictly required for intake
-    order_id: form.order_id || null
-  };
+   // Send a superset of fields for backward/forward compatibility across function versions.
+   // - Include both product_slug and product_id (slug form) so either is accepted.
+   // - Include both name/reviewer_name and email/reviewer_email.
+   // - Include both comment and body.
+   // - Force rating to a number.
+   const payload = {
+     product_id: form.product_slug,                               // some handlers expect product_id (slug allowed)
+     product_slug: form.product_slug,                             // others expect product_slug
+     name: (form.reviewer_name && form.reviewer_name.trim()) ? form.reviewer_name.trim() : 'Anonymous',
+     reviewer_name: (form.reviewer_name && form.reviewer_name.trim()) ? form.reviewer_name.trim() : 'Anonymous',
+     email: form.reviewer_email || null,
+     reviewer_email: form.reviewer_email || null,
+     rating: Number(form.rating),
+     title: (form.title?.trim() || null),
+     comment: form.body.trim(),                                   // new handler prefers "comment"
+     body: form.body.trim(),                                      // older handler expects "body"
+     // Optionals not strictly required for intake
+     order_id: form.order_id || null
+   };
 
   console.log('Sending review to:', url);
   console.log('Payload:', payload);
+  console.log('Payload.rating typeof:', typeof (payload as any).rating);
 
   try {
     const res = await fetch(url, {
