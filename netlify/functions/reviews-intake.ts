@@ -38,21 +38,32 @@ export const handler: Handler = async (event) => {
     return { statusCode: 400, body: "Invalid JSON" };
   }
 
-  // DEBUG: log what the function actually sees
-  console.log("reviews-intake parsed body:", inBody);
-
-  const productIdRaw = (inBody.product_id || inBody.product_slug || "").toString().trim();
-  const reviewer_name = (inBody.reviewer_name || inBody.name || "").toString().trim();
-  const reviewer_email = (inBody.reviewer_email || inBody.email || "").toString().trim();
-  const rating = Number(inBody.rating ?? 0);
-  const title = (inBody.title || "").toString().trim();
-  const comment = (inBody.comment || inBody.body || "").toString().trim();
-
-  // Guardrails with clear messages
-  if (!productIdRaw) return { statusCode: 400, body: "product_id (or product_slug) is required" };
-  if (!reviewer_name) return { statusCode: 400, body: "name is required" };
-  if (!reviewer_email) return { statusCode: 400, body: "email is required" };
-  if (!(rating >= 1 && rating <= 5)) return { statusCode: 400, body: "rating must be 1..5" };
+   // DEBUG: log what the function actually sees
+   console.log("reviews-intake parsed body:", inBody);
+  
+   // Normalize inputs with sensible defaults and strong typing
+   const productIdRaw = (inBody.product_id || inBody.product_slug || "").toString().trim();
+   const reviewer_name = ((inBody.reviewer_name || inBody.name || "Anonymous") as string).toString().trim() || "Anonymous";
+   const _email = (inBody.reviewer_email || inBody.email || "").toString().trim();
+   const reviewer_email: string | null = _email || null;
+   const rating = Number(inBody.rating);
+   const title = (inBody.title || "").toString().trim();
+   const comment = (inBody.comment || inBody.body || "").toString().trim();
+  
+   // Extra debug
+   console.log("reviews-intake normalized:", {
+     productIdRaw,
+     reviewer_name,
+     hasEmail: !!reviewer_email,
+     ratingType: typeof (inBody.rating as any),
+     rating,
+     hasComment: !!comment,
+   });
+  
+   // Guardrails with clear messages (allow anonymous/no email; require product, comment, rating)
+   if (!productIdRaw) return { statusCode: 400, body: "product_id (or product_slug) is required" };
+   if (!comment) return { statusCode: 400, body: "body/comment is required" };
+   if (!(rating >= 1 && rating <= 5)) return { statusCode: 400, body: "rating must be 1..5" };
 
   // Resolve slug -> UUID
   let product_id = productIdRaw;
@@ -68,7 +79,7 @@ export const handler: Handler = async (event) => {
       }
     );
     if (!prodRes.ok) return { statusCode: 500, body: `Product lookup failed: ${await prodRes.text()}` };
-    const rows = await prodRes.json();
+    const rows = (await prodRes.json()) as any[];
     if (!rows?.length) return { statusCode: 400, body: `Unknown product slug: ${productIdRaw}` };
     product_id = rows[0].id;
   }
@@ -102,6 +113,11 @@ export const handler: Handler = async (event) => {
     return { statusCode: 500, body: `DB insert failed: ${t}` };
   }
 
-  const [review] = await insRes.json();
-  return { statusCode: 200, body: JSON.stringify({ ok: true, review }) };
+  const data = (await insRes.json()) as any[];
+  const review = Array.isArray(data) ? data[0] : data;
+  return {
+    statusCode: 200,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ok: true, review })
+  };
 };
