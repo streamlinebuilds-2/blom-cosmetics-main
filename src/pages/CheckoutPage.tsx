@@ -328,55 +328,17 @@ export const CheckoutPage: React.FC = () => {
         timestamp: new Date().toISOString()
       }));
 
-      // Step 2: Prepare PayFast payment with order ID
-      const paymentData = {
-        m_payment_id: orderId,
-        amount: (totalCents / 100).toFixed(2),
-        item_name: `BLOM Order (${cartState.items.length} items)`,
-        name_first: shippingInfo.firstName,
-        name_last: shippingInfo.lastName,
-        email_address: shippingInfo.email,
-        cell_number: formatMobileNumber(shippingInfo.phone),
-        items: cartState.items.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        coupon: appliedCoupon ? { code: appliedCoupon.code } : null,
-        shippingInfo: {
-          ...shippingInfo,
-          method: shippingMethod,
-          cost: shippingCost,
-          // Door-to-door delivery fields
-          ...(shippingMethod === 'door-to-door' && {
-            ship_to_street: deliveryAddress.street_address,
-            ship_to_suburb: deliveryAddress.local_area,
-            ship_to_city: deliveryAddress.city,
-            ship_to_zone: deliveryAddress.zone,
-            ship_to_postal_code: deliveryAddress.code,
-            ship_to_country: deliveryAddress.country,
-            ship_to_lat: deliveryAddress.lat,
-            ship_to_lng: deliveryAddress.lng
-          })
-        }
-      };
-
-      // Step 3: Use PayFast checkout function to get signed form data
-      // Send in the format backend expects: m_payment_id, amount, name_first, etc.
+      // Step 2: Redirect to PayFast with minimal payload
+      // All customer/delivery data already saved to Supabase via create-order above
       const pfRequestBody = {
         m_payment_id: orderData.merchant_payment_id,
         amount: (totalCents / 100).toFixed(2),
-        name_first: shippingInfo.firstName,
-        name_last: shippingInfo.lastName,
-        email_address: shippingInfo.email,
-        item_name: `BLOM Order ${orderData.merchant_payment_id}`,
-        order_id: orderId,
-        coupon: appliedCoupon ? { code: appliedCoupon.code } : null
+        item_name: `BLOM Order ${orderData.merchant_payment_id}`
       };
-      
+
       console.log('🔍 PayFast request:', pfRequestBody);
-      
-      const pfResponse = await fetch('/.netlify/functions/payfast-checkout', {
+
+      const pfResponse = await fetch('/.netlify/functions/payfast-redirect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pfRequestBody)
@@ -384,44 +346,35 @@ export const CheckoutPage: React.FC = () => {
 
       if (!pfResponse.ok) {
         const pfError = await pfResponse.json().catch(() => ({ error: 'PayFast initiation failed' }));
-        console.error('❌ PayFast checkout error:', pfError);
+        console.error('❌ PayFast redirect error:', pfError);
         alert(`PayFast Error: ${JSON.stringify(pfError, null, 2)}`);
         throw new Error(pfError.error || 'Payment initiation failed');
       }
 
-      const pfData = await pfResponse.json();
-      console.log('✅ PayFast response:', pfData);
-      
-      // New format: backend returns a redirect URL with all params already encoded
-      const redirectUrl = pfData.redirect || pfData.url;
-      
-      if (!redirectUrl) {
-        // Fallback: if old format (endpoint + fields), build form as before
-        const pfUrl = pfData.endpoint || 'https://www.payfast.co.za/eng/process';
-        const pfFields = pfData.fields || {};
-        
-        console.log('🚀 Submitting to (fallback):', pfUrl);
-        
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = pfUrl;
-        
-        Object.entries(pfFields).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = key;
-            input.value = String(value);
-            form.appendChild(input);
-          }
-        });
-        
-        document.body.appendChild(form);
-        form.submit();
+      // payfast-redirect returns HTML with auto-submit form
+      const contentType = pfResponse.headers.get('content-type') || '';
+
+      if (contentType.includes('text/html')) {
+        // HTML response: inject and let it auto-submit
+        const html = await pfResponse.text();
+        console.log('🚀 Redirecting to PayFast via auto-submit form');
+
+        // Replace current page with the PayFast redirect form
+        document.open();
+        document.write(html);
+        document.close();
       } else {
-        // New format: simple redirect to pre-built URL
-        console.log('🚀 Redirecting to PayFast:', redirectUrl);
-        window.location.href = redirectUrl;
+        // JSON fallback (for backward compatibility)
+        const pfData = await pfResponse.json();
+        console.log('✅ PayFast response:', pfData);
+
+        const redirectUrl = pfData.redirect || pfData.url;
+        if (redirectUrl) {
+          console.log('🚀 Redirecting to PayFast:', redirectUrl);
+          window.location.href = redirectUrl;
+        } else {
+          throw new Error('No redirect URL received from PayFast');
+        }
       }
       
     } catch (error: any) {
