@@ -1,44 +1,24 @@
 import { Handler } from '@netlify/functions';
 import crypto from 'crypto';
 
-// FIXED VERSION - Correct signature order for PayFast
-
-// Always use live endpoint
 const PF_BASE = 'https://www.payfast.co.za';
 const SITE_BASE_URL = process.env.SITE_BASE_URL || process.env.URL || '';
 const RETURN_URL = `${SITE_BASE_URL}/checkout/status`;
 const CANCEL_URL = `${SITE_BASE_URL}/checkout/cancel`;
 const NOTIFY_URL = process.env.PAYFAST_NOTIFY_URL || '';
 
-// PHP-style urlencode for PayFast: spaces -> +, and encode ! ' ( ) *
 function encPF(v: unknown) {
   return encodeURIComponent(String(v ?? ''))
     .replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())
     .replace(/%20/g, '+');
 }
 
-async function upsertOrder({ 
-  merchant_payment_id, 
-  amount, 
-  currency, 
-  email,
-  name,
-  items,
-  shippingInfo
-}: {
-  merchant_payment_id: string;
-  amount: number;
-  currency: string;
-  email?: string;
-  name?: string;
-  items?: any[];
-  shippingInfo?: any;
-}) {
+async function upsertOrder({ merchant_payment_id, amount, currency, email, name, items, shippingInfo }: any) {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!supabaseUrl || !serviceKey) {
-    console.warn('Supabase not configured, skipping order upsert');
+    console.warn('Supabase not configured');
     return;
   }
 
@@ -63,9 +43,9 @@ async function upsertOrder({
       lng: shippingInfo?.ship_to_lng ?? null
     } : null,
     updated_at: new Date().toISOString()
-  } as Record<string, any>;
+  };
 
-  const r = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_payment_id`, {
+  await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_payment_id`, {
     method: 'POST',
     headers: {
       apikey: serviceKey,
@@ -75,12 +55,6 @@ async function upsertOrder({
     },
     body: JSON.stringify(orderData)
   });
-
-  if (!r.ok) {
-    const txt = await r.text();
-    console.error(`Supabase upsert order failed: ${r.status} ${txt}`);
-    throw new Error(`Failed to create order: ${r.status}`);
-  }
 }
 
 export const handler: Handler = async (event) => {
@@ -95,11 +69,7 @@ export const handler: Handler = async (event) => {
   }
 
   if (event.httpMethod !== 'POST') {
-    return { 
-      statusCode: 405, 
-      headers,
-      body: JSON.stringify({ error: 'Method Not Allowed' }) 
-    };
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
@@ -111,14 +81,9 @@ export const handler: Handler = async (event) => {
     const m_payment_id = String(payload.m_payment_id || `BLOM-${Date.now()}`);
     
     if (!Number.isFinite(amountNum) || amountNum <= 0) {
-      return { 
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Invalid amount' }) 
-      };
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid amount' }) };
     }
 
-    // 1) Store order in Supabase
     try {
       await upsertOrder({ 
         merchant_payment_id: m_payment_id, 
@@ -133,11 +98,9 @@ export const handler: Handler = async (event) => {
       });
     } catch (e) {
       console.error('Order upsert failed:', e);
-      // Continue anyway - we can create order via ITN webhook
     }
 
-    // 2) Build PayFast redirect with CORRECT signature order
-    // CRITICAL: PayFast validates signature in THIS EXACT ORDER
+    // Build fields including optional ones if present
     const fields: Record<string, string> = {
       merchant_id: process.env.PAYFAST_MERCHANT_ID || '',
       merchant_key: process.env.PAYFAST_MERCHANT_KEY || '',
@@ -149,19 +112,28 @@ export const handler: Handler = async (event) => {
       item_name
     };
 
-    // PayFast signature order - MUST be in this exact sequence
+    // Add optional fields if provided
+    if (payload.name_first) fields.name_first = String(payload.name_first);
+    if (payload.name_last) fields.name_last = String(payload.name_last);
+    if (payload.email_address) fields.email_address = String(payload.email_address);
+    if (payload.custom_str1) fields.custom_str1 = String(payload.custom_str1);
+
+    // PayFast signature order - MUST include ALL fields that will be in URL
     const signatureOrder = [
       'merchant_id',
       'merchant_key',
       'return_url',
       'cancel_url',
       'notify_url',
+      'name_first',
+      'name_last',
+      'email_address',
       'm_payment_id',
       'amount',
-      'item_name'
+      'item_name',
+      'custom_str1'
     ];
 
-    // Build signature string
     const parts: string[] = [];
     for (const key of signatureOrder) {
       const val = fields[key];
@@ -171,27 +143,13 @@ export const handler: Handler = async (event) => {
     }
     
     let baseString = parts.join('&');
-    
-    // Add passphrase if configured
     if (process.env.PAYFAST_PASSPHRASE) {
       baseString += `&passphrase=${encPF(process.env.PAYFAST_PASSPHRASE)}`;
     }
     
-    // Generate MD5 signature
     const signature = crypto.createHash('md5').update(baseString).digest('hex');
-
-    // Debug logging (remove in production)
-    console.log('PayFast Signature Debug:');
-    console.log('- Merchant ID:', process.env.PAYFAST_MERCHANT_ID);
-    console.log('- Amount:', amountStr);
-    console.log('- m_payment_id:', m_payment_id);
-    console.log('- Signature length:', signature.length);
-    console.log('- Base string:', baseString.substring(0, 200) + '...');
-
-    // Add signature to fields
     fields.signature = signature;
 
-    // 3) Generate HTML form that auto-submits
     function htmlAutoPost(action: string, fields: Record<string, any>) {
       const inputs = Object.entries(fields).map(([k, v]) =>
         `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`
@@ -206,7 +164,7 @@ export const handler: Handler = async (event) => {
 <body onload="document.forms[0].submit()">
   <form action="${action}" method="post" accept-charset="utf-8">
     ${inputs}
-    <p>Redirecting to PayFast... <button type="submit">Click here if not redirected</button></p>
+    <p>Redirecting... <button type="submit">Click if not redirected</button></p>
   </form>
 </body>
 </html>`;
@@ -220,10 +178,6 @@ export const handler: Handler = async (event) => {
 
   } catch (e: any) {
     console.error('PayFast redirect error:', e);
-    return { 
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: e.message || 'Checkout error' }) 
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message || 'Checkout error' }) };
   }
 };
