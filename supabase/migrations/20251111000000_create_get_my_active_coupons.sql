@@ -1,5 +1,5 @@
 -- Migration: Create RPC function to fetch active coupons for logged-in user
--- This function finds coupons where email_locked matches the user's email,
+-- This function finds coupons where locked_email matches the user's email,
 -- they haven't been used, are active, and haven't expired.
 
 CREATE OR REPLACE FUNCTION get_my_active_coupons()
@@ -10,9 +10,9 @@ AS $$
   SELECT *
   FROM public.coupons
   WHERE
-    email_locked = (auth.jwt() ->> 'email') AND
+    locked_email = (auth.jwt() ->> 'email') AND
     used_count < max_uses AND
-    active = true AND
+    COALESCE(status, 'inactive') = 'active' AND
     valid_until > now();
 $$;
 
