@@ -3,7 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
-import { User, Mail, Phone, Calendar, Package, Heart, Settings } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Package, Heart, Settings, Ticket, MapPin } from 'lucide-react';
 import { authService, AuthState } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { wishlistStore } from '../lib/wishlist';
@@ -180,6 +180,18 @@ export default function AccountPageFullCore() {
                   onClick={() => setActiveTab('wishlist')}
                 >
                   <Heart className="h-5 w-5" /> Wishlist
+                </button>
+                <button
+                  className="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-gray-50"
+                  onClick={() => (window.location.href = '/account/coupons')}
+                >
+                  <Ticket className="h-5 w-5" /> My Coupons
+                </button>
+                <button
+                  className="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-gray-50"
+                  onClick={() => (window.location.href = '/account/addresses')}
+                >
+                  <MapPin className="h-5 w-5" /> Saved Addresses
                 </button>
                 <button
                   className={`w-full text-left px-5 py-4 flex items-center gap-3 ${activeTab==='settings' ? 'bg-pink-50 text-pink-600' : 'hover:bg-gray-50'}`}

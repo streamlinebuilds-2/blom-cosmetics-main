@@ -37,6 +37,8 @@ const DealsPage = lazy(() => import('./pages/DealsPage').then(m => ({ default: m
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })));
 const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample').then(m => ({ default: m.ProductTemplateExample })));
+const MyCoupons = lazy(() => import('./pages/MyCoupons'));
+const ManageAddresses = lazy(() => import('./pages/ManageAddresses'));
 
 /**
  * Prefetch next likely routes on idle to improve perceived performance.
@@ -111,16 +113,18 @@ function App() {
           <Route path="/cookie-policy" element={<PageWithCart><CookiePolicyPage /></PageWithCart>} />
           
           {/* Account */}
-          <Route 
-            path="/account" 
+          <Route
+            path="/account"
             element={
               <PageWithCart>
                 <ErrorBoundary>
                   <AccountPageFullCore />
                 </ErrorBoundary>
               </PageWithCart>
-            } 
+            }
           />
+          <Route path="/account/coupons" element={<PageWithCart><MyCoupons /></PageWithCart>} />
+          <Route path="/account/addresses" element={<PageWithCart><ManageAddresses /></PageWithCart>} />
           
           {/* Orders */}
           <Route path="/orders/:id" element={<PageWithCart><OrderDetailPage /></PageWithCart>} />
