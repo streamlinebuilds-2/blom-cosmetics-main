@@ -1,13 +1,14 @@
 import { Handler } from '@netlify/functions';
 import crypto from 'crypto';
 
-// Env configuration per spec
-// Always use live endpoint; ignore any env override to prevent sandbox redirects
+// FIXED VERSION - Correct signature order for PayFast
+
+// Always use live endpoint
 const PF_BASE = 'https://www.payfast.co.za';
 const SITE_BASE_URL = process.env.SITE_BASE_URL || process.env.URL || '';
-const RETURN_URL = `${SITE_BASE_URL}/payment-success`;
-const CANCEL_URL = `${SITE_BASE_URL}/payment-cancelled`;
-const NOTIFY_URL = process.env.N8N_ITN_URL || '';
+const RETURN_URL = `${SITE_BASE_URL}/checkout/status`;
+const CANCEL_URL = `${SITE_BASE_URL}/checkout/cancel`;
+const NOTIFY_URL = process.env.PAYFAST_NOTIFY_URL || '';
 
 // PHP-style urlencode for PayFast: spaces -> +, and encode ! ' ( ) *
 function encPF(v: unknown) {
@@ -16,46 +17,11 @@ function encPF(v: unknown) {
     .replace(/%20/g, '+');
 }
 
-// Build signature using documentation order (not sorting)
-function signPayfastInOrder(fields: Record<string, any>, passphrase?: string) {
-  // Documentation order per spec
-  const order = [
-    'merchant_id','merchant_key','return_url','cancel_url','notify_url',
-    'name_first','name_last','email_address','cell_number',
-    'm_payment_id','amount','item_name','item_description',
-    'custom_int1','custom_int2','custom_int3','custom_int4','custom_int5',
-    'custom_str1','custom_str2','custom_str3','custom_str4','custom_str5',
-    'email_confirmation','confirmation_address','payment_method'
-  ];
-
-  const parts: string[] = [];
-  for (const key of order) {
-    const val = (fields as any)[key];
-    if (val !== undefined && val !== null && String(val) !== '') {
-      parts.push(`${key}=${encPF(val)}`);
-    }
-  }
-
-  let base = parts.join('&');
-  if (passphrase) {
-    base += `&passphrase=${encPF(passphrase)}`;
-  }
-
-  const signature = crypto.createHash('md5').update(base).digest('hex');
-
-  // TEMP LOGS (remove after success)
-  console.log('PF merchant:', process.env.PAYFAST_MERCHANT_ID);
-  console.log('Sig len:', signature.length);
-  console.log('PF baseString:', base);
-
-  return { signature, base };
-}
-
 async function upsertOrder({ 
   merchant_payment_id, 
   amount, 
   currency, 
-  email, 
+  email,
   name,
   items,
   shippingInfo
@@ -68,7 +34,6 @@ async function upsertOrder({
   items?: any[];
   shippingInfo?: any;
 }) {
-  // Upsert order to Supabase using service_role key
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   
@@ -87,7 +52,6 @@ async function upsertOrder({
     customer_mobile: shippingInfo?.phone ?? null,
     shipping_method: shippingInfo?.method ?? null,
     shipping_cost: shippingInfo?.cost ?? 0,
-    // Delivery address JSON (schema-safe)
     delivery_address: shippingInfo?.method === 'door-to-door' ? {
       street_address: shippingInfo?.ship_to_street ?? null,
       local_area: shippingInfo?.ship_to_suburb ?? null,
@@ -120,14 +84,12 @@ async function upsertOrder({
 }
 
 export const handler: Handler = async (event) => {
-  // Set CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  // Handle preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers, body: '' };
   }
@@ -174,23 +136,11 @@ export const handler: Handler = async (event) => {
       // Continue anyway - we can create order via ITN webhook
     }
 
-    // Helper: HTML auto-submit form
-    function htmlAutoPost(action: string, fields: Record<string, any>) {
-      const inputs = Object.entries(fields).map(([k, v]) =>
-        `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`
-      ).join('\n');
-      return `<!doctype html><meta charset="utf-8"><title>Redirecting…</title>
-<body onload="document.forms[0].submit()">
-  <form action="${action}" method="post" accept-charset="utf-8">
-    ${inputs}
-  </form>
-</body>`;
-    }
-
-    // 2) Minimal hosted-form fields and signing in documentation order (no sorting)
-    const fields: Record<string, any> = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
+    // 2) Build PayFast redirect with CORRECT signature order
+    // CRITICAL: PayFast validates signature in THIS EXACT ORDER
+    const fields: Record<string, string> = {
+      merchant_id: process.env.PAYFAST_MERCHANT_ID || '',
+      merchant_key: process.env.PAYFAST_MERCHANT_KEY || '',
       return_url: RETURN_URL,
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
@@ -199,30 +149,68 @@ export const handler: Handler = async (event) => {
       item_name
     };
 
-    const order = [
-      'merchant_id','merchant_key','return_url','cancel_url','notify_url',
-      'm_payment_id','amount','item_name'
+    // PayFast signature order - MUST be in this exact sequence
+    const signatureOrder = [
+      'merchant_id',
+      'merchant_key',
+      'return_url',
+      'cancel_url',
+      'notify_url',
+      'm_payment_id',
+      'amount',
+      'item_name'
     ];
 
+    // Build signature string
     const parts: string[] = [];
-    for (const key of order) {
-      const val = (fields as any)[key];
+    for (const key of signatureOrder) {
+      const val = fields[key];
       if (val !== undefined && val !== null && String(val) !== '') {
         parts.push(`${key}=${encPF(val)}`);
       }
     }
+    
     let baseString = parts.join('&');
+    
+    // Add passphrase if configured
     if (process.env.PAYFAST_PASSPHRASE) {
       baseString += `&passphrase=${encPF(process.env.PAYFAST_PASSPHRASE)}`;
     }
+    
+    // Generate MD5 signature
     const signature = crypto.createHash('md5').update(baseString).digest('hex');
 
-    // TEMP debug logs
-    console.log('PF merchant:', process.env.PAYFAST_MERCHANT_ID);
-    console.log('Sig len:', signature.length);
-    console.log('PF baseString:', baseString);
+    // Debug logging (remove in production)
+    console.log('PayFast Signature Debug:');
+    console.log('- Merchant ID:', process.env.PAYFAST_MERCHANT_ID);
+    console.log('- Amount:', amountStr);
+    console.log('- m_payment_id:', m_payment_id);
+    console.log('- Signature length:', signature.length);
+    console.log('- Base string:', baseString.substring(0, 200) + '...');
 
+    // Add signature to fields
     fields.signature = signature;
+
+    // 3) Generate HTML form that auto-submits
+    function htmlAutoPost(action: string, fields: Record<string, any>) {
+      const inputs = Object.entries(fields).map(([k, v]) =>
+        `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`
+      ).join('\n    ');
+      
+      return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting to PayFast...</title>
+</head>
+<body onload="document.forms[0].submit()">
+  <form action="${action}" method="post" accept-charset="utf-8">
+    ${inputs}
+    <p>Redirecting to PayFast... <button type="submit">Click here if not redirected</button></p>
+  </form>
+</body>
+</html>`;
+    }
 
     return {
       statusCode: 200,
