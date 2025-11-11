@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -8,6 +9,7 @@ import { supabase } from '../lib/supabase';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, UserPlus } from 'lucide-react';
 
 export const SignupPage: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,7 +21,7 @@ export const SignupPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   // const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: string }>({
+  const [status, setStatus] = useState<{ type: 'error' | 'success' | null; message: React.ReactNode }>({
     type: null,
     message: ''
   });
@@ -33,14 +35,19 @@ export const SignupPage: React.FC = () => {
       metaDescription.setAttribute('content', 'Create a BLOM Cosmetics account to shop faster, track orders, and manage your profile.');
     }
     window.scrollTo({ top: 0 });
-
-    // Check if user is already logged in
-    // Temporarily disable auth redirect while testing
-    // const authState = authService.getState();
-    // if (authState.user && !authState.loading) {
-    //   window.location.href = '/account';
-    // }
   }, []);
+
+  // Check if user is already logged in and redirect to account page
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate('/account');
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
 
   useEffect(() => {
     // Validate form
@@ -108,7 +115,26 @@ export const SignupPage: React.FC = () => {
       });
 
       if (error) {
-        setStatus({ type: 'error', message: error.message });
+        // Check if the error is due to email already being registered
+        if (error.message.includes('User already registered')) {
+          setStatus({
+            type: 'error',
+            message: (
+              <>
+                This email is already registered.{' '}
+                <a
+                  href="/login"
+                  className="underline font-medium hover:text-red-800 transition-colors"
+                >
+                  Click here to log in
+                </a>
+                .
+              </>
+            )
+          });
+        } else {
+          setStatus({ type: 'error', message: error.message });
+        }
         setIsSubmitting(false);
         return;
       }
