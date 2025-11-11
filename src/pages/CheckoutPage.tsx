@@ -77,6 +77,12 @@ export const CheckoutPage: React.FC = () => {
 
   const [userId, setUserId] = useState<string | null>(null);
 
+  // Saved addresses state
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('');
+  const [saveThisAddress, setSaveThisAddress] = useState(false);
+  const [userSession, setUserSession] = useState<any>(null);
+
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
     return unsubscribe;
@@ -98,6 +104,88 @@ export const CheckoutPage: React.FC = () => {
     });
     setIsWishlisted(wishlistStatus);
   }, []);
+
+  // Fetch user session and saved addresses
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('Error fetching session:', error);
+          return;
+        }
+
+        if (session?.user) {
+          setUserSession(session);
+          setUserId(session.user.id);
+
+          // Autofill contact information from user metadata
+          const firstName = session.user.user_metadata?.full_name?.split(' ')[0] || '';
+          const lastName = session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '';
+          const email = session.user.email || '';
+          const phone = session.user.user_metadata?.phone || '';
+
+          setShippingInfo(prev => ({
+            ...prev,
+            firstName: firstName || prev.firstName,
+            lastName: lastName || prev.lastName,
+            email: email || prev.email,
+            phone: phone || prev.phone,
+          }));
+
+          // Fetch saved addresses
+          const { data: addresses, error: addressError } = await supabase
+            .from('user_addresses')
+            .select('*')
+            .order('is_default', { ascending: false })
+            .order('created_at', { ascending: false });
+
+          if (addressError) {
+            console.error('Error fetching addresses:', addressError);
+            return;
+          }
+
+          setSavedAddresses(addresses || []);
+        }
+      } catch (error) {
+        console.error('Error in fetchUserData:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  // Handle saved address selection
+  const handleSavedAddressSelect = (addressId: string) => {
+    setSelectedAddressId(addressId);
+
+    const address = savedAddresses.find(addr => addr.id === addressId);
+    if (address) {
+      // Populate contact info
+      setShippingInfo(prev => ({
+        ...prev,
+        firstName: address.recipient_name?.split(' ')[0] || prev.firstName,
+        lastName: address.recipient_name?.split(' ').slice(1).join(' ') || prev.lastName,
+        phone: address.recipient_phone || prev.phone,
+      }));
+
+      // Populate delivery address
+      setDeliveryAddress({
+        street_address: address.address_line_1 || '',
+        local_area: address.address_line_2 || '',
+        city: address.city || '',
+        zone: address.province || '',
+        code: address.postal_code || '',
+        country: 'ZA',
+        lat: undefined,
+        lng: undefined,
+      });
+
+      // Update address input field
+      setAddressInput(address.address_line_1 || '');
+    }
+  };
 
   const handleWishlistToggle = (productId: string, productName: string, productPrice: number, productImage: string) => {
     const wishlistItem = {
@@ -315,6 +403,27 @@ export const CheckoutPage: React.FC = () => {
       const orderId = orderData.order_id;
       const totalCents = orderData.total_cents;
 
+      // Save address to user_addresses if requested and user is logged in
+      if (saveThisAddress && userSession?.user && shippingMethod === 'door-to-door') {
+        try {
+          await supabase.from('user_addresses').insert({
+            user_id: userSession.user.id,
+            address_name: null,
+            recipient_name: `${shippingInfo.firstName} ${shippingInfo.lastName}`.trim(),
+            recipient_phone: shippingInfo.phone,
+            address_line_1: deliveryAddress.street_address,
+            address_line_2: deliveryAddress.local_area,
+            city: deliveryAddress.city,
+            province: deliveryAddress.zone,
+            postal_code: deliveryAddress.code,
+            is_default: false,
+          });
+        } catch (err) {
+          console.error('Failed to save address:', err);
+          // Don't block checkout if address save fails
+        }
+      }
+
       // Store order locally before redirecting
       localStorage.setItem('blom_pending_order', JSON.stringify({
         orderId,
@@ -526,6 +635,26 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Saved Address Dropdown */}
+                      {userSession && savedAddresses.length > 0 && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Use a saved address
+                          </label>
+                          <select
+                            value={selectedAddressId}
+                            onChange={(e) => handleSavedAddressSelect(e.target.value)}
+                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-pink-400 focus:border-pink-400"
+                          >
+                            <option value="">Select a saved address...</option>
+                            {savedAddresses.map((addr) => (
+                              <option key={addr.id} value={addr.id}>
+                                {addr.address_name || 'Unnamed'} - {addr.address_line_1}, {addr.city}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       <div className="grid md:grid-cols-2 gap-4">
                         <div>
@@ -663,6 +792,22 @@ export const CheckoutPage: React.FC = () => {
                               Start typing your address above to get suggestions. This will auto-fill all the fields below for accurate delivery.
                             </p>
                           </div>
+
+                          {/* Save Address Checkbox */}
+                          {userSession && (
+                            <div className="flex items-center gap-2 bg-pink-50 border border-pink-200 rounded-lg p-3">
+                              <input
+                                type="checkbox"
+                                id="save_address"
+                                checked={saveThisAddress}
+                                onChange={(e) => setSaveThisAddress(e.target.checked)}
+                                className="rounded border-gray-300 text-pink-500 focus:ring-pink-400"
+                              />
+                              <label htmlFor="save_address" className="text-sm text-gray-700 cursor-pointer">
+                                Save this address to my account for faster checkout next time
+                              </label>
+                            </div>
+                          )}
                         </div>
                       )}
 
