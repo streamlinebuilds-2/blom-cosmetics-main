@@ -64,19 +64,14 @@ export const handler: Handler = async (event) => {
     'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers, body: '' };
-  }
-
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
+  if (event.httpMethod !== 'POST') return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) };
 
   try {
     const payload = JSON.parse(event.body || '{}');
     
     const amountNum = Number(payload.amount);
-    const amountStr = Number(payload.amount).toFixed(2);
+    const amountStr = amountNum.toFixed(2);
     const item_name = String(payload.item_name || 'BLOM Order');
     const m_payment_id = String(payload.m_payment_id || `BLOM-${Date.now()}`);
     
@@ -100,7 +95,7 @@ export const handler: Handler = async (event) => {
       console.error('Order upsert failed:', e);
     }
 
-    // Build fields including optional ones if present
+    // Build fields - start with required
     const fields: Record<string, string> = {
       merchant_id: process.env.PAYFAST_MERCHANT_ID || '',
       merchant_key: process.env.PAYFAST_MERCHANT_KEY || '',
@@ -112,26 +107,17 @@ export const handler: Handler = async (event) => {
       item_name
     };
 
-    // Add optional fields if provided
+    // Add optional fields if present
     if (payload.name_first) fields.name_first = String(payload.name_first);
     if (payload.name_last) fields.name_last = String(payload.name_last);
     if (payload.email_address) fields.email_address = String(payload.email_address);
     if (payload.custom_str1) fields.custom_str1 = String(payload.custom_str1);
 
-    // PayFast signature order - MUST include ALL fields that will be in URL
+    // Signature order with optional fields
     const signatureOrder = [
-      'merchant_id',
-      'merchant_key',
-      'return_url',
-      'cancel_url',
-      'notify_url',
-      'name_first',
-      'name_last',
-      'email_address',
-      'm_payment_id',
-      'amount',
-      'item_name',
-      'custom_str1'
+      'merchant_id', 'merchant_key', 'return_url', 'cancel_url', 'notify_url',
+      'name_first', 'name_last', 'email_address',
+      'm_payment_id', 'amount', 'item_name', 'custom_str1'
     ];
 
     const parts: string[] = [];
@@ -155,19 +141,7 @@ export const handler: Handler = async (event) => {
         `<input type="hidden" name="${k}" value="${String(v).replace(/"/g, '&quot;')}">`
       ).join('\n    ');
       
-      return `<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Redirecting to PayFast...</title>
-</head>
-<body onload="document.forms[0].submit()">
-  <form action="${action}" method="post" accept-charset="utf-8">
-    ${inputs}
-    <p>Redirecting... <button type="submit">Click if not redirected</button></p>
-  </form>
-</body>
-</html>`;
+      return `<!doctype html><html><head><meta charset="utf-8"><title>Redirecting...</title></head><body onload="document.forms[0].submit()"><form action="${action}" method="post">${inputs}<p>Redirecting... <button type="submit">Click if not redirected</button></p></form></body></html>`;
     }
 
     return {
@@ -177,7 +151,7 @@ export const handler: Handler = async (event) => {
     };
 
   } catch (e: any) {
-    console.error('PayFast redirect error:', e);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message || 'Checkout error' }) };
+    console.error('PayFast error:', e);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
 };
