@@ -40,6 +40,10 @@ const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample
 const MyCoupons = lazy(() => import('./pages/MyCoupons'));
 const ManageAddresses = lazy(() => import('./pages/ManageAddresses'));
 
+// Admin pages
+const AdminOrders = lazy(() => import('./pages/Orders'));
+const AdminOrderDetail = lazy(() => import('./pages/OrderDetail'));
+
 /**
  * Prefetch next likely routes on idle to improve perceived performance.
  * This downloads route chunks after initial render without blocking LCP.
@@ -149,6 +153,10 @@ function App() {
           
           {/* Template/Dev */}
           <Route path="/product-template-example" element={<PageWithCart><ProductTemplateExample /></PageWithCart>} />
+
+          {/* Admin Routes */}
+          <Route path="/admin/orders" element={<PageWithCart><AdminOrders /></PageWithCart>} />
+          <Route path="/admin/orders/:orderId" element={<PageWithCart><AdminOrderDetail /></PageWithCart>} />
         </Routes>
       </ErrorBoundary>
     </BrowserRouter>
