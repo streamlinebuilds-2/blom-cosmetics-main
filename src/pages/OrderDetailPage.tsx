@@ -252,8 +252,8 @@ export default function OrderDetailPage() {
                 <div className="text-sm text-gray-600 space-y-2">
                   <div className="font-medium">Thank you for your purchase!</div>
                   <div>Questions? Contact us:</div>
-                  <div>Email: support@blom-cosmetics.co.za</div>
-                  <div>Phone: +27 (0) 82 000 0000</div>
+                  <div>Email: shopblomcosmetics@gmail.com</div>
+                  <div>Phone: +27 79 548 3317</div>
                 </div>
                 <div className="text-right text-sm text-gray-600">blom-cosmetics.co.za</div>
               </div>
