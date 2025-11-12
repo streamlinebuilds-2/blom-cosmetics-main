@@ -35,7 +35,7 @@ export const handler: Handler = async (event) => {
     }
     
     if (body.shipping || body.deliveryAddress || body.shippingMethod) {
-      // Preferred new shape
+      // Preferred new shape (from CheckoutPage)
       if (body.shipping) {
         fulfillment = {
           method: body.shipping.method,
@@ -43,21 +43,23 @@ export const handler: Handler = async (event) => {
           collection_location: body.shipping.method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
         }
       }
-      
-      const method = body.shippingMethod || 'door-to-door'
-      const deliveryAddr = body.deliveryAddress || {}
-      
-      fulfillment = {
-        method: method,
-        delivery_address: method === 'door-to-door' ? {
-          street_address: deliveryAddr.street_address || '',
-          local_area: deliveryAddr.local_area || '',
-          city: deliveryAddr.city || '',
-          zone: deliveryAddr.zone || '',
-          code: deliveryAddr.code || '',
-          country: deliveryAddr.country || 'ZA'
-        } : null,
-        collection_location: method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
+      // Legacy format - ONLY if body.shipping wasn't provided
+      else if (body.shippingMethod || body.deliveryAddress) {
+        const method = body.shippingMethod || 'door-to-door'
+        const deliveryAddr = body.deliveryAddress || {}
+
+        fulfillment = {
+          method: method,
+          delivery_address: method === 'door-to-door' ? {
+            street_address: deliveryAddr.street_address || '',
+            local_area: deliveryAddr.local_area || '',
+            city: deliveryAddr.city || '',
+            zone: deliveryAddr.zone || '',
+            code: deliveryAddr.code || '',
+            country: deliveryAddr.country || 'ZA'
+          } : null,
+          collection_location: method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
+        }
       }
     }
     
