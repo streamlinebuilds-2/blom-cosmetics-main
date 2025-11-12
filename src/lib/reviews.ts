@@ -21,23 +21,14 @@ export async function submitReview(form: {
     throw new Error('Please write a review');
   }
 
-   // Send a superset of fields for backward/forward compatibility across function versions.
-   // - Include both product_slug and product_id (slug form) so either is accepted.
-   // - Include both name/reviewer_name and email/reviewer_email.
-   // - Include both comment and body.
-   // - Force rating to a number.
+   // Send payload with correct field names
    const payload = {
-     product_id: form.product_slug,                               // some handlers expect product_id (slug allowed)
-     product_slug: form.product_slug,                             // others expect product_slug
-     name: (form.reviewer_name && form.reviewer_name.trim()) ? form.reviewer_name.trim() : 'Anonymous',
+     product_slug: form.product_slug,
      reviewer_name: (form.reviewer_name && form.reviewer_name.trim()) ? form.reviewer_name.trim() : 'Anonymous',
-     email: form.reviewer_email || null,
      reviewer_email: form.reviewer_email || null,
      rating: Number(form.rating),
      title: (form.title?.trim() || null),
-     comment: form.body.trim(),                                   // new handler prefers "comment"
-     body: form.body.trim(),                                      // older handler expects "body"
-     // Optionals not strictly required for intake
+     body: form.body.trim(),
      order_id: form.order_id || null
    };
 
