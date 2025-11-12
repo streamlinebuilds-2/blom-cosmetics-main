@@ -9,7 +9,7 @@ export async function submitReview(form: {
   is_verified_buyer?: boolean;
   order_id?: string;
 }) {
-  const url = 'https://blom-admin-1.netlify.app/.netlify/functions/reviews-intake';
+  const url = '/.netlify/functions/reviews-intake';
   
   // Validate rating is present and valid
   if (!form.rating || form.rating < 1 || form.rating > 5) {
