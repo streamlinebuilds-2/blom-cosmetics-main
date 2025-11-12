@@ -619,10 +619,37 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           averageRating={product.rating || 0}
           reviewCount={product.reviewCount || 0}
           reviews={product.reviews || []}
-          onReviewSubmit={(reviewData) => {
-            // In a real app, this would submit to your backend
-            console.log('New review submitted:', reviewData);
-            showNotification('Thank you for your review! It will be published after moderation.');
+          onReviewSubmit={async (reviewData) => {
+            try {
+              const response = await fetch('/.netlify/functions/reviews-intake', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  product_slug: product.slug,
+                  name: reviewData.name,
+                  email: reviewData.email,
+                  title: reviewData.title,
+                  body: reviewData.comment,
+                  rating: reviewData.rating,
+                  is_verified_buyer: reviewData.verified || false
+                }),
+              });
+
+              const result = await response.json();
+
+              if (response.ok) {
+                showNotification('Thank you for your review! It will be published after moderation.');
+                console.log('Review submitted successfully:', result);
+              } else {
+                showNotification('Failed to submit review. Please try again.');
+                console.error('Review submission failed:', result);
+              }
+            } catch (error) {
+              console.error('Error submitting review:', error);
+              showNotification('An error occurred. Please try again later.');
+            }
           }}
         />
 
