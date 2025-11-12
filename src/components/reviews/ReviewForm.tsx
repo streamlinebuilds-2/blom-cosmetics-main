@@ -50,35 +50,20 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
 
     try {
       setStatus('saving');
-      // Upload photos (optional)
-      const photoUrls: string[] = [];
-      for (const p of photos) {
-        // 5MB limit
-        if (p.size > 5 * 1024 * 1024) continue;
-        try {
-          const url = await uploadToCloudinary(p);
-          photoUrls.push(url);
-        } catch (photoError) {
-          console.error('Photo upload failed:', photoError);
-          // Continue without this photo
-        }
-      }
 
-      const reviewData = {
+      // Build the payload to send to the backend
+      const payload = {
         product_slug: productSlug,
         reviewer_name: String(fd.get('name') || 'Anonymous'),
         reviewer_email: String(fd.get('email') || ''),
+        rating: Number(rating),
         title: String(fd.get('title') || ''),
-        body: String(fd.get('body') || ''),
-        rating,
-        is_verified_buyer: Boolean(fd.get('verified')),
-        order_id: String(fd.get('order_id') || ''),
-        photos: photoUrls
+        body: String(fd.get('body') || '')
       };
 
-      console.log('Submitting review:', { ...reviewData, photos: photoUrls.length });
+      console.log('Submitting review:', payload);
 
-      await submitReview(reviewData);
+      await submitReview(payload);
 
       setStatus('done');
       setPhotos([]);
