@@ -230,9 +230,9 @@ export const handler = async (event: any) => {
     y -= 12
     drawText("Questions? Contact us:", left, y, 9, false, rgb(0.4, 0.45, 0.52))
     y -= 11
-    drawText("Email: support@blom-cosmetics.co.za", left, y, 9, false, rgb(0.4, 0.45, 0.52))
+    drawText("Email: shopblomcosmetics@gmail.com", left, y, 9, false, rgb(0.4, 0.45, 0.52))
     y -= 11
-    drawText("Phone: +27 (0) 82 000 0000", left, y, 9, false, rgb(0.4, 0.45, 0.52))
+    drawText("Phone: +27 79 548 3317", left, y, 9, false, rgb(0.4, 0.45, 0.52))
     
     // Website in bottom right
     drawRightText(SITE.replace(/^https?:\/\//, "") || "blom-cosmetics.co.za", right, y - 11, 9, false, rgb(0.4, 0.45, 0.52))
