@@ -220,7 +220,7 @@ export const handler: Handler = async (event) => {
     // 6) Forward to n8n (non-blocking fan-out)
     ;(async () => {
       try {
-        const n8nUrl = process.env.N8N_ORDER_STATUS_WEBHOOK || `${process.env.N8N_BASE || 'https://dockerfile-1n82.onrender.com'}/webhook/payfast-itn`
+        const n8nUrl = process.env.N8N_ORDER_STATUS_WEBHOOK || `${process.env.N8N_BASE}/webhook/notify-order`
         await fetch(n8nUrl, {
           method: 'POST',
           headers: { 'content-type': 'application/x-www-form-urlencoded' },
