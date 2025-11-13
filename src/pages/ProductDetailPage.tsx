@@ -53,8 +53,7 @@ export const ProductDetailPage: React.FC = () => {
   const [allImages, setAllImages] = useState<string[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
 
-  // Legacy product database - REPLACED with dynamic Supabase fetch
-  /*
+  // Static product database - Keep existing products working
   const productDatabase = {
     'prep-primer-bundle': {
       id: 'bundle-1',
@@ -1208,7 +1207,6 @@ export const ProductDetailPage: React.FC = () => {
       reviews: []
     }
   };
-  */
 
   useEffect(() => {
     async function loadProduct() {
@@ -1218,7 +1216,39 @@ export const ProductDetailPage: React.FC = () => {
         // Load discounts
         loadDiscounts().then(setDiscounts).catch(console.error);
 
-        // Fetch product from Supabase by slug
+        // First, check static product database
+        const staticProduct = productDatabase[productSlug as keyof typeof productDatabase];
+
+        if (staticProduct) {
+          // Use static product
+          setProduct(staticProduct);
+          const firstVariant = staticProduct.variants[0];
+          setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
+
+          // Build allImages array including variant images
+          const images = [...staticProduct.images];
+          staticProduct.variants.forEach((variant: any) => {
+            if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
+              images.push(variant.image);
+            }
+          });
+          setAllImages(images);
+
+          // Update SEO with product data
+          const seoData = productSEO(
+            staticProduct.name,
+            staticProduct.shortDescription,
+            staticProduct.price,
+            staticProduct.images[0]
+          );
+          updateSEO(seoData);
+          trackPageView(seoData.title || '', seoData.url || '');
+
+          setLoading(false);
+          return;
+        }
+
+        // If not found in static products, try fetching from Supabase database
         const { data, error } = await supabase
           .from('products')
           .select(`
