@@ -51,18 +51,31 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
     try {
       setStatus('saving');
 
-      // Build the payload to send to the backend
+      // Upload photos to Cloudinary FIRST
+      const photoUrls: string[] = [];
+      if (photos.length > 0) {
+        for (const file of photos) {
+          try {
+            const url = await uploadToCloudinary(file);
+            photoUrls.push(url);
+          } catch (err) {
+            console.warn('Photo upload failed:', err);
+          }
+        }
+      }
+
+      // Build payload with photo URLs
       const payload = {
         product_slug: productSlug,
         reviewer_name: String(fd.get('name') || 'Anonymous'),
         reviewer_email: String(fd.get('email') || ''),
         rating: Number(rating),
         title: String(fd.get('title') || ''),
-        body: String(fd.get('body') || '')
+        body: String(fd.get('body') || ''),
+        photos: photoUrls // ✅ ADD THIS
       };
 
-      console.log('Submitting review:', payload);
-
+      console.log('Submitting review with photos:', payload);
       await submitReview(payload);
 
       setStatus('done');
@@ -73,7 +86,6 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
     } catch (error: any) {
       console.error('Review submission error:', error);
       setStatus('error');
-      // Store error message for display
       setErrors({ body: error.message || 'Failed to submit review. Please try again.' });
     }
   }
