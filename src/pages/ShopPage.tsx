@@ -589,20 +589,20 @@ export const ShopPage: React.FC = () => {
           return;
         }
 
-        // Map messy DB to clean format - check ALL variations
+        // Map messy DB to clean format - check ALL variations with comprehensive fallbacks
         const mappedProducts = (products || []).map((p: any) => ({
           id: p.id,
           name: p.name,
           slug: p.slug,
           category: p.category || 'all',
 
-          // Price - check variations
+          // Price - check all variations
           price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
           compareAtPrice: p.compare_at_price || p.compare_at || null,
 
-          // Stock - check ALL possible columns
-          stock: p.stock || p.stock_quantity || p.stock_qty || p.stock_on_hand || p.stock_available || p.inventory_quantity || 0,
-          inStock: (p.stock || p.stock_quantity || p.stock_qty || p.stock_available || p.inventory_quantity || 0) > 0,
+          // Stock - check ALL possible columns (using ?? to properly handle 0 values)
+          stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
+          inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
 
           // Descriptions - check variations
           shortDescription: p.short_description || p.short_desc || p.description_short || '',
@@ -610,13 +610,13 @@ export const ShopPage: React.FC = () => {
           description: p.short_description || p.short_desc || p.description_short || '',
           overview: p.overview || p.long_description || p.description_full || p.description || '',
 
-          // Images - check variations
+          // Images - check variations (including gallery fallback)
           images: [
             p.thumbnail_url || p.image_main || p.image_url,
-            ...(p.gallery_urls || p.image_gallery || [])
+            ...(p.gallery_urls || p.image_gallery || p.gallery || [])
           ].filter(Boolean),
 
-          // Arrays
+          // Arrays (use modern names, fallback to empty)
           features: p.features || [],
           howToUse: p.how_to_use || [],
           ingredients: {
@@ -628,7 +628,7 @@ export const ShopPage: React.FC = () => {
           // Meta
           rating: 0,
           reviews: 0,
-          badges: [],
+          badges: p.badges || [],
           seo: {
             title: p.meta_title || p.name,
             description: p.meta_description || p.short_description || p.short_desc
