@@ -578,23 +578,10 @@ export const ShopPage: React.FC = () => {
   useEffect(() => {
     async function loadDbProducts() {
       try {
-        const { data, error } = await supabase
+        const { data: products, error } = await supabase
           .from('products')
-          .select(`
-            id,
-            name,
-            slug,
-            price,
-            compare_at_price,
-            short_description,
-            thumbnail_url,
-            gallery_urls,
-            status,
-            inventory_quantity
-          `)
-          .eq('is_active', true)
-          .in('status', ['active', 'published'])
-          .order('created_at', { ascending: false });
+          .select('*')
+          .eq('is_active', true);
 
         if (error) {
           console.error('Error fetching products from database:', error);
@@ -602,26 +589,50 @@ export const ShopPage: React.FC = () => {
           return;
         }
 
-        // Map database products to component format
-        const mappedProducts = (data || []).map((p: any) => ({
+        // Map messy DB to clean format - check ALL variations
+        const mappedProducts = (products || []).map((p: any) => ({
           id: p.id,
           name: p.name,
           slug: p.slug,
-          price: p.price || 0,
-          compareAtPrice: p.compare_at_price,
-          short_description: p.short_description || '',
-          shortDescription: p.short_description || '',
-          description: p.short_description || '',
+          category: p.category || 'all',
+
+          // Price - check variations
+          price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
+          compareAtPrice: p.compare_at_price || p.compare_at || null,
+
+          // Stock - check ALL possible columns
+          stock: p.stock || p.stock_quantity || p.stock_qty || p.stock_on_hand || p.stock_available || p.inventory_quantity || 0,
+          inStock: (p.stock || p.stock_quantity || p.stock_qty || p.stock_available || p.inventory_quantity || 0) > 0,
+
+          // Descriptions - check variations
+          shortDescription: p.short_description || p.short_desc || p.description_short || '',
+          short_description: p.short_description || p.short_desc || p.description_short || '',
+          description: p.short_description || p.short_desc || p.description_short || '',
+          overview: p.overview || p.long_description || p.description_full || p.description || '',
+
+          // Images - check variations
           images: [
-            p.thumbnail_url,
-            ...(p.gallery_urls || [])
+            p.thumbnail_url || p.image_main || p.image_url,
+            ...(p.gallery_urls || p.image_gallery || [])
           ].filter(Boolean),
-          category: 'all', // Will be enhanced when categories are linked
+
+          // Arrays
+          features: p.features || [],
+          howToUse: p.how_to_use || [],
+          ingredients: {
+            inci: p.inci_ingredients || [],
+            key: p.key_ingredients || []
+          },
+          variants: p.variants || [],
+
+          // Meta
           rating: 0,
           reviews: 0,
           badges: [],
-          inStock: (p.status === 'active' || p.status === 'published') && (p.inventory_quantity || 0) > 0,
-          variants: []
+          seo: {
+            title: p.meta_title || p.name,
+            description: p.meta_description || p.short_description || p.short_desc
+          }
         }));
 
         setDbProducts(mappedProducts);
