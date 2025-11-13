@@ -14,6 +14,7 @@ import { ProductStructuredData } from '../components/seo/ProductStructuredData';
 import { ShareButton } from '../components/ui/ShareButton';
 import { ProductReviews } from '../components/reviews/ProductReviews';
 import { ReviewForm } from '../components/reviews/ReviewForm';
+import { ApprovedReviews } from '../components/product-page/ApprovedReviews';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 import { 
   Heart, 
@@ -2067,14 +2068,16 @@ export const ProductDetailPage: React.FC = () => {
           </Container>
         </section>
 
-        {/* Reviews (approved only) */}
+        {/* Reviews Section */}
         <section className="section-padding">
           <Container>
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
-              {product && <ProductReviews productSlug={product.slug} />}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-2">Write a review</h3>
+              {/* Approved Reviews Display */}
+              {product && <ApprovedReviews productSlug={product.slug} />}
+
+              {/* Write a Review Form */}
+              <div className="mt-12">
+                <h3 className="text-2xl font-bold mb-6 text-gray-900">Write a Review</h3>
                 {product && (
                   <ReviewForm
                     productSlug={product.slug}
