@@ -1263,7 +1263,7 @@ export const ProductDetailPage: React.FC = () => {
         }
 
         if (data) {
-          // Map messy DB to clean format - check ALL variations
+          // Map messy DB to clean format - check ALL variations with comprehensive fallbacks
           const mappedProduct = {
             id: data.id,
             name: data.name,
@@ -1274,23 +1274,23 @@ export const ProductDetailPage: React.FC = () => {
             shortDescription: data.short_description || data.short_desc || data.description_short || '',
             overview: data.overview || data.long_description || data.description_full || data.description || data.short_description || '',
 
-            // Price - check variations
+            // Price - check all variations
             price: data.price || (data.price_cents ? data.price_cents / 100 : 0),
             compareAtPrice: data.compare_at_price || data.compare_at || null,
 
-            // Stock - check ALL possible columns
+            // Stock - check ALL possible columns (using ?? to properly handle 0 values)
             stock: (() => {
-              const stockQty = data.stock || data.stock_quantity || data.stock_qty || data.stock_on_hand || data.stock_available || data.inventory_quantity || 0;
+              const stockQty = data.stock ?? data.stock_quantity ?? data.stock_qty ?? data.stock_on_hand ?? data.stock_available ?? data.inventory_quantity ?? 0;
               return stockQty > 0 ? 'In Stock' : 'Out of Stock';
             })(),
 
-            // Images - check variations
+            // Images - check variations (including gallery fallback)
             images: [
               data.thumbnail_url || data.image_main || data.image_url,
-              ...(data.gallery_urls || data.image_gallery || [])
+              ...(data.gallery_urls || data.image_gallery || data.gallery || [])
             ].filter(Boolean),
 
-            // Arrays
+            // Arrays (use modern names, fallback to empty)
             features: data.features || [],
             howToUse: data.how_to_use || [],
             ingredients: {
@@ -1310,6 +1310,7 @@ export const ProductDetailPage: React.FC = () => {
             rating: 0,
             reviewCount: 0,
             reviews: [],
+            badges: data.badges || [],
             seo: {
               title: data.meta_title || data.name,
               description: data.meta_description || data.short_description || data.short_desc
