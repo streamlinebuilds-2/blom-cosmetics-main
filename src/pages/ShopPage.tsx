@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
+import { supabase } from '../lib/supabase';
 // Discount system disabled
 
 export const ShopPage: React.FC = () => {
@@ -20,9 +21,78 @@ export const ShopPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
   // Discount system disabled
 
-  // All BLOM products with detailed information - Final Product List
+  // Fetch products from Supabase
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        setLoading(true);
+
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            slug,
+            price,
+            compare_at_price,
+            short_description,
+            thumbnail_url,
+            gallery_urls,
+            status,
+            inventory_quantity
+          `)
+          .eq('is_active', true)
+          .in('status', ['active', 'published'])
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching products:', error);
+          setError('Failed to load products');
+          setAllProducts([]);
+          return;
+        }
+
+        // Map database products to component format
+        const mappedProducts = (data || []).map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          price: p.price || 0,
+          compareAtPrice: p.compare_at_price,
+          short_description: p.short_description || '',
+          shortDescription: p.short_description || '',
+          description: p.short_description || '',
+          images: [
+            p.thumbnail_url,
+            ...(p.gallery_urls || [])
+          ].filter(Boolean),
+          category: 'all', // Categories will be fetched separately if needed
+          rating: 0,
+          reviews: 0,
+          badges: [], // Badges can be derived from product properties if needed
+          inStock: (p.status === 'active' || p.status === 'published') && (p.inventory_quantity || 0) > 0,
+          variants: []
+        }));
+
+        setAllProducts(mappedProducts);
+      } catch (err: any) {
+        console.error('Error loading products:', err);
+        setError('Failed to load products');
+        setAllProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProducts();
+  }, []);
+
+  // Legacy static products array - REPLACED with dynamic Supabase fetch above
+  /*
   const allProducts = [
     // Bundle Deals
     {
@@ -570,6 +640,7 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     }
   ];
+  */
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
@@ -596,13 +667,6 @@ export const ShopPage: React.FC = () => {
       metaDescription.setAttribute('content', 'Shop professional nail care products, acrylic systems, and tools. High-quality products trusted by nail artists and beauty professionals.');
     }
     window.scrollTo({ top: 0 });
-
-    // Discount system disabled
-
-    // Simulate loading
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
 
     // If navigated with hash to a category (e.g., #acrylic-system), preselect it
     const hash = window.location.hash.replace('#', '');
