@@ -16,6 +16,7 @@ import { ProductReviews } from '../components/reviews/ProductReviews';
 import { ReviewForm } from '../components/reviews/ReviewForm';
 import { ApprovedReviews } from '../components/product-page/ApprovedReviews';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
+import { supabase } from '../lib/supabase';
 import { 
   Heart, 
   Share2, 
@@ -52,7 +53,8 @@ export const ProductDetailPage: React.FC = () => {
   const [allImages, setAllImages] = useState<string[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
 
-  // Product database - matches ShopPage products
+  // Legacy product database - REPLACED with dynamic Supabase fetch
+  /*
   const productDatabase = {
     'prep-primer-bundle': {
       id: 'bundle-1',
@@ -1206,42 +1208,117 @@ export const ProductDetailPage: React.FC = () => {
       reviews: []
     }
   };
+  */
 
   useEffect(() => {
-    // Load discounts
-    loadDiscounts().then(setDiscounts).catch(console.error);
-    
-    // Find product by slug
-    const foundProduct = productDatabase[productSlug as keyof typeof productDatabase];
+    async function loadProduct() {
+      try {
+        setLoading(true);
 
-    if (foundProduct) {
-      setProduct(foundProduct);
-      const firstVariant = foundProduct.variants[0];
-      setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
+        // Load discounts
+        loadDiscounts().then(setDiscounts).catch(console.error);
 
-      // Build allImages array including variant images
-      const images = [...foundProduct.images];
-      foundProduct.variants.forEach((variant: any) => {
-        if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
-          images.push(variant.image);
+        // Fetch product from Supabase by slug
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            slug,
+            price,
+            compare_at_price,
+            short_description,
+            overview,
+            thumbnail_url,
+            gallery_urls,
+            status,
+            inventory_quantity,
+            features,
+            how_to_use,
+            inci_ingredients,
+            key_ingredients,
+            size,
+            shelf_life,
+            claims
+          `)
+          .eq('slug', productSlug)
+          .eq('is_active', true)
+          .in('status', ['active', 'published'])
+          .single();
+
+        if (error) {
+          console.error('Error fetching product:', error);
+          setLoading(false);
+          return;
         }
-      });
-      setAllImages(images);
 
-      // Update SEO with product data
-      const seoData = productSEO(
-        foundProduct.name,
-        foundProduct.shortDescription,
-        foundProduct.price,
-        foundProduct.images[0]
-      );
-      updateSEO(seoData);
-      
-      // Track product page view
-      trackPageView(seoData.title || '', seoData.url || '');
+        if (data) {
+          // Map database product to component format
+          const mappedProduct = {
+            id: data.id,
+            name: data.name,
+            slug: data.slug,
+            category: 'Products', // Category will be fetched separately if needed
+            shortDescription: data.short_description || '',
+            overview: data.overview || data.short_description || '',
+            price: data.price || 0,
+            compareAtPrice: data.compare_at_price,
+            stock: (data.status === 'active' || data.status === 'published') && (data.inventory_quantity || 0) > 0 ? 'In Stock' : 'Out of Stock',
+            images: [
+              data.thumbnail_url,
+              ...(data.gallery_urls || [])
+            ].filter(Boolean),
+            features: data.features || [],
+            howToUse: data.how_to_use || [],
+            ingredients: {
+              inci: data.inci_ingredients || [],
+              key: data.key_ingredients || []
+            },
+            details: {
+              size: data.size || '',
+              shelfLife: data.shelf_life || '',
+              claims: data.claims || []
+            },
+            variants: [], // Variants can be fetched from product_variants table if needed
+            rating: 0,
+            reviewCount: 0,
+            reviews: []
+          };
+
+          setProduct(mappedProduct);
+
+          const firstVariant = mappedProduct.variants[0];
+          setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
+
+          // Build allImages array including variant images
+          const images = [...mappedProduct.images];
+          mappedProduct.variants.forEach((variant: any) => {
+            if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
+              images.push(variant.image);
+            }
+          });
+          setAllImages(images);
+
+          // Update SEO with product data
+          const seoData = productSEO(
+            mappedProduct.name,
+            mappedProduct.shortDescription,
+            mappedProduct.price,
+            mappedProduct.images[0]
+          );
+          updateSEO(seoData);
+
+          // Track product page view
+          trackPageView(seoData.title || '', seoData.url || '');
+        }
+      } catch (err) {
+        console.error('Error loading product:', err);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    setLoading(false);
+    loadProduct();
   }, [productSlug]);
 
   useEffect(() => {
