@@ -21,16 +21,18 @@ export async function submitReview(form: {
     throw new Error('Please write a review');
   }
 
-   // Send payload with correct field names
-   const payload = {
-     product_slug: form.product_slug,
-     reviewer_name: (form.reviewer_name && form.reviewer_name.trim()) ? form.reviewer_name.trim() : 'Anonymous',
-     reviewer_email: form.reviewer_email || null,
-     rating: Number(form.rating),
-     title: (form.title?.trim() || null),
-     body: form.body.trim(),
-     order_id: form.order_id || null
-   };
+  // Send payload with correct field names
+  const payload = {
+    product_slug: form.product_slug,
+    reviewer_name: (form.reviewer_name && form.reviewer_name.trim()) ? form.reviewer_name.trim() : 'Anonymous',
+    reviewer_email: form.reviewer_email || null,
+    rating: Number(form.rating),
+    title: (form.title?.trim() || null),
+    body: form.body.trim(),
+    photos: form.photos || [],
+    is_verified_buyer: form.is_verified_buyer || false,
+    order_id: form.order_id || null
+  };
 
   console.log('Sending review to:', url);
   console.log('Payload:', payload);
