@@ -1251,29 +1251,9 @@ export const ProductDetailPage: React.FC = () => {
         // If not found in static products, try fetching from Supabase database
         const { data, error } = await supabase
           .from('products')
-          .select(`
-            id,
-            name,
-            slug,
-            price,
-            compare_at_price,
-            short_description,
-            overview,
-            thumbnail_url,
-            gallery_urls,
-            status,
-            inventory_quantity,
-            features,
-            how_to_use,
-            inci_ingredients,
-            key_ingredients,
-            size,
-            shelf_life,
-            claims
-          `)
+          .select('*')
           .eq('slug', productSlug)
           .eq('is_active', true)
-          .in('status', ['active', 'published'])
           .single();
 
         if (error) {
@@ -1283,36 +1263,57 @@ export const ProductDetailPage: React.FC = () => {
         }
 
         if (data) {
-          // Map database product to component format
+          // Map messy DB to clean format - check ALL variations
           const mappedProduct = {
             id: data.id,
             name: data.name,
             slug: data.slug,
-            category: 'Products', // Category will be fetched separately if needed
-            shortDescription: data.short_description || '',
-            overview: data.overview || data.short_description || '',
-            price: data.price || 0,
-            compareAtPrice: data.compare_at_price,
-            stock: (data.status === 'active' || data.status === 'published') && (data.inventory_quantity || 0) > 0 ? 'In Stock' : 'Out of Stock',
+            category: data.category || 'Products',
+
+            // Descriptions - check variations
+            shortDescription: data.short_description || data.short_desc || data.description_short || '',
+            overview: data.overview || data.long_description || data.description_full || data.description || data.short_description || '',
+
+            // Price - check variations
+            price: data.price || (data.price_cents ? data.price_cents / 100 : 0),
+            compareAtPrice: data.compare_at_price || data.compare_at || null,
+
+            // Stock - check ALL possible columns
+            stock: (() => {
+              const stockQty = data.stock || data.stock_quantity || data.stock_qty || data.stock_on_hand || data.stock_available || data.inventory_quantity || 0;
+              return stockQty > 0 ? 'In Stock' : 'Out of Stock';
+            })(),
+
+            // Images - check variations
             images: [
-              data.thumbnail_url,
-              ...(data.gallery_urls || [])
+              data.thumbnail_url || data.image_main || data.image_url,
+              ...(data.gallery_urls || data.image_gallery || [])
             ].filter(Boolean),
+
+            // Arrays
             features: data.features || [],
             howToUse: data.how_to_use || [],
             ingredients: {
               inci: data.inci_ingredients || [],
               key: data.key_ingredients || []
             },
+            variants: data.variants || [],
+
+            // Details
             details: {
               size: data.size || '',
               shelfLife: data.shelf_life || '',
               claims: data.claims || []
             },
-            variants: [], // Variants can be fetched from product_variants table if needed
+
+            // Meta
             rating: 0,
             reviewCount: 0,
-            reviews: []
+            reviews: [],
+            seo: {
+              title: data.meta_title || data.name,
+              description: data.meta_description || data.short_description || data.short_desc
+            }
           };
 
           setProduct(mappedProduct);
