@@ -66,6 +66,28 @@ export const handler: Handler = async (event) => {
       return { statusCode: 400, body: 'Invalid signature' }
     }
 
+    // --- START NEW CODE: Check Payment Status ---
+    const paymentStatus = data.payment_status;
+    if (paymentStatus !== 'COMPLETE') {
+      console.warn(`Payment status is ${paymentStatus}, marking order as cancelled/failed.`);
+
+      // If valid m_payment_id exists, mark order as cancelled
+      if (data.m_payment_id) {
+         await fetch(`${SUPABASE_URL}/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(data.m_payment_id)}`, {
+          method: 'PATCH',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          // 'cancelled' is in your allowed status list
+          body: JSON.stringify({ status: 'cancelled', payment_status: 'failed' })
+        });
+      }
+      return { statusCode: 200, body: 'Payment failed/cancelled recorded' };
+    }
+    // --- END NEW CODE ---
+
     // 2) Validate amount matches order
     const m_payment_id = data.m_payment_id
     if (!m_payment_id) {
