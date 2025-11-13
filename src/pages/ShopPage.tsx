@@ -21,79 +21,12 @@ export const ShopPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const [dbProducts, setDbProducts] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   // Discount system disabled
 
-  // Fetch products from Supabase
-  useEffect(() => {
-    async function loadProducts() {
-      try {
-        setLoading(true);
-
-        const { data, error } = await supabase
-          .from('products')
-          .select(`
-            id,
-            name,
-            slug,
-            price,
-            compare_at_price,
-            short_description,
-            thumbnail_url,
-            gallery_urls,
-            status,
-            inventory_quantity
-          `)
-          .eq('is_active', true)
-          .in('status', ['active', 'published'])
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching products:', error);
-          setError('Failed to load products');
-          setAllProducts([]);
-          return;
-        }
-
-        // Map database products to component format
-        const mappedProducts = (data || []).map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          slug: p.slug,
-          price: p.price || 0,
-          compareAtPrice: p.compare_at_price,
-          short_description: p.short_description || '',
-          shortDescription: p.short_description || '',
-          description: p.short_description || '',
-          images: [
-            p.thumbnail_url,
-            ...(p.gallery_urls || [])
-          ].filter(Boolean),
-          category: 'all', // Categories will be fetched separately if needed
-          rating: 0,
-          reviews: 0,
-          badges: [], // Badges can be derived from product properties if needed
-          inStock: (p.status === 'active' || p.status === 'published') && (p.inventory_quantity || 0) > 0,
-          variants: []
-        }));
-
-        setAllProducts(mappedProducts);
-      } catch (err: any) {
-        console.error('Error loading products:', err);
-        setError('Failed to load products');
-        setAllProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProducts();
-  }, []);
-
-  // Legacy static products array - REPLACED with dynamic Supabase fetch above
-  /*
-  const allProducts = [
+  // Static products - Keep existing products working while database is being populated
+  const staticProducts = [
     // Bundle Deals
     {
       id: 'bundle-1',
@@ -640,7 +573,71 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     }
   ];
-  */
+
+  // Fetch additional products from Supabase database
+  useEffect(() => {
+    async function loadDbProducts() {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            id,
+            name,
+            slug,
+            price,
+            compare_at_price,
+            short_description,
+            thumbnail_url,
+            gallery_urls,
+            status,
+            inventory_quantity
+          `)
+          .eq('is_active', true)
+          .in('status', ['active', 'published'])
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching products from database:', error);
+          setError('Failed to load some products');
+          return;
+        }
+
+        // Map database products to component format
+        const mappedProducts = (data || []).map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          price: p.price || 0,
+          compareAtPrice: p.compare_at_price,
+          short_description: p.short_description || '',
+          shortDescription: p.short_description || '',
+          description: p.short_description || '',
+          images: [
+            p.thumbnail_url,
+            ...(p.gallery_urls || [])
+          ].filter(Boolean),
+          category: 'all', // Will be enhanced when categories are linked
+          rating: 0,
+          reviews: 0,
+          badges: [],
+          inStock: (p.status === 'active' || p.status === 'published') && (p.inventory_quantity || 0) > 0,
+          variants: []
+        }));
+
+        setDbProducts(mappedProducts);
+      } catch (err: any) {
+        console.error('Error loading database products:', err);
+        setError('Failed to load some products');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDbProducts();
+  }, []);
+
+  // Merge static products + database products
+  const allProducts = [...staticProducts, ...dbProducts];
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
