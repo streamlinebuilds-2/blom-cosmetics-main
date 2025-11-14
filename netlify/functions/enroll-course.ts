@@ -26,6 +26,53 @@ export const handler: Handler = async (event) => {
 
     console.log('Enrolling in course:', { order_id, course_slug, buyer_email });
 
+    // 1. Check if user already exists in academy
+    const { data: existingUsers } = await ACADEMY_SUPABASE.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(u => u.email === buyer_email);
+
+    let academy_user_id = existingUser?.id;
+
+    if (!existingUser) {
+      // 2. Invite new user to academy
+      const { data: invitation, error: inviteError } = await ACADEMY_SUPABASE.auth.admin.inviteUserByEmail(
+        buyer_email,
+        {
+          data: {
+            full_name: buyer_name,
+            phone: buyer_phone
+          },
+          redirectTo: `${process.env.ACADEMY_URL}/auth/callback`
+        }
+      );
+
+      if (inviteError) {
+        console.error('Invitation error:', inviteError);
+        throw new Error(`Failed to invite user: ${inviteError.message}`);
+      }
+
+      academy_user_id = invitation.user?.id;
+      console.log('User invited:', academy_user_id);
+    } else {
+      console.log('User already exists:', academy_user_id);
+    }
+
+    // 3. Grant course access
+    const { error: enrollError } = await ACADEMY_SUPABASE
+      .from('enrollments')
+      .insert({
+        user_id: academy_user_id,
+        course_slug: course_slug,
+        status: 'active',
+        enrolled_at: new Date().toISOString()
+      });
+
+    if (enrollError) {
+      console.error('Enrollment error:', enrollError);
+      throw new Error(`Failed to enroll: ${enrollError.message}`);
+    }
+
+    console.log('Enrolling in course:', { order_id, course_slug, buyer_email });
+
     // 1. Get course ID from slug
     const { data: course, error: courseError } = await ACADEMY_SUPABASE
       .from('courses')
@@ -87,6 +134,7 @@ export const handler: Handler = async (event) => {
         buyer_phone,
         invited_at: new Date().toISOString(),
         invitation_status: 'sent',
+        academy_user_id
         academy_user_id: null // Will be set when they redeem
       });
 
@@ -97,6 +145,8 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: true,
+        academy_user_id,
+        message: 'Enrollment successful. Check your email for login instructions.'
         invite_token: token,
         invite_url: inviteUrl,
         message: 'Enrollment successful. Check your email for course access link.'

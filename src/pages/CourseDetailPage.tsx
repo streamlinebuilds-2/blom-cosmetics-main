@@ -345,8 +345,20 @@ export const CourseDetailPage: React.FC = () => {
 
     // Validate all fields
     const isValid = Object.entries(formData).every(([key, value]) => validateField(key, value));
-    if (!isValid || !selectedPackage || !selectedDate) {
+    if (!isValid) {
       showNotification('Please fill all required fields', 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!selectedPackage) {
+      showNotification('Please select a package', 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!selectedDate) {
+      showNotification('Please select a date', 'error');
       setIsSubmitting(false);
       return;
     }
@@ -355,7 +367,7 @@ export const CourseDetailPage: React.FC = () => {
       // Get the selected package price
       const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
       if (!selectedPkg) {
-        showNotification('Please select a package', 'error');
+        showNotification('Package not found', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -372,7 +384,10 @@ export const CourseDetailPage: React.FC = () => {
           buyer: {
             name: formData.name,
             email: formData.email,
-            phone: `${formData.countryCode}${formData.phone}`
+            phone: formData.phone
+          },
+          shipping: {
+            method: 'digital'
           },
           items: [{
             product_id: course.id,
@@ -384,14 +399,13 @@ export const CourseDetailPage: React.FC = () => {
             subtotal_cents: Math.round(coursePrice * 100),
             shipping_cents: 0,
             tax_cents: 0
-          },
-          shipping: {
-            method: 'digital' // No shipping needed for online courses
           }
         })
       });
 
       if (!orderRes.ok) {
+        const errorText = await orderRes.text();
+        console.error('Order creation failed:', errorText);
         throw new Error('Failed to create order');
       }
 
@@ -408,8 +422,8 @@ export const CourseDetailPage: React.FC = () => {
           email_address: formData.email,
           name_first: formData.name.split(' ')[0],
           name_last: formData.name.split(' ').slice(1).join(' ') || formData.name.split(' ')[0],
-          custom_str1: course.id, // Pass course ID
-          custom_str2: courseSlug // Pass course slug
+          custom_str1: course.id,
+          custom_str2: courseSlug
         })
       });
 
@@ -872,7 +886,7 @@ export const CourseDetailPage: React.FC = () => {
                       {/* Submit Button */}
                     <button
                         type="submit"
-                      disabled={isSubmitting || !selectedPackage || !selectedDate || !formData.terms}
+                      disabled={isSubmitting}
                       className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                       style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                     >
