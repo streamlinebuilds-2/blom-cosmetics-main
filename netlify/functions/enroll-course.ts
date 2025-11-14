@@ -6,108 +6,105 @@ const STORE_SUPABASE = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Academy Supabase client (for course enrollment system)
-const ACADEMY_SUPABASE = process.env.ACADEMY_SUPABASE_URL && process.env.ACADEMY_SUPABASE_SERVICE_KEY
-  ? createClient(
-      process.env.ACADEMY_SUPABASE_URL!,
-      process.env.ACADEMY_SUPABASE_SERVICE_KEY!
-    )
-  : null;
+const ACADEMY_SUPABASE = createClient(
+  process.env.ACADEMY_SUPABASE_URL!,
+  process.env.ACADEMY_SUPABASE_SERVICE_KEY!
+);
 
 export const handler: Handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers };
+  }
+
   try {
-    const { order_id, course_slug, buyer_email, buyer_name } = JSON.parse(event.body || '{}');
+    const { order_id, course_slug, buyer_email, buyer_name, buyer_phone } = JSON.parse(event.body || '{}');
 
-    if (!order_id || !course_slug || !buyer_email) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields: order_id, course_slug, buyer_email' })
-      };
-    }
+    console.log('Enrolling in course:', { order_id, course_slug, buyer_email });
 
-    console.log(`Enrolling ${buyer_email} in course ${course_slug} for order ${order_id}`);
+    // 1. Check if user already exists in academy
+    const { data: existingUsers } = await ACADEMY_SUPABASE.auth.admin.listUsers();
+    const existingUser = existingUsers?.users?.find(u => u.email === buyer_email);
 
-    // If Academy Supabase is configured, enroll the student
-    if (ACADEMY_SUPABASE) {
-      try {
-        // 1. Create user invitation in Academy Supabase
-        const { data: invitation, error: inviteError } = await ACADEMY_SUPABASE.auth.admin.inviteUserByEmail(
-          buyer_email,
-          {
-            data: {
-              full_name: buyer_name,
-              enrolled_course: course_slug
-            }
-          }
-        );
+    let academy_user_id = existingUser?.id;
 
-        if (inviteError && !inviteError.message.includes('already registered')) {
-          console.error('Invitation error:', inviteError);
-          throw inviteError;
+    if (!existingUser) {
+      // 2. Invite new user to academy
+      const { data: invitation, error: inviteError } = await ACADEMY_SUPABASE.auth.admin.inviteUserByEmail(
+        buyer_email,
+        {
+          data: {
+            full_name: buyer_name,
+            phone: buyer_phone
+          },
+          redirectTo: `${process.env.ACADEMY_URL}/auth/callback`
         }
+      );
 
-        console.log('User invitation sent/exists:', buyer_email);
-
-        // 2. Grant course access in Academy database
-        const { error: accessError } = await ACADEMY_SUPABASE
-          .from('course_enrollments') // Your academy table name
-          .insert({
-            user_email: buyer_email,
-            course_slug: course_slug,
-            enrolled_at: new Date().toISOString(),
-            status: 'active'
-          })
-          .select()
-          .maybeSingle();
-
-        if (accessError && !accessError.message.includes('duplicate')) {
-          console.error('Access grant error:', accessError);
-          throw accessError;
-        }
-
-        console.log('Course access granted:', course_slug);
-      } catch (academyError: any) {
-        console.error('Academy enrollment error:', academyError);
-        // Continue to track in store database even if academy enrollment fails
+      if (inviteError) {
+        console.error('Invitation error:', inviteError);
+        throw new Error(`Failed to invite user: ${inviteError.message}`);
       }
+
+      academy_user_id = invitation.user?.id;
+      console.log('User invited:', academy_user_id);
     } else {
-      console.warn('Academy Supabase not configured - skipping user invitation and enrollment');
+      console.log('User already exists:', academy_user_id);
     }
 
-    // 3. Track in store database
-    const { error: trackError } = await STORE_SUPABASE
+    // 3. Grant course access
+    const { error: enrollError } = await ACADEMY_SUPABASE
+      .from('enrollments')
+      .insert({
+        user_id: academy_user_id,
+        course_slug: course_slug,
+        status: 'active',
+        enrolled_at: new Date().toISOString()
+      });
+
+    if (enrollError) {
+      console.error('Enrollment error:', enrollError);
+      throw new Error(`Failed to enroll: ${enrollError.message}`);
+    }
+
+    // 4. Track in store database
+    await STORE_SUPABASE
       .from('course_purchases')
       .insert({
         order_id,
         course_slug,
         buyer_email,
         buyer_name,
+        buyer_phone,
         invited_at: new Date().toISOString(),
-        invitation_status: ACADEMY_SUPABASE ? 'sent' : 'pending_config'
-      })
-      .select()
-      .maybeSingle();
+        invitation_status: 'sent',
+        academy_user_id
+      });
 
-    if (trackError && !trackError.message.includes('duplicate')) {
-      console.error('Track error:', trackError);
-      // Don't fail the request if tracking fails
-    }
-
-    console.log('Course purchase tracked in store database');
+    console.log('Course enrollment complete');
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         success: true,
-        message: 'Course enrollment completed',
-        academy_configured: !!ACADEMY_SUPABASE
+        academy_user_id,
+        message: 'Enrollment successful. Check your email for login instructions.'
       })
     };
+
   } catch (error: any) {
     console.error('Course enrollment error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || 'Enrollment failed' })
+      headers,
+      body: JSON.stringify({
+        error: error.message || 'Failed to enroll in course'
+      })
     };
   }
 };

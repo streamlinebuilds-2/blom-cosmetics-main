@@ -156,7 +156,7 @@ export const handler: Handler = async (event) => {
 
       console.log('Order marked as paid:', order.id)
 
-      // 3b) Check if order contains courses and enroll user
+      // 3b) Enroll in courses if order contains course products
       ;(async () => {
         try {
           const itemsRes = await fetch(
@@ -174,7 +174,8 @@ export const handler: Handler = async (event) => {
             const courseItems = items.filter((i: any) => i.products?.product_type === 'course');
 
             if (courseItems.length > 0) {
-              // Enroll in each course
+              console.log(`Enrolling in ${courseItems.length} courses`);
+
               for (const item of courseItems) {
                 await fetch(`${SITE}/.netlify/functions/enroll-course`, {
                   method: 'POST',
@@ -183,16 +184,17 @@ export const handler: Handler = async (event) => {
                     order_id: order.id,
                     course_slug: item.products.slug,
                     buyer_email: data.email_address || order.buyer_email,
-                    buyer_name: `${data.name_first || ''} ${data.name_last || ''}`.trim()
+                    buyer_name: `${data.name_first || ''} ${data.name_last || ''}`.trim() || order.buyer_name,
+                    buyer_phone: order.buyer_phone
                   })
                 });
               }
 
-              console.log('Enrolled in courses:', courseItems.length);
+              console.log('Course enrollments triggered');
             }
           }
         } catch (e: any) {
-          console.warn('Course enrollment check failed:', e?.message);
+          console.warn('Course enrollment failed:', e?.message);
         }
       })();
 
