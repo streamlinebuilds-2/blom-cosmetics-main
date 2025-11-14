@@ -24,7 +24,7 @@ export const CourseDetailPage: React.FC = () => {
   // Course data
   const courses = {
     'professional-acrylic-training': {
-      id: 'e700b464-5c16-45b3-bd8b-fe6ba9fdc498',
+      id: 'a603be5f-2c56-4e95-9423-8229c8991b40',
       title: 'Professional Acrylic Training',
       description: 'Master the art of acrylic nail application with hands-on training in Randfontein.',
       heroImage: '/professional-acrylic-training-hero.webp',
@@ -115,7 +115,7 @@ export const CourseDetailPage: React.FC = () => {
       ]
     },
     'online-watercolour-workshop': {
-      id: 'f8a1c5d7-9b3e-4f2a-8e6d-1a2b3c4d5e6f',
+      id: 'e700b464-5c16-45b3-bd8b-fe6ba9fdc498',
       title: 'Online Watercolour Workshop',
       description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance.',
       heroImage: '/online-watercolor-card.webp',
@@ -188,7 +188,7 @@ export const CourseDetailPage: React.FC = () => {
       ]
     },
     'christmas-watercolor-workshop': {
-      id: 'a9b8c7d6-e5f4-3g2h-1i0j-9k8l7m6n5o4p',
+      id: '23666e48-bf0b-4e08-a0c0-9c5ae7838076',
       title: 'Christmas Watercolor Workshop',
       description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
       heroImage: '/christmas-watercolor-card.webp',
