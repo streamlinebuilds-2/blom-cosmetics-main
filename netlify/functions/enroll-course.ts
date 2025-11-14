@@ -6,108 +6,111 @@ const STORE_SUPABASE = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Academy Supabase client (for course enrollment system)
-const ACADEMY_SUPABASE = process.env.ACADEMY_SUPABASE_URL && process.env.ACADEMY_SUPABASE_SERVICE_KEY
-  ? createClient(
-      process.env.ACADEMY_SUPABASE_URL!,
-      process.env.ACADEMY_SUPABASE_SERVICE_KEY!
-    )
-  : null;
+const ACADEMY_SUPABASE = createClient(
+  process.env.ACADEMY_SUPABASE_URL!,
+  process.env.ACADEMY_SUPABASE_SERVICE_KEY!
+);
 
 export const handler: Handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json'
+  };
+
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 204, headers };
+  }
+
   try {
-    const { order_id, course_slug, buyer_email, buyer_name } = JSON.parse(event.body || '{}');
+    const { order_id, course_slug, buyer_email, buyer_name, buyer_phone } = JSON.parse(event.body || '{}');
 
-    if (!order_id || !course_slug || !buyer_email) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Missing required fields: order_id, course_slug, buyer_email' })
-      };
+    console.log('Enrolling in course:', { order_id, course_slug, buyer_email });
+
+    // 1. Get course ID from slug
+    const { data: course, error: courseError } = await ACADEMY_SUPABASE
+      .from('courses')
+      .select('id')
+      .eq('slug', course_slug)
+      .single();
+
+    if (courseError || !course) {
+      throw new Error(`Course not found: ${course_slug}`);
     }
 
-    console.log(`Enrolling ${buyer_email} in course ${course_slug} for order ${order_id}`);
+    const course_id = course.id;
+    console.log('Course ID:', course_id);
 
-    // If Academy Supabase is configured, enroll the student
-    if (ACADEMY_SUPABASE) {
-      try {
-        // 1. Create user invitation in Academy Supabase
-        const { data: invitation, error: inviteError } = await ACADEMY_SUPABASE.auth.admin.inviteUserByEmail(
-          buyer_email,
-          {
-            data: {
-              full_name: buyer_name,
-              enrolled_course: course_slug
-            }
-          }
-        );
+    // 2. Create invitation token
+    const token = crypto.randomUUID();
+    const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
-        if (inviteError && !inviteError.message.includes('already registered')) {
-          console.error('Invitation error:', inviteError);
-          throw inviteError;
-        }
+    const { error: inviteError } = await ACADEMY_SUPABASE
+      .from('course_invites')
+      .insert({
+        course_id,
+        email: buyer_email,
+        token,
+        expires_at: expires_at.toISOString(),
+        created_at: new Date().toISOString()
+      });
 
-        console.log('User invitation sent/exists:', buyer_email);
-
-        // 2. Grant course access in Academy database
-        const { error: accessError } = await ACADEMY_SUPABASE
-          .from('course_enrollments') // Your academy table name
-          .insert({
-            user_email: buyer_email,
-            course_slug: course_slug,
-            enrolled_at: new Date().toISOString(),
-            status: 'active'
-          })
-          .select()
-          .maybeSingle();
-
-        if (accessError && !accessError.message.includes('duplicate')) {
-          console.error('Access grant error:', accessError);
-          throw accessError;
-        }
-
-        console.log('Course access granted:', course_slug);
-      } catch (academyError: any) {
-        console.error('Academy enrollment error:', academyError);
-        // Continue to track in store database even if academy enrollment fails
-      }
-    } else {
-      console.warn('Academy Supabase not configured - skipping user invitation and enrollment');
+    if (inviteError) {
+      console.error('Invite creation error:', inviteError);
+      throw new Error(`Failed to create invite: ${inviteError.message}`);
     }
 
-    // 3. Track in store database
-    const { error: trackError } = await STORE_SUPABASE
+    console.log('Invite token created:', token);
+
+    // 3. Send invitation email via n8n
+    const inviteUrl = `${process.env.ACADEMY_URL}/invite/${token}`;
+
+    await fetch(`${process.env.N8N_BASE}/webhook/course-invite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: buyer_email,
+        name: buyer_name,
+        course_name: course_slug.replace(/-/g, ' ').replace(/^./, s => s.toUpperCase()),
+        invite_url: inviteUrl,
+        expires_at: expires_at.toISOString()
+      })
+    }).catch(err => console.warn('n8n email failed:', err));
+
+    // 4. Track in store database
+    await STORE_SUPABASE
       .from('course_purchases')
       .insert({
         order_id,
         course_slug,
         buyer_email,
         buyer_name,
+        buyer_phone,
         invited_at: new Date().toISOString(),
-        invitation_status: ACADEMY_SUPABASE ? 'sent' : 'pending_config'
-      })
-      .select()
-      .maybeSingle();
+        invitation_status: 'sent',
+        academy_user_id: null // Will be set when they redeem
+      });
 
-    if (trackError && !trackError.message.includes('duplicate')) {
-      console.error('Track error:', trackError);
-      // Don't fail the request if tracking fails
-    }
-
-    console.log('Course purchase tracked in store database');
+    console.log('Course enrollment complete');
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         success: true,
-        message: 'Course enrollment completed',
-        academy_configured: !!ACADEMY_SUPABASE
+        invite_token: token,
+        invite_url: inviteUrl,
+        message: 'Enrollment successful. Check your email for course access link.'
       })
     };
+
   } catch (error: any) {
     console.error('Course enrollment error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || 'Enrollment failed' })
+      headers,
+      body: JSON.stringify({
+        error: error.message || 'Failed to enroll in course'
+      })
     };
   }
 };
