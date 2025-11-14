@@ -605,8 +605,8 @@ export const ShopPage: React.FC = () => {
     loadDbProducts();
   }, []);
 
-  // Merge static products + database products
-  const allProducts = [...staticProducts, ...dbProducts];
+  // Use ONLY static products (emergency fix for duplicates)
+  const allProducts = staticProducts; // Database products temporarily disabled
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
