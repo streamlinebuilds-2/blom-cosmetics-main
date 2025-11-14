@@ -156,7 +156,47 @@ export const handler: Handler = async (event) => {
 
       console.log('Order marked as paid:', order.id)
 
-      // 3b) Mark coupon as used if payment successful and coupon was applied
+      // 3b) Check if order contains courses and enroll user
+      ;(async () => {
+        try {
+          const itemsRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=*,products(product_type,slug)`,
+            {
+              headers: {
+                apikey: SERVICE_KEY,
+                Authorization: `Bearer ${SERVICE_KEY}`
+              }
+            }
+          );
+
+          if (itemsRes.ok) {
+            const items = await itemsRes.json();
+            const courseItems = items.filter((i: any) => i.products?.product_type === 'course');
+
+            if (courseItems.length > 0) {
+              // Enroll in each course
+              for (const item of courseItems) {
+                await fetch(`${SITE}/.netlify/functions/enroll-course`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    order_id: order.id,
+                    course_slug: item.products.slug,
+                    buyer_email: data.email_address || order.buyer_email,
+                    buyer_name: `${data.name_first || ''} ${data.name_last || ''}`.trim()
+                  })
+                });
+              }
+
+              console.log('Enrolled in courses:', courseItems.length);
+            }
+          }
+        } catch (e: any) {
+          console.warn('Course enrollment check failed:', e?.message);
+        }
+      })();
+
+      // 3c) Mark coupon as used if payment successful and coupon was applied
       if (couponCode) {
         ;(async () => {
           try {
