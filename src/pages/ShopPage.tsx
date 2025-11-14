@@ -355,7 +355,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '18',
+      id: '24',
       name: 'Iris Manicure Table',
       slug: 'iris-manicure-table',
       price: 3490,
@@ -374,7 +374,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '15',
+      id: '25',
       name: 'Blom Manicure Table & Work Station',
       slug: 'blom-manicure-workstation',
       price: 4500,
@@ -489,7 +489,7 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     },
     {
-      id: '21',
+      id: '26',
       name: 'Floral Manicure Table',
       slug: 'floral-manicure-table',
       price: 4300,
@@ -510,7 +510,7 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Glass top included in price.'
     },
     {
-      id: '22',
+      id: '27',
       name: 'Orchid Manicure Table',
       slug: 'orchid-manicure-table',
       price: 3700,
@@ -644,17 +644,17 @@ export const ShopPage: React.FC = () => {
   }, []);
 
   const filteredProducts = allProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || 
+    const matchesCategory = selectedCategory === 'all' ||
       product.category === selectedCategory;
-    
+
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      (product.shortDescription || '').toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
-    
+
     // Exclude archived products
     const isNotArchived = product.category !== 'archived';
-    
+
     return matchesCategory && matchesSearch && matchesStock && isNotArchived;
   });
 
@@ -662,13 +662,19 @@ export const ShopPage: React.FC = () => {
     // Always put "Coming Soon" products at the bottom
     if (a.category === 'coming-soon' && b.category !== 'coming-soon') return 1;
     if (b.category === 'coming-soon' && a.category !== 'coming-soon') return -1;
-    
+
     switch (sortBy) {
       case 'name':
         return a.name.localeCompare(b.name);
       case 'price-low':
+        // Handle products with price -1 (coming soon) by putting them at the end
+        if (a.price === -1 && b.price !== -1) return 1;
+        if (b.price === -1 && a.price !== -1) return -1;
         return a.price - b.price;
       case 'price-high':
+        // Handle products with price -1 (coming soon) by putting them at the end
+        if (a.price === -1 && b.price !== -1) return 1;
+        if (b.price === -1 && a.price !== -1) return -1;
         return b.price - a.price;
       default:
         return 0;
