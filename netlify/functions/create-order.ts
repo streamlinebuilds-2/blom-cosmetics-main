@@ -28,10 +28,19 @@ export const handler: Handler = async (event) => {
     // 1b. Normalize Fulfillment (The Critical Fix)
     // This enforces ONLY 'collection' or 'delivery'
     if (body.shipping) {
-      fulfillment = {
-        method: body.shipping.method === 'store-pickup' ? 'collection' : 'delivery',
-        delivery_address: body.shipping.address || null,
-        collection_location: body.shipping.method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
+      // Handle digital products (courses, online workshops)
+      if (body.shipping.method === 'digital') {
+        fulfillment = {
+          method: 'collection', // Use collection for digital products
+          delivery_address: null,
+          collection_location: 'Digital Access' // Indicates no physical location
+        }
+      } else {
+        fulfillment = {
+          method: body.shipping.method === 'store-pickup' ? 'collection' : 'delivery',
+          delivery_address: body.shipping.address || null,
+          collection_location: body.shipping.method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
+        }
       }
     }
     // Fallback for safety
