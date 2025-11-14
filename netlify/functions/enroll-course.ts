@@ -27,14 +27,29 @@ export const handler: Handler = async (event) => {
     console.log('Enrolling in course:', { order_id, course_slug, buyer_email });
 
     // 1. Get course ID from slug
+    console.log('Looking up course with slug:', course_slug);
+    console.log('Academy URL:', process.env.ACADEMY_SUPABASE_URL);
+
+    // First, try to list all courses to verify connection
+    const { data: allCourses, error: listError } = await ACADEMY_SUPABASE
+      .from('courses')
+      .select('id, title, slug');
+
+    console.log('All courses:', allCourses);
+    console.log('List error:', listError);
+
+    // Then try to find specific course
     const { data: course, error: courseError } = await ACADEMY_SUPABASE
       .from('courses')
       .select('id')
       .eq('slug', course_slug)
       .single();
 
+    console.log('Course found:', course);
+    console.log('Course error:', courseError);
+
     if (courseError || !course) {
-      throw new Error(`Course not found: ${course_slug}`);
+      throw new Error(`Course not found: ${course_slug}. Available courses: ${allCourses?.map(c => c.slug).join(', ')}`);
     }
 
     const course_id = course.id;

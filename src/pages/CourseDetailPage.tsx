@@ -279,6 +279,16 @@ export const CourseDetailPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Auto-select package and date if there's only one option
+  useEffect(() => {
+    if (course.packages.length === 1 && !selectedPackage) {
+      setSelectedPackage(course.packages[0].name);
+    }
+    if (course.availableDates.length === 1 && !selectedDate) {
+      setSelectedDate(course.availableDates[0]);
+    }
+  }, [course, selectedPackage, selectedDate]);
+
   const toggleAccordion = (index: number) => {
     setExpandedAccordion(expandedAccordion === index ? null : index);
   };
@@ -773,7 +783,46 @@ export const CourseDetailPage: React.FC = () => {
                 {/* Form Body */}
                 <div className="p-12">
                   <form onSubmit={handleSubmit} className="space-y-7">
-                    {/* Row 1: simplified intro removed (date & package not needed for online) */}
+                    {/* Selection Summary */}
+                    {(!selectedPackage || !selectedDate) && (
+                      <div className="p-4 rounded-xl border-2 border-yellow-400 bg-yellow-50">
+                        <p className="text-sm font-semibold text-gray-800 mb-2">Please complete your selections:</p>
+                        <ul className="space-y-1 text-sm text-gray-700">
+                          {!selectedPackage && (
+                            <li className="flex items-center gap-2">
+                              <span className="text-yellow-600">●</span>
+                              <span>Choose a package above</span>
+                            </li>
+                          )}
+                          {!selectedDate && (
+                            <li className="flex items-center gap-2">
+                              <span className="text-yellow-600">●</span>
+                              <span>Select a date above</span>
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    )}
+
+                    {(selectedPackage || selectedDate) && (
+                      <div className="p-4 rounded-xl bg-green-50 border-2 border-green-200">
+                        <p className="text-sm font-semibold text-gray-800 mb-2">Your Selections:</p>
+                        <div className="space-y-1 text-sm text-gray-700">
+                          {selectedPackage && (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <span><strong>Package:</strong> {selectedPackage}</span>
+                            </div>
+                          )}
+                          {selectedDate && (
+                            <div className="flex items-center gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <span><strong>Date:</strong> {selectedDate}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Row 2: Name & Email */}
                     <div className="grid md:grid-cols-2 gap-6">
@@ -870,14 +919,34 @@ export const CourseDetailPage: React.FC = () => {
                       )}
 
                       {/* Submit Button */}
-                    <button
-                        type="submit"
-                      disabled={isSubmitting || !selectedPackage || !selectedDate || !formData.terms}
-                      className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
-                      style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
-                    >
-                      {isSubmitting ? 'Processing...' : course.isOnline ? 'Complete Purchase' : 'Pay Deposit & Secure Spot (R2,000)'}
-                    </button>
+                    <div>
+                      <button
+                          type="submit"
+                        disabled={isSubmitting || !selectedPackage || !selectedDate || !formData.terms}
+                        className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
+                        style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
+                      >
+                        {isSubmitting ? 'Processing...' : course.isOnline ? 'Complete Purchase' : 'Pay Deposit & Secure Spot (R2,000)'}
+                      </button>
+
+                      {/* Help text when button is disabled */}
+                      {(!selectedPackage || !selectedDate || !formData.terms) && !isSubmitting && (
+                        <div className="mt-3 text-center text-sm text-gray-600">
+                          {!selectedPackage && !selectedDate && (
+                            <p>Please select a package and date above to continue</p>
+                          )}
+                          {!selectedPackage && selectedDate && (
+                            <p>Please select a package above to continue</p>
+                          )}
+                          {selectedPackage && !selectedDate && (
+                            <p>Please select a date above to continue</p>
+                          )}
+                          {selectedPackage && selectedDate && !formData.terms && (
+                            <p>Please agree to the Terms & Conditions to continue</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Security Icons */}
                     <div className="flex items-center justify-center gap-8 pt-6 border-t border-gray-200">
