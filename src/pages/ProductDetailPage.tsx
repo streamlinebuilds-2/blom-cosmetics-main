@@ -522,59 +522,6 @@ export const ProductDetailPage: React.FC = () => {
       reviewCount: 112,
       reviews: []
     },
-    'nail-liquid-monomer': {
-      id: '10',
-      name: 'Nail Liquid (Monomer)',
-      slug: 'nail-liquid-monomer',
-      category: 'Acrylic System',
-      shortDescription: 'Professional monomer for acrylic applications.',
-      overview: 'Premium quality monomer formulated for optimal acrylic application. Low odor formula with superior clarity and strength. Essential for creating durable, beautiful acrylic enhancements.',
-      price: -1,
-      compareAtPrice: null,
-      stock: 'Coming Soon',
-      images: [
-        '/nail-liquid-monomer-white.webp',
-        '/nail-liquid-monomer-colorful.webp'
-      ],
-      features: [
-        'Low odor formula',
-        'Superior clarity and strength',
-        'Professional grade quality',
-        'Optimal working time',
-        'Creates durable enhancements'
-      ],
-      howToUse: [
-        'Pour into dappen dish',
-        'Dip acrylic brush into liquid',
-        'Pick up acrylic powder to form bead',
-        'Apply to nail and sculpt',
-        'Allow to air dry completely'
-      ],
-      ingredients: {
-        inci: [
-          'Ethyl Methacrylate',
-          'Polymethyl Methacrylate',
-          'Catalyst'
-        ],
-        key: [
-          'Ethyl Methacrylate – creates strong bond',
-          'Low odor formula – comfortable application',
-          'Professional grade – salon quality results'
-        ]
-      },
-      details: {
-        size: '250ml / 500ml',
-        shelfLife: '24 months',
-        claims: ['Professional Grade', 'Low Odor', 'High Quality']
-      },
-      variants: [
-        { name: '250ml', image: '/nail-liquid-monomer-colorful.webp', price: -1 },
-        { name: '500ml', image: '/nail-liquid-monomer-white.webp', price: -1 }
-      ],
-      rating: 4.8,
-      reviewCount: 94,
-      reviews: []
-    },
     'crystal-kolinsky-sculpting-brush': {
       id: '11',
       name: 'Crystal Kolinsky Sculpting Brush',
@@ -1713,7 +1660,7 @@ export const ProductDetailPage: React.FC = () => {
                 {product.variants && product.variants.length > 0 && (
                   <div className="mb-8">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                      {product.slug === 'cuticle-oil' ? 'Scent' : product.slug === 'nail-liquid-monomer' ? 'Size' : 'Options'}
+                      {product.slug === 'cuticle-oil' ? 'Scent' : 'Options'}
                     </h3>
                     <div className="flex flex-wrap gap-3">
                       {product.variants.map((variant: any) => {

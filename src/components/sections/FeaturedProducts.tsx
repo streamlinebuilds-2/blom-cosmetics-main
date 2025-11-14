@@ -49,17 +49,6 @@ export const FeaturedProducts: React.FC = () => {
         product_images: [
           { image_url: '/acrylic-powder-01.webp', sort_order: 1 }
         ]
-      },
-      {
-        id: '10',
-        name: 'Nail Liquid (Monomer)',
-        slug: 'nail-liquid-monomer',
-        price: 380,
-        compare_at_price: null,
-        short_description: 'High-quality monomer for smooth application',
-        product_images: [
-          { image_url: '/nail-liquid-monomer.webp', sort_order: 1 }
-        ]
       }
     ];
 
@@ -116,14 +105,6 @@ export const FeaturedProducts: React.FC = () => {
         price: 280,
         image: '/acrylic-powder-01.webp',
         description: 'Professional grade acrylic powder for perfect sculpting'
-      },
-      {
-        id: '10',
-        slug: 'nail-liquid-monomer',
-        name: 'Nail Liquid (Monomer)',
-        price: 380,
-        image: '/nail-liquid-monomer.webp',
-        description: 'High-quality monomer for smooth application'
       }
     ];
 
