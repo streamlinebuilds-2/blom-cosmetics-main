@@ -25,13 +25,29 @@ export const handler: Handler = async (event) => {
       }
     }
     
-    // 1b. Normalize Fulfillment (The Critical Fix)
-    // This enforces ONLY 'collection' or 'delivery'
+    // 1b. Normalize Fulfillment
+    // Handle: collection, delivery, and digital (for courses/downloads)
     if (body.shipping) {
-      fulfillment = {
-        method: body.shipping.method === 'store-pickup' ? 'collection' : 'delivery',
-        delivery_address: body.shipping.address || null,
-        collection_location: body.shipping.method === 'store-pickup' ? 'BLOM HQ, Randfontein' : null
+      const shippingMethod = body.shipping.method;
+
+      if (shippingMethod === 'store-pickup') {
+        fulfillment = {
+          method: 'collection',
+          delivery_address: null,
+          collection_location: 'BLOM HQ, Randfontein'
+        }
+      } else if (shippingMethod === 'digital') {
+        fulfillment = {
+          method: 'collection', // Digital treated as collection (no shipping)
+          delivery_address: null,
+          collection_location: null
+        }
+      } else {
+        fulfillment = {
+          method: 'delivery',
+          delivery_address: body.shipping.address || null,
+          collection_location: null
+        }
       }
     }
     // Fallback for safety
@@ -113,11 +129,11 @@ export const handler: Handler = async (event) => {
 
     // --- 4. Construct Delivery Address (Robust Mapping) ---
     // This specifically fixes the "empty address" bug
-    
+
     let deliveryAddressJson = null
-    // Only process address if method is delivery
-    if (fulfillment.method === 'delivery') {
-      const rawAddr = fulfillment.delivery_address || {}
+    // Only process address if method is delivery AND address exists
+    if (fulfillment.method === 'delivery' && fulfillment.delivery_address) {
+      const rawAddr = fulfillment.delivery_address
       deliveryAddressJson = {
         // We check multiple possible field names to be safe
         street_address: rawAddr.street_address || rawAddr.streetAddress || rawAddr.address || rawAddr.street || '',
