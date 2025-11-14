@@ -24,11 +24,13 @@ export const CourseDetailPage: React.FC = () => {
   // Course data
   const courses = {
     'professional-acrylic-training': {
+      id: 'e700b464-5c16-45b3-bd8b-fe6ba9fdc498',
       title: 'Professional Acrylic Training',
       description: 'Master the art of acrylic nail application with hands-on training in Randfontein.',
       heroImage: '/professional-acrylic-training-hero.webp',
       duration: '5 Days',
       price: 'From R7,200',
+      numericPrice: 7200,
       isOnline: false,
       location: 'Randfontein',
       instructor: {
@@ -113,11 +115,13 @@ export const CourseDetailPage: React.FC = () => {
       ]
     },
     'online-watercolour-workshop': {
+      id: 'f8a1c5d7-9b3e-4f2a-8e6d-1a2b3c4d5e6f',
       title: 'Online Watercolour Workshop',
       description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance.',
       heroImage: '/online-watercolor-card.webp',
       duration: 'Self-Paced',
       price: 'R480',
+      numericPrice: 480,
       isOnline: true,
       location: 'Online',
       instructor: {
@@ -184,12 +188,14 @@ export const CourseDetailPage: React.FC = () => {
       ]
     },
     'christmas-watercolor-workshop': {
+      id: 'a9b8c7d6-e5f4-3g2h-1i0j-9k8l7m6n5o4p',
       title: 'Christmas Watercolor Workshop',
       description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
       heroImage: '/christmas-watercolor-card.webp',
       duration: 'Self-Paced',
       price: 'R450',
       originalPrice: 'R650',
+      numericPrice: 450,
       isOnline: true,
       location: 'Online',
       instructor: {
@@ -336,11 +342,90 @@ export const CourseDetailPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Minimal validation for presentation
+
+    // Validate all fields
     const isValid = Object.entries(formData).every(([key, value]) => validateField(key, value));
-    if (!isValid) { setIsSubmitting(false); return; }
-    // Jump straight to Checkout payment step (demo)
-    window.location.href = '/checkout?step=payment&item=online-course';
+    if (!isValid || !selectedPackage || !selectedDate) {
+      showNotification('Please fill all required fields', 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      // Get the selected package price
+      const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
+      if (!selectedPkg) {
+        showNotification('Please select a package', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Extract numeric price from package (e.g., "R450" -> 450)
+      const priceMatch = selectedPkg.price.match(/[\d,]+/);
+      const coursePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
+
+      // Create order with course as product
+      const orderRes = await fetch('/.netlify/functions/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          buyer: {
+            name: formData.name,
+            email: formData.email,
+            phone: `${formData.countryCode}${formData.phone}`
+          },
+          items: [{
+            product_id: course.id,
+            product_name: `${course.title} - ${selectedPackage} Package`,
+            unit_price: coursePrice,
+            quantity: 1
+          }],
+          totals: {
+            subtotal_cents: Math.round(coursePrice * 100),
+            shipping_cents: 0,
+            tax_cents: 0
+          },
+          shipping: {
+            method: 'digital' // No shipping needed for online courses
+          }
+        })
+      });
+
+      if (!orderRes.ok) {
+        throw new Error('Failed to create order');
+      }
+
+      const orderData = await orderRes.json();
+
+      // Redirect to PayFast
+      const paymentRes = await fetch('/.netlify/functions/payfast-redirect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: coursePrice,
+          item_name: `${course.title} - ${selectedPackage} Package`,
+          m_payment_id: orderData.m_payment_id,
+          email_address: formData.email,
+          name_first: formData.name.split(' ')[0],
+          name_last: formData.name.split(' ').slice(1).join(' ') || formData.name.split(' ')[0],
+          custom_str1: course.id, // Pass course ID
+          custom_str2: courseSlug // Pass course slug
+        })
+      });
+
+      if (!paymentRes.ok) {
+        throw new Error('Failed to initialize payment');
+      }
+
+      // Auto-submit PayFast form
+      const html = await paymentRes.text();
+      document.body.innerHTML = html;
+
+    } catch (error) {
+      console.error('Enrollment error:', error);
+      showNotification('Something went wrong. Please try again.', 'error');
+      setIsSubmitting(false);
+    }
   };
 
   const showNotification = (message: string, type: 'success' | 'error' = 'success') => {
