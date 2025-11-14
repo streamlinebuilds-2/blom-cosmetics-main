@@ -194,29 +194,7 @@ export const ShopPage: React.FC = () => {
       inStock: false,
       variants: []
     },
-    
-    // Coming Soon Products
-    {
-      id: 'coming-soon-2',
-      name: 'Low Odour Nail Liquid',
-      slug: 'nail-liquid-monomer-coming-soon',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      shortDescription: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      description: 'A premium low-odour acrylic monomer designed for comfort and performance. Features low odour (no migraines), affordable luxury, HEMA-free, EMA monomer (safe formula), no MMA, and enhances salon experience.',
-      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
-      category: 'coming-soon',
-      rating: 0,
-      reviews: 87,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: [
-        { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
-        { name: '500ml', inStock: false, price: -1, image: '/nail-liquid-monomer-colorful.webp' }
-      ]
-    },
-    
+
     // Coming Soon Products (Prices TBA) - HIDDEN
     // {
     //   id: '10',
@@ -300,26 +278,6 @@ export const ShopPage: React.FC = () => {
     //   inStock: false,
     //   variants: []
     // },
-    {
-      id: '14',
-      name: 'Low Odour Nail Liquid',
-      slug: 'nail-liquid-monomer',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      shortDescription: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      description: 'A premium low-odour acrylic monomer designed for comfort and performance. Features low odour (no migraines), affordable luxury, HEMA-free, EMA monomer (safe formula), no MMA, and enhances salon experience.',
-      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
-      category: 'acrylic-system',
-      rating: 0,
-      reviews: 87,
-      badges: [],
-      inStock: false,
-      variants: [
-        { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
-        { name: '500ml', inStock: false, price: -1, image: '/nail-liquid-monomer-colorful.webp' }
-      ]
-    },
     {
       id: '15',
       name: 'Crystal Kolinsky Sculpting Brush',
