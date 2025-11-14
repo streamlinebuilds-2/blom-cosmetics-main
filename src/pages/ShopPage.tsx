@@ -194,29 +194,7 @@ export const ShopPage: React.FC = () => {
       inStock: false,
       variants: []
     },
-    
-    // Coming Soon Products
-    {
-      id: 'coming-soon-2',
-      name: 'Low Odour Nail Liquid',
-      slug: 'nail-liquid-monomer-coming-soon',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      shortDescription: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      description: 'A premium low-odour acrylic monomer designed for comfort and performance. Features low odour (no migraines), affordable luxury, HEMA-free, EMA monomer (safe formula), no MMA, and enhances salon experience.',
-      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
-      category: 'coming-soon',
-      rating: 0,
-      reviews: 87,
-      badges: ['Coming Soon'],
-      inStock: false,
-      variants: [
-        { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
-        { name: '500ml', inStock: false, price: -1, image: '/nail-liquid-monomer-colorful.webp' }
-      ]
-    },
-    
+
     // Coming Soon Products (Prices TBA) - HIDDEN
     // {
     //   id: '10',
@@ -301,26 +279,6 @@ export const ShopPage: React.FC = () => {
     //   variants: []
     // },
     {
-      id: '14',
-      name: 'Low Odour Nail Liquid',
-      slug: 'nail-liquid-monomer',
-      price: -1,
-      compareAtPrice: undefined,
-      short_description: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      shortDescription: 'A premium low-odour acrylic monomer designed for comfort and performance.',
-      description: 'A premium low-odour acrylic monomer designed for comfort and performance. Features low odour (no migraines), affordable luxury, HEMA-free, EMA monomer (safe formula), no MMA, and enhances salon experience.',
-      images: ['/nail-liquid-monomer-white.webp', '/nail-liquid-monomer-colorful.webp'],
-      category: 'acrylic-system',
-      rating: 0,
-      reviews: 87,
-      badges: [],
-      inStock: false,
-      variants: [
-        { name: '250ml', inStock: false, price: -1, image: '/nail-liquid-monomer-white.webp' },
-        { name: '500ml', inStock: false, price: -1, image: '/nail-liquid-monomer-colorful.webp' }
-      ]
-    },
-    {
       id: '15',
       name: 'Crystal Kolinsky Sculpting Brush',
       slug: 'crystal-kolinsky-sculpting-brush',
@@ -397,7 +355,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '18',
+      id: '24',
       name: 'Iris Manicure Table',
       slug: 'iris-manicure-table',
       price: 3490,
@@ -416,7 +374,7 @@ export const ShopPage: React.FC = () => {
       ]
     },
     {
-      id: '15',
+      id: '25',
       name: 'Blom Manicure Table & Work Station',
       slug: 'blom-manicure-workstation',
       price: 4500,
@@ -531,7 +489,7 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     },
     {
-      id: '21',
+      id: '26',
       name: 'Floral Manicure Table',
       slug: 'floral-manicure-table',
       price: 4300,
@@ -552,7 +510,7 @@ export const ShopPage: React.FC = () => {
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Glass top included in price.'
     },
     {
-      id: '22',
+      id: '27',
       name: 'Orchid Manicure Table',
       slug: 'orchid-manicure-table',
       price: 3700,
@@ -686,17 +644,17 @@ export const ShopPage: React.FC = () => {
   }, []);
 
   const filteredProducts = allProducts.filter(product => {
-    const matchesCategory = selectedCategory === 'all' || 
+    const matchesCategory = selectedCategory === 'all' ||
       product.category === selectedCategory;
-    
+
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.shortDescription.toLowerCase().includes(searchTerm.toLowerCase());
-    
+      (product.shortDescription || '').toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
-    
+
     // Exclude archived products
     const isNotArchived = product.category !== 'archived';
-    
+
     return matchesCategory && matchesSearch && matchesStock && isNotArchived;
   });
 
@@ -704,13 +662,19 @@ export const ShopPage: React.FC = () => {
     // Always put "Coming Soon" products at the bottom
     if (a.category === 'coming-soon' && b.category !== 'coming-soon') return 1;
     if (b.category === 'coming-soon' && a.category !== 'coming-soon') return -1;
-    
+
     switch (sortBy) {
       case 'name':
         return a.name.localeCompare(b.name);
       case 'price-low':
+        // Handle products with price -1 (coming soon) by putting them at the end
+        if (a.price === -1 && b.price !== -1) return 1;
+        if (b.price === -1 && a.price !== -1) return -1;
         return a.price - b.price;
       case 'price-high':
+        // Handle products with price -1 (coming soon) by putting them at the end
+        if (a.price === -1 && b.price !== -1) return 1;
+        if (b.price === -1 && a.price !== -1) return -1;
         return b.price - a.price;
       default:
         return 0;
