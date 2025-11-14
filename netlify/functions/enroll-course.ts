@@ -8,7 +8,7 @@ const STORE_SUPABASE = createClient(
 
 const ACADEMY_SUPABASE = createClient(
   process.env.ACADEMY_SUPABASE_URL!,
-  process.env.ACADEMY_SUPABASE_SERVICE_KEY!
+  process.env.ACADEMY_SUPABASE_ANON_KEY!
 );
 
 export const handler: Handler = async (event) => {
