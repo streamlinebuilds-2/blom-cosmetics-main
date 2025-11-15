@@ -1664,7 +1664,7 @@ export const ProductDetailPage: React.FC = () => {
                     </h3>
                     <div className="flex flex-wrap gap-3">
                       {product.variants.map((variant: any) => {
-                        const variantName = typeof variant === 'string' ? variant : variant.name;
+                        const variantName = typeof variant === 'string' ? variant : (variant.name || variant.label || variant.title || '');
                         const variantImage = typeof variant === 'object' && variant.image ? variant.image : null;
                         const variantPrice = typeof variant === 'object' && variant.price ? variant.price : null;
 
