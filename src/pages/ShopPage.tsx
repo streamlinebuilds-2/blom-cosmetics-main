@@ -539,7 +539,9 @@ export const ShopPage: React.FC = () => {
         const { data: products, error } = await supabase
           .from('products')
           .select('*')
-          .eq('is_active', true);
+          .eq('is_active', true)
+          .eq('status', 'active')
+          .order('category', { ascending: true });
 
         if (error) {
           console.error('Error fetching products from database:', error);
@@ -605,8 +607,8 @@ export const ShopPage: React.FC = () => {
     loadDbProducts();
   }, []);
 
-  // Use ONLY static products (emergency fix for duplicates)
-  const allProducts = staticProducts; // Database products temporarily disabled
+  // Use database products (fetched from Supabase)
+  const allProducts = dbProducts;
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
