@@ -532,6 +532,23 @@ export const ShopPage: React.FC = () => {
     }
   ];
 
+  // Helper function to normalize category names to slugs
+  const normalizeCategoryToSlug = (category: string): string => {
+    const categoryMap: Record<string, string> = {
+      'Bundle Deals': 'bundle-deals',
+      'Acrylic System': 'acrylic-system',
+      'Prep & Finish': 'prep-finishing',
+      'Prep & Finishing': 'prep-finishing',
+      'Gel System': 'gel-system',
+      'Tools & Essentials': 'tools-essentials',
+      'Furniture': 'furniture',
+      'Coming Soon': 'coming-soon'
+    };
+
+    // Return mapped value or convert to slug format as fallback
+    return categoryMap[category] || category.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
+  };
+
   // Fetch additional products from Supabase database
   useEffect(() => {
     async function loadDbProducts() {
@@ -554,7 +571,7 @@ export const ShopPage: React.FC = () => {
           id: p.id,
           name: p.name,
           slug: p.slug,
-          category: p.category || 'all',
+          category: normalizeCategoryToSlug(p.category || 'all'),
 
           // Price - check all variations
           price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
