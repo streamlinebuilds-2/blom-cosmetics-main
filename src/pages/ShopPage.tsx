@@ -583,7 +583,22 @@ export const ShopPage: React.FC = () => {
             inci: p.inci_ingredients || [],
             key: p.key_ingredients || []
           },
-          variants: p.variants || [],
+          // Variants - ensure proper mapping with name/label fallback
+          variants: Array.isArray(p.variants)
+            ? p.variants.map((v: any) => {
+                // Handle both object and string variants
+                if (typeof v === 'string') {
+                  return { name: v, inStock: true };
+                }
+                return {
+                  name: v.name || v.label || v.title || '',
+                  label: v.label || v.name || v.title || '',
+                  inStock: v.inStock ?? v.in_stock ?? true,
+                  image: v.image || v.image_url || null,
+                  price: v.price || null
+                };
+              })
+            : [],
 
           // Meta
           rating: 0,
