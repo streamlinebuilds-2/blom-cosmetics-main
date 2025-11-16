@@ -39,6 +39,7 @@ const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage').then(m =>
 const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample').then(m => ({ default: m.ProductTemplateExample })));
 const MyCoupons = lazy(() => import('./pages/MyCoupons'));
 const ManageAddresses = lazy(() => import('./pages/ManageAddresses'));
+const AcceptInvite = lazy(() => import('./pages/AcceptInvite').then(m => ({ default: m.AcceptInvite })));
 
 /**
  * Prefetch next likely routes on idle to improve perceived performance.
@@ -142,6 +143,7 @@ function App() {
           <Route path="/account/reset-password" element={<PageWithCart><ResetPasswordPage /></PageWithCart>} />
           <Route path="/auth/reset" element={<PageWithCart><AuthResetPage /></PageWithCart>} />
           <Route path="/auth/callback" element={<PageWithCart><AuthCallbackPage /></PageWithCart>} />
+          <Route path="/accept-invite" element={<PageWithCart><AcceptInvite /></PageWithCart>} />
           
           {/* Payment */}
           <Route path="/payment-success" element={<PageWithCart><PaymentSuccess /></PageWithCart>} />
