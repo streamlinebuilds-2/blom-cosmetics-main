@@ -1,131 +1,232 @@
 import { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 
+// Helper to get Supabase admin client (uses SERVICE_ROLE_KEY)
+const getSupabaseAdmin = () => {
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceKey) {
+    throw new Error('Server configuration error: Missing Supabase credentials');
+  }
+
+  return createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false }
+  });
+};
+
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS'
+};
+
 export const handler: Handler = async (event) => {
-  // Only allow POST requests
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
+      headers,
+      body: JSON.stringify({ ok: false, message: 'Method Not Allowed' })
     };
   }
 
   try {
-    const { code, customerId, cart } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const { code, cart, email } = body;
+    // Expect: { code: "CODE", cart: [{ product_id, quantity, price }], email?: "user@example.com" }
+    // Note: price should be in cents
 
     if (!code) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ ok: false, error: 'Coupon code is required' })
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Coupon code is required' })
       };
     }
 
-    // Initialize Supabase client
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseServiceKey) {
+    if (!cart || cart.length === 0) {
       return {
-        statusCode: 500,
-        body: JSON.stringify({ ok: false, error: 'Server configuration error' })
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Cart data is required' })
       };
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = getSupabaseAdmin();
+    const now = new Date();
 
-    // Query the coupons table directly
-    const { data: coupons, error: queryError } = await supabase
+    // 1. Find the coupon
+    const { data: coupon, error: couponError } = await supabase
       .from('coupons')
       .select('*')
       .eq('code', code.toUpperCase())
-      .eq('status', 'active')
-      .eq('is_active', true)
       .single();
 
-    if (queryError || !coupons) {
-      console.error('Coupon query error:', queryError);
+    if (couponError || !coupon) {
+      console.error('Coupon query error:', couponError);
       return {
-        statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Invalid or inactive coupon code' })
+        statusCode: 404,
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Invalid coupon code' })
       };
     }
 
-    // Check if coupon has expired
-    if (coupons.valid_to && new Date(coupons.valid_to) < new Date()) {
+    // 2. Run all validation checks
+
+    // Check if active
+    if (coupon.is_active === false) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Coupon has expired' })
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Coupon is not active' })
+      };
+    }
+
+    // Check status field if it exists
+    if (coupon.status && coupon.status !== 'active') {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Coupon is not active' })
       };
     }
 
     // Check if coupon is valid from date
-    if (coupons.valid_from && new Date(coupons.valid_from) > new Date()) {
+    if (coupon.valid_from && new Date(coupon.valid_from) > now) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Coupon is not yet valid' })
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Coupon is not yet valid' })
+      };
+    }
+
+    // Check if coupon has expired
+    if (coupon.valid_until && new Date(coupon.valid_until) < now) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Coupon has expired' })
       };
     }
 
     // Check usage limits
-    if (coupons.usage_limit && coupons.used_count >= coupons.usage_limit) {
+    if (coupon.max_uses && (coupon.used_count || 0) >= coupon.max_uses) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Coupon usage limit exceeded' })
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Coupon has reached its usage limit' })
       };
     }
 
-    // Calculate cart subtotal
-    const cartSubtotal = cart.reduce((sum: number, item: any) => {
-      return sum + (item.price * item.quantity);
-    }, 0);
-
-    // Check minimum order total
-    if (coupons.min_order_total && cartSubtotal < coupons.min_order_total) {
+    // Check email lock (if coupon is locked to specific email)
+    if (coupon.locked_email && email) {
+      if (coupon.locked_email.toLowerCase() !== email.toLowerCase()) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({ ok: false, message: 'This coupon is locked to a different email' })
+        };
+      }
+    } else if (coupon.locked_email && !email) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ 
-          ok: false, 
-          reason: `Minimum order total of R${(coupons.min_order_total / 100).toFixed(2)} required` 
+        headers,
+        body: JSON.stringify({ ok: false, message: 'Email is required for this coupon' })
+      };
+    }
+
+    // 3. Calculate cart subtotal (price is expected in cents)
+    const subtotal_cents = cart.reduce((acc: number, item: any) => {
+      const itemPrice = item.price_cents || item.price || 0;
+      const quantity = item.quantity || 1;
+      return acc + (itemPrice * quantity);
+    }, 0);
+
+    // 4. Check Minimum Spend
+    const minOrderCents = coupon.min_order_cents || coupon.min_order_total || 0;
+    if (minOrderCents && subtotal_cents < minOrderCents) {
+      const minSpend = (minOrderCents / 100).toFixed(2);
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          ok: false,
+          message: `Minimum spend of R${minSpend} required`
         })
       };
     }
 
-    // Calculate discount
-    let discountAmount = 0;
-    if (coupons.type === 'percent' || coupons.percent_off) {
-      // Percentage discount
-      const percentOff = coupons.percent_off || coupons.value || 0;
-      discountAmount = (cartSubtotal * percentOff) / 100;
-    } else if (coupons.type === 'fixed') {
-      // Fixed amount discount
-      discountAmount = coupons.value || 0;
+    // 5. Check for Excluded Products (if the field exists)
+    if (coupon.excluded_product_ids && Array.isArray(coupon.excluded_product_ids)) {
+      const cartProductIds = cart.map((item: any) => item.product_id || item.productId || item.id);
+      const hasExcludedProduct = cartProductIds.some((id: string) =>
+        coupon.excluded_product_ids.includes(id)
+      );
+
+      if (hasExcludedProduct) {
+        return {
+          statusCode: 400,
+          headers,
+          body: JSON.stringify({
+            ok: false,
+            message: 'Coupon is not valid for one or more items in your cart'
+          })
+        };
+      }
     }
 
-    console.log(`✅ Coupon applied: ${code} | Discount: R${(discountAmount).toFixed(2)} | Subtotal: R${(cartSubtotal).toFixed(2)}`);
+    // 6. Calculate the discount
+    let discount_cents = 0;
+
+    // Check discount type - support both 'fixed' type and percentage
+    if (coupon.type === 'fixed' && coupon.value) {
+      // Fixed amount discount (value is in Rands, convert to cents)
+      discount_cents = Math.round(coupon.value * 100);
+    } else if (coupon.percent || coupon.percent_off || coupon.type === 'percent' || coupon.type === 'percentage') {
+      // Percentage discount
+      const percentOff = coupon.percent || coupon.percent_off || coupon.value || 0;
+      discount_cents = Math.round(subtotal_cents * (percentOff / 100));
+
+      // Check for Max Discount (if the field exists)
+      if (coupon.max_discount_cents && discount_cents > coupon.max_discount_cents) {
+        discount_cents = coupon.max_discount_cents;
+      }
+    }
+
+    // Ensure discount isn't more than the total
+    if (discount_cents > subtotal_cents) {
+      discount_cents = subtotal_cents;
+    }
+
+    console.log(`✅ Coupon applied: ${code} | Discount: R${(discount_cents / 100).toFixed(2)} | Subtotal: R${(subtotal_cents / 100).toFixed(2)}`);
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
-      },
+      headers,
       body: JSON.stringify({
         ok: true,
-        coupon_id: coupons.id,
-        code: coupons.code,
-        discount: discountAmount,
-        percent_off: coupons.percent_off || 0,
-        reason: 'Coupon applied successfully'
+        message: 'Coupon applied successfully',
+        coupon_id: coupon.id,
+        code: coupon.code,
+        discount_cents: discount_cents,
+        discount: discount_cents / 100, // Also return in Rands for backward compatibility
+        percent: coupon.percent || coupon.percent_off || 0,
+        min_order_cents: minOrderCents
       })
     };
 
-  } catch (error: any) {
-    console.error('Apply coupon function error:', error);
+  } catch (e: any) {
+    console.error('Apply coupon error:', e);
     return {
       statusCode: 500,
-      body: JSON.stringify({ ok: false, error: 'Internal server error: ' + error.message })
+      headers,
+      body: JSON.stringify({ ok: false, message: e.message || 'Server error' })
     };
   }
 };
