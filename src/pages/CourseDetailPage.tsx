@@ -115,7 +115,7 @@ export const CourseDetailPage: React.FC = () => {
       ]
     },
     'online-watercolour-workshop': {
-      id: 'e700b464-5c16-45b3-bd8b-fe6ba9fdc498',
+      id: '7c5276c1-9207-4653-89c3-bb4c675db5e2', // Matches Academy "Blom Flower Workshop"
       title: 'Online Watercolour Workshop',
       description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance.',
       heroImage: '/online-watercolor-card.webp',
@@ -188,7 +188,7 @@ export const CourseDetailPage: React.FC = () => {
       ]
     },
     'christmas-watercolor-workshop': {
-      id: '23666e48-bf0b-4e08-a0c0-9c5ae7838076',
+      id: 'efe16488-1de6-4522-aeb3-b08cfae3a640', // Matches Academy "Christmas Workshop"
       title: 'Christmas Watercolor Workshop',
       description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
       heroImage: '/christmas-watercolor-card.webp',
