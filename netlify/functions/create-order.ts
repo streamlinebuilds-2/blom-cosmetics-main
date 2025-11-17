@@ -161,9 +161,11 @@ export const handler: Handler = async (event) => {
       p_discount_cents: discount_cents,
       p_tax_cents: tax_cents,
       // Strict Enum: 'collection' or 'delivery'
-      p_fulfillment_method: fulfillment.method, 
+      p_fulfillment_method: fulfillment.method,
       p_delivery_address: deliveryAddressJson,
-      p_collection_location: fulfillment.method === 'collection' ? 'BLOM HQ, Randfontein' : null
+      p_collection_location: fulfillment.method === 'collection' ? 'BLOM HQ, Randfontein' : null,
+      // Always pass coupon_code to resolve function overloading
+      p_coupon_code: coupon?.code ? String(coupon.code).toUpperCase() : null
     }
 
     const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
