@@ -639,8 +639,18 @@ export const ShopPage: React.FC = () => {
     loadDbProducts();
   }, []);
 
-  // Use database products (fetched from Supabase)
-  const allProducts = dbProducts;
+  // Use database products (fetched from Supabase) merged with static bundle products
+  // Ensure bundle products have correct local images (not placeholder URLs from database)
+  const allProducts = dbProducts.map(product => {
+    // Override bundle images with local images
+    if (product.slug === 'prep-primer-bundle') {
+      return {
+        ...product,
+        images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp']
+      };
+    }
+    return product;
+  });
 
   const productCategories = [
     { name: 'All Products', slug: 'all', count: allProducts.length },
