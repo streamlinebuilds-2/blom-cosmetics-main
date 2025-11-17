@@ -1163,81 +1163,46 @@ export const ProductDetailPage: React.FC = () => {
         // Load discounts
         loadDiscounts().then(setDiscounts).catch(console.error);
 
-        // First, check static product database
-        const staticProduct = productDatabase[productSlug as keyof typeof productDatabase];
-
-        if (staticProduct) {
-          // Use static product
-          setProduct(staticProduct);
-          const firstVariant = staticProduct.variants[0];
-          setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
-
-          // Build allImages array including variant images
-          const images = [...staticProduct.images];
-          staticProduct.variants.forEach((variant: any) => {
-            if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
-              images.push(variant.image);
-            }
-          });
-          setAllImages(images);
-
-          // Update SEO with product data
-          const seoData = productSEO(
-            staticProduct.name,
-            staticProduct.shortDescription,
-            staticProduct.price,
-            staticProduct.images[0]
-          );
-          updateSEO(seoData);
-          trackPageView(seoData.title || '', seoData.url || '');
-
-          setLoading(false);
-          return;
-        }
-
-        // If not found in static products, try fetching from Supabase database
+        // 1. CHECK SUPABASE FIRST (Priority)
+        // This ensures products created in Admin App always take precedence
         const { data, error } = await supabase
           .from('products')
           .select('*')
           .eq('slug', productSlug)
           .eq('is_active', true)
-          .single();
-
-        if (error) {
-          console.error('Error fetching product:', error);
-          setLoading(false);
-          return;
-        }
+          .maybeSingle();
 
         if (data) {
-          // Map messy DB to clean format - check ALL variations with comprehensive fallbacks
+          console.log('Loaded product from Database:', data.name);
+
+          // Map DB format to Page format
           const mappedProduct = {
             id: data.id,
             name: data.name,
             slug: data.slug,
             category: data.category || 'Products',
 
-            // Descriptions - check variations
-            shortDescription: data.short_description || data.short_desc || data.description_short || '',
-            overview: data.overview || data.long_description || data.description_full || data.description || data.short_description || '',
+            // Descriptions
+            shortDescription: data.short_description || data.short_desc || '',
+            overview: data.overview || data.description || '',
 
-            // Price - check all variations
+            // Price
             price: data.price || (data.price_cents ? data.price_cents / 100 : 0),
-            compareAtPrice: data.compare_at_price || data.compare_at || null,
+            compareAtPrice: data.compare_at_price || (data.compare_at_price_cents ? data.compare_at_price_cents / 100 : null),
 
-            // Stock - check ALL possible columns (using ?? to properly handle 0 values)
+            // Stock
             stock: (() => {
-              const stockQty = data.stock ?? data.stock_quantity ?? data.stock_qty ?? data.stock_on_hand ?? data.stock_available ?? data.inventory_quantity ?? 0;
+              const stockQty = data.stock ?? data.inventory_quantity ?? 0;
               return stockQty > 0 ? 'In Stock' : 'Out of Stock';
             })(),
 
-            // Images - check variations (including gallery fallback)
+            // Images
             images: [
-              data.thumbnail_url || data.image_main || data.image_url,
-              ...(data.gallery_urls || data.image_gallery || data.gallery || [])
+              data.thumbnail_url || data.image_url,
+              ...(data.gallery_urls || [])
             ].filter(Boolean),
 
-            // Arrays (use modern names, fallback to empty)
+            // Arrays
             features: data.features || [],
             howToUse: data.how_to_use || [],
             ingredients: {
@@ -1258,18 +1223,17 @@ export const ProductDetailPage: React.FC = () => {
             reviewCount: 0,
             reviews: [],
             badges: data.badges || [],
-            seo: {
-              title: data.meta_title || data.name,
-              description: data.meta_description || data.short_description || data.short_desc
-            }
+
+            // Bundle specific fields
+            includedProducts: data.bundle_products || [],
           };
 
           setProduct(mappedProduct);
 
+          // Setup initial selections
           const firstVariant = mappedProduct.variants[0];
           setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
 
-          // Build allImages array including variant images
           const images = [...mappedProduct.images];
           mappedProduct.variants.forEach((variant: any) => {
             if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
@@ -1278,7 +1242,7 @@ export const ProductDetailPage: React.FC = () => {
           });
           setAllImages(images);
 
-          // Update SEO with product data
+          // SEO
           const seoData = productSEO(
             mappedProduct.name,
             mappedProduct.shortDescription,
@@ -1286,10 +1250,44 @@ export const ProductDetailPage: React.FC = () => {
             mappedProduct.images[0]
           );
           updateSEO(seoData);
-
-          // Track product page view
           trackPageView(seoData.title || '', seoData.url || '');
+
+          setLoading(false);
+          return; // Exit early since we found it in DB
         }
+
+        // 2. FALLBACK TO STATIC DATABASE
+        // Only runs if Supabase returned nothing
+        const staticProduct = productDatabase[productSlug as keyof typeof productDatabase];
+
+        if (staticProduct) {
+          console.log('Loaded product from Static Fallback');
+          setProduct(staticProduct);
+          const firstVariant = staticProduct.variants[0];
+          setSelectedVariant(typeof firstVariant === 'string' ? firstVariant : firstVariant?.name || '');
+
+          const images = [...staticProduct.images];
+          staticProduct.variants.forEach((variant: any) => {
+            if (typeof variant === 'object' && variant.image && !images.includes(variant.image)) {
+              images.push(variant.image);
+            }
+          });
+          setAllImages(images);
+
+          const seoData = productSEO(
+            staticProduct.name,
+            staticProduct.shortDescription,
+            staticProduct.price,
+            staticProduct.images[0]
+          );
+          updateSEO(seoData);
+          trackPageView(seoData.title || '', seoData.url || '');
+        } else {
+          // Not found in either
+          console.warn('Product not found:', productSlug);
+          setProduct(null);
+        }
+
       } catch (err) {
         console.error('Error loading product:', err);
       } finally {
