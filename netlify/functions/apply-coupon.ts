@@ -11,9 +11,9 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    const { code, customerId, cart } = JSON.parse(event.body || '{}');
+    const { code, cart } = JSON.parse(event.body || '{}');
 
-    if (!code) {
+    if (!code || !cart) {
       return {
         statusCode: 400,
         body: JSON.stringify({ ok: false, error: 'Coupon code is required' })
@@ -21,7 +21,7 @@ export const handler: Handler = async (event) => {
     }
 
     // Initialize Supabase client
-    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseServiceKey) {
@@ -33,99 +33,119 @@ export const handler: Handler = async (event) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Query the coupons table directly
-    const { data: coupons, error: queryError } = await supabase
+    // 1. Fetch Coupon Data
+    const { data: coupon, error: queryError } = await supabase
       .from('coupons')
       .select('*')
       .eq('code', code.toUpperCase())
-      .eq('status', 'active')
       .eq('is_active', true)
       .single();
 
-    if (queryError || !coupons) {
-      console.error('Coupon query error:', queryError);
+    if (queryError || !coupon) {
       return {
         statusCode: 400,
         body: JSON.stringify({ ok: false, reason: 'Invalid or inactive coupon code' })
       };
     }
 
-    // Check if coupon has expired
-    if (coupons.valid_to && new Date(coupons.valid_to) < new Date()) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Coupon has expired' })
-      };
+    // 2. Validate Dates & Limits
+    const now = new Date();
+    if (coupon.valid_until && new Date(coupon.valid_until) < now) {
+      return { statusCode: 400, body: JSON.stringify({ ok: false, reason: 'Coupon has expired' }) };
+    }
+    if (coupon.valid_from && new Date(coupon.valid_from) > now) {
+      return { statusCode: 400, body: JSON.stringify({ ok: false, reason: 'Coupon is not yet valid' }) };
+    }
+    if (coupon.max_uses > 0 && coupon.used_count >= coupon.max_uses) {
+      return { statusCode: 400, body: JSON.stringify({ ok: false, reason: 'Coupon usage limit exceeded' }) };
     }
 
-    // Check if coupon is valid from date
-    if (coupons.valid_from && new Date(coupons.valid_from) > new Date()) {
+    // 3. Calculate Totals (Handling Excluded Products)
+    let cartTotalRands = 0;
+    let eligibleTotalRands = 0;
+
+    // Normalize excluded IDs to a set of strings for easy lookup
+    const excludedIds = new Set((coupon.excluded_product_ids || []).map((id: any) => String(id)));
+
+    cart.forEach((item: any) => {
+      const itemPrice = Number(item.price); // Price in Rands (e.g., 140)
+      const itemQty = Number(item.quantity);
+      const lineTotal = itemPrice * itemQty;
+
+      cartTotalRands += lineTotal;
+
+      // Check if item is excluded (check both 'id' and 'product_id' to be safe)
+      const itemId = String(item.id || '');
+      const prodId = String(item.product_id || ''); // If cart uses product_id
+
+      if (!excludedIds.has(itemId) && !excludedIds.has(prodId)) {
+        eligibleTotalRands += lineTotal;
+      }
+    });
+
+    // 4. Check Minimum Order (Convert Rands to Cents for comparison)
+    // DB stores min_order in CENTS (e.g., 50000 for R500)
+    const eligibleTotalCents = Math.round(eligibleTotalRands * 100);
+    const minOrderCents = coupon.min_order_cents || coupon.min_order_total || 0; // Check both column names
+
+    if (minOrderCents > 0 && eligibleTotalCents < minOrderCents) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Coupon is not yet valid' })
-      };
-    }
-
-    // Check usage limits
-    if (coupons.usage_limit && coupons.used_count >= coupons.usage_limit) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Coupon usage limit exceeded' })
-      };
-    }
-
-    // Calculate cart subtotal
-    const cartSubtotal = cart.reduce((sum: number, item: any) => {
-      return sum + (item.price * item.quantity);
-    }, 0);
-
-    // Check minimum order total
-    if (coupons.min_order_total && cartSubtotal < coupons.min_order_total) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ 
-          ok: false, 
-          reason: `Minimum order total of R${(coupons.min_order_total / 100).toFixed(2)} required` 
+        body: JSON.stringify({
+          ok: false,
+          reason: `Order must be over R${(minOrderCents / 100).toFixed(0)} (excluding restricted items)`
         })
       };
     }
 
-    // Calculate discount
-    let discountAmount = 0;
-    if (coupons.type === 'percent' || coupons.percent_off) {
-      // Percentage discount
-      const percentOff = coupons.percent_off || coupons.value || 0;
-      discountAmount = (cartSubtotal * percentOff) / 100;
-    } else if (coupons.type === 'fixed') {
-      // Fixed amount discount
-      discountAmount = coupons.value || 0;
+    // 5. Calculate Discount (In Cents)
+    let discountCents = 0;
+
+    if (coupon.type === 'fixed') {
+      // Fixed amount: coupon.value is likely in Rands (e.g. 50)
+      // We convert it to cents
+      discountCents = Math.round(Number(coupon.value) * 100);
+    }
+    else if (coupon.type === 'percent' || coupon.percent_off) {
+      // Percentage: coupon.value is e.g. 10 for 10%
+      const percent = Number(coupon.value || coupon.percent_off || 0);
+      discountCents = Math.round(eligibleTotalCents * (percent / 100));
+
+      // Apply Max Discount Cap (if exists)
+      const maxDiscountCents = coupon.max_discount_cents || 0;
+      if (maxDiscountCents > 0 && discountCents > maxDiscountCents) {
+        discountCents = maxDiscountCents;
+      }
     }
 
-    console.log(`✅ Coupon applied: ${code} | Discount: R${(discountAmount).toFixed(2)} | Subtotal: R${(cartSubtotal).toFixed(2)}`);
+    // Safety: Discount cannot exceed the eligible total
+    if (discountCents > eligibleTotalCents) {
+      discountCents = eligibleTotalCents;
+    }
 
+    // 6. Return Success
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify({
         ok: true,
-        coupon_id: coupons.id,
-        code: coupons.code,
-        discount: discountAmount,
-        percent_off: coupons.percent_off || 0,
+        coupon_id: coupon.id,
+        code: coupon.code,
+        // Frontend expects discount in Rands
+        discount: discountCents / 100,
+        // Also send cents just in case
+        discount_cents: discountCents,
         reason: 'Coupon applied successfully'
       })
     };
-
   } catch (error: any) {
-    console.error('Apply coupon function error:', error);
+    console.error('Apply coupon error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ ok: false, error: 'Internal server error: ' + error.message })
+      body: JSON.stringify({ ok: false, error: 'Server error' })
     };
   }
 };
