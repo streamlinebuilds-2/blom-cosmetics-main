@@ -157,6 +157,23 @@ export const SignupPage: React.FC = () => {
           name: formData.name,
           phone: formData.phone
         }, { onConflict: 'id' });
+
+        // Save contact info to contacts system for marketing
+        try {
+          await fetch('/.netlify/functions/contacts-intake', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone || '',
+              source: 'account_creation'
+            })
+          });
+        } catch (contactError) {
+          // Don't block signup if contact save fails
+          console.warn('Failed to save contact info:', contactError);
+        }
       }
 
       setStatus({ type: 'success', message: 'Account created successfully! Redirecting to your account...' });
