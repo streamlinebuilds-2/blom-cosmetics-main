@@ -522,6 +522,63 @@ export const ProductDetailPage: React.FC = () => {
       reviewCount: 112,
       reviews: []
     },
+    'core-acrylics': {
+      id: '9',
+      name: 'Core Acrylics (56g)',
+      slug: 'core-acrylics',
+      category: 'Acrylic System',
+      shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
+      overview: 'Our Core Acrylic Powder is a professional-grade polymer designed for superior adhesion, smooth application, and exceptional strength. The self-leveling formula ensures a flawless finish with minimal filing required. Available in essential shades for every nail technician.',
+      price: 280,
+      compareAtPrice: null,
+      stock: 'In Stock',
+      images: [
+        '/acrylic-powder-01.webp', // The featured image you wanted to keep
+        '/core-acrylics-white.webp',
+        '/core-acrylics-colorful.webp'
+      ],
+      features: [
+        'Superior adhesion and longevity',
+        'Self-leveling buttery consistency',
+        'Non-yellowing formula',
+        'Medium setting time for perfect control',
+        'Crystal clear clarity (Clear powder)',
+        'Bubble-free application'
+      ],
+      howToUse: [
+        'Prep natural nail and apply primer',
+        'Dip brush into monomer, then into powder',
+        'Place bead onto nail and guide into place',
+        'Allow to cure before filing'
+      ],
+      ingredients: {
+        inci: [
+          'Polyethylmethacrylate',
+          'Polymethyl Methacrylate',
+          'Benzoyl Peroxide',
+          'Silica'
+        ],
+        key: [
+          'Advanced Polymers – for strength and flexibility',
+          'UV Inhibitors – prevents yellowing',
+          'Fine grade powder – for smooth consistency'
+        ]
+      },
+      details: {
+        size: '56g',
+        shelfLife: '24 months',
+        claims: ['HEMA-Free', 'Professional Grade', 'Non-Yellowing']
+      },
+      variants: [
+        { name: 'Clear', price: 280, image: '/acrylic-powder-01.webp' },
+        { name: 'White', price: 280, image: '/core-acrylics-white.webp' },
+        { name: 'Pink', price: 280, image: '/core-acrylics-colorful.webp' },
+        { name: 'Cover Pink', price: 280, image: '/core-acrylics-colorful.webp' }
+      ],
+      rating: 5.0,
+      reviewCount: 42,
+      reviews: []
+    },
     'crystal-kolinsky-sculpting-brush': {
       id: '11',
       name: 'Crystal Kolinsky Sculpting Brush',
