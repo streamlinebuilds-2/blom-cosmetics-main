@@ -272,12 +272,8 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
-    // Client-side check: block if cart < R500
-    const productSubtotalCents = Math.round(cartState.subtotal * 100);
-    if (productSubtotalCents < 50000) {
-      setCouponError('Order must be over R500 (product total, excl. shipping).');
-      return;
-    }
+    // REMOVED: The hardcoded R500 check.
+    // We now let the backend decide if the order value is high enough for this specific coupon.
 
     setIsApplyingCoupon(true);
     setCouponError('');
