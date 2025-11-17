@@ -287,6 +287,24 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
         setSuccess(true);
         recentSubmissions.current[trimmedEmail] = now;
 
+        // Save contact info to contacts system for marketing
+        try {
+          await fetch('/.netlify/functions/contacts-intake', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: '', // Not collected in Beauty Club signup
+              email: trimmedEmail,
+              phone: phone.trim(),
+              source: 'beauty_club_signup'
+            })
+          });
+          console.info('Contact info saved to contacts system');
+        } catch (contactError) {
+          // Don't block signup if contact save fails
+          console.warn('Failed to save contact info:', contactError);
+        }
+
         // Mark user as signed up to hide popup and banner permanently
         try {
           localStorage.setItem('blom_user_signed_up', 'true');
