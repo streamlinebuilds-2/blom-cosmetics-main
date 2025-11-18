@@ -1,15 +1,11 @@
-// No Chromium. Pure Node PDF.
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 import fetch from "node-fetch"
 
 const SB_URL = process.env.SUPABASE_URL!
 const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const SITE = (process.env.SITE_BASE_URL || process.env.SITE_URL || "https://blom-cosmetics.co.za").replace(/\/+$/, '')
 const BUCKET = "invoices" // must exist
 const LOGO_URL = "https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png"
 
-const PROVINCES: Record<string, string> = { WC: 'Western Cape', GP: 'Gauteng', KZN: 'KwaZulu-Natal', EC: 'Eastern Cape', FS: 'Free State', LP: 'Limpopo', MP: 'Mpumalanga', NC: 'Northern Cape', NW: 'North West' }
-const COUNTRY = (c?: string) => (c === 'ZA' ? 'South Africa' : c || '')
 const money = (n: any) => "R " + Number(n || 0).toFixed(2)
 
 const sb = (path: string, init?: any) =>
@@ -20,154 +16,134 @@ export const handler = async (event: any) => {
     const id = event.queryStringParameters?.m_payment_id
     if (!id) return { statusCode: 400, body: "m_payment_id required" }
 
-    // 1) Fetch order + items (ADDED: subtotal_cents, shipping_cents, discount_cents)
-    const oRes = await sb(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,order_number,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,subtotal_cents,shipping_cents,discount_cents,status,created_at,invoice_url`)
+    // 1. Fetch order with ALL financial fields
+    const oRes = await sb(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=*`)
     const [order] = (await oRes.json()) as any[]
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
-    const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at,variant_title`)
+    const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=*`)
     const items = (await iRes.json()) as any[]
 
-    // C - Fix: Compute total from items if order.total is missing/zero
-    const computedTotal = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unit_price || 0)), 0)
-    order.total = Number(order.total) > 0 ? Number(order.total) : computedTotal
-
-    // Also fix line_total if missing for items
-    items.forEach((it: any) => {
-      if (!it.line_total || Number(it.line_total) === 0) {
-        it.line_total = Number(it.quantity || 0) * Number(it.unit_price || 0)
-      }
-    })
-
-    const orderNumber = order.order_number || id
-
-    // 2) Build PDF in-memory
+    // 2. Setup PDF
     const pdf = await PDFDocument.create()
     const page = pdf.addPage([595.28, 841.89]) // A4
-    const { width } = page.getSize()
     const font = await pdf.embedFont(StandardFonts.Helvetica)
     const bold = await pdf.embedFont(StandardFonts.HelveticaBold)
+    const { width } = page.getSize()
 
-    let y = 800,
-      left = 40,
-      right = width - 40
+    let y = 750;
+    const left = 50;
+    const right = width - 50;
 
-    const text = (t: string, x: number, yy: number, s = 12, b = false, c = rgb(0.1, 0.1, 0.15)) =>
+    const text = (t: string, x: number, yy: number, s = 10, b = false, c = rgb(0,0,0)) =>
       page.drawText(String(t), { x, y: yy, size: s, font: b ? bold : font, color: c })
-    const rightText = (t: string, x: number, yy: number, s = 12, b = false, c = rgb(0.1, 0.1, 0.15)) => {
-      const textWidth = (b ? bold : font).widthOfTextAtSize(String(t), s)
-      page.drawText(String(t), { x: x - textWidth, y: yy, size: s, font: b ? bold : font, color: c })
-    }
-    const line = (x1: number, y1: number, x2: number, y2: number) =>
-      page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1, color: rgb(0.9, 0.92, 0.95) })
 
-    // Logo (best-effort)
+    const rightText = (t: string, x: number, yy: number, s = 10, b = false, c = rgb(0,0,0)) => {
+        const w = (b ? bold : font).widthOfTextAtSize(String(t), s)
+        page.drawText(String(t), { x: x - w, y: yy, size: s, font: b ? bold : font, color: c })
+    }
+    const line = (yPos: number) => page.drawLine({ start: { x: left, y: yPos }, end: { x: right, y: yPos }, thickness: 1, color: rgb(0.8,0.8,0.8) })
+
+    // Logo
     try {
       const logoBuf = await (await fetch(LOGO_URL)).arrayBuffer()
-      // try PNG first, fallback to JPG
-      const logoImg = await pdf.embedPng(logoBuf).catch(async () => pdf.embedJpg(logoBuf))
-      const logoW = 120
-      const logoH = (logoImg.height / logoImg.width) * logoW
-      page.drawImage(logoImg, { x: left, y: y - logoH, width: logoW, height: logoH })
+      const img = await pdf.embedPng(logoBuf).catch(async () => pdf.embedJpg(logoBuf))
+      const dims = img.scale(0.25) // Adjust scale as needed
+      page.drawImage(img, { x: left, y: y, width: dims.width, height: dims.height })
+      y -= 20
     } catch {}
 
-    // Header (RECEIPT)
-    text("RECEIPT", right - 150, y, 20, true)
+    // Header
+    rightText("INVOICE / RECEIPT", right, y + 10, 16, true)
+    rightText(`Order #: ${order.order_number}`, right, y - 10, 10)
+    rightText(`Date: ${new Date(order.created_at).toLocaleDateString()}`, right, y - 22, 10)
+
+    // Payment Status Badge
+    const statusColor = order.payment_status === 'paid' ? rgb(0, 0.6, 0) : rgb(0.8, 0.4, 0);
+    const statusText = order.payment_status === 'paid' ? "PAID" : "PAYMENT DUE";
+    rightText(statusText, right, y - 40, 12, true, statusColor)
+
+    y -= 80
+
+    // Addresses
+    text("Billed To:", left, y, 10, true)
+    text(order.buyer_name || "Guest", left, y - 15)
+    text(order.buyer_email || "", left, y - 27)
+    text(order.buyer_phone || "", left, y - 39)
+
+    if (order.fulfillment_method === 'delivery') {
+       text("Ship To:", left + 200, y, 10, true)
+       const addr = order.delivery_address || {}
+       text(addr.street_address || "", left + 200, y - 15)
+       text(`${addr.city || ''} ${addr.code || ''}`, left + 200, y - 27)
+       text(addr.country || "", left + 200, y - 39)
+    } else {
+       text("Collection From:", left + 200, y, 10, true)
+       text("BLOM Cosmetics HQ", left + 200, y - 15)
+    }
+
+    y -= 70
+
+    // Items Table Header
+    line(y + 12)
+    text("Item", left, y, 10, true)
+    rightText("Qty", right - 150, y, 10, true)
+    rightText("Price", right - 80, y, 10, true)
+    rightText("Total", right, y, 10, true)
     y -= 8
-    text(`Order #: ${orderNumber}`, right - 150, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
-    text(`Date: ${new Date(order.created_at).toLocaleString()}`, right - 150, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
+    line(y)
+    y -= 20
 
-    y -= 22
-    line(left, y, right, y)
-    y -= 16
-
-    // Customer / Fulfillment (method stacked above address)
-    text("Customer", left, y, 12, true)
-    text("Fulfillment", right - 200, y, 12, true)
-    y -= 14
-    text(order.buyer_name || "-", left, y)
-    text(String(order.fulfillment_method || '-').toUpperCase(), right - 200, y)
-    y -= 14
-    text(order.buyer_email || "-", left, y, 10, false, rgb(0.28, 0.33, 0.40))
-    const a = order.delivery_address || {}
-    const lines = [
-      a.line1,
-      [a.city, a.postal_code].filter(Boolean).join(' '),
-      [PROVINCES[a.province as string] ?? a.province, COUNTRY(a.country)].filter(Boolean).join(', ')
-    ].filter(Boolean)
-    let yAddr = y
-    for (const ln of lines) {
-      text(String(ln), right - 200, yAddr, 9, false, rgb(0.4, 0.45, 0.52))
-      yAddr -= 11
-    }
-    y -= 12
-    y = Math.min(y, yAddr - 8)
-
-    line(left, y, right, y)
-    y -= 18
-
-    // Table header
-    text("Item", left, y, 12, true)
-    rightText("Qty", right - 200, y, 12, true)
-    rightText("Unit", right - 140, y, 12, true)
-    rightText("Total", right - 40, y, 12, true) // Adjusted spacing
-    y -= 10
-    line(left, y, right, y)
-    y -= 12
-
-    // Rows
+    // Items Rows
     for (const it of items) {
-      const name = it.product_name || it.sku || "-"
-      const variant = it.variant_title ? ` • ${it.variant_title}` : ""
-      text(name + variant, left, y, 10)
-      rightText(String(it.quantity), right - 200, y, 10)
-      rightText(money(it.unit_price), right - 140, y, 10)
-      rightText(money(it.line_total), right - 40, y, 10)
-      y -= 16
-      if (y < 120) {
-        line(left, y + 8, right, y + 8)
-        text("Continued…", left, y, 10, false, rgb(0.5, 0.5, 0.55))
-        y = 800
-      }
+      // Fix: Ensure unit_price is number
+      const price = Number(it.unit_price) || 0;
+      const qty = Number(it.quantity) || 1;
+      const total = price * qty;
+
+      text(it.product_name || "Item", left, y)
+      rightText(String(qty), right - 150, y)
+      rightText(money(price), right - 80, y)
+      rightText(money(total), right, y)
+      y -= 20
     }
 
-    y -= 6
-    line(left, y, right, y)
-    y -= 16
+    line(y + 10)
+    y -= 10
 
-    // --- NEW: Breakdown Section ---
+    // Totals Block
+    const subtotal = (order.subtotal_cents || 0) / 100
+    const shipping = (order.shipping_cents || 0) / 100
+    const discount = (order.discount_cents || 0) / 100
+    const total = (order.total_cents || 0) / 100
 
-    // Subtotal
-    if (order.subtotal_cents) {
-      rightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.4))
-      rightText(money(order.subtotal_cents / 100), right - 40, y, 10)
-      y -= 14
+    rightText("Subtotal:", right - 80, y, 10)
+    rightText(money(subtotal), right, y, 10)
+    y -= 15
+
+    if (shipping > 0) {
+      rightText("Shipping:", right - 80, y, 10)
+      rightText(money(shipping), right, y, 10)
+      y -= 15
     }
 
-    // Discount
-    if (order.discount_cents > 0) {
-      rightText("Discount", right - 140, y, 10, false, rgb(0.4, 0.4, 0.4))
-      rightText("-" + money(order.discount_cents / 100), right - 40, y, 10, false, rgb(0.8, 0.2, 0.2))
-      y -= 14
+    if (discount > 0) {
+      rightText("Discount:", right - 80, y, 10)
+      rightText("-" + money(discount), right, y, 10)
+      y -= 15
     }
 
-    // Shipping
-    if (order.shipping_cents >= 0) {
-      rightText("Shipping", right - 140, y, 10, false, rgb(0.4, 0.4, 0.4))
-      rightText(money(order.shipping_cents / 100), right - 40, y, 10)
-      y -= 16
-    }
+    y -= 5
+    line(y + 12)
+    rightText("Total:", right - 80, y, 12, true)
+    rightText(money(total), right, y, 12, true)
 
-    // Final Total
-    line(right - 250, y + 6, right, y + 6)
-    text("Total", right - 140, y, 13, true)
-    rightText(money(order.total), right - 40, y, 13, true)
+    // 3. Save & Upload
+    const pdfBytes = await pdf.save()
+    const filename = `${order.order_number}.pdf`
 
-    const bytes = await pdf.save() // Uint8Array
-
-    // 3) Upload (UPSERT) to Supabase Storage
-    const filename = `${orderNumber}.pdf`
-    const upload = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(filename)}`, {
+    // Upload to Supabase Storage
+    await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${encodeURIComponent(filename)}`, {
       method: "POST",
       headers: {
         apikey: SB_KEY,
@@ -175,28 +151,22 @@ export const handler = async (event: any) => {
         "Content-Type": "application/pdf",
         "x-upsert": "true"
       },
-      body: Buffer.from(bytes)
+      body: Buffer.from(pdfBytes)
     })
-    if (!upload.ok) {
-      const tx = await upload.text()
-      console.error("UPLOAD_FAILED", tx)
-      return { statusCode: 500, body: "UPLOAD_FAILED" }
-    }
 
     const publicUrl = `${SB_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(filename)}`
 
-    // 4) Persist invoice_url and order_number
+    // Update order with URL
     await sb(`/rest/v1/orders?id=eq.${order.id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ invoice_url: publicUrl, order_number: orderNumber })
+      body: JSON.stringify({ invoice_url: publicUrl })
     })
 
     return { statusCode: 200, body: JSON.stringify({ url: publicUrl }) }
+
   } catch (e: any) {
     console.error(e)
-    return { statusCode: 500, body: e?.message || "Error" }
+    return { statusCode: 500, body: e.message }
   }
 }
-
-
