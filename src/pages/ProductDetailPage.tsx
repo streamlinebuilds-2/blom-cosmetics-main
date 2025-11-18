@@ -1363,14 +1363,37 @@ export const ProductDetailPage: React.FC = () => {
     wishlistStore.toggleItem(wishlistItem);
   };
 
+  // --- NEW SMART NAVIGATION ---
+
+  // Helper to sync variant when image changes
+  const syncVariantWithImage = (newIndex: number) => {
+    if (!product || !product.variants) return;
+
+    const currentImageUrl = allImages[newIndex];
+
+    // Find the variant that uses this image
+    const matchingVariant = product.variants.find((v: any) =>
+      (typeof v === 'object' && v.image === currentImageUrl)
+    );
+
+    if (matchingVariant) {
+      const variantName = matchingVariant.name || matchingVariant.title;
+      setSelectedVariant(variantName);
+    }
+  };
+
   const nextImage = () => {
     if (!product) return;
-    setSelectedImage((prev) => (prev + 1) % allImages.length);
+    const newIndex = (selectedImage + 1) % allImages.length;
+    setSelectedImage(newIndex);
+    syncVariantWithImage(newIndex); // <--- Updates the button
   };
 
   const prevImage = () => {
     if (!product) return;
-    setSelectedImage((prev) => (prev - 1 + allImages.length) % allImages.length);
+    const newIndex = (selectedImage - 1 + allImages.length) % allImages.length;
+    setSelectedImage(newIndex);
+    syncVariantWithImage(newIndex); // <--- Updates the button
   };
 
   const nextThumbnail = () => {

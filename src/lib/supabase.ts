@@ -58,6 +58,7 @@ export interface Product {
   track_inventory: boolean;
   is_active: boolean;
   is_featured: boolean;
+  featured_home_image: string | null;
   weight: number | null;
   meta_title: string | null;
   meta_description: string | null;
