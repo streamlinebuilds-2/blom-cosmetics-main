@@ -13,6 +13,7 @@ type OrderItem = {
   quantity: number;
   unit_price: number;
   line_total: number;
+  variant_title: string | null;
 };
 
 type Order = {
@@ -81,7 +82,7 @@ export default function OrderDetailPage() {
         // Fetch order items from order_items_account_v1 or order_items
         let itemsQuery = supabase
           .from('order_items_account_v1')
-          .select('id, product_name, sku, quantity, unit_price, line_total')
+          .select('id, product_name, sku, quantity, unit_price, line_total, variant_title')
           .eq('order_id', orderId);
 
         let { data: itemsData, error: itemsError } = await itemsQuery;
@@ -90,7 +91,7 @@ export default function OrderDetailPage() {
         if (itemsError && (itemsError.code === '42P01' || itemsError.message?.includes('does not exist'))) {
           itemsQuery = supabase
             .from('order_items')
-            .select('id, product_name, sku, quantity, unit_price, line_total')
+            .select('id, product_name, sku, quantity, unit_price, line_total, variant_title')
             .eq('order_id', orderId);
           
           const result = await itemsQuery;
@@ -119,6 +120,7 @@ export default function OrderDetailPage() {
               quantity: qty,
               unit_price: unit,
               line_total: lineTotal,
+              variant_title: item.variant_title || null,
             };
           }),
         });
@@ -224,7 +226,14 @@ export default function OrderDetailPage() {
                       order.items.map((item) => (
                         <tr key={item.id} className="border-b">
                           <td className="py-3 px-3 text-sm">
-                            <div className="font-medium">{item.product_name || item.sku || 'Unknown Item'}</div>
+                            <div className="font-medium">
+                              {item.product_name || item.sku || 'Unknown Item'}
+                              {item.variant_title && (
+                                <span style={{ color: 'rgb(107, 114, 128)', fontWeight: 400, marginLeft: '8px' }}>
+                                  • {item.variant_title}
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td className="text-right py-3 px-3 text-sm">{item.quantity}</td>
                           <td className="text-right py-3 px-3 text-sm">R {item.unit_price.toFixed(2)}</td>

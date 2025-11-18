@@ -25,7 +25,7 @@ export const handler = async (event: any) => {
     const [order] = (await oRes.json()) as any[]
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
-    const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`)
+    const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at,variant_title`)
     const items = (await iRes.json()) as any[]
 
     // C - Fix: Compute total from items if order.total is missing/zero
@@ -118,7 +118,8 @@ export const handler = async (event: any) => {
     // Rows
     for (const it of items) {
       const name = it.product_name || it.sku || "-"
-      text(name, left, y, 10)
+      const variant = it.variant_title ? ` • ${it.variant_title}` : ""
+      text(name + variant, left, y, 10)
       rightText(String(it.quantity), right - 200, y, 10)
       rightText(money(it.unit_price), right - 140, y, 10)
       rightText(money(it.line_total), right - 40, y, 10)

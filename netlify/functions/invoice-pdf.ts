@@ -61,7 +61,7 @@ export const handler = async (event: any) => {
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
     const items = await fetchJson(
-      `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at`
+      `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at,variant_title`
     )
 
     // C - Fix: Compute total from items if order.total is missing/zero
@@ -196,11 +196,12 @@ export const handler = async (event: any) => {
     // Rows (better alignment) - Calculate line_total if missing
     items.forEach((it: any) => {
       const name = it.product_name || it.sku || "-"
+      const variant = it.variant_title ? ` • ${it.variant_title}` : ""
       const qty = Number(it.quantity || 0)
       const unit = Number(it.unit_price || 0)
       const lineTotal = it.line_total ? Number(it.line_total) : (qty * unit)
-      
-      drawText(name, left, y, 10)
+
+      drawText(name + variant, left, y, 10)
       drawRightText(String(qty), right - 150, y, 10)
       drawRightText(money(unit), right - 90, y, 10)
       drawRightText(money(lineTotal), right - 20, y, 10)
