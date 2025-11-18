@@ -16,10 +16,11 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Fetch orders from Supabase
+    // Fetch orders from Supabase - ONLY PAID ORDERS
   const url = `${process.env.SUPABASE_URL}/rest/v1/orders`
       + `?select=*,order_items(name,quantity,unit_price,total_price,product_id)`
       + `&user_id=eq.${encodeURIComponent(userId)}`
+      + `&status=eq.paid`
       + `&order=created_at.desc`;
 
     const response = await fetch(url, {

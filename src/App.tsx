@@ -104,6 +104,7 @@ function App() {
           {/* Checkout */}
           <Route path="/checkout" element={<PageWithCart><CheckoutPage /></PageWithCart>} />
           <Route path="/checkout/success" element={<PageWithCart><CheckoutSuccess /></PageWithCart>} />
+          <Route path="/checkout/status" element={<PageWithCart><CheckoutSuccess /></PageWithCart>} />
           <Route path="/checkout/cancel" element={<PageWithCart><CheckoutCancel /></PageWithCart>} />
           
           {/* Legal Pages */}

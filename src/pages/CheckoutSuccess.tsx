@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
+import { cartStore } from '../lib/cart';
 
 export default function CheckoutSuccess() {
   const [status, setStatus] = useState<'checking' | 'paid' | 'pending' | 'not-found'>('checking');
@@ -28,6 +29,8 @@ export default function CheckoutSuccess() {
         if (!error && data) {
           if (data.status === 'paid' || data.payment_status === 'paid') {
             setStatus('paid');
+            // Clear cart on successful payment
+            cartStore.clearCart();
             // Notify admin pipeline (n8n) via order-status function
             try {
               await fetch('/.netlify/functions/order-status', {
