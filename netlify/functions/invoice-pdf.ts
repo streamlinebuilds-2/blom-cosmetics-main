@@ -54,9 +54,9 @@ export const handler = async (event: any) => {
 
     const site_url = body.site_url || q.site_url || SITE;
 
-    // 1) Load order + items
+    // 1) Load order + items (ADDED: subtotal_cents, shipping_cents, discount_cents)
     const [order] = await fetchJson(
-      `${SUPABASE_URL}/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(m_payment_id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,status,created_at,invoice_url`
+      `${SUPABASE_URL}/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(m_payment_id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,subtotal_cents,shipping_cents,discount_cents,status,created_at,invoice_url`
     )
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
@@ -216,8 +216,32 @@ export const handler = async (event: any) => {
     y -= 8
     drawLine(left, y, right, y)
     y -= 18
-    
-    // Total row (more prominent) - Move "Total" label further left to avoid overlap
+
+    // --- NEW BREAKDOWN LOGIC ---
+
+    // Subtotal
+    if (order.subtotal_cents) {
+      drawRightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
+      drawRightText(money(order.subtotal_cents / 100), right - 20, y, 10)
+      y -= 14
+    }
+
+    // Discount
+    if (order.discount_cents > 0) {
+      drawRightText("Discount", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
+      drawRightText("-" + money(order.discount_cents / 100), right - 20, y, 10, false, rgb(0.8, 0.2, 0.2)) // Red color
+      y -= 14
+    }
+
+    // Shipping
+    if (order.shipping_cents !== undefined) {
+       drawRightText("Shipping", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
+       drawRightText(money(order.shipping_cents / 100), right - 20, y, 10)
+       y -= 16
+    }
+
+    // Total row (More prominent)
+    drawLine(right - 250, y + 6, right, y + 6) // Short line above total
     drawText("Total", right - 140, y, 13, true)
     drawRightText(money(order.total), right - 20, y, 13, true)
 

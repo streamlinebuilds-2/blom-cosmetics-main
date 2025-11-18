@@ -20,8 +20,8 @@ export const handler = async (event: any) => {
     const id = event.queryStringParameters?.m_payment_id
     if (!id) return { statusCode: 400, body: "m_payment_id required" }
 
-    // 1) Fetch order + items
-    const oRes = await sb(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,order_number,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,status,created_at,invoice_url`)
+    // 1) Fetch order + items (ADDED: subtotal_cents, shipping_cents, discount_cents)
+    const oRes = await sb(`/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(id)}&select=id,order_number,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,subtotal_cents,shipping_cents,discount_cents,status,created_at,invoice_url`)
     const [order] = (await oRes.json()) as any[]
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
@@ -54,6 +54,10 @@ export const handler = async (event: any) => {
 
     const text = (t: string, x: number, yy: number, s = 12, b = false, c = rgb(0.1, 0.1, 0.15)) =>
       page.drawText(String(t), { x, y: yy, size: s, font: b ? bold : font, color: c })
+    const rightText = (t: string, x: number, yy: number, s = 12, b = false, c = rgb(0.1, 0.1, 0.15)) => {
+      const textWidth = (b ? bold : font).widthOfTextAtSize(String(t), s)
+      page.drawText(String(t), { x: x - textWidth, y: yy, size: s, font: b ? bold : font, color: c })
+    }
     const line = (x1: number, y1: number, x2: number, y2: number) =>
       page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1, color: rgb(0.9, 0.92, 0.95) })
 
@@ -104,9 +108,9 @@ export const handler = async (event: any) => {
 
     // Table header
     text("Item", left, y, 12, true)
-    text("Qty", right - 200, y, 12, true)
-    text("Unit", right - 140, y, 12, true)
-    text("Total", right - 70, y, 12, true)
+    rightText("Qty", right - 200, y, 12, true)
+    rightText("Unit", right - 140, y, 12, true)
+    rightText("Total", right - 40, y, 12, true) // Adjusted spacing
     y -= 10
     line(left, y, right, y)
     y -= 12
@@ -114,10 +118,10 @@ export const handler = async (event: any) => {
     // Rows
     for (const it of items) {
       const name = it.product_name || it.sku || "-"
-      text(name, left, y)
-      text(String(it.quantity), right - 200, y)
-      text(money(it.unit_price), right - 140, y)
-      text(money(it.line_total), right - 70, y)
+      text(name, left, y, 10)
+      rightText(String(it.quantity), right - 200, y, 10)
+      rightText(money(it.unit_price), right - 140, y, 10)
+      rightText(money(it.line_total), right - 40, y, 10)
       y -= 16
       if (y < 120) {
         line(left, y + 8, right, y + 8)
@@ -129,8 +133,34 @@ export const handler = async (event: any) => {
     y -= 6
     line(left, y, right, y)
     y -= 16
-    text("Total", right - 140, y, 12, true)
-    text(money(order.total), right - 70, y, 12, true)
+
+    // --- NEW: Breakdown Section ---
+
+    // Subtotal
+    if (order.subtotal_cents) {
+      rightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.4))
+      rightText(money(order.subtotal_cents / 100), right - 40, y, 10)
+      y -= 14
+    }
+
+    // Discount
+    if (order.discount_cents > 0) {
+      rightText("Discount", right - 140, y, 10, false, rgb(0.4, 0.4, 0.4))
+      rightText("-" + money(order.discount_cents / 100), right - 40, y, 10, false, rgb(0.8, 0.2, 0.2))
+      y -= 14
+    }
+
+    // Shipping
+    if (order.shipping_cents >= 0) {
+      rightText("Shipping", right - 140, y, 10, false, rgb(0.4, 0.4, 0.4))
+      rightText(money(order.shipping_cents / 100), right - 40, y, 10)
+      y -= 16
+    }
+
+    // Final Total
+    line(right - 250, y + 6, right, y + 6)
+    text("Total", right - 140, y, 13, true)
+    rightText(money(order.total), right - 40, y, 13, true)
 
     const bytes = await pdf.save() // Uint8Array
 
