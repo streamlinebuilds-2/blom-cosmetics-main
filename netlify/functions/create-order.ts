@@ -49,15 +49,25 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // 1c. Normalize Items
-    if (items.length > 0 && items[0].quantity !== undefined && items[0].unit_price === undefined) {
-      items = items.map((it: any) => ({
-        product_id: it.productId || it.id,
-        quantity: it.quantity,
-        unit_price: it.unit_price ?? it.price,
-        product_name: it.name,
-        sku: it.sku || null
-      }))
+    // 1c. Normalize Items (CRITICAL FIX FOR VARIANTS & PRICES)
+    if (items.length > 0) {
+      items = items.map((it: any) => {
+        // Determine the correct name (Product Name + Variant Name)
+        let finalName = it.product_name || it.name || 'Unknown Product';
+        if (it.variant && it.variant.title) {
+          finalName = `${finalName} - ${it.variant.title}`;
+        } else if (it.selectedVariant) {
+           finalName = `${finalName} - ${it.selectedVariant}`;
+        }
+
+        return {
+          product_id: it.product_id || it.productId || it.id,
+          quantity: Number(it.quantity || 1),
+          unit_price: Number(it.unit_price ?? it.price ?? 0),
+          product_name: finalName,
+          sku: it.sku || null
+        };
+      });
     }
 
     if (!items.length) {
@@ -145,7 +155,7 @@ export const handler: Handler = async (event) => {
       p_channel: 'website',
       p_items: items.map((it: any) => ({
         product_id: it.product_id,
-        product_name: it.product_name || it.name,
+        product_name: it.product_name, // Uses the fixed name from step 1c
         sku: it.sku || null,
         quantity: it.quantity,
         unit_price: it.unit_price
