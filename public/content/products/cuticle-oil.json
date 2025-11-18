@@ -30,7 +30,7 @@
     "Enriched with Vitamin E for nail health",
     "Fast-absorbing, non-greasy formula",
     "Strengthens and nourishes cuticles",
-    "Available in 5 beautiful scents",
+    "Available in 6 beautiful scents",
     "Professional salon quality"
   ],
   "howToUse": [
@@ -62,7 +62,8 @@
     { "name": "Vanilla", "image": "/cuticle-oil-vanilla.webp" },
     { "name": "Tiny Touch", "image": "/cuticle-oil-tiny-touch.webp" },
     { "name": "Dragon Fruit Lotus", "image": "/cuticle-oil-dragon-fruit-lotus.webp" },
-    { "name": "Watermelon", "image": "/cuticle-oil-watermelon.webp" }
+    { "name": "Watermelon", "image": "/cuticle-oil-watermelon.webp" },
+    { "name": "Sweet Peach", "image": "/cuticle-oil-sweet-peach.jpg" }
   ],
   "createdAt": "2024-01-01T10:00:00Z",
   "updatedAt": "2024-01-01T10:00:00Z"
