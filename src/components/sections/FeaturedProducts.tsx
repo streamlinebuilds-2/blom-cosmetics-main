@@ -1,195 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { Container } from '../layout/Container';
-import { ProductCard } from '../ProductCard';
-import { Button } from '../ui/Button';
-import { Card, CardContent } from '../ui/Card';
-import { Product, ProductImage } from '../../lib/supabase';
-import { cartStore, showNotification } from '../../lib/cart';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../../lib/supabase'; // Adjust path if needed
+import { ProductCard } from '../ProductCard'; // Adjust path if needed
+import { Container } from '../layout/Container'; // Adjust path if needed
 
-interface ProductWithImages extends Product {
-  product_images: ProductImage[];
-}
-
-export const FeaturedProducts: React.FC = () => {
-  const [products, setProducts] = useState<ProductWithImages[]>([]);
+export const FeaturedProducts = () => {
+  const [featured, setFeatured] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleViewAllClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    try {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      window.location.assign('/shop');
-    } catch {
-      window.location.assign('/shop');
-    }
-  };
 
   useEffect(() => {
-    // Use specially made bestseller products with special images
-    const bestsellerProducts = [
-      {
-        id: '2',
-        name: 'Vitamin Primer',
-        slug: 'vitamin-primer',
-        price: 210,
-        compare_at_price: null,
-        short_description: 'Essential nail preparation for lasting results',
-        product_images: [
-          { image_url: '/primer-01.webp', sort_order: 1 }
-        ]
-      },
-      {
-        id: '9',
-        name: 'Core Acrylics (56 g)',
-        slug: 'core-acrylics',
-        price: 280,
-        compare_at_price: null,
-        short_description: 'Professional grade acrylic powder for perfect sculpting',
-        product_images: [
-          { image_url: '/acrylic-powder-01.webp', sort_order: 1 }
-        ]
-      }
-    ];
+    async function loadFeatured() {
+      try {
+        // 1. Fetch the 3 slots from your new 'featured_items' table
+        // We join the 'products' table to get the name/price info
+        const { data, error } = await supabase
+          .from('featured_items')
+          .select(`
+            slot_number,
+            custom_image_url,
+            products (
+              id, name, slug, price, compare_at_price,
+              short_description, thumbnail_url, category, stock
+            )
+          `)
+          .not('product_id', 'is', null) // Only show slots that have a product selected
+          .order('slot_number');
 
-    setProducts(bestsellerProducts as ProductWithImages[]);
-    setLoading(false);
+        if (error) throw error;
+
+        if (data) {
+          // 2. Transform the data into the format ProductCard expects
+          const items = data.map((item: any) => {
+            const p = item.products;
+            // If product was deleted but slot remains, p might be null
+            if (!p) return null;
+
+            return {
+              id: p.id,
+              name: p.name,
+              price: p.price,
+              compareAtPrice: p.compare_at_price,
+              // CRITICAL: This line prefers your Admin Custom Image over the default
+              image: item.custom_image_url || p.thumbnail_url,
+              category: p.category,
+              slug: p.slug,
+              inStock: p.stock > 0
+            };
+          }).filter(Boolean); // Remove empty slots
+
+          setFeatured(items);
+        }
+      } catch (err) {
+        console.error('Error loading featured items:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadFeatured();
   }, []);
 
-  if (loading) {
-    return (
-      <section className="section-padding">
-        <Container>
-          <div className="text-center mb-12">
-            <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
-            <h2 className="heading-with-stripe">BEST SELLERS</h2>
-            <p className="section-subheader">
-              Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
-            </p>
-          </div>
-          <div className="grid-responsive">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="card animate-pulse">
-                <div className="aspect-square bg-gray-200"></div>
-                <CardContent>
-                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="flex items-center justify-between">
-                    <div className="h-8 w-20 bg-gray-200 rounded"></div>
-                    <div className="h-10 w-24 bg-gray-200 rounded"></div>
-                  </div>
-                </CardContent>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </section>
-    );
-  }
-
-  if (error || products.length === 0) {
-    // Fallback to static data if database fails
-    const fallbackProducts = [
-      {
-        id: '2',
-        slug: 'vitamin-primer',
-        name: 'Vitamin Primer',
-        price: 210,
-        image: '/primer-01.webp',
-        description: 'Essential nail preparation for lasting results'
-      },
-      {
-        id: '9',
-        slug: 'core-acrylics',
-        name: 'Core Acrylics (56 g)',
-        price: 280,
-        image: '/acrylic-powder-01.webp',
-        description: 'Professional grade acrylic powder for perfect sculpting'
-      }
-    ];
-
-    return (
-      <section className="section-padding">
-        <Container>
-          <div className="text-center mb-12">
-            <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
-            <h2 className="heading-with-stripe">BEST SELLERS</h2>
-            <p className="section-subheader">
-              Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
-            </p>
-          </div>
-
-          <div className="grid-responsive">
-            {fallbackProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                slug={product.slug}
-                price={product.price}
-                shortDescription={product.description}
-                images={[product.image]}
-                inStock={true}
-                badges={['Bestseller']}
-                hoverShine
-              />
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <a href="/shop" className="inline-block" onClick={handleViewAllClick}>
-              <Button size="lg" variant="outline">
-                View All Products
-              </Button>
-            </a>
-          </div>
-        </Container>
-      </section>
-    );
-  }
+  if (loading) return <div className="py-20 text-center">Loading favorites...</div>;
+  if (featured.length === 0) return null; // Hide section if no slots are set
 
   return (
-      <section className="section-padding">
-        <Container>
-          <div className="text-center mb-12">
-            <p className="uppercase tracking-wide text-sm font-semibold text-slate-500 mb-2">EXPLORE THE COLLECTION</p>
-            <h2 className="heading-with-stripe">BEST SELLERS</h2>
-            <p className="section-subheader">
-              Premium, HEMA-free formulas with a soft, salon-perfect finish — loved by nail artists across South Africa.
-            </p>
-          </div>
-
-        <div className="grid-responsive">
-          {products.map((product) => {
-            const images = product.product_images.map(img => img.image_url);
-
-            return (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                slug={product.slug}
-                price={product.price}
-                compareAtPrice={product.compare_at_price}
-                shortDescription={product.short_description}
-                images={images}
-                inStock={true}
-                badges={['Bestseller']}
-                hoverShine
-              />
-            );
-          })}
+    <section className="section-padding bg-white">
+      <Container>
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">This Week's Favorites</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Our most loved products, curated just for you.
+          </p>
         </div>
 
-        <div className="text-center mt-12">
-          <a href="/shop" className="inline-block" onClick={handleViewAllClick}>
-            <Button size="lg" variant="outline">
-              View All Products
-            </Button>
-          </a>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {featured.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
         </div>
       </Container>
     </section>
   );
 };
-
