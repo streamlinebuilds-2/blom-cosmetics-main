@@ -3,7 +3,7 @@ import { Container } from '../layout/Container';
 import { ProductCard } from '../ProductCard';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
-import { Product, ProductImage } from '../../lib/supabase';
+import { Product, ProductImage, supabase } from '../../lib/supabase';
 import { cartStore, showNotification } from '../../lib/cart';
 
 interface ProductWithImages extends Product {
@@ -26,34 +26,49 @@ export const FeaturedProducts: React.FC = () => {
   };
 
   useEffect(() => {
-    // Use specially made bestseller products with special images
-    const bestsellerProducts = [
-      {
-        id: '2',
-        name: 'Vitamin Primer',
-        slug: 'vitamin-primer',
-        price: 210,
-        compare_at_price: null,
-        short_description: 'Essential nail preparation for lasting results',
-        product_images: [
-          { image_url: '/primer-01.webp', sort_order: 1 }
-        ]
-      },
-      {
-        id: '9',
-        name: 'Core Acrylics (56 g)',
-        slug: 'core-acrylics',
-        price: 280,
-        compare_at_price: null,
-        short_description: 'Professional grade acrylic powder for perfect sculpting',
-        product_images: [
-          { image_url: '/acrylic-powder-01.webp', sort_order: 1 }
-        ]
-      }
-    ];
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
 
-    setProducts(bestsellerProducts as ProductWithImages[]);
-    setLoading(false);
+        // Fetch products where is_featured is true, limit to 3
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            *,
+            product_images (
+              id,
+              image_url,
+              alt_text,
+              sort_order
+            )
+          `)
+          .eq('is_featured', true)
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (error) {
+          console.error('Error fetching featured products:', error);
+          setError(error.message);
+        } else {
+          // Sort product images by sort_order
+          const productsWithSortedImages = (data || []).map(product => ({
+            ...product,
+            product_images: (product.product_images || []).sort(
+              (a: ProductImage, b: ProductImage) => a.sort_order - b.sort_order
+            )
+          }));
+          setProducts(productsWithSortedImages as ProductWithImages[]);
+        }
+      } catch (err) {
+        console.error('Error fetching featured products:', err);
+        setError('Failed to load featured products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
   }, []);
 
   if (loading) {
@@ -161,7 +176,10 @@ export const FeaturedProducts: React.FC = () => {
 
         <div className="grid-responsive">
           {products.map((product) => {
-            const images = product.product_images.map(img => img.image_url);
+            // Use featured_home_image if it exists, otherwise fall back to product_images
+            const images = product.featured_home_image
+              ? [product.featured_home_image, ...product.product_images.map(img => img.image_url)]
+              : product.product_images.map(img => img.image_url);
 
             return (
               <ProductCard
