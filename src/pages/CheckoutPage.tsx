@@ -371,6 +371,7 @@ export const CheckoutPage: React.FC = () => {
             name: it.name,
             unit_price: it.price,
             quantity: it.quantity,
+            variant: it.variant
           })),
           totals: {
             subtotal_cents: Math.round(cartState.subtotal * 100),
