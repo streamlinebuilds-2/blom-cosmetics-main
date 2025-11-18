@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase'; // Adjust path if needed
-import { ProductCard } from '../ProductCard'; // Adjust path if needed
-import { Container } from '../layout/Container'; // Adjust path if needed
+import { supabase } from '../../lib/supabase';
+import { ProductCard } from '../ProductCard';
+import { Container } from '../layout/Container';
 
 export const FeaturedProducts = () => {
   const [featured, setFeatured] = useState<any[]>([]);
@@ -11,7 +11,6 @@ export const FeaturedProducts = () => {
     async function loadFeatured() {
       try {
         // 1. Fetch the 3 slots from your new 'featured_items' table
-        // We join the 'products' table to get the name/price info
         const { data, error } = await supabase
           .from('featured_items')
           .select(`
@@ -22,16 +21,16 @@ export const FeaturedProducts = () => {
               short_description, thumbnail_url, category, stock
             )
           `)
-          .not('product_id', 'is', null) // Only show slots that have a product selected
+          .not('product_id', 'is', null) // Only get slots that have products
           .order('slot_number');
 
         if (error) throw error;
 
         if (data) {
-          // 2. Transform the data into the format ProductCard expects
+          // 2. Transform the data
           const items = data.map((item: any) => {
             const p = item.products;
-            // If product was deleted but slot remains, p might be null
+            // Safety check if product was deleted
             if (!p) return null;
 
             return {
@@ -39,11 +38,11 @@ export const FeaturedProducts = () => {
               name: p.name,
               price: p.price,
               compareAtPrice: p.compare_at_price,
-              // CRITICAL: This line prefers your Admin Custom Image over the default
+              // Use custom image if set, otherwise fallback to product thumbnail
               image: item.custom_image_url || p.thumbnail_url,
-              category: p.category,
+              shortDescription: p.short_description,
               slug: p.slug,
-              inStock: p.stock > 0
+              inStock: (p.stock || 0) > 0
             };
           }).filter(Boolean); // Remove empty slots
 
@@ -59,7 +58,7 @@ export const FeaturedProducts = () => {
   }, []);
 
   if (loading) return <div className="py-20 text-center">Loading favorites...</div>;
-  if (featured.length === 0) return null; // Hide section if no slots are set
+  if (featured.length === 0) return null;
 
   return (
     <section className="section-padding bg-white">
@@ -72,8 +71,20 @@ export const FeaturedProducts = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {featured.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {featured.map((item) => (
+            <ProductCard
+              key={item.id}
+              id={item.id}
+              name={item.name}
+              slug={item.slug}
+              price={item.price}
+              compareAtPrice={item.compareAtPrice}
+              shortDescription={item.shortDescription}
+              // CRITICAL FIX: ProductCard expects an array of strings for 'images'
+              images={[item.image]}
+              inStock={item.inStock}
+              hoverShine={true}
+            />
           ))}
         </div>
       </Container>
