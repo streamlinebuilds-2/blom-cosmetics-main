@@ -69,8 +69,7 @@ export const handler: Handler = async (event) => {
           quantity: Number(it.quantity || 1),
           unit_price: Number(it.unit_price ?? it.price ?? 0),
           product_name: finalName,
-          sku: it.sku || null,
-          variant_title: it.variant?.title || it.variant || null
+          sku: it.sku || null
         };
       });
     }
@@ -203,8 +202,7 @@ export const handler: Handler = async (event) => {
         sku: it.sku || null,
         quantity: it.quantity,
         unit_price: it.unit_price,
-        line_total: it.unit_price * it.quantity,
-        variant_title: it.variant_title || null
+        line_total: it.unit_price * it.quantity
       }))
 
       const itemsRes = await fetch(`${SUPABASE_URL}/rest/v1/order_items`, {
