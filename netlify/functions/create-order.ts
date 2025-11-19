@@ -159,9 +159,8 @@ export const handler: Handler = async (event) => {
       p_channel: 'website',
       p_items: items.map((it: any) => ({
         product_id: it.product_id || null,
-        product_name: it.product_name || it.name || 'Unknown Product', // Uses the fixed name from step 1c
+        product_name: it.product_name || it.name || 'Unknown Product', // Uses the fixed name from step 1c (includes variant)
         sku: it.sku || null,
-        variant: it.variant || null,
         quantity: it.quantity || it.qty || 1,
         unit_price: it.unit_price || (it.unit_price_cents ? it.unit_price_cents / 100 : 0)
       })),
