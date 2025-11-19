@@ -8,6 +8,10 @@ export const handler: Handler = async (event) => {
 
     const body = JSON.parse(event.body || '{}')
 
+    // DEBUG: Log what frontend is sending
+    console.log("📦 Received orderData:", JSON.stringify(body, null, 2));
+    console.log("📦 Items array:", JSON.stringify(body.items, null, 2));
+
     // --- 1. Extract & Normalize Payloads ---
 
     let items = body.items || []
