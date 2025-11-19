@@ -16,12 +16,11 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Fetch orders from Supabase - ONLY PAID ORDERS
+    // Fetch orders from Supabase
   const url = `${process.env.SUPABASE_URL}/rest/v1/orders`
-      + `?select=*,order_items(name,quantity,unit_price,total_price,product_id)`
+      + `?select=*,order_items(name,quantity,unit_price,total_price,product_id,variant)`
       + `&user_id=eq.${encodeURIComponent(userId)}`
-      + `&status=eq.paid`
-      + `&order=created_at.desc`;
+      + `&order=created_at.desc`; // Show ALL orders, not just paid
 
     const response = await fetch(url, {
       headers: {
@@ -45,10 +44,17 @@ export const handler: Handler = async (event) => {
   const formattedOrders = orders.map((order: any) => {
     const addr = order.delivery_address || null;
     const shippingAddress = addr && addr.street_address ? `${addr.street_address}, ${addr.local_area || ''}, ${addr.city || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null;
+
+    // Map status for display
+    let displayStatus = order.status || 'pending';
+    if (displayStatus === 'unpaid' || (displayStatus === 'pending' && !order.paid_at)) {
+      displayStatus = 'payment_pending'; // Show as "payment pending" instead of hiding
+    }
+
     return {
       id: order.merchant_payment_id,
       date: order.created_at,
-      status: order.status || 'pending',
+      status: displayStatus, // Use mapped status
       total: parseFloat(order.total_amount || order.total || 0),
       items: order.order_items?.length || 0,
       trackingNumber: order.tracking_number || null,
