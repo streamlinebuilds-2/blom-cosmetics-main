@@ -639,10 +639,57 @@ export const ShopPage: React.FC = () => {
     loadDbProducts();
   }, []);
 
-  // Use database products (fetched from Supabase) merged with static bundle products
-  // Ensure bundle products have correct local images (not placeholder URLs from database)
-  const allProducts = dbProducts.map(product => {
-    // Override bundle images with local images
+  // Fetch bundles from database
+  const [dbBundles, setDbBundles] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadDbBundles() {
+      try {
+        const { data: bundles, error } = await supabase
+          .from('products')
+          .select('*')
+          .or('product_type.eq.bundle,category.eq.Bundle Deals')
+          .eq('is_active', true)
+          .eq('status', 'active');
+
+        if (error) {
+          console.error('Error fetching bundles:', error);
+          return;
+        }
+
+        const mappedBundles = (bundles || []).map((b: any) => ({
+          id: b.id,
+          name: b.name,
+          slug: b.slug,
+          category: 'bundle-deals',
+          price: b.price_cents ? b.price_cents / 100 : 0,
+          compareAtPrice: b.compare_at_price_cents ? b.compare_at_price_cents / 100 : null,
+          shortDescription: b.short_description || b.short_desc || '',
+          short_description: b.short_description || b.short_desc || '',
+          description: b.short_description || '',
+          images: [
+            b.thumbnail_url || b.image_main || b.image_url,
+            ...(b.gallery_urls || b.image_gallery || [])
+          ].filter(Boolean),
+          inStock: true,
+          badges: b.badges || [],
+          rating: 0,
+          reviews: 0,
+          variants: []
+        }));
+
+        setDbBundles(mappedBundles);
+      } catch (err) {
+        console.error('Error loading bundles:', err);
+      }
+    }
+
+    loadDbBundles();
+  }, []);
+
+  // Merge database products AND database bundles
+  const allProducts = [...dbProducts, ...dbBundles].map(product => {
+    // Override bundle images with local images if they exist
     if (product.slug === 'prep-primer-bundle') {
       return {
         ...product,
