@@ -69,7 +69,8 @@ export const handler: Handler = async (event) => {
           quantity: Number(it.quantity || 1),
           unit_price: Number(it.unit_price ?? it.price ?? 0),
           product_name: finalName,
-          sku: it.sku || null
+          sku: it.sku || null,
+          variant_title: it.variant?.title || it.variant || null
         };
       });
     }
@@ -127,7 +128,7 @@ export const handler: Handler = async (event) => {
 
     const total_cents = Math.max(0, subtotal_cents + shipping_cents + tax_cents - discount_cents)
     const amountStr = (total_cents / 100).toFixed(2)
-    const m_payment_id = `BL-${Date.now().toString(16).toUpperCase()}`
+    const merchant_payment_id = `BL-${Date.now().toString(16).toUpperCase()}`
     const order_number = `BL-${Date.now().toString(36).toUpperCase()}`
 
     // --- 4. Construct Delivery Address (Robust Mapping) ---
@@ -148,58 +149,89 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // --- 5. Save Order to Supabase ---
+    // --- 5. Save Order Directly to Supabase (NO RPC) ---
 
-    const rpcPayload = {
-      p_order_number: order_number,
-      p_m_payment_id: m_payment_id,
-      p_buyer_email: buyer.email || '',
-      p_buyer_name: buyer.name || '',
-      p_buyer_phone: buyer.phone || '',
-      p_channel: 'website',
-      p_items: items.map((it: any) => ({
-        product_id: it.product_id || null,
-        product_name: it.product_name || it.name || 'Unknown Product', // Uses the fixed name from step 1c (includes variant)
-        sku: it.sku || null,
-        quantity: it.quantity || it.qty || 1,
-        unit_price: it.unit_price || (it.unit_price_cents ? it.unit_price_cents / 100 : 0)
-      })),
-      p_subtotal_cents: subtotal_cents,
-      p_shipping_cents: shipping_cents,
-      p_discount_cents: discount_cents,
-      p_tax_cents: tax_cents,
-      p_fulfillment_method: fulfillment.method,
-      p_delivery_address: deliveryAddressJson,
-      p_collection_location: fulfillment.collection_location
+    const orderPayload = {
+      order_number,
+      merchant_payment_id,
+      status: 'pending_payment',
+      payment_status: 'unpaid',
+      channel: 'website',
+      buyer_email: buyer.email || '',
+      buyer_name: buyer.name || '',
+      buyer_phone: buyer.phone || '',
+      user_id: buyer.user_id || null,
+      fulfillment_method: fulfillment.method,
+      delivery_address: deliveryAddressJson,
+      collection_location: fulfillment.collection_location,
+      subtotal_cents,
+      shipping_cents,
+      discount_cents,
+      tax_cents,
+      total_cents,
+      total: total_cents / 100,
+      placed_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
     }
 
-    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
+    const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
       method: 'POST',
       headers: {
         apikey: SERVICE_KEY,
         Authorization: `Bearer ${SERVICE_KEY}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
       },
-      body: JSON.stringify(rpcPayload)
+      body: JSON.stringify(orderPayload)
     })
 
-    if (!rpcRes.ok) {
-      const err = await rpcRes.text()
-      console.error('DB Error:', err)
+    if (!orderRes.ok) {
+      const err = await orderRes.text()
+      console.error('Order DB Error:', err)
       return { statusCode: 400, body: JSON.stringify({ error: 'ORDER_CREATE_FAILED', details: err }) }
     }
 
-    const rpcData = await rpcRes.json()
-    const orderRow = Array.isArray(rpcData) ? rpcData[0] : rpcData
+    const orderData = await orderRes.json()
+    const orderRow = Array.isArray(orderData) ? orderData[0] : orderData
+
+    // --- 6. Save Order Items ---
+    if (items.length > 0) {
+      const itemsPayload = items.map((it: any) => ({
+        order_id: orderRow.id,
+        product_id: it.product_id || null,
+        product_name: it.product_name,
+        sku: it.sku || null,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        line_total: it.unit_price * it.quantity,
+        variant_title: it.variant_title || null
+      }))
+
+      const itemsRes = await fetch(`${SUPABASE_URL}/rest/v1/order_items`, {
+        method: 'POST',
+        headers: {
+          apikey: SERVICE_KEY,
+          Authorization: `Bearer ${SERVICE_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(itemsPayload)
+      })
+
+      if (!itemsRes.ok) {
+        const err = await itemsRes.text()
+        console.error('Order Items DB Error:', err)
+        // Don't fail the whole order if items fail - order is already created
+      }
+    }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        order_id: orderRow?.order_id,
+        order_id: orderRow.id,
         order_number,
-        m_payment_id,
-        merchant_payment_id: m_payment_id,
+        m_payment_id: merchant_payment_id,
+        merchant_payment_id,
         amount: amountStr,
         total_cents,
         discount_cents
