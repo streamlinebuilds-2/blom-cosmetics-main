@@ -556,7 +556,7 @@ export const ShopPage: React.FC = () => {
         const { data: products, error } = await supabase
           .from('products')
           .select('*, product_reviews(count), hover_image')
-          .eq('is_active', true)
+          // .eq('is_active', true)
           .eq('status', 'active')
           .order('category', { ascending: true });
 
