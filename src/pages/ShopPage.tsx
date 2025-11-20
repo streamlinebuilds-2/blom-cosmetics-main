@@ -185,7 +185,7 @@ export const ShopPage: React.FC = () => {
       compareAtPrice: undefined,
       short_description: 'Professional-grade, fast acting nail remover.',
       shortDescription: 'Professional-grade, fast acting nail remover.',
-      description: 'Professional-grade acetone for fast and effective nail polish removal.',
+      description: 'Professional acetone for fast and effective nail polish removal.',
       images: ['/acetone-remover-white.webp', '/acetone-remover-colorful.webp'],
       category: 'archived',
       rating: 0,
@@ -553,58 +553,207 @@ export const ShopPage: React.FC = () => {
   useEffect(() => {
     async function loadDbProducts() {
       try {
-        const { data: products, error } = await supabase
+        // Fetch products from products table
+        const { data: products, error: productsError } = await supabase
           .from('products')
           .select('*, product_reviews(count), hover_image')
           // .eq('is_active', true)
           .eq('status', 'active')
           .order('category', { ascending: true });
 
-        if (error) {
-          console.error('Error fetching products from database:', error);
+        if (productsError) {
+          console.error('Error fetching products from database:', productsError);
+        }
+
+        // Fetch bundles from bundles table
+        const { data: bundles, error: bundlesError } = await supabase
+          .from('bundles')
+          .select('*')
+          .eq('status', 'active')
+          .order('name', { ascending: true });
+
+        if (bundlesError) {
+          console.error('Error fetching bundles from database:', bundlesError);
+        }
+
+        if (productsError && bundlesError) {
           setError('Failed to load some products');
           return;
         }
 
-        // Map messy DB to clean format - check ALL variations with comprehensive fallbacks
-        const mappedProducts = (products || []).map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          slug: p.slug,
-          category: normalizeCategoryToSlug(p.category || 'all'),
+        // Map products from products table
+        const mappedProducts = (products || []).map((p: any) => {
+          // Check if this is actually a bundle stored in products table
+          const isBundleFromProductsTable = p.product_type === 'bundle' || p.category === 'Bundle Deals';
+          
+          if (isBundleFromProductsTable) {
+            return {
+              id: `bundle-${p.id}`,
+              name: p.name,
+              slug: p.slug,
+              category: 'bundle-deals', // Force bundle category
+
+              // Price - check all variations
+              price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
+              compareAtPrice: p.compare_at_price || p.compare_at || null,
+
+              // Stock - check ALL possible columns (using ?? to properly handle 0 values)
+              stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
+              inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
+
+              // Descriptions - check variations
+              shortDescription: p.short_description || p.short_desc || p.description_short || '',
+              short_description: p.short_description || p.short_desc || p.description_short || '',
+              description: p.short_description || p.short_desc || p.description_short || '',
+              overview: p.overview || p.long_description || p.description_full || p.description || '',
+
+              // Images - check variations (including gallery fallback)
+              // We insert hover_image at index 1 for the card flip effect
+              images: [
+                p.thumbnail_url || p.image_main || p.image_url,
+                p.hover_image || p.hover_url, 
+                ...(p.gallery_urls || p.image_gallery || p.gallery || [])
+              ].filter(Boolean),
+
+              // Arrays (use modern names, fallback to empty)
+              features: p.features || [],
+              howToUse: p.how_to_use || [],
+              ingredients: {
+                inci: p.inci_ingredients || [],
+                key: p.key_ingredients || []
+              },
+              // Variants - ensure proper mapping with name/label fallback
+              variants: Array.isArray(p.variants)
+                ? p.variants.map((v: any) => {
+                    // Handle both object and string variants
+                    if (typeof v === 'string') {
+                      return { name: v, inStock: true };
+                    }
+                    return {
+                      name: v.name || v.label || v.title || '',
+                      label: v.label || v.name || v.title || '',
+                      inStock: v.inStock ?? v.in_stock ?? true,
+                      image: v.image || v.image_url || null,
+                      price: v.price || null
+                    };
+                  })
+                : [],
+
+              // Meta
+              rating: 0,
+              reviews: 0,
+              badges: [...(p.badges || []), 'Bundle'],
+              seo: {
+                title: p.meta_title || p.name,
+                description: p.meta_description || p.short_description || p.short_desc
+              },
+              
+              // Bundle-specific fields
+              isBundle: true,
+              bundleProducts: p.bundle_products || [] // Will be populated if needed
+            };
+          }
+          
+          // Regular product
+          return {
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            category: normalizeCategoryToSlug(p.category || 'all'),
+
+            // Price - check all variations
+            price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
+            compareAtPrice: p.compare_at_price || p.compare_at || null,
+
+            // Stock - check ALL possible columns (using ?? to properly handle 0 values)
+            stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
+            inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
+
+            // Descriptions - check variations
+            shortDescription: p.short_description || p.short_desc || p.description_short || '',
+            short_description: p.short_description || p.short_desc || p.description_short || '',
+            description: p.short_description || p.short_desc || p.description_short || '',
+            overview: p.overview || p.long_description || p.description_full || p.description || '',
+
+            // Images - check variations (including gallery fallback)
+            // We insert hover_image at index 1 for the card flip effect
+            images: [
+              p.thumbnail_url || p.image_main || p.image_url,
+              p.hover_image || p.hover_url, 
+              ...(p.gallery_urls || p.image_gallery || p.gallery || [])
+            ].filter(Boolean),
+
+            // Arrays (use modern names, fallback to empty)
+            features: p.features || [],
+            howToUse: p.how_to_use || [],
+            ingredients: {
+              inci: p.inci_ingredients || [],
+              key: p.key_ingredients || []
+            },
+            // Variants - ensure proper mapping with name/label fallback
+            variants: Array.isArray(p.variants)
+              ? p.variants.map((v: any) => {
+                  // Handle both object and string variants
+                  if (typeof v === 'string') {
+                    return { name: v, inStock: true };
+                  }
+                  return {
+                    name: v.name || v.label || v.title || '',
+                    label: v.label || v.name || v.title || '',
+                    inStock: v.inStock ?? v.in_stock ?? true,
+                    image: v.image || v.image_url || null,
+                    price: v.price || null
+                  };
+                })
+              : [],
+
+            // Meta
+            rating: 0,
+            reviews: 0,
+            badges: p.badges || [],
+            seo: {
+              title: p.meta_title || p.name,
+              description: p.meta_description || p.short_description || p.short_desc
+            }
+          };
+        }));
+
+        // Map bundles to product format
+        const mappedBundles = (bundles || []).map((bundle: any) => ({
+          id: `bundle-${bundle.id}`,
+          name: bundle.name,
+          slug: bundle.slug,
+          category: 'bundle-deals', // Always use bundle-deals category
 
           // Price - check all variations
-          price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
-          compareAtPrice: p.compare_at_price || p.compare_at || null,
+          price: bundle.price_cents ? bundle.price_cents / 100 : (bundle.price || 0),
+          compareAtPrice: bundle.compare_at_price_cents ? bundle.compare_at_price_cents / 100 : bundle.compare_at_price || null,
 
-          // Stock - check ALL possible columns (using ?? to properly handle 0 values)
-          stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
-          inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
+          // Stock - bundles are always in stock if active
+          stock: 1,
+          inStock: true,
 
           // Descriptions - check variations
-          shortDescription: p.short_description || p.short_desc || p.description_short || '',
-          short_description: p.short_description || p.short_desc || p.description_short || '',
-          description: p.short_description || p.short_desc || p.description_short || '',
-          overview: p.overview || p.long_description || p.description_full || p.description || '',
+          shortDescription: bundle.short_desc || bundle.description_short || '',
+          short_description: bundle.short_desc || bundle.description_short || '',
+          description: bundle.short_desc || bundle.description_short || '',
+          overview: bundle.long_desc || bundle.description_full || bundle.description || '',
 
-          // Images - check variations (including gallery fallback)
-          // We insert hover_image at index 1 for the card flip effect
-          images: [
-            p.thumbnail_url || p.image_main || p.image_url,
-            p.hover_image || p.hover_url, 
-            ...(p.gallery_urls || p.image_gallery || p.gallery || [])
-          ].filter(Boolean),
+          // Images - bundles use images array, fallback to image_url
+          images: Array.isArray(bundle.images) 
+            ? bundle.images 
+            : [bundle.image_url || bundle.thumbnail_url].filter(Boolean),
 
           // Arrays (use modern names, fallback to empty)
-          features: p.features || [],
-          howToUse: p.how_to_use || [],
+          features: bundle.features || [],
+          howToUse: bundle.how_to_use || [],
           ingredients: {
-            inci: p.inci_ingredients || [],
-            key: p.key_ingredients || []
+            inci: bundle.inci_ingredients || [],
+            key: bundle.key_ingredients || []
           },
           // Variants - ensure proper mapping with name/label fallback
-          variants: Array.isArray(p.variants)
-            ? p.variants.map((v: any) => {
+          variants: Array.isArray(bundle.variants)
+            ? bundle.variants.map((v: any) => {
                 // Handle both object and string variants
                 if (typeof v === 'string') {
                   return { name: v, inStock: true };
@@ -622,14 +771,20 @@ export const ShopPage: React.FC = () => {
           // Meta
           rating: 0,
           reviews: 0,
-          badges: p.badges || [],
+          badges: bundle.badges || ['Bundle'],
           seo: {
-            title: p.meta_title || p.name,
-            description: p.meta_description || p.short_description || p.short_desc
-          }
+            title: bundle.meta_title || bundle.name,
+            description: bundle.meta_description || bundle.short_desc || ''
+          },
+          
+          // Bundle-specific fields
+          isBundle: true,
+          bundleProducts: bundle.bundle_products || [] // Will be populated if needed
         }));
 
-        setDbProducts(mappedProducts);
+        // Combine products and bundles
+        const allDbProducts = [...mappedProducts, ...mappedBundles];
+        setDbProducts(allDbProducts);
       } catch (err: any) {
         console.error('Error loading database products:', err);
         setError('Failed to load some products');
@@ -998,8 +1153,9 @@ export const ShopPage: React.FC = () => {
                 >
                   Clear All Filters
                     </button>
+              </div>
             </div>
-          </div>
+          )}
         )}
         </Container>
       </main>
