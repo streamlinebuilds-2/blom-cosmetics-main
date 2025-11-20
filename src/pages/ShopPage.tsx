@@ -716,7 +716,7 @@ export const ShopPage: React.FC = () => {
               description: p.meta_description || p.short_description || p.short_desc
             }
           };
-        }));
+        });
 
         // Map bundles to product format
         const mappedBundles = (bundles || []).map((bundle: any) => ({
@@ -1156,7 +1156,6 @@ export const ShopPage: React.FC = () => {
               </div>
             </div>
           )}
-        )}
         </Container>
       </main>
 
