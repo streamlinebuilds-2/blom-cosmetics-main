@@ -1,8 +1,9 @@
-import React from 'react';
-import { Heart, ShoppingCart, ShoppingBag } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
+import { analytics } from '../lib/analytics';
 
 interface ProductCardProps {
   id: string;
@@ -16,9 +17,7 @@ interface ProductCardProps {
   badges?: string[];
   className?: string;
   isListView?: boolean;
-  // Enable homepage-only shine hover effect on image (no colorful hover image)
   hoverShine?: boolean;
-  // Discount information
   discountPrice?: number;
   discountBadge?: string;
   discountBadgeColor?: string;
@@ -42,11 +41,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   discountBadgeColor
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
-  const cardRef = React.useRef<HTMLElement | null>(null);
+  const cardRef = useRef<HTMLElement | null>(null);
   const [isInView, setIsInView] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [hasViewed, setHasViewed] = React.useState(false);
 
-  React.useEffect(() => {
+  // Track product views when card comes into view
+  useEffect(() => {
+    if (isInView && !hasViewed) {
+      const product = {
+        id: slug,
+        name,
+        category: 'Nail Care Products',
+        price,
+        brand: 'BLOM Cosmetics'
+      };
+      
+      analytics.viewItem(product);
+      setHasViewed(true);
+    }
+  }, [isInView, hasViewed, slug, name, price]);
+
+  // Wishlist tracking
+  useEffect(() => {
     setIsWishlisted(wishlistStore.isInWishlist(slug));
     
     const unsubscribe = wishlistStore.subscribe(() => {
@@ -56,66 +73,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     return unsubscribe;
   }, [slug]);
 
-  // Detect mobile once on mount
-  React.useEffect(() => {
+  // Mobile detection
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       setIsMobile(window.innerWidth < 768);
     }
   }, []);
 
-  // Mobile-only: Scroll-triggered reveal when card center is within a band around viewport center
-  React.useEffect(() => {
-    if (!isListView) return;
-    if (!isMobile) return;
+  // Scroll-triggered reveal for mobile list view
+  useEffect(() => {
+    if (!isListView || !isMobile) return;
 
     const el = cardRef.current;
     if (!el) return;
 
-    const lastYRef = { current: typeof window !== 'undefined' ? window.scrollY : 0 } as { current: number };
-    const lastTRef = { current: typeof performance !== 'undefined' ? performance.now() : 0 } as { current: number };
-    const velRef = { current: 0 } as { current: number };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+          } else {
+            setIsInView(false);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
 
-    const centerBandPct = 0.15; // ±15% around viewport center
-    const enterDwellMs = 160;
-    const exitDwellMs = 100;
-    const maxScrollPxPerMs = 1.2; // velocity guard
-    let timer: number | null = null;
+    observer.observe(el);
 
-    const onScroll = () => {
-      const now = performance.now();
-      const y = window.scrollY;
-      const dy = Math.abs(y - lastYRef.current);
-      const dt = Math.max(1, now - lastTRef.current);
-      velRef.current = dy / dt; // px/ms
-      lastYRef.current = y;
-      lastTRef.current = now;
-
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const center = rect.top + rect.height / 2;
-      const bandTop = vh * 0.5 * (1 - centerBandPct);
-      const bandBot = vh * 0.5 * (1 + centerBandPct);
-
-      const isInBand = center >= bandTop && center <= bandBot;
-      const isSlow = velRef.current <= maxScrollPxPerMs;
-
-      if (timer) { window.clearTimeout(timer); timer = null; }
-
-      if (isInBand && isSlow) {
-        timer = window.setTimeout(() => setIsInView(true), enterDwellMs);
-      } else {
-        timer = window.setTimeout(() => setIsInView(false), exitDwellMs);
-      }
-    };
-
-    // initial compute
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (timer) window.clearTimeout(timer);
+      observer.disconnect();
     };
   }, [isListView, isMobile]);
 
@@ -132,7 +120,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       price,
       image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
     });
-    
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -150,15 +137,29 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     
     const wasAdded = wishlistStore.toggleItem(wishlistItem);
     
+    // Track wishlist action
+    analytics.customEvent(wasAdded ? 'add_to_wishlist' : 'remove_from_wishlist', {
+      item_id: slug,
+      item_name: name,
+      category: 'Nail Care Products'
+    });
   };
 
   const handleCardClick = () => {
+    // Track product click
+    analytics.customEvent('select_item', {
+      item_id: slug,
+      item_name: name,
+      item_category: 'Nail Care Products',
+      item_brand: 'BLOM Cosmetics'
+    });
+    
     window.location.href = `/products/${slug}`;
   };
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
-  // List view layout - mobile: styled like best seller cards, desktop: horizontal list
+  // List view layout
   if (isListView) {
     return (
       <article 
@@ -223,7 +224,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           )}
 
-          {/* Wishlist Button - Bigger */}
+          {/* Wishlist Button */}
           <div className="absolute top-3 right-3 z-10 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 md:top-1 md:right-1">
             <button
               type="button"
@@ -284,85 +285,63 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
       onClick={handleCardClick}
     >
-      {/* Image Container - Static for best sellers, Flip for others */}
-      {hoverShine ? (
-        <div className="relative aspect-square overflow-hidden bg-gray-50">
-          <img
-            src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-            alt={name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-            }}
-          />
-          {/* Hover Shine Effect (homepage best sellers only) */}
-          <div className="shimmer"></div>
-
-          {/* Wishlist Heart */}
-          <button
-            type="button"
-            onClick={handleWishlistToggle}
-            className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
-            aria-label="Toggle wishlist"
-          >
-            <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
-              isWishlisted 
-                ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
-                : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
-            }`} />
-          </button>
-        </div>
-      ) : (
-        <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
-          <div className="product-card-flip-inner">
-            {/* Front Face - White Background Image */}
-            <div className="product-card-flip-front">
-              <img
-                src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-                alt={name}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-                }}
-              />
-            </div>
-
-            {/* Back Face - Colorful Image */}
-            {images[1] && (
-              <div className="product-card-flip-back">
-                <img
-                  src={images[1]}
-                  alt={name}
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
-                  }}
-                />
-              </div>
-            )}
+      {/* Image Container */}
+      <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
+        <div className="product-card-flip-inner">
+          {/* Front Face - White Background Image */}
+          <div className="product-card-flip-front">
+            <OptimizedImage
+              src={images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+              alt={name}
+              productName={name}
+              productPrice={price}
+              productCategory="Nail Care Products"
+              className="w-full h-full object-cover"
+              width={400}
+              height={400}
+              loading="lazy"
+            />
           </div>
 
-          {/* Wishlist Heart */}
-          <button
-            type="button"
-            onClick={handleWishlistToggle}
-            className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
-            aria-label="Toggle wishlist"
-          >
-            <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
-              isWishlisted 
-                ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
-                : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
-            }`} />
-          </button>
+          {/* Back Face - Colorful Image */}
+          {images[1] && (
+            <div className="product-card-flip-back">
+              <OptimizedImage
+                src={images[1]}
+                alt={`${name} - Colorful view`}
+                productName={name}
+                productPrice={price}
+                productCategory="Nail Care Products"
+                className="w-full h-full object-cover"
+                width={400}
+                height={400}
+                loading="lazy"
+              />
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Wishlist Heart */}
+        <button
+          type="button"
+          onClick={handleWishlistToggle}
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 shadow-lg group/heart"
+          aria-label="Toggle wishlist"
+        >
+          <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
+            isWishlisted 
+              ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
+              : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
+          }`} />
+        </button>
+
+        {/* Shimmer Effect for best sellers */}
+        {hoverShine && (
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="shimmer"></div>
+          </div>
+        )}
+      </div>
 
       {/* Content */}
       <div className="p-4 sm:p-4 md:p-6">
@@ -418,20 +397,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </div>
 
-      <style jsx>{`
+      {/* Inline styles for line clamping */}
+      <style>{`
         .line-clamp-2 {
           display: -webkit-box;
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
-        }
-        @keyframes shineMove {
-          0% { transform: translateX(-150%) skewX(-12deg); }
-          100% { transform: translateX(150%) skewX(-12deg); }
-        }
-        /* Trigger animation only on hover to avoid continuous motion */
-        .group:hover .shine-bar {
-          animation: shineMove 1.2s ease-in-out;
         }
       `}</style>
     </article>

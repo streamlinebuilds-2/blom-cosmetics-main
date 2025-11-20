@@ -1,5 +1,6 @@
 // Cart state management and utilities
 import { Product, ProductVariant } from './supabase';
+import { analytics } from './analytics';
 
 export interface CartItem {
   id: string;
@@ -153,19 +154,20 @@ class CartStore {
       this.state.items.push({ ...item, quantity });
     }
 
-    // Track Google Analytics event
-    if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'add_to_cart', {
-        currency: 'ZAR',
-        value: item.price * quantity,
-        items: [{
-          item_id: item.productId,
-          item_name: item.name,
-          category: 'Nail Care Products',
-          quantity: quantity,
-          price: item.price
-        }]
-      });
+    // Enhanced E-commerce Analytics Tracking
+    try {
+      const cartItems = [{
+        id: item.productId,
+        name: item.name,
+        category: 'Nail Care Products',
+        price: item.price,
+        quantity: quantity,
+        brand: 'BLOM Cosmetics'
+      }];
+
+      analytics.addToCart(cartItems, item.price * quantity);
+    } catch (error) {
+      console.warn('Analytics tracking failed:', error);
     }
 
     this.updateTotals();

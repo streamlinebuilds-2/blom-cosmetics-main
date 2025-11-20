@@ -130,10 +130,117 @@
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
 
+      // Enhanced GA4 Configuration
       gtag('config', 'G-H9GCB42G9C', {
+        // Enhanced E-commerce tracking
+        send_page_view: false,
         page_title: document.title,
-        page_location: window.location.href
+        page_location: window.location.href,
+        
+        // Enhanced E-commerce and attribution
+        ecommerce: {
+          currency: 'ZAR',
+          value: 0,
+          items: []
+        },
+        
+        // Enhanced user identification
+        user_properties: {
+          user_type: 'new', // Will be updated based on session
+          customer_lifetime_value: 0,
+          customer_segment: 'unknown'
+        },
+        
+        // Enhanced attribution and tracking
+        allow_google_signals: true,
+        allow_ad_personalization_signals: true,
+        
+        // Custom parameters for enhanced reporting
+        custom_map: {
+          'user_type': 'user_type',
+          'customer_lifetime_value': 'customer_lifetime_value',
+          'customer_segment': 'customer_segment'
+        },
+        
+        // Enhanced event tracking
+        send_page_view: true,
+        anonymize_ip: false, // Disable for better attribution
+        cookie_expires: 7776000, // 90 days
+        
+        // Cross-domain tracking
+        linker: {
+          domains: ['blom-cosmetics.co.za'],
+          allow_incoming: true
+        },
+        
+        // Enhanced measurement
+        enhanced_measurement: {
+          scrolls: true,
+          outbound_clicks: true,
+          site_search: true,
+          video_engagement: true,
+          file_downloads: true
+        }
       });
+
+      // Custom event tracking for enhanced analytics
+      gtag('config', 'G-H9GCB42G9C', {
+        // Custom parameters for conversion optimization
+        custom_parameter_1: 'conversion_tracking',
+        custom_parameter_2: 'enhanced_ecommerce'
+      });
+
+      // Set up enhanced ecommerce plugin
+      gtag('config', 'G-H9GCB42G9C', {
+        // Enhanced ecommerce measurement
+        enhanced_ecommerce: true
+      });
+
+      // Set up cross-platform measurement
+      gtag('config', 'G-H9GCB42G9C', {
+        // Cross-domain tracking
+        link_id_domain: ['blom-cosmetics.co.za']
+      });
+
+      // Track page performance
+      gtag('config', 'G-H9GCB42G9C', {
+        // Custom timing measurement
+        speed_icon: true,
+        tracking_id: 'G-H9GCB42G9C'
+      });
+
+      // Debug mode for development (remove in production)
+      window.gtag_debug = false;
+    </script>
+    
+    <!-- Facebook Pixel -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', 'YOUR_FACEBOOK_PIXEL_ID');
+      fbq('track', 'PageView');
+    </script>
+    <noscript>
+      <img height="1" width="1" style="display:none"
+           src="https://www.facebook.com/tr?id=YOUR_FACEBOOK_PIXEL_ID&ev=PageView&noscript=1"/>
+    </noscript>
+    
+    <!-- Hotjar Tracking -->
+    <script>
+      (function(h,o,t,j,a,r){
+          h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+          h._hjSettings={hjid:YOUR_HOTJAR_ID,hjsv:6};
+          a=o.getElementsByTagName('head')[0];
+          r=o.createElement('script');r.async=1;
+          r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+          a.appendChild(r);
+      })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
     </script>
     
     <!-- Google Search Console Verification (Replace with your actual verification code) -->
