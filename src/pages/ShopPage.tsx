@@ -588,8 +588,10 @@ export const ShopPage: React.FC = () => {
           overview: p.overview || p.long_description || p.description_full || p.description || '',
 
           // Images - check variations (including gallery fallback)
+          // We insert hover_image at index 1 for the card flip effect
           images: [
             p.thumbnail_url || p.image_main || p.image_url,
+            p.hover_image || p.hover_url, 
             ...(p.gallery_urls || p.image_gallery || p.gallery || [])
           ].filter(Boolean),
 
