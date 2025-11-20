@@ -1175,6 +1175,55 @@ export const ProductDetailPage: React.FC = () => {
         if (data) {
           console.log('Loaded product from Database:', data.name);
 
+          // Check if this is a bundle product
+          const isBundle = data.product_type === 'bundle' && data.bundle_products && data.bundle_products.length > 0;
+          
+          let includedProducts = [];
+          
+          // If it's a bundle, fetch component product details
+          if (isBundle) {
+            console.log('Processing bundle product:', data.bundle_products.length, 'components');
+            
+            try {
+              // Extract product IDs from bundle_products array
+              const productIds = data.bundle_products.map((bp: any) => bp.product_id).filter(Boolean);
+              
+              if (productIds.length > 0) {
+                // Fetch component product details
+                const { data: componentProducts, error: componentError } = await supabase
+                  .from('products')
+                  .select('id, name, thumbnail_url, slug, price')
+                  .in('id', productIds)
+                  .eq('is_active', true);
+                
+                if (componentError) {
+                  console.error('Error fetching bundle components:', componentError);
+                } else {
+                  console.log('Fetched bundle components:', componentProducts?.length);
+                  
+                  // Map bundle products to include component details
+                  includedProducts = data.bundle_products.map((bp: any) => {
+                    const component = componentProducts?.find(cp => cp.id === bp.product_id);
+                    return {
+                      id: bp.product_id,
+                      name: component?.name || 'Unknown Product',
+                      quantity: bp.quantity || 1,
+                      price: component?.price || 0,
+                      image: component?.thumbnail_url || null,
+                      slug: component?.slug || null
+                    };
+                  });
+                  
+                  console.log('Processed included products:', includedProducts.length);
+                }
+              }
+            } catch (bundleError) {
+              console.error('Error processing bundle:', bundleError);
+              // Fallback to raw bundle_products if fetching fails
+              includedProducts = data.bundle_products || [];
+            }
+          }
+
           // Map DB format to Page format
           const mappedProduct = {
             id: data.id,
@@ -1225,7 +1274,7 @@ export const ProductDetailPage: React.FC = () => {
             badges: data.badges || [],
 
             // Bundle specific fields
-            includedProducts: data.bundle_products || [],
+            includedProducts: includedProducts,
           };
 
           setProduct(mappedProduct);
