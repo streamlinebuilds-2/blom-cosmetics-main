@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -555,7 +555,7 @@ export const ShopPage: React.FC = () => {
       try {
         const { data: products, error } = await supabase
           .from('products')
-          .select('*')
+          .select('*, product_reviews(count), hover_image')
           .eq('is_active', true)
           .eq('status', 'active')
           .order('category', { ascending: true });
@@ -654,16 +654,28 @@ export const ShopPage: React.FC = () => {
     return product;
   });
 
-  const productCategories = [
-    { name: 'All Products', slug: 'all', count: allProducts.length },
-    { name: 'Bundle Deals', slug: 'bundle-deals', count: allProducts.filter(p => p.category === 'bundle-deals').length },
-    { name: 'Acrylic System', slug: 'acrylic-system', count: allProducts.filter(p => p.category === 'acrylic-system').length },
-    { name: 'Prep & Finish', slug: 'prep-finishing', count: allProducts.filter(p => p.category === 'prep-finishing').length },
-    { name: 'Gel System', slug: 'gel-system', count: allProducts.filter(p => p.category === 'gel-system').length },
-    { name: 'Tools & Essentials', slug: 'tools-essentials', count: allProducts.filter(p => p.category === 'tools-essentials').length },
-    { name: 'Furniture', slug: 'furniture', count: allProducts.filter(p => p.category === 'furniture').length },
-    { name: 'Coming Soon', slug: 'coming-soon', count: allProducts.filter(p => p.category === 'coming-soon').length }
-  ];
+  // --- DYNAMIC CATEGORY GENERATION ---
+  const productCategories = useMemo(() => {
+    const cats = new Map();
+
+    // 1. Always start with "All Products"
+    cats.set('all', { name: 'All Products', slug: 'all', count: allProducts.length });
+
+    // 2. Scan products for unique categories
+    allProducts.forEach((product: any) => {
+      const slug = product.category;
+      if (!slug || slug === 'all') return;
+
+      if (!cats.has(slug)) {
+        // Create a pretty name from the slug (e.g. "new-category" -> "New Category")
+        const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        cats.set(slug, { name, slug, count: 0 });
+      }
+      cats.get(slug).count++;
+    });
+
+    return Array.from(cats.values());
+  }, [allProducts]);
 
   const sortOptions = [
     { value: 'featured', label: 'Featured' },
