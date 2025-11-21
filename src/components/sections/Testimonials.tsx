@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Container } from '../layout/Container';
 
 const testimonials = [
@@ -40,16 +41,20 @@ const testimonials = [
 ];
 
 export const Testimonials: React.FC = () => {
-  const [isPaused, setIsPaused] = useState(false);
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleClick = () => {
-    if (isPaused) {
-      // Resume animation
-      setIsPaused(false);
-    } else {
-      // Pause animation by removing the animation class
-      setIsPaused(true);
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 350; // Width of card (320px) + gap (24px)
+      const currentScroll = scrollContainerRef.current.scrollLeft;
+      const targetScroll = direction === 'left' 
+        ? currentScroll - scrollAmount 
+        : currentScroll + scrollAmount;
+      
+      scrollContainerRef.current.scrollTo({
+        left: targetScroll,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -60,64 +65,70 @@ export const Testimonials: React.FC = () => {
           <h2 className="text-3xl font-bold text-gray-900">What Our Customers Say</h2>
         </div>
 
-        <div 
-          className="relative overflow-hidden cursor-pointer"
-          onClick={handleClick}
-        >
-          {/* Infinite scrolling carousel */}
-          <div 
-            ref={carouselRef}
-            className={`flex gap-6 ${isPaused ? '' : 'animate-scroll'}`}
+        <div className="relative">
+          {/* Left Arrow */}
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 hidden md:flex items-center justify-center"
+            aria-label="Scroll left"
           >
-            {/* First set of testimonials */}
-            {testimonials.map((testimonial) => (
-              <div key={`first-${testimonial.id}`} className="flex-shrink-0 w-80">
-                <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
+            <ChevronLeft className="h-6 w-6 text-gray-800" />
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-110 hidden md:flex items-center justify-center"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="h-6 w-6 text-gray-800" />
+          </button>
+
+          {/* Scrollable container */}
+          <div 
+            ref={scrollContainerRef}
+            className="overflow-x-auto scrollbar-hide scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <div className="flex gap-6 px-4 md:px-0">
+              {testimonials.map((testimonial) => (
+                <div key={testimonial.id} className="flex-shrink-0 w-80">
+                  <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-            {/* Duplicate set for seamless loop */}
-            {testimonials.map((testimonial) => (
-              <div key={`second-${testimonial.id}`} className="flex-shrink-0 w-80">
-                <div className="aspect-[9/16] rounded-2xl overflow-hidden bg-gray-50 shadow-lg">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile scroll indicators */}
+          <div className="flex md:hidden justify-center gap-2 mt-6">
+            <button
+              onClick={() => scroll('left')}
+              className="bg-pink-400 hover:bg-pink-500 text-white rounded-full p-2 shadow-md transition-all duration-200"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <button
+              onClick={() => scroll('right')}
+              className="bg-pink-400 hover:bg-pink-500 text-white rounded-full p-2 shadow-md transition-all duration-200"
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </Container>
 
-      <style jsx>{`
-        @keyframes scroll-left {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        
-        .animate-scroll {
-          animation: scroll-left 20s linear infinite;
-        }
-        
-        /* Mobile - 50% faster than desktop */
-        @media (max-width: 768px) {
-          .animate-scroll {
-            animation: scroll-left 13.33s linear infinite;
-          }
+      <style>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
         }
       `}</style>
     </section>
