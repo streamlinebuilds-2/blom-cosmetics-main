@@ -39,6 +39,7 @@ const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage').then(m =>
 const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample').then(m => ({ default: m.ProductTemplateExample })));
 const MyCoupons = lazy(() => import('./pages/MyCoupons'));
 const ManageAddresses = lazy(() => import('./pages/ManageAddresses'));
+const ProductNew = lazy(() => import('./pages/ProductNew').then(m => ({ default: m.ProductNew })));
 
 /**
  * Prefetch next likely routes on idle to improve perceived performance.
@@ -150,6 +151,9 @@ function App() {
           
           {/* Template/Dev */}
           <Route path="/product-template-example" element={<PageWithCart><ProductTemplateExample /></PageWithCart>} />
+
+          {/* Admin */}
+          <Route path="/admin/products/new" element={<PageWithCart><ProductNew /></PageWithCart>} />
         </Routes>
       </ErrorBoundary>
     </BrowserRouter>
