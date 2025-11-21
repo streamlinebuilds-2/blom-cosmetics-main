@@ -2,10 +2,14 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'gradient';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   children: React.ReactNode;
   loading?: boolean;
+  icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
+  loadingText?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -13,19 +17,25 @@ export const Button: React.FC<ButtonProps> = ({
   size = 'md',
   children,
   loading = false,
+  icon,
+  iconPosition = 'left',
+  fullWidth = false,
+  loadingText = 'Loading...',
   className = '',
   disabled,
   ...props
 }) => {
-  const baseClass = 'btn';
+  const baseClass = 'btn focus-ring';
   const variantClass = `btn-${variant}`;
-  const sizeClass = size !== 'md' ? `btn-${size}` : '';
+  const sizeClass = `btn-${size}`;
+  const widthClass = fullWidth ? 'w-full' : '';
 
   const classes = [
     baseClass,
     variantClass,
     sizeClass,
-    loading && 'opacity-75 cursor-not-allowed',
+    widthClass,
+    loading && 'loading',
     className
   ].filter(Boolean).join(' ');
 
@@ -33,12 +43,29 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       className={classes}
       disabled={disabled || loading}
+      aria-disabled={disabled || loading}
       {...props}
     >
       {loading && (
-        <Loader2 className="animate-spin -ml-1 mr-3 h-4 w-4" />
+        <>
+          <div className="spinner" aria-hidden="true" />
+          <span className="sr-only">{loadingText}</span>
+        </>
       )}
-      {children}
+      
+      {!loading && icon && iconPosition === 'left' && (
+        <span className="mr-2" aria-hidden="true">
+          {icon}
+        </span>
+      )}
+      
+      <span>{children}</span>
+      
+      {!loading && icon && iconPosition === 'right' && (
+        <span className="ml-2" aria-hidden="true">
+          {icon}
+        </span>
+      )}
     </button>
   );
 };

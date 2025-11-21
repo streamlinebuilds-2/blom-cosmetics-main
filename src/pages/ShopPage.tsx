@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
+import { PageLoadingSpinner, ProductGridSkeleton } from '../components/ui/LoadingSpinner';
 import { supabase } from '../lib/supabase';
 // Discount system disabled
 
@@ -823,7 +824,7 @@ export const ShopPage: React.FC = () => {
 
       if (!cats.has(slug)) {
         // Create a pretty name from the slug (e.g. "new-category" -> "New Category")
-        const name = slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         cats.set(slug, { name, slug, count: 0 });
       }
       cats.get(slug).count++;
@@ -922,10 +923,7 @@ export const ShopPage: React.FC = () => {
         <Header showMobileMenu={true} />
         <main className="section-padding">
           <Container>
-            <div className="text-center py-16">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-400 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading products...</p>
-            </div>
+            <PageLoadingSpinner text="Loading our amazing products..." />
           </Container>
         </main>
         <Footer />

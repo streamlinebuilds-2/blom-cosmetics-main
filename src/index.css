@@ -1,6 +1,9 @@
+/* Import Enhanced Design System - MUST BE FIRST */
+@import './styles/design-system.css';
+
 /* ========================================
    FORCE LIGHT MODE - ANDROID & ALL DEVICES
-   CRITICAL: Must be before @tailwind
+   CRITICAL: Must be after design system imports
    ======================================== */
 
 html {

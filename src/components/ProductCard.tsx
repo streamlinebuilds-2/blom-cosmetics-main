@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Heart, ShoppingCart } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Heart, ShoppingCart, Zap } from 'lucide-react';
 import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
@@ -21,6 +21,8 @@ interface ProductCardProps {
   discountPrice?: number;
   discountBadge?: string;
   discountBadgeColor?: string;
+  premium?: boolean;
+  showQuickAdd?: boolean;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -38,7 +40,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   hoverShine = false,
   discountPrice,
   discountBadge,
-  discountBadgeColor
+  discountBadgeColor,
+  premium = false,
+  showQuickAdd = true
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
@@ -159,13 +163,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
+  // Enhanced card classes
+  const cardClasses = [
+    'product-card',
+    'reveal-on-scroll',
+    premium ? 'card-premium' : 'card-enhanced',
+    isListView ? 'md:flex md:items-center md:gap-6 md:p-4' : '',
+    className
+  ].filter(Boolean).join(' ');
+
   // List view layout
   if (isListView) {
     return (
       <article 
         ref={cardRef as any}
-        className={`product-card group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] md:flex md:items-center md:gap-6 md:p-4 ${className}`}
-        style={{ boxShadow: '0 10px 30px rgba(15,23,42,0.06)' }}
+        className={`${cardClasses} group cursor-pointer overflow-hidden transition-all duration-300 ease-out hover:-translate-y-2`}
         onClick={handleCardClick}
       >
         {/* Image Container with Shimmer Effect */}
@@ -270,7 +282,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             type="button"
             onClick={handleAddToCart}
             disabled={!inStock || price === -1}
-            className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-out hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(255,116,164,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none md:w-auto md:px-6 md:py-2 md:text-sm"
+            className={`btn btn-primary w-full ${isListView ? 'md:w-auto' : ''} touch-target focus-ring ${
+              !inStock || price === -1 ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             {price === -1 ? 'Coming Soon' : inStock ? 'Add to Cart' : 'Out of Stock'}
           </button>
@@ -282,7 +296,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   // Grid view layout
   return (
     <article
-      className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
+      className={`${cardClasses} group relative overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''}`}
       onClick={handleCardClick}
     >
       {/* Image Container */}
@@ -384,14 +398,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             type="button"
             onClick={handleAddToCart}
             disabled={!inStock || price === -1}
-            className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-3 px-4 sm:py-2.5 sm:px-5 md:py-3.5 md:px-8 rounded-full font-bold text-sm sm:text-xs md:text-sm uppercase transition-all duration-200 ${
+            className={`btn btn-primary w-full touch-target focus-ring ${
               inStock && price !== -1
-                ? 'bg-pink-400 text-white hover:bg-pink-400 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
-                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                ? 'hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+                : 'opacity-50 cursor-not-allowed'
             }`}
             aria-disabled={!inStock || price === -1}
           >
-            <ShoppingCart className="h-4 w-4 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+            <ShoppingCart className="h-4 w-4 mr-2" />
             {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
         </div>
