@@ -405,7 +405,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             }`}
             aria-disabled={!inStock || price === -1}
           >
-            <ShoppingCart className="h-4 w-4 mr-2" />
+            <ShoppingCart className="h-4 w-4 mr-1.5" />
             {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
           </button>
         </div>

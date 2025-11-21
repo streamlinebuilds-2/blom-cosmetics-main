@@ -467,13 +467,13 @@ html, body {
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 cursor-pointer border-0 outline-none focus:ring-2 focus:ring-offset-2;
-    min-height: 44px;
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-full font-medium text-sm transition-all duration-200 cursor-pointer border-0 outline-none focus:ring-2 focus:ring-offset-2;
+    min-height: 40px;
   }
   @media (max-width: 640px) {
     .btn {
       border-radius: 9999px;
-      padding: 0.75rem 1.5rem;
+      padding: 0.625rem 1.5rem;
     }
   }
 
@@ -734,9 +734,9 @@ html, body {
     .master__actions{ justify-content:center; }
   }
 
-  .btn{ display:inline-block; padding:.9rem 1.2rem; border-radius:25px; font-weight:800; cursor:pointer; text-decoration:none; }
+  .btn{ display:inline-block; padding:.625rem 1.2rem; border-radius:9999px; font-weight:800; cursor:pointer; text-decoration:none; }
   @media (max-width: 640px) {
-    .btn { border-radius: 9999px; padding: 0.75rem 1.5rem; }
+    .btn { border-radius: 9999px; padding: 0.625rem 1.5rem; }
   }
   .btn-pink{ background:#FF74A4; color:#fff; }
   .btn-outline{ background:#fff; color:#FF74A4; border:1px solid #FF74A4; }
