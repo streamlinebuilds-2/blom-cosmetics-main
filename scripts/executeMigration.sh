@@ -3,8 +3,14 @@
 # Execute SQL migrations via Supabase SQL Editor API
 # This script sends the SQL to be executed
 
-SUPABASE_URL="https://yvmnedjybrpvlupygusf.supabase.co"
-SERVICE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bW5lZGp5YnJwdmx1cHlndXNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODYwOTY0MywiZXhwIjoyMDc0MTg1NjQzfQ.dI1D3wtCcM_HwBDyT5bg_H5Yj5e0GUT2ILjDfw6gSyI"
+SUPABASE_URL="${SUPABASE_URL:-${VITE_SUPABASE_URL}}"
+SERVICE_KEY="${SUPABASE_SERVICE_ROLE_KEY}"
+
+if [ -z "$SUPABASE_URL" ] || [ -z "$SERVICE_KEY" ]; then
+  echo "❌ Error: Missing required environment variables"
+  echo "   Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY"
+  exit 1
+fi
 
 echo "=========================================="
 echo "🔄 RUNNING DATABASE MIGRATIONS"
@@ -17,7 +23,7 @@ cat migrations/001_add_order_constraints.sql
 
 echo ""
 echo "⚠️  This migration should be run manually in Supabase SQL Editor"
-echo "   URL: https://supabase.com/dashboard/project/yvmnedjybrpvlupygusf/editor"
+echo "   URL: https://supabase.com/dashboard/project/YOUR_PROJECT_ID/editor"
 echo ""
 
 # Migration 2: Review Constraints
@@ -40,7 +46,7 @@ echo ""
 echo "Due to Supabase security restrictions, migrations must be run manually."
 echo "Please follow these steps:"
 echo ""
-echo "1. Go to: https://supabase.com/dashboard/project/yvmnedjybrpvlupygusf/editor"
+echo "1. Go to your Supabase SQL Editor"
 echo "2. Open the SQL Editor"
 echo "3. Copy and paste each migration file:"
 echo "   - migrations/001_add_order_constraints.sql"
