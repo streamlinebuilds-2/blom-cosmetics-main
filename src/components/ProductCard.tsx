@@ -282,11 +282,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             type="button"
             onClick={handleAddToCart}
             disabled={!inStock || price === -1}
-            className={`btn btn-primary w-full ${isListView ? 'md:w-auto' : ''} touch-target focus-ring ${
-              !inStock || price === -1 ? 'opacity-50 cursor-not-allowed' : ''
+            className={`inline-flex items-center justify-center px-4 py-3 text-sm font-semibold text-white bg-pink-400 border-2 border-pink-400 rounded-lg transition-all duration-200 hover:bg-transparent hover:text-pink-400 hover:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 ${
+              isListView ? 'md:w-auto md:px-6' : 'w-full min-h-[48px]'
+            } ${
+              !inStock || price === -1 ? 'opacity-50 cursor-not-allowed bg-gray-300 border-gray-300 text-gray-500' : 'hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
             }`}
           >
-            {price === -1 ? 'Coming Soon' : inStock ? 'Add to Cart' : 'Out of Stock'}
+            <ShoppingCart className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">
+              {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+            </span>
           </button>
         </div>
       </article>
@@ -392,21 +397,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
 
-        {/* Add to Cart Button - Centered */}
-        <div className="text-center">
+        {/* Add to Cart Button - Centered with Fixed Height */}
+        <div className="flex items-center justify-center">
           <button
             type="button"
             onClick={handleAddToCart}
             disabled={!inStock || price === -1}
-            className={`btn btn-primary w-full touch-target focus-ring ${
+            className={`inline-flex items-center justify-center px-6 py-3 w-full min-h-[48px] text-sm font-semibold text-white bg-pink-400 border-2 border-pink-400 rounded-lg transition-all duration-200 hover:bg-transparent hover:text-pink-400 hover:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 ${
               inStock && price !== -1
                 ? 'hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
-                : 'opacity-50 cursor-not-allowed'
+                : 'opacity-50 cursor-not-allowed bg-gray-300 border-gray-300 text-gray-500'
             }`}
             aria-disabled={!inStock || price === -1}
           >
-            <ShoppingCart className="h-4 w-4 mr-1.5" />
-            {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+            <ShoppingCart className="h-4 w-4 mr-2 flex-shrink-0" />
+            <span className="truncate">
+              {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+            </span>
           </button>
         </div>
       </div>
