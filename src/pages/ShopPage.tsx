@@ -810,20 +810,42 @@ export const ShopPage: React.FC = () => {
     return product;
   });
 
-  // --- DYNAMIC CATEGORY GENERATION ---
+  // --- DYNAMIC CATEGORY GENERATION WITH CUSTOM ORDERING ---
   const productCategories = useMemo(() => {
     const cats = new Map();
 
     // 1. Always start with "All Products"
     cats.set('all', { name: 'All Products', slug: 'all', count: allProducts.length });
 
-    // 2. Scan products for unique categories
+    // 2. Define priority order for categories (most important first)
+    const priorityOrder = [
+      'acrylic-system',    // Core Acrylics, Colour Acrylics, Glitter Acrylics - TOP PRIORITY
+      'prep-finishing',    // Prep Solution & Primer - SECOND PRIORITY
+      'gel-system',        // Gel products
+      'tools-essentials',  // Tools and essentials
+      'bundle-deals',      // Bundle deals
+      'furniture'          // Furniture - BOTTOM PRIORITY
+    ];
+
+    // 3. Scan products for unique categories and organize by priority
+    const foundCategories = new Set();
+    
+    // Process products in priority order to maintain desired sequence
+    priorityOrder.forEach(slug => {
+      const productsInCategory = allProducts.filter((product: any) => product.category === slug);
+      if (productsInCategory.length > 0) {
+        const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        cats.set(slug, { name, slug, count: productsInCategory.length });
+        foundCategories.add(slug);
+      }
+    });
+
+    // 4. Add any remaining categories that aren't in our priority list
     allProducts.forEach((product: any) => {
       const slug = product.category;
-      if (!slug || slug === 'all') return;
+      if (!slug || slug === 'all' || foundCategories.has(slug)) return;
 
       if (!cats.has(slug)) {
-        // Create a pretty name from the slug (e.g. "new-category" -> "New Category")
         const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         cats.set(slug, { name, slug, count: 0 });
       }
