@@ -895,9 +895,57 @@ export const ShopPage: React.FC = () => {
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    // Define priority order for specific products (most important first)
+    const priorityProducts = [
+      'Prep Solution',           // Nail dehydrator
+      'Vitamin Primer',          // Primer  
+      'Glitter Acrylic',         // Glitter Acrylics
+      'Crystal Kolinsky Sculpting Brush',
+      'Professional Detail Brush'
+    ];
+
+    // Check if products contain priority keywords (for database products)
+    const containsPriorityKeyword = (productName: string) => {
+      const nameLower = productName.toLowerCase();
+      return nameLower.includes('nail liquid') || 
+             nameLower.includes('core acrylic') || 
+             nameLower.includes('colour acrylic') || 
+             nameLower.includes('color acrylic') ||
+             nameLower.includes('glitter acrylic') ||
+             nameLower.includes('prep solution') ||
+             nameLower.includes('vitamin primer') ||
+             nameLower.includes('prep') ||
+             nameLower.includes('primer');
+    };
+
     // Always put "Coming Soon" products at the bottom
     if (a.category === 'coming-soon' && b.category !== 'coming-soon') return 1;
     if (b.category === 'coming-soon' && a.category !== 'coming-soon') return -1;
+
+    // Always put furniture products at the bottom
+    if (a.category === 'furniture' && b.category !== 'furniture') return 1;
+    if (b.category === 'furniture' && a.category !== 'furniture') return -1;
+
+    // Check if both are furniture - sort by name
+    if (a.category === 'furniture' && b.category === 'furniture') {
+      return sortBy === 'name' ? a.name.localeCompare(b.name) : 0;
+    }
+
+    // Check if products are in priority list or contain priority keywords
+    const aIsPriority = priorityProducts.some(p => a.name.includes(p)) || containsPriorityKeyword(a.name);
+    const bIsPriority = priorityProducts.some(p => b.name.includes(p)) || containsPriorityKeyword(b.name);
+
+    if (aIsPriority && !bIsPriority) return -1;
+    if (bIsPriority && !aIsPriority) return 1;
+
+    // If both are priority, sort by their order in the priority list
+    if (aIsPriority && bIsPriority) {
+      const aIndex = priorityProducts.findIndex(p => a.name.includes(p));
+      const bIndex = priorityProducts.findIndex(p => b.name.includes(p));
+      if (aIndex !== -1 && bIndex !== -1) {
+        return aIndex - bIndex;
+      }
+    }
 
     switch (sortBy) {
       case 'name':
