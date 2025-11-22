@@ -1589,6 +1589,24 @@ export const ProductDetailPage: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                   
+                  {/* Variant Name Overlay */}
+                  {(() => {
+                    const currentImageUrl = allImages[selectedImage];
+                    const matchingVariant = product.variants?.find((v: any) =>
+                      (typeof v === 'object' && v.image === currentImageUrl)
+                    );
+                    const variantName = matchingVariant?.name || matchingVariant?.title;
+                    
+                    if (variantName) {
+                      return (
+                        <div className="absolute bottom-4 left-4 bg-black bg-opacity-70 text-white px-3 py-1.5 rounded-full text-xs font-medium backdrop-blur-sm">
+                          {variantName}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+                  
                   {/* Navigation Arrows */}
                   {allImages.length > 1 && (
                     <>
