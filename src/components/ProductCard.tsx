@@ -4,6 +4,7 @@ import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
 import { analytics } from '../lib/analytics';
+import { BundleVariantModal } from './bundle/BundleVariantModal';
 
 interface ProductCardProps {
   id: string;
@@ -23,6 +24,7 @@ interface ProductCardProps {
   discountBadgeColor?: string;
   premium?: boolean;
   showQuickAdd?: boolean;
+  includedProducts?: any[];
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -42,13 +44,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   discountBadge,
   discountBadgeColor,
   premium = false,
-  showQuickAdd = true
+  showQuickAdd = true,
+  // Add support for bundles
+  includedProducts = []
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
   const [isInView, setIsInView] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [hasViewed, setHasViewed] = React.useState(false);
+  const [showBundleModal, setShowBundleModal] = React.useState(false);
 
   // Track product views when card comes into view
   useEffect(() => {
@@ -117,13 +122,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     
     if (!inStock || price === -1) return;
     
-    cartStore.addItem({
-      id: `item_${Date.now()}`,
-      productId: slug,
-      name,
-      price,
-      image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'
-    });
+    // Check if this is a bundle with variants that need selection
+    const hasBundleWithVariants = includedProducts && includedProducts.length > 0 && 
+      includedProducts.some((product: any) => product.variants && product.variants.length > 0);
+    
+    if (hasBundleWithVariants) {
+      setShowBundleModal(true);
+    } else {
+      // Regular product or bundle without variants
+      cartStore.addItem({
+        id: `item_${Date.now()}`,
+        productId: slug,
+        name,
+        price,
+        image: images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+        variant: { title: 'Default' },
+        isBundle: includedProducts && includedProducts.length > 0,
+        includedProducts
+      });
+    }
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -417,6 +434,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Bundle Variant Selection Modal */}
+      <BundleVariantModal
+        isOpen={showBundleModal}
+        onClose={() => setShowBundleModal(false)}
+        bundle={{
+          id,
+          name,
+          slug,
+          price,
+          compareAtPrice,
+          images,
+          includedProducts
+        }}
+      />
 
       {/* Inline styles for line clamping */}
       <style>{`

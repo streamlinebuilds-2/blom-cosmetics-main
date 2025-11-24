@@ -16,6 +16,22 @@ export interface CartItem {
     option2?: string;
     option3?: string;
   };
+  // Bundle-specific properties
+  isBundle?: boolean;
+  includedProducts?: Array<{
+    id: string;
+    name: string;
+    quantity: number;
+    price: number;
+    image?: string;
+    variants?: Array<{
+      name: string;
+      inStock: boolean;
+      image?: string;
+    }>;
+    selectedVariant?: string;
+  }>;
+  bundleVariants?: Record<string, string>;
 }
 
 export interface CartState {
