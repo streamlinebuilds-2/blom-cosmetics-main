@@ -353,8 +353,8 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                     </button>
                     <ShareButton
                       url={window.location.href}
-                      title={productData.name}
-                      description={productData.shortDescription}
+                      title={product.name}
+                      description={product.shortDescription}
                       className="flex-1"
                     />
                   </div>
@@ -364,7 +364,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 <div className="space-y-3 py-6 border-t border-gray-200">
                   <div className="flex items-center gap-3">
                     <Truck className="h-5 w-5 text-gray-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">Free shipping on orders over R1500</span>
+                    <span className="text-sm text-gray-700">Free shipping on orders over R2000</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Shield className="h-5 w-5 text-gray-600 flex-shrink-0" />

@@ -14,7 +14,7 @@ export const AnnouncementBar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm font-semibold text-gray-800">
         <Truck className="h-3 w-3 sm:h-4 sm:w-4 text-gray-800" />
-        <span>FREE SHIPPING ON ORDERS OVER R1500</span>
+        <span>FREE SHIPPING ON ORDERS OVER R2000</span>
       </div>
     </div>
   );

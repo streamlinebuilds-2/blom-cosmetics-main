@@ -140,7 +140,7 @@ export const HomePage: React.FC = () => {
                   <Zap className="h-7 w-7" style={{ color: '#1e293b' }} />
                 </div>
                 <h3 className="font-bold text-lg mb-3">Fast & Reliable</h3>
-                <p className="text-gray-600 text-sm">Free shipping on orders over R1500 with 2–3 day delivery nationwide</p>
+                <p className="text-gray-600 text-sm">Free shipping on orders over R2000 with 2–3 day delivery nationwide</p>
               </div>
 
               {/* 4 */}
