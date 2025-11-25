@@ -1163,30 +1163,92 @@ export const ProductDetailPage: React.FC = () => {
         // Load discounts
         loadDiscounts().then(setDiscounts).catch(console.error);
 
-        // 1. CHECK SUPABASE FIRST (Priority)
+        // 1. CHECK SUPABASE PRODUCTS TABLE FIRST (Priority)
         // This ensures products created in Admin App always take precedence
-        const { data, error } = await supabase
+        const { data: productData, error: productError } = await supabase
           .from('products')
           .select('*')
           .eq('slug', productSlug)
           .eq('is_active', true)
           .maybeSingle();
 
+        // 2. IF NOT FOUND IN PRODUCTS, CHECK BUNDLES TABLE
+        let data = productData;
+        if (!data) {
+          console.log('Product not found in products table, checking bundles table...');
+          const { data: bundleData, error: bundleError } = await supabase
+            .from('bundles')
+            .select('*')
+            .eq('slug', productSlug)
+            .eq('is_active', true)
+            .maybeSingle();
+          
+          if (bundleData) {
+            console.log('Loaded bundle from bundles table:', bundleData.name);
+            // Transform bundle data to match product format
+            data = {
+              ...bundleData,
+              product_type: 'bundle',
+              id: `bundle-${bundleData.id}`
+            };
+          } else if (bundleError) {
+            console.error('Error fetching from bundles table:', bundleError);
+          }
+        }
+
         if (data) {
           console.log('Loaded product from Database:', data.name);
+          console.log('Product data structure:', {
+            id: data.id,
+            product_type: data.product_type,
+            hasBundleProducts: !!data.bundle_products,
+            bundleProductsLength: data.bundle_products?.length || 0,
+            isActive: data.is_active
+          });
 
-          // Check if this is a bundle product
-          const isBundle = data.product_type === 'bundle' && data.bundle_products && data.bundle_products.length > 0;
+          // Check if this is a bundle product - multiple ways to identify
+          const isBundle = 
+            data.product_type === 'bundle' || // Explicit bundle type
+            data.category === 'Bundle Deals' || // Category-based detection
+            (data.bundle_products && data.bundle_products.length > 0) || // Has bundle products
+            (data.bundle_id && data.bundle_id !== null); // Has bundle reference
+
+          console.log('Bundle detection:', {
+            product_type: data.product_type,
+            category: data.category,
+            hasBundleProducts: !!(data.bundle_products && data.bundle_products.length > 0),
+            bundleProductsLength: data.bundle_products?.length || 0,
+            hasBundleId: !!(data.bundle_id),
+            isBundle: isBundle
+          });
           
           let includedProducts = [];
           
           // If it's a bundle, fetch component product details
           if (isBundle) {
-            console.log('Processing bundle product:', data.bundle_products.length, 'components');
+            console.log('Processing bundle product with', data.bundle_products?.length || 0, 'components');
             
             try {
+              let bundleProducts = data.bundle_products || [];
+              
+              // If this is from bundles table, try to get bundle_products from there
+              if (data.product_type === 'bundle' && (!bundleProducts.length || bundleProducts.length === 0)) {
+                console.log('Attempting to fetch bundle_products for bundle from bundles table...');
+                const { data: bundleProductData, error: bundleProductError } = await supabase
+                  .from('bundle_products')
+                  .select('*')
+                  .eq('bundle_id', data.id);
+                
+                if (!bundleProductError && bundleProductData) {
+                  console.log('Found bundle_products:', bundleProductData.length);
+                  bundleProducts = bundleProductData;
+                } else {
+                  console.warn('No bundle_products found or error fetching:', bundleProductError);
+                }
+              }
+              
               // Extract product IDs from bundle_products array
-              const productIds = data.bundle_products.map((bp: any) => bp.product_id).filter(Boolean);
+              const productIds = bundleProducts.map((bp: any) => bp.product_id || bp.id).filter(Boolean);
               
               if (productIds.length > 0) {
                 // Fetch component product details
@@ -1202,20 +1264,25 @@ export const ProductDetailPage: React.FC = () => {
                   console.log('Fetched bundle components:', componentProducts?.length);
                   
                   // Map bundle products to include component details
-                  includedProducts = data.bundle_products.map((bp: any) => {
-                    const component = componentProducts?.find(cp => cp.id === bp.product_id);
+                  includedProducts = bundleProducts.map((bp: any) => {
+                    const productId = bp.product_id || bp.id;
+                    const component = componentProducts?.find(cp => cp.id === productId);
                     return {
-                      id: bp.product_id,
-                      name: component?.name || 'Unknown Product',
+                      id: productId,
+                      name: component?.name || bp.name || 'Unknown Product',
                       quantity: bp.quantity || 1,
-                      price: component?.price || 0,
-                      image: component?.thumbnail_url || null,
+                      price: component?.price || bp.price || 0,
+                      image: component?.thumbnail_url || bp.image || null,
                       slug: component?.slug || null
                     };
                   });
                   
                   console.log('Processed included products:', includedProducts.length);
                 }
+              } else {
+                console.warn('No product IDs found in bundle_products');
+                // Use bundleProducts as fallback
+                includedProducts = bundleProducts;
               }
             } catch (bundleError) {
               console.error('Error processing bundle:', bundleError);
