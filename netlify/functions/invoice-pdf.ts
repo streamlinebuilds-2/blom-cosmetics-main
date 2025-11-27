@@ -62,7 +62,7 @@ export const handler = async (event: any) => {
 
     const items = await fetchJson(
       `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,created_at,variant_title`
-    )
+    ) as any[]
 
     // C - Fix: Compute total from items if order.total is missing/zero
     const computedTotal = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unit_price || 0)), 0)
@@ -214,32 +214,41 @@ export const handler = async (event: any) => {
       }
     })
 
-    // Add shipping as a line item if shipping cost exists
-    if (order.shipping_cents && order.shipping_cents > 0) {
-      const shippingAmount = order.shipping_cents / 100
-      const freeShippingThreshold = 2000 // R2000 threshold for free shipping
-      
-      // Check if this qualifies for free shipping (order subtotal >= R2000)
-      const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : 0
-      const isFreeShipping = subtotalAmount >= freeShippingThreshold && shippingAmount === 0
-      const wasShippingFree = order.discount_cents > 0 && (order.subtotal_cents + order.discount_cents) / 100 >= freeShippingThreshold
-      
-      if (isFreeShipping) {
-        // Show FREE SHIPPING line item
-        drawText("FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
-        drawRightText("R 0.00", right - 20, y, 10, false, rgb(0, 0.6, 0))
-      } else if (shippingAmount > 0) {
-        // Show regular shipping cost
-        drawText("Shipping & Handling", left, y, 10)
-        drawRightText("1", right - 150, y, 10)
-        drawRightText(money(shippingAmount), right - 90, y, 10)
-        drawRightText(money(shippingAmount), right - 20, y, 10)
-      }
+    // Add shipping as a line item if shipping cost exists (enhanced logic for all orders)
+    const shippingAmount = order.shipping_cents ? order.shipping_cents / 100 : 0
+    const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : computedTotal
+    const freeShippingThreshold = 2000 // R2000 threshold for free shipping
+    
+    // Check if this qualifies for free shipping (order subtotal >= R2000)
+    const isFreeShipping = subtotalAmount >= freeShippingThreshold && shippingAmount === 0
+    
+    // For orders without shipping_cents field, assume shipping based on total
+    const hasShippingInfo = order.shipping_cents !== null && order.shipping_cents !== undefined
+    
+    if (isFreeShipping) {
+      // Show FREE SHIPPING line item
+      drawText("FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
+      drawRightText("R 0.00", right - 20, y, 10, false, rgb(0, 0.6, 0))
+      y -= 16
+    } else if (hasShippingInfo && shippingAmount > 0) {
+      // Show regular shipping cost (when explicitly stored)
+      drawText("Shipping & Handling", left, y, 10)
+      drawRightText("1", right - 150, y, 10)
+      drawRightText(money(shippingAmount), right - 90, y, 10)
+      drawRightText(money(shippingAmount), right - 20, y, 10)
+      y -= 16
+    } else if (!hasShippingInfo && subtotalAmount < freeShippingThreshold) {
+      // Show estimated shipping for old orders without shipping data
+      const estimatedShipping = 75 // Standard shipping cost estimate
+      drawText("Shipping & Handling (Estimated)", left, y, 10, false, rgb(0.5, 0.5, 0.5))
+      drawRightText("1", right - 150, y, 10)
+      drawRightText(money(estimatedShipping), right - 90, y, 10)
+      drawRightText(money(estimatedShipping), right - 20, y, 10)
       y -= 16
     }
 
     // Add coupon discount as a line item if discount exists
-    if (order.discount_cents > 0) {
+    if (order.discount_cents && order.discount_cents > 0) {
       const discountAmount = order.discount_cents / 100
       drawText("Coupon Discount", left, y, 10, false, rgb(0.8, 0.2, 0.2))
       drawRightText("-" + money(discountAmount), right - 20, y, 10, false, rgb(0.8, 0.2, 0.2))
