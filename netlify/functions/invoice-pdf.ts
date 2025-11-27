@@ -226,11 +226,11 @@ export const handler = async (event: any) => {
       
       if (isFreeShipping) {
         // Show FREE SHIPPING line item
-        drawText("🚚 FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
+        drawText("FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
         drawRightText("R 0.00", right - 20, y, 10, false, rgb(0, 0.6, 0))
       } else if (shippingAmount > 0) {
         // Show regular shipping cost
-        drawText("🚚 Shipping & Handling", left, y, 10)
+        drawText("Shipping & Handling", left, y, 10)
         drawRightText("1", right - 150, y, 10)
         drawRightText(money(shippingAmount), right - 90, y, 10)
         drawRightText(money(shippingAmount), right - 20, y, 10)
@@ -241,7 +241,7 @@ export const handler = async (event: any) => {
     // Add coupon discount as a line item if discount exists
     if (order.discount_cents > 0) {
       const discountAmount = order.discount_cents / 100
-      drawText("🎫 Coupon Discount", left, y, 10, false, rgb(0.8, 0.2, 0.2))
+      drawText("Coupon Discount", left, y, 10, false, rgb(0.8, 0.2, 0.2))
       drawRightText("-" + money(discountAmount), right - 20, y, 10, false, rgb(0.8, 0.2, 0.2))
       y -= 16
     }
