@@ -3,6 +3,7 @@ import { Heart, ShoppingCart } from 'lucide-react';
 import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { analytics } from '../lib/analytics';
+import { ProductVariantModal } from './product/ProductVariantModal';
 
 interface ProductCardProps {
   id: string;
@@ -59,6 +60,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [isInView, setIsInView] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
   const [hasViewed, setHasViewed] = React.useState(false);
+  const [showVariantModal, setShowVariantModal] = React.useState(false);
 
   // Ensure we always have valid data
   const safeName = name || 'Product Name';
@@ -139,31 +141,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     const hasProductVariants = variants && variants.length > 0;
     
     if (hasProductVariants) {
-      // For products with variants, we'd need to open a modal
-      // For now, just add with default variant
-      cartStore.addItem({
-        id: `item_${Date.now()}`,
-        productId: slug,
-        name: safeName,
-        price: safePrice,
-        image: safeImages[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-        variant: { title: 'Default' },
-        isBundle: includedProducts && includedProducts.length > 0,
-        includedProducts
-      });
-    } else {
-      // Regular product
-      cartStore.addItem({
-        id: `item_${Date.now()}`,
-        productId: slug,
-        name: safeName,
-        price: safePrice,
-        image: safeImages[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
-        variant: { title: 'Default' },
-        isBundle: includedProducts && includedProducts.length > 0,
-        includedProducts
-      });
+      // For products with variants, show the modal
+      setShowVariantModal(true);
+      return;
     }
+    
+    // For products without variants, add directly to cart
+    cartStore.addItem({
+      id: `item_${Date.now()}`,
+      productId: slug,
+      name: safeName,
+      price: safePrice,
+      image: safeImages[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop',
+      variant: { title: 'Default' },
+      isBundle: includedProducts && includedProducts.length > 0,
+      includedProducts
+    });
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -404,6 +397,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           overflow: hidden;
         }
       `}</style>
+
+      {/* Product Variant Selection Modal */}
+      {variants && variants.length > 0 && (
+        <ProductVariantModal
+          isOpen={showVariantModal}
+          onClose={() => setShowVariantModal(false)}
+          product={{
+            id: id,
+            name: safeName,
+            slug: slug,
+            price: safePrice,
+            images: safeImages,
+            variants: variants
+          }}
+        />
+      )}
     </article>
   );
 };
+ch

@@ -10,6 +10,7 @@ import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
+import { ProductVariantModal } from '../components/product/ProductVariantModal';
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -82,6 +83,8 @@ export const CheckoutPage: React.FC = () => {
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
   const [saveThisAddress, setSaveThisAddress] = useState(false);
   const [userSession, setUserSession] = useState<any>(null);
+  const [showVariantModal, setShowVariantModal] = useState(false);
+  const [selectedProductForVariant, setSelectedProductForVariant] = useState<any>(null);
 
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
@@ -208,6 +211,25 @@ export const CheckoutPage: React.FC = () => {
       ...prev,
       [productId]: !prev[productId]
     }));
+  };
+
+  const handleAddRecommendedProduct = (productData: any) => {
+    // Check if product has variants
+    if (productData.variants && productData.variants.length > 0) {
+      setSelectedProductForVariant(productData);
+      setShowVariantModal(true);
+      return;
+    }
+    
+    // Add directly to cart if no variants
+    cartStore.addItem({
+      id: `item_${Date.now()}`,
+      productId: productData.id,
+      name: productData.name,
+      price: productData.price,
+      image: productData.image,
+      variant: { title: 'Default' }
+    });
   };
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
@@ -1361,15 +1383,16 @@ export const CheckoutPage: React.FC = () => {
                 </div>
                 
                 <button
-                  onClick={() => {
-                    cartStore.addItem({
-                      id: `item_${Date.now()}`,
-                      productId: 'nail-file',
-                      name: 'Nail File (80/80 Grit)',
-                      price: 35,
-                      image: '/nail-file-white.webp'
-                    });
-                  }}
+                  onClick={() => handleAddRecommendedProduct({
+                    id: 'nail-file',
+                    name: 'Nail File (80/80 Grit)',
+                    price: 35,
+                    image: '/nail-file-white.webp',
+                    variants: [
+                      { name: 'Single File', price: 35, image: '/nail-file-colorful.webp' },
+                      { name: '5-Pack Bundle', price: 160, image: '/nail-file-white.webp' }
+                    ]
+                  })}
                   className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add to Cart
@@ -1405,15 +1428,19 @@ export const CheckoutPage: React.FC = () => {
                 </div>
                 
                 <button
-                  onClick={() => {
-                    cartStore.addItem({
-                      id: `item_${Date.now()}`,
-                      productId: 'cuticle-oil',
-                      name: 'Cuticle Oil',
-                      price: 140,
-                      image: '/cuticle-oil-white.webp'
-                    });
-                  }}
+                  onClick={() => handleAddRecommendedProduct({
+                    id: 'cuticle-oil',
+                    name: 'Cuticle Oil',
+                    price: 140,
+                    image: '/cuticle-oil-white.webp',
+                    variants: [
+                      { name: 'Cotton Candy', image: '/cuticle-oil-cotton-candy.webp' },
+                      { name: 'Vanilla', image: '/cuticle-oil-vanilla.webp' },
+                      { name: 'Tiny Touch', image: '/cuticle-oil-tiny-touch.webp' },
+                      { name: 'Dragon Fruit Lotus', image: '/cuticle-oil-dragon-fruit-lotus.webp' },
+                      { name: 'Watermelon', image: '/cuticle-oil-watermelon.webp' }
+                    ]
+                  })}
                   className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add to Cart
@@ -1449,15 +1476,13 @@ export const CheckoutPage: React.FC = () => {
                 </div>
                 
                 <button
-                  onClick={() => {
-                    cartStore.addItem({
-                      id: `item_${Date.now()}`,
-                      productId: 'top-coat',
-                      name: 'Top Coat',
-                      price: 190,
-                      image: '/top-coat-white.webp'
-                    });
-                  }}
+                  onClick={() => handleAddRecommendedProduct({
+                    id: 'top-coat',
+                    name: 'Top Coat',
+                    price: 190,
+                    image: '/top-coat-white.webp',
+                    variants: []
+                  })}
                   className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
                 >
                   Add to Cart
@@ -1469,6 +1494,30 @@ export const CheckoutPage: React.FC = () => {
       </main>
 
       <Footer />
+
+      {/* Product Variant Selection Modal for Recommended Products */}
+      <ProductVariantModal
+        isOpen={showVariantModal}
+        onClose={() => {
+          setShowVariantModal(false);
+          setSelectedProductForVariant(null);
+        }}
+        product={selectedProductForVariant ? {
+          id: selectedProductForVariant.id,
+          name: selectedProductForVariant.name,
+          slug: selectedProductForVariant.id,
+          price: selectedProductForVariant.price,
+          images: [selectedProductForVariant.image],
+          variants: selectedProductForVariant.variants || []
+        } : {
+          id: '',
+          name: '',
+          slug: '',
+          price: 0,
+          images: [],
+          variants: []
+        }}
+      />
     </div>
   );
 };
