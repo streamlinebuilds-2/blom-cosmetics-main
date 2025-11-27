@@ -182,15 +182,15 @@ export const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
     
-    // Check if this is a product with variants that need selection
-    const hasProductVariants = product.variants && product.variants.length > 0;
+    // Check if this is a product with MULTIPLE variants that need selection
+    const hasProductVariants = product.variants && product.variants.length > 1;
     
     if (hasProductVariants) {
-      // For products with variants, show variant selection modal
+      // For products with multiple variants, show variant selection modal
       setSelectedProductForModal(product);
       setShowVariantModal(true);
     } else {
-      // Regular product without variants - add directly to cart
+      // Products with 0 or 1 variant - add directly to cart
       cartStore.addItem({
         id: `item_${Date.now()}`,
         productId: product.slug,

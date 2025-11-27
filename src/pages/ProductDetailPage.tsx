@@ -1442,15 +1442,8 @@ export const ProductDetailPage: React.FC = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    // Check if product has variants - if so, show modal
-    const hasVariants = product.variants && product.variants.length > 0;
-    
-    if (hasVariants) {
-      setShowVariantModal(true);
-      return;
-    }
-
-    // If no variants, add directly to cart
+    // Always add directly to cart on product detail page - no popup needed
+    // Users already selected their variants on this page
     const currentVariant = product.variants?.find((v: any) =>
       typeof v === 'object' ? v.name === selectedVariant : v === selectedVariant
     );
