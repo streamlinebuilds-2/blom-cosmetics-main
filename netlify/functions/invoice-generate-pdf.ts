@@ -119,8 +119,8 @@ export const handler = async (event: any) => {
       
       if (isFreeShipping) {
         // Show FREE SHIPPING line item
-        text("FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
-        rightText("R 0.00", right, y, 10, false, rgb(0, 0.6, 0))
+        text("FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10)
+        rightText("R 0.00", right, y, 10)
       } else if (shippingAmount > 0) {
         // Show regular shipping cost
         text("Shipping & Handling", left, y, 10)
@@ -134,26 +134,21 @@ export const handler = async (event: any) => {
     // Add coupon discount as a line item if discount exists
     if (order.discount_cents > 0) {
       const discountAmount = order.discount_cents / 100
-      text("Coupon Discount", left, y, 10, false, rgb(0.8, 0.2, 0.2))
-      rightText("-" + money(discountAmount), right, y, 10, false, rgb(0.8, 0.2, 0.2))
+      text("Coupon Discount", left, y, 10)
+      rightText("-" + money(discountAmount), right, y, 10)
       y -= 20
     }
 
     line(y + 10)
     y -= 10
 
-    // Totals Block - Only show subtotal and total since other items are now line items
-    const subtotal = (order.subtotal_cents || 0) / 100
+    // Totals Block - Only show total since other items are now line items
     const total = (order.total_cents || 0) / 100
 
-    rightText("Subtotal:", right - 80, y, 10)
-    rightText(money(subtotal), right, y, 10)
-    y -= 20
-
-    y -= 5
-    line(y + 12)
-    rightText("Total:", right - 80, y, 12, true)
-    rightText(money(total), right, y, 12, true)
+    y -= 15
+    line(y + 20)
+    rightText("Total:", right - 80, y - 8, 12, true)
+    rightText(money(total), right, y - 8, 12, true)
 
     // 3. Save & Upload
     const pdfBytes = await pdf.save()
