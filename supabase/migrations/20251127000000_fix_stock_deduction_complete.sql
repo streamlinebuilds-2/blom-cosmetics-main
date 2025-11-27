@@ -7,7 +7,7 @@ CREATE TABLE public.stock_movements (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   variant_id uuid REFERENCES public.product_variants(id) ON DELETE SET NULL,
-  order_id uuid REFERENCES public.orders(id) ON DELETE CASCADE,
+  order_id text REFERENCES public.orders(id) ON DELETE CASCADE,
   order_item_id uuid REFERENCES public.order_items(id) ON DELETE CASCADE,
   delta integer NOT NULL, -- Positive for stock increase, negative for decrease
   reason text NOT NULL, -- 'sale', 'restock', 'adjustment', etc.

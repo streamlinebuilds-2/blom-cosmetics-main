@@ -33,7 +33,7 @@ CREATE TABLE public.stock_movements (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id uuid NOT NULL REFERENCES public.products(id),
   variant_id uuid REFERENCES public.product_variants(id),
-  order_id uuid REFERENCES public.orders(id),
+  order_id text REFERENCES public.orders(id),  -- FIXED: Changed from uuid to text to match existing orders.id type
   order_item_id uuid REFERENCES public.order_items(id),
   delta integer NOT NULL, -- Positive for increases, negative for decreases
   reason text NOT NULL, -- 'sale', 'restock', 'adjustment'
