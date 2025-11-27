@@ -10,7 +10,6 @@ import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../hooks/useAuth';
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -59,6 +58,7 @@ export const CheckoutPage: React.FC = () => {
   const [discount, setDiscount] = useState(0);
   const [couponError, setCouponError] = useState('');
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponDetails, setCouponDetails] = useState<any>(null);
 
   // Validation errors
   const [validationErrors, setValidationErrors] = useState<{
@@ -87,6 +87,13 @@ export const CheckoutPage: React.FC = () => {
     const unsubscribe = cartStore.subscribe(setCartState);
     return unsubscribe;
   }, []);
+
+  // Dynamically recalculate coupon discount when cart changes
+  useEffect(() => {
+    if (appliedCoupon && couponDetails) {
+      recalculateCouponDiscount();
+    }
+  }, [cartState.subtotal, appliedCoupon, couponDetails]);
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -322,6 +329,7 @@ export const CheckoutPage: React.FC = () => {
         setCouponError(result.message || 'Invalid coupon code');
         setDiscount(0);
         setAppliedCoupon(null);
+        setCouponDetails(null);
       } else {
         // Convert discount_cents to rands
         const discountAmount = result.discount_cents / 100;
@@ -330,6 +338,8 @@ export const CheckoutPage: React.FC = () => {
           id: couponCode.trim().toUpperCase(), // Store code as ID for now
           code: couponCode.trim().toUpperCase() 
         });
+        // Store full coupon details for dynamic recalculation
+        setCouponDetails(result);
         setCouponError('');
       }
 
@@ -346,6 +356,57 @@ export const CheckoutPage: React.FC = () => {
     setAppliedCoupon(null);
     setCouponCode('');
     setCouponError('');
+    setCouponDetails(null);
+  };
+
+  const recalculateCouponDiscount = async () => {
+    if (!appliedCoupon || !couponDetails) return;
+
+    try {
+      // Calculate product subtotal in cents (excluding shipping)
+      const productSubtotal = Math.round(cartState.subtotal * 100);
+      
+      // Check minimum order requirement if it exists
+      const minOrderCents = couponDetails.min_order_cents || couponDetails.min_order_total || 0;
+      if (minOrderCents > 0 && productSubtotal < minOrderCents) {
+        // Minimum order not met, remove coupon
+        setCouponError(`Order must be over R${(minOrderCents / 100).toFixed(0)} to use this coupon`);
+        handleRemoveCoupon();
+        return;
+      }
+
+      // Recalculate discount based on current subtotal
+      let newDiscountCents = 0;
+      
+      if (couponDetails.type === 'fixed' || couponDetails.discount_type === 'fixed') {
+        // Fixed amount discount
+        newDiscountCents = Math.round(Number(couponDetails.value || couponDetails.amount) * 100);
+      } else if (couponDetails.type === 'percent' || couponDetails.percent_off || couponDetails.discount_type === 'percent') {
+        // Percentage discount
+        const percent = Number(couponDetails.value || couponDetails.percent_off || 0);
+        newDiscountCents = Math.round(productSubtotal * (percent / 100));
+        
+        // Apply max discount cap if exists
+        const maxDiscountCents = couponDetails.max_discount_cents || 0;
+        if (maxDiscountCents > 0 && newDiscountCents > maxDiscountCents) {
+          newDiscountCents = maxDiscountCents;
+        }
+      }
+
+      // Safety: Discount cannot exceed the product subtotal
+      if (newDiscountCents > productSubtotal) {
+        newDiscountCents = productSubtotal;
+      }
+
+      setDiscount(newDiscountCents / 100);
+      setCouponError('');
+
+    } catch (error) {
+      console.error('Error recalculating coupon discount:', error);
+      // Remove coupon on error to prevent incorrect discounts
+      handleRemoveCoupon();
+      setCouponError('Failed to recalculate coupon. Please reapply coupon.');
+    }
   };
 
   const handlePlaceOrder = async () => {
