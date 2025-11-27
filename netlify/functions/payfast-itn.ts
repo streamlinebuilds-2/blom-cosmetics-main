@@ -150,6 +150,21 @@ export const handler: Handler = async (event) => {
 
       console.log('Order marked as paid:', order.id)
 
+      // 3c) Send new order alert webhook (non-blocking)
+      ;(async () => {
+        try {
+          const webhookUrl = `${SITE}/.netlify/functions/new-order-alert`
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ order_id: order.id })
+          })
+          console.log('New order alert sent')
+        } catch (e: any) {
+          console.warn('New order alert failed:', e?.message)
+        }
+      })()
+
       // 3a) Get the order to check if a coupon was used
       const orderDataRes = await fetch(
         `${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}&select=coupon_code`,
