@@ -214,31 +214,49 @@ export const handler = async (event: any) => {
       }
     })
 
+    // Add shipping as a line item if shipping cost exists
+    if (order.shipping_cents && order.shipping_cents > 0) {
+      const shippingAmount = order.shipping_cents / 100
+      const freeShippingThreshold = 2000 // R2000 threshold for free shipping
+      
+      // Check if this qualifies for free shipping (order subtotal >= R2000)
+      const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : 0
+      const isFreeShipping = subtotalAmount >= freeShippingThreshold && shippingAmount === 0
+      const wasShippingFree = order.discount_cents > 0 && (order.subtotal_cents + order.discount_cents) / 100 >= freeShippingThreshold
+      
+      if (isFreeShipping) {
+        // Show FREE SHIPPING line item
+        drawText("🚚 FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
+        drawRightText("R 0.00", right - 20, y, 10, false, rgb(0, 0.6, 0))
+      } else if (shippingAmount > 0) {
+        // Show regular shipping cost
+        drawText("🚚 Shipping & Handling", left, y, 10)
+        drawRightText("1", right - 150, y, 10)
+        drawRightText(money(shippingAmount), right - 90, y, 10)
+        drawRightText(money(shippingAmount), right - 20, y, 10)
+      }
+      y -= 16
+    }
+
+    // Add coupon discount as a line item if discount exists
+    if (order.discount_cents > 0) {
+      const discountAmount = order.discount_cents / 100
+      drawText("🎫 Coupon Discount", left, y, 10, false, rgb(0.8, 0.2, 0.2))
+      drawRightText("-" + money(discountAmount), right - 20, y, 10, false, rgb(0.8, 0.2, 0.2))
+      y -= 16
+    }
+
     y -= 8
     drawLine(left, y, right, y)
     y -= 18
 
-    // --- NEW BREAKDOWN LOGIC ---
+    // --- TOTALS BREAKDOWN ---
 
-    // Subtotal
+    // Subtotal (only show if it exists)
     if (order.subtotal_cents) {
       drawRightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
       drawRightText(money(order.subtotal_cents / 100), right - 20, y, 10)
-      y -= 14
-    }
-
-    // Discount
-    if (order.discount_cents > 0) {
-      drawRightText("Discount", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
-      drawRightText("-" + money(order.discount_cents / 100), right - 20, y, 10, false, rgb(0.8, 0.2, 0.2)) // Red color
-      y -= 14
-    }
-
-    // Shipping
-    if (order.shipping_cents !== undefined) {
-       drawRightText("Shipping", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
-       drawRightText(money(order.shipping_cents / 100), right - 20, y, 10)
-       y -= 16
+      y -= 16
     }
 
     // Total row (More prominent)

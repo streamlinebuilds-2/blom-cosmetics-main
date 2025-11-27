@@ -108,30 +108,47 @@ export const handler = async (event: any) => {
       y -= 20
     }
 
+    // Add shipping as a line item if shipping cost exists
+    if (order.shipping_cents && order.shipping_cents > 0) {
+      const shippingAmount = order.shipping_cents / 100
+      const freeShippingThreshold = 2000 // R2000 threshold for free shipping
+      
+      // Check if this qualifies for free shipping (order subtotal >= R2000)
+      const subtotalAmount = (order.subtotal_cents || 0) / 100
+      const isFreeShipping = subtotalAmount >= freeShippingThreshold && shippingAmount === 0
+      
+      if (isFreeShipping) {
+        // Show FREE SHIPPING line item
+        text("🚚 FREE SHIPPING - Order over R" + freeShippingThreshold.toFixed(0), left, y, 10, false, rgb(0, 0.6, 0))
+        rightText("R 0.00", right, y, 10, false, rgb(0, 0.6, 0))
+      } else if (shippingAmount > 0) {
+        // Show regular shipping cost
+        text("🚚 Shipping & Handling", left, y, 10)
+        rightText("1", right - 150, y, 10)
+        rightText(money(shippingAmount), right - 80, y, 10)
+        rightText(money(shippingAmount), right, y, 10)
+      }
+      y -= 20
+    }
+
+    // Add coupon discount as a line item if discount exists
+    if (order.discount_cents > 0) {
+      const discountAmount = order.discount_cents / 100
+      text("🎫 Coupon Discount", left, y, 10, false, rgb(0.8, 0.2, 0.2))
+      rightText("-" + money(discountAmount), right, y, 10, false, rgb(0.8, 0.2, 0.2))
+      y -= 20
+    }
+
     line(y + 10)
     y -= 10
 
-    // Totals Block
+    // Totals Block - Only show subtotal and total since other items are now line items
     const subtotal = (order.subtotal_cents || 0) / 100
-    const shipping = (order.shipping_cents || 0) / 100
-    const discount = (order.discount_cents || 0) / 100
     const total = (order.total_cents || 0) / 100
 
     rightText("Subtotal:", right - 80, y, 10)
     rightText(money(subtotal), right, y, 10)
-    y -= 15
-
-    if (shipping > 0) {
-      rightText("Shipping:", right - 80, y, 10)
-      rightText(money(shipping), right, y, 10)
-      y -= 15
-    }
-
-    if (discount > 0) {
-      rightText("Discount:", right - 80, y, 10)
-      rightText("-" + money(discount), right, y, 10)
-      y -= 15
-    }
+    y -= 20
 
     y -= 5
     line(y + 12)
