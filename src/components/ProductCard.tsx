@@ -5,6 +5,7 @@ import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
 import { analytics } from '../lib/analytics';
 import { BundleVariantModal } from './bundle/BundleVariantModal';
+import { ProductVariantModal } from './product/ProductVariantModal';
 
 interface ProductCardProps {
   id: string;
@@ -25,6 +26,12 @@ interface ProductCardProps {
   premium?: boolean;
   showQuickAdd?: boolean;
   includedProducts?: any[];
+  variants?: Array<{
+    name: string;
+    price?: number;
+    inStock?: boolean;
+    image?: string;
+  }>;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -46,7 +53,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   premium = false,
   showQuickAdd = true,
   // Add support for bundles
-  includedProducts = []
+  includedProducts = [],
+  // Add support for product variants
+  variants = []
 }) => {
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
@@ -54,6 +63,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [isMobile, setIsMobile] = React.useState(false);
   const [hasViewed, setHasViewed] = React.useState(false);
   const [showBundleModal, setShowBundleModal] = React.useState(false);
+  const [showProductVariantModal, setShowProductVariantModal] = React.useState(false);
 
   // Track product views when card comes into view
   useEffect(() => {
@@ -126,8 +136,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     const hasBundleWithVariants = includedProducts && includedProducts.length > 0 && 
       includedProducts.some((product: any) => product.variants && product.variants.length > 0);
     
+    // Check if this is a product with variants that need selection
+    const hasProductVariants = variants && variants.length > 0;
+    
     if (hasBundleWithVariants) {
       setShowBundleModal(true);
+    } else if (hasProductVariants) {
+      setShowProductVariantModal(true);
     } else {
       // Regular product or bundle without variants
       cartStore.addItem({
@@ -379,19 +394,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         )}
       </div>
 
-      {/* Content */}
-      <div className="p-4 sm:p-4 md:p-6">
+      {/* Content - Flex layout to ensure consistent height */}
+      <div className="p-4 sm:p-4 md:p-6 flex flex-col h-full">
         {/* Product Name */}
         <h3 className="font-bold text-base sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem] text-center">
           {name}
         </h3>
 
-        {/* Short Description */}
-        {shortDescription && (
-          <p className="text-gray-600 text-sm sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed text-center">
-            {shortDescription}
+        {/* Short Description - Always present with consistent spacing */}
+        <div className="flex-1 flex flex-col justify-center mb-3 sm:mb-3 md:mb-4">
+          <p className="text-gray-600 text-sm sm:text-sm line-clamp-2 leading-relaxed text-center">
+            {shortDescription || 'Professional quality nail care product'}
           </p>
-        )}
+        </div>
 
         {/* Price - Centered */}
         <div className="text-center mb-4 sm:mb-4 md:mb-5">
@@ -414,8 +429,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
 
-        {/* Add to Cart Button - Centered with Fixed Height */}
-        <div className="flex items-center justify-center">
+        {/* Add to Cart Button - Always at bottom with consistent height */}
+        <div className="flex items-end justify-center flex-shrink-0">
           <button
             type="button"
             onClick={handleAddToCart}
@@ -447,6 +462,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           compareAtPrice,
           images,
           includedProducts
+        }}
+      />
+
+      {/* Product Variant Selection Modal */}
+      <ProductVariantModal
+        isOpen={showProductVariantModal}
+        onClose={() => setShowProductVariantModal(false)}
+        product={{
+          id,
+          name,
+          slug,
+          price,
+          images,
+          variants
         }}
       />
 

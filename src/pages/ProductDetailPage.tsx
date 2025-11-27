@@ -17,6 +17,7 @@ import { ReviewForm } from '../components/reviews/ReviewForm';
 import { ApprovedReviews } from '../components/product-page/ApprovedReviews';
 import { loadDiscounts, computeFinalPrice, formatDiscountBadge, getDiscountBadgeColor, type Discount, type ProductItem } from '../utils/discounts';
 import { supabase } from '../lib/supabase';
+import { ProductVariantModal } from '../components/product/ProductVariantModal';
 import { 
   Heart, 
   Share2, 
@@ -52,6 +53,7 @@ export const ProductDetailPage: React.FC = () => {
   const [thumbnailScrollIndex, setThumbnailScrollIndex] = useState(0);
   const [allImages, setAllImages] = useState<string[]>([]);
   const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [showVariantModal, setShowVariantModal] = useState(false);
 
   // Static product database - Keep existing products working
   const productDatabase = {
@@ -1440,7 +1442,16 @@ export const ProductDetailPage: React.FC = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    const currentVariant = product.variants.find((v: any) =>
+    // Check if product has variants - if so, show modal
+    const hasVariants = product.variants && product.variants.length > 0;
+    
+    if (hasVariants) {
+      setShowVariantModal(true);
+      return;
+    }
+
+    // If no variants, add directly to cart
+    const currentVariant = product.variants?.find((v: any) =>
       typeof v === 'object' ? v.name === selectedVariant : v === selectedVariant
     );
     const variantPrice = typeof currentVariant === 'object' && currentVariant?.price ? currentVariant.price : product.price;
@@ -1460,6 +1471,17 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = () => {
+    if (!product) return;
+
+    // Check if product has variants - if so, show modal
+    const hasVariants = product.variants && product.variants.length > 0;
+    
+    if (hasVariants) {
+      setShowVariantModal(true);
+      return;
+    }
+
+    // If no variants, add directly to cart and proceed to checkout
     handleAddToCart();
     window.location.href = '/checkout';
   };
@@ -2337,6 +2359,21 @@ export const ProductDetailPage: React.FC = () => {
           onQuantityChange={setQuantity}
           onAddToCart={handleAddToCart}
           isVisible={true}
+        />
+
+        {/* Product Variant Selection Modal */}
+        <ProductVariantModal
+          isOpen={showVariantModal}
+          onClose={() => setShowVariantModal(false)}
+          product={{
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: product.price,
+            images: product.images,
+            variants: product.variants || []
+          }}
+          initialQuantity={quantity}
         />
       </main>
 
