@@ -301,9 +301,6 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
-    // REMOVED: The hardcoded R500 check.
-    // We now let the backend decide if the order value is high enough for this specific coupon.
-
     setIsApplyingCoupon(true);
     setCouponError('');
 
@@ -320,7 +317,14 @@ export const CheckoutPage: React.FC = () => {
         return;
       }
 
-      // Call RPC directly
+      console.log('🔍 Applying coupon:', {
+        code: couponCode.trim().toUpperCase(),
+        email: shippingInfo.email,
+        subtotal_cents: productSubtotal,
+        cart_items_count: cartState.items.length
+      });
+
+      // Call the new redeem_coupon RPC with cart items
       const res = await fetch(`${supabaseUrl}/rest/v1/rpc/redeem_coupon`, {
         method: 'POST',
         headers: {
@@ -331,13 +335,18 @@ export const CheckoutPage: React.FC = () => {
         body: JSON.stringify({
           p_code: couponCode.trim().toUpperCase(),
           p_email: shippingInfo.email || '',
-          p_order_total_cents: productSubtotal, // EXCLUDE shipping
+          p_order_total_cents: productSubtotal,
+          p_cart_items: JSON.stringify(cartState.items.map(item => ({
+            product_id: String(item.productId || item.id || ''),
+            quantity: Number(item.quantity || 1),
+            unit_price_cents: Math.round(Number(item.price || 0) * 100)
+          })))
         }),
       });
 
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('Coupon RPC error:', errorText);
+        console.error('❌ Coupon RPC error:', errorText);
         setCouponError('Failed to validate coupon. Please try again.');
         return;
       }
@@ -348,16 +357,24 @@ export const CheckoutPage: React.FC = () => {
       const result = Array.isArray(data) ? data[0] : data;
       
       if (!result.valid) {
+        console.log('❌ Coupon validation failed:', result.message);
         setCouponError(result.message || 'Invalid coupon code');
         setDiscount(0);
         setAppliedCoupon(null);
         setCouponDetails(null);
       } else {
-        // Convert discount_cents to rands
+        // Success - convert discount_cents to rands
         const discountAmount = result.discount_cents / 100;
+        console.log('✅ Coupon applied successfully:', {
+          discount: discountAmount,
+          type: result.discount_type,
+          value: result.discount_value,
+          message: result.message
+        });
+        
         setDiscount(discountAmount);
         setAppliedCoupon({ 
-          id: couponCode.trim().toUpperCase(), // Store code as ID for now
+          id: result.coupon_id || couponCode.trim().toUpperCase(),
           code: couponCode.trim().toUpperCase() 
         });
         // Store full coupon details for dynamic recalculation
@@ -366,7 +383,7 @@ export const CheckoutPage: React.FC = () => {
       }
 
     } catch (error) {
-      console.error('Coupon application error:', error);
+      console.error('❌ Coupon application error:', error);
       setCouponError('Failed to apply coupon. Please try again.');
     } finally {
       setIsApplyingCoupon(false);

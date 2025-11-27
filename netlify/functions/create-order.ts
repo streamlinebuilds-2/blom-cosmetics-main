@@ -95,10 +95,25 @@ export const handler: Handler = async (event) => {
       subtotal_cents = items.reduce((sum: number, it: any) => sum + Math.round(Number(it.unit_price) * 100) * Number(it.quantity || 1), 0)
     }
 
-    // --- 3. Apply Coupon (RPC) ---
+    // --- 3. Apply Coupon (RPC) with Cart Item Validation ---
     let discount_cents = 0
+    let applied_coupon_id: string | null = null
     if (coupon?.code) {
       try {
+        // Convert cart items to the expected format for coupon validation
+        const cartItemsForValidation = items.map((item: any) => ({
+          product_id: String(item.product_id || ''),
+          quantity: Number(item.quantity || 1),
+          unit_price_cents: Math.round(Number(item.unit_price || 0) * 100)
+        }))
+
+        console.log('🔍 Validating coupon with items:', JSON.stringify({
+          code: coupon.code,
+          email: buyer.email,
+          subtotal_cents: subtotal_cents,
+          cart_items: cartItemsForValidation
+        }, null, 2))
+
         const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
           method: 'POST',
           headers: {
@@ -109,19 +124,73 @@ export const handler: Handler = async (event) => {
           body: JSON.stringify({
             p_code: String(coupon.code).toUpperCase(),
             p_email: buyer.email || '',
-            p_order_total_cents: subtotal_cents
+            p_order_total_cents: subtotal_cents,
+            p_cart_items: JSON.stringify(cartItemsForValidation)
           })
         })
 
         if (rpcRes.ok) {
           const rpcData = await rpcRes.json()
           const row = Array.isArray(rpcData) ? rpcData[0] : rpcData
+          console.log('✅ Coupon validation result:', JSON.stringify(row, null, 2))
+          
           if (row?.valid) {
             discount_cents = Number(row.discount_cents) || 0
+            applied_coupon_id = row.coupon_id || null
+            
+            // Mark coupon as used immediately after successful validation
+            if (applied_coupon_id) {
+              try {
+                await fetch(`${SUPABASE_URL}/rest/v1/rpc/mark_coupon_used`, {
+                  method: 'POST',
+                  headers: {
+                    apikey: SERVICE_KEY,
+                    Authorization: `Bearer ${SERVICE_KEY}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    p_code: String(coupon.code).toUpperCase()
+                  })
+                })
+                console.log('✅ Coupon marked as used:', coupon.code)
+              } catch (markError) {
+                console.error('⚠️ Failed to mark coupon as used:', markError)
+                // Don't fail the order if marking fails - just log it
+              }
+            }
+          } else {
+            console.log('❌ Coupon validation failed:', row?.message || 'Unknown error')
+            return {
+              statusCode: 400,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                error: 'COUPON_INVALID',
+                message: row?.message || 'Invalid coupon code'
+              })
+            }
+          }
+        } else {
+          const errorText = await rpcRes.text()
+          console.error('❌ Coupon RPC error:', rpcRes.status, errorText)
+          return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              error: 'COUPON_VALIDATION_ERROR',
+              message: 'Unable to validate coupon at this time'
+            })
           }
         }
       } catch (e) {
-        console.error('Coupon validation failed:', e)
+        console.error('❌ Coupon validation exception:', e)
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: 'COUPON_ERROR',
+            message: 'Coupon validation failed'
+          })
+        }
       }
     }
 
@@ -132,7 +201,7 @@ export const handler: Handler = async (event) => {
 
     // --- 4. Construct Delivery Address (Robust Mapping) ---
 
-    let deliveryAddressJson = null
+    let deliveryAddressJson: any = null
     // Only process address if method is explicitly delivery
     if (fulfillment.method === 'delivery') {
       const rawAddr = fulfillment.delivery_address || {}

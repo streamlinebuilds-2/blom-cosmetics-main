@@ -6,14 +6,14 @@ export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
+      body: JSON.stringify({ ok: false, error: 'Method not allowed' })
     };
   }
 
   try {
-    const { code, cart } = JSON.parse(event.body || '{}');
+    const { code, cart, email } = JSON.parse(event.body || '{}');
 
-    if (!code || !cart) {
+    if (!code) {
       return {
         statusCode: 400,
         body: JSON.stringify({ ok: false, error: 'Coupon code is required' })
@@ -33,97 +33,65 @@ export const handler: Handler = async (event) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Fetch Coupon Data
-    const { data: coupon, error: queryError } = await supabase
-      .from('coupons')
-      .select('*')
-      .eq('code', code.toUpperCase())
-      .eq('is_active', true)
-      .single();
+    // Convert cart items to the format expected by the new redeem_coupon function
+    let cartItemsForValidation: Array<{product_id: string, quantity: number, unit_price_cents: number}> = [];
+    let productSubtotalCents = 0;
 
-    if (queryError || !coupon) {
+    if (Array.isArray(cart) && cart.length > 0) {
+      cartItemsForValidation = cart.map((item: any) => {
+        const unitPriceCents = Math.round(Number(item.price || 0) * 100);
+        const quantity = Number(item.quantity || 1);
+        const lineTotalCents = unitPriceCents * quantity;
+        productSubtotalCents += lineTotalCents;
+
+        return {
+          product_id: String(item.product_id || item.id || ''),
+          quantity: quantity,
+          unit_price_cents: unitPriceCents
+        };
+      });
+    }
+
+    // Use redeem_coupon RPC function with cart items
+    console.log('🔍 Validating coupon:', {
+      code: code.toUpperCase(),
+      email: email || '',
+      subtotal_cents: productSubtotalCents,
+      cart_items: cartItemsForValidation
+    });
+
+    const { data: couponResult, error } = await supabase.rpc('redeem_coupon', {
+      p_code: code.toUpperCase(),
+      p_email: email || '',
+      p_order_total_cents: productSubtotalCents,
+      p_cart_items: JSON.stringify(cartItemsForValidation)
+    });
+
+    if (error) {
+      console.error('❌ Coupon RPC error:', error);
       return {
         statusCode: 400,
-        body: JSON.stringify({ ok: false, reason: 'Invalid or inactive coupon code' })
+        body: JSON.stringify({ ok: false, error: 'Coupon validation failed' })
       };
     }
 
-    // 2. Validate Dates & Limits
-    const now = new Date();
-    if (coupon.valid_until && new Date(coupon.valid_until) < now) {
-      return { statusCode: 400, body: JSON.stringify({ ok: false, reason: 'Coupon has expired' }) };
-    }
-    if (coupon.valid_from && new Date(coupon.valid_from) > now) {
-      return { statusCode: 400, body: JSON.stringify({ ok: false, reason: 'Coupon is not yet valid' }) };
-    }
-    if (coupon.max_uses > 0 && coupon.used_count >= coupon.max_uses) {
-      return { statusCode: 400, body: JSON.stringify({ ok: false, reason: 'Coupon usage limit exceeded' }) };
-    }
+    // The RPC returns an array with one row
+    const result = Array.isArray(couponResult) ? couponResult[0] : couponResult;
 
-    // 3. Calculate Totals (Handling Excluded Products)
-    let cartTotalRands = 0;
-    let eligibleTotalRands = 0;
-
-    // Normalize excluded IDs to a set of strings for easy lookup
-    const excludedIds = new Set((coupon.excluded_product_ids || []).map((id: any) => String(id)));
-
-    cart.forEach((item: any) => {
-      const itemPrice = Number(item.price); // Price in Rands (e.g., 140)
-      const itemQty = Number(item.quantity);
-      const lineTotal = itemPrice * itemQty;
-
-      cartTotalRands += lineTotal;
-
-      // Check if item is excluded (check both 'id' and 'product_id' to be safe)
-      const itemId = String(item.id || '');
-      const prodId = String(item.product_id || ''); // If cart uses product_id
-
-      if (!excludedIds.has(itemId) && !excludedIds.has(prodId)) {
-        eligibleTotalRands += lineTotal;
-      }
-    });
-
-    // 4. Check Minimum Order (Convert Rands to Cents for comparison)
-    // DB stores min_order in CENTS (e.g., 50000 for R500)
-    const eligibleTotalCents = Math.round(eligibleTotalRands * 100);
-    const minOrderCents = coupon.min_order_cents || coupon.min_order_total || 0; // Check both column names
-
-    if (minOrderCents > 0 && eligibleTotalCents < minOrderCents) {
+    if (!result || !result.valid) {
       return {
         statusCode: 400,
-        body: JSON.stringify({
-          ok: false,
-          reason: `Order must be over R${(minOrderCents / 100).toFixed(0)} (excluding restricted items)`
+        body: JSON.stringify({ 
+          ok: false, 
+          error: result?.message || 'Invalid coupon code',
+          code: code.toUpperCase()
         })
       };
     }
 
-    // 5. Calculate Discount (In Cents)
-    let discountCents = 0;
+    // Success - return coupon details
+    const discountRands = Number(result.discount_cents) / 100;
 
-    if (coupon.type === 'fixed') {
-      // Fixed amount: coupon.value is likely in Rands (e.g. 50)
-      // We convert it to cents
-      discountCents = Math.round(Number(coupon.value) * 100);
-    }
-    else if (coupon.type === 'percent' || coupon.percent_off) {
-      // Percentage: coupon.value is e.g. 10 for 10%
-      const percent = Number(coupon.value || coupon.percent_off || 0);
-      discountCents = Math.round(eligibleTotalCents * (percent / 100));
-
-      // Apply Max Discount Cap (if exists)
-      const maxDiscountCents = coupon.max_discount_cents || 0;
-      if (maxDiscountCents > 0 && discountCents > maxDiscountCents) {
-        discountCents = maxDiscountCents;
-      }
-    }
-
-    // Safety: Discount cannot exceed the eligible total
-    if (discountCents > eligibleTotalCents) {
-      discountCents = eligibleTotalCents;
-    }
-
-    // 6. Return Success
     return {
       statusCode: 200,
       headers: {
@@ -132,15 +100,17 @@ export const handler: Handler = async (event) => {
       },
       body: JSON.stringify({
         ok: true,
-        coupon_id: coupon.id,
-        code: coupon.code,
-        // Frontend expects discount in Rands
-        discount: discountCents / 100,
-        // Also send cents just in case
-        discount_cents: discountCents,
-        reason: 'Coupon applied successfully'
+        coupon_id: result.coupon_id,
+        code: code.toUpperCase(),
+        discount: discountRands,
+        discount_cents: result.discount_cents,
+        discount_type: result.discount_type,
+        discount_value: result.discount_value,
+        message: result.message,
+        min_order_cents: result.min_order_cents
       })
     };
+
   } catch (error: any) {
     console.error('Apply coupon error:', error);
     return {
