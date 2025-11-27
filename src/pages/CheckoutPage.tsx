@@ -557,6 +557,7 @@ export const CheckoutPage: React.FC = () => {
       // Step 2: Redirect to PayFast with minimal payload
       // All customer/delivery data already saved to Supabase via create-order above
       const pfRequestBody = {
+        order_id: orderData.order_id, // Pass the actual order ID for proper redirect
         m_payment_id: orderData.merchant_payment_id,
         amount: (totalCents / 100).toFixed(2),
         item_name: `BLOM Order ${orderData.merchant_payment_id}`

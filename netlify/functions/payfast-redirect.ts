@@ -6,7 +6,6 @@ import crypto from 'crypto';
 // Always use live endpoint
 const PF_BASE = 'https://www.payfast.co.za';
 const SITE_BASE_URL = process.env.SITE_BASE_URL || process.env.URL || '';
-const RETURN_URL = `${SITE_BASE_URL}/checkout/status`;
 const CANCEL_URL = `${SITE_BASE_URL}/checkout/cancel`;
 const NOTIFY_URL = process.env.PAYFAST_NOTIFY_URL || '';
 
@@ -138,6 +137,10 @@ export const handler: Handler = async (event) => {
 
     // 2) Build PayFast redirect with CORRECT signature order
     // CRITICAL: PayFast validates signature in THIS EXACT ORDER
+    // Use order_id from payload if available, otherwise use m_payment_id
+    const orderId = payload.order_id || m_payment_id;
+    const RETURN_URL = `${SITE_BASE_URL}/checkout/status?order=${orderId}`;
+    
     const fields: Record<string, string> = {
       merchant_id: process.env.PAYFAST_MERCHANT_ID || '',
       merchant_key: process.env.PAYFAST_MERCHANT_KEY || '',
