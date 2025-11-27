@@ -90,10 +90,10 @@ export const CheckoutPage: React.FC = () => {
 
   // Dynamically recalculate coupon discount when cart changes
   useEffect(() => {
-    if (appliedCoupon && couponDetails) {
+    if (appliedCoupon && couponDetails && cartState.subtotal > 0) {
       recalculateCouponDiscount();
     }
-  }, [cartState.subtotal, appliedCoupon, couponDetails]);
+  }, [cartState.subtotal]); // Only depend on cartState.subtotal to prevent infinite loops
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -363,49 +363,74 @@ export const CheckoutPage: React.FC = () => {
     if (!appliedCoupon || !couponDetails) return;
 
     try {
+      console.log('🔄 Recalculating coupon discount...', { 
+        couponCode: appliedCoupon.code, 
+        originalDiscount: couponDetails.discount_cents,
+        cartSubtotal: cartState.subtotal,
+        couponType: couponDetails.type,
+        couponPercent: couponDetails.percent_off
+      });
+
       // Calculate product subtotal in cents (excluding shipping)
       const productSubtotal = Math.round(cartState.subtotal * 100);
       
       // Check minimum order requirement if it exists
       const minOrderCents = couponDetails.min_order_cents || couponDetails.min_order_total || 0;
       if (minOrderCents > 0 && productSubtotal < minOrderCents) {
+        console.log('❌ Minimum order not met, removing coupon');
         // Minimum order not met, remove coupon
         setCouponError(`Order must be over R${(minOrderCents / 100).toFixed(0)} to use this coupon`);
         handleRemoveCoupon();
         return;
       }
 
-      // Recalculate discount based on current subtotal
-      let newDiscountCents = 0;
-      
-      if (couponDetails.type === 'fixed' || couponDetails.discount_type === 'fixed') {
-        // Fixed amount discount
-        newDiscountCents = Math.round(Number(couponDetails.value || couponDetails.amount) * 100);
-      } else if (couponDetails.type === 'percent' || couponDetails.percent_off || couponDetails.discount_type === 'percent') {
-        // Percentage discount
-        const percent = Number(couponDetails.value || couponDetails.percent_off || 0);
-        newDiscountCents = Math.round(productSubtotal * (percent / 100));
-        
-        // Apply max discount cap if exists
-        const maxDiscountCents = couponDetails.max_discount_cents || 0;
-        if (maxDiscountCents > 0 && newDiscountCents > maxDiscountCents) {
-          newDiscountCents = maxDiscountCents;
+      // For fixed amount coupons, always keep the original discount
+      if (couponDetails.type === 'fixed') {
+        const originalDiscount = Number(couponDetails.discount_cents || 0);
+        const finalDiscount = originalDiscount / 100;
+        console.log('✅ Fixed coupon - keeping original discount:', finalDiscount, 'Rands');
+        setDiscount(finalDiscount);
+        setCouponError('');
+        return;
+      }
+
+      // For percentage coupons, recalculate based on current subtotal
+      if (couponDetails.percent_off || couponDetails.type === 'percent') {
+        const percent = Number(couponDetails.percent_off || 0);
+        if (percent > 0) {
+          let newDiscountCents = Math.round(productSubtotal * (percent / 100));
+          
+          // Apply max discount cap if exists
+          const maxDiscountCents = couponDetails.max_discount_cents || 0;
+          if (maxDiscountCents > 0 && newDiscountCents > maxDiscountCents) {
+            newDiscountCents = maxDiscountCents;
+          }
+
+          // Safety: Discount cannot exceed the product subtotal
+          if (newDiscountCents > productSubtotal) {
+            newDiscountCents = productSubtotal;
+          }
+
+          const finalDiscount = Math.max(0, newDiscountCents / 100);
+          console.log('✅ Percentage coupon recalculated:', finalDiscount, 'Rands');
+          setDiscount(finalDiscount);
+          setCouponError('');
+          return;
         }
       }
 
-      // Safety: Discount cannot exceed the product subtotal
-      if (newDiscountCents > productSubtotal) {
-        newDiscountCents = productSubtotal;
-      }
-
-      setDiscount(newDiscountCents / 100);
+      // Fallback: use original discount if we can't determine type
+      const originalDiscount = Number(couponDetails.discount_cents || 0);
+      const finalDiscount = originalDiscount / 100;
+      console.log('✅ Using original discount (fallback):', finalDiscount, 'Rands');
+      setDiscount(finalDiscount);
       setCouponError('');
 
     } catch (error) {
-      console.error('Error recalculating coupon discount:', error);
-      // Remove coupon on error to prevent incorrect discounts
-      handleRemoveCoupon();
-      setCouponError('Failed to recalculate coupon. Please reapply coupon.');
+      console.error('❌ Error recalculating coupon discount:', error);
+      // Don't remove coupon on calculation error, just log and maintain existing state
+      console.log('🔄 Keeping existing discount due to error');
+      setCouponError('Unable to recalculate discount. Current discount may be incorrect.');
     }
   };
 
