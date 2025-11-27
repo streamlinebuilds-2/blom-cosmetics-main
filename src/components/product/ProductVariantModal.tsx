@@ -95,15 +95,15 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       {/* Backdrop */}
       <div 
         className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 max-h-[90vh] overflow-hidden">
+      {/* Modal - Full height on mobile, auto height on desktop */}
+      <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] sm:max-h-[90vh] overflow-hidden sm:mx-4 sm:max-w-2xl md:max-w-lg flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-pink-400 to-blue-400 text-white p-6">
           <div className="flex items-center justify-between">
@@ -120,14 +120,14 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
+        {/* Content - Scrollable on mobile */}
+        <div className="flex-1 overflow-y-auto p-6">
           {/* Product Image */}
           <div className="mb-6">
             <img
               src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
               alt={product.name}
-              className="w-full h-48 object-cover rounded-lg"
+              className="w-full h-40 sm:h-48 object-cover rounded-lg"
             />
           </div>
 
@@ -136,7 +136,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Select Variant ({product.variants.length} available)
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {product.variants.map((variant) => (
                 <button
                   key={variant.name}
@@ -199,21 +199,21 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <div className="flex items-center justify-between">
               <span className="text-gray-700">Price per item:</span>
-              <span className="text-2xl font-bold text-gray-900">
+              <span className="text-xl sm:text-2xl font-bold text-gray-900">
                 R{getSelectedVariantPrice().toFixed(2)}
               </span>
             </div>
             <div className="flex items-center justify-between mt-2">
               <span className="text-gray-700">Total ({quantity} items):</span>
-              <span className="text-xl font-bold text-pink-600">
+              <span className="text-lg sm:text-xl font-bold text-pink-600">
                 R{(getSelectedVariantPrice() * quantity).toFixed(2)}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-gray-200 p-6 bg-gray-50">
+        {/* Footer - Sticky on mobile */}
+        <div className="border-t border-gray-200 p-6 bg-white sm:bg-gray-50">
           <div className="flex gap-3">
             <button
               onClick={onClose}

@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { cartStore } from '../../lib/cart';
 import { wishlistStore } from '../../lib/wishlist';
+import { ProductVariantModal } from '../product/ProductVariantModal';
 
 interface HomepageBestSellerCardProps {
   id: string;
@@ -13,6 +14,12 @@ interface HomepageBestSellerCardProps {
   image: string;
   inStock?: boolean;
   badges?: string[];
+  variants?: Array<{
+    name: string;
+    price?: number;
+    inStock?: boolean;
+    image?: string;
+  }>;
 }
 
 export const HomepageBestSellerCard: React.FC<HomepageBestSellerCardProps> = ({
@@ -24,9 +31,11 @@ export const HomepageBestSellerCard: React.FC<HomepageBestSellerCardProps> = ({
   shortDescription,
   image,
   inStock = true,
-  badges = []
+  badges = [],
+  variants = []
 }) => {
   const cardRef = useRef<HTMLElement>(null);
+  const [showVariantModal, setShowVariantModal] = useState(false);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -66,14 +75,22 @@ export const HomepageBestSellerCard: React.FC<HomepageBestSellerCardProps> = ({
     
     if (!inStock) return;
     
-    cartStore.addItem({
-      id: `item_${Date.now()}`,
-      productId: slug,
-      name,
-      price,
-      image
-    });
+    // Check if this is a product with variants that need selection
+    const hasProductVariants = variants && variants.length > 0;
     
+    if (hasProductVariants) {
+      // For products with variants, show variant selection modal
+      setShowVariantModal(true);
+    } else {
+      // Regular product without variants - add directly to cart
+      cartStore.addItem({
+        id: `item_${Date.now()}`,
+        productId: slug,
+        name,
+        price,
+        image
+      });
+    }
   };
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
@@ -174,6 +191,21 @@ export const HomepageBestSellerCard: React.FC<HomepageBestSellerCardProps> = ({
         </button>
       </div>
 
+      {/* Product Variant Selection Modal */}
+      {showVariantModal && (
+        <ProductVariantModal
+          isOpen={showVariantModal}
+          onClose={() => setShowVariantModal(false)}
+          product={{
+            id,
+            name,
+            slug,
+            price,
+            images: [image],
+            variants: variants || []
+          }}
+        />
+      )}
     </article>
   );
 };

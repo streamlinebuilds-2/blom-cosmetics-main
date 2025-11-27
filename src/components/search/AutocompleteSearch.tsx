@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, Star, ShoppingCart, Heart } from 'lucide-react';
 import { cartStore } from '../../lib/cart';
 import { wishlistStore } from '../../lib/wishlist';
+import { ProductVariantModal } from '../product/ProductVariantModal';
 
 interface Product {
   id: string;
@@ -15,6 +16,12 @@ interface Product {
   badges?: string[];
   category?: string;
   keywords?: string[]; // Alternative names and search terms
+  variants?: Array<{
+    name: string;
+    price?: number;
+    inStock?: boolean;
+    image?: string;
+  }>;
 }
 
 interface AutocompleteSearchProps {
@@ -43,6 +50,8 @@ export const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [isWishlisted, setIsWishlisted] = useState<{[key: string]: boolean}>({});
+  const [showVariantModal, setShowVariantModal] = useState(false);
+  const [selectedProductForModal, setSelectedProductForModal] = useState<Product | null>(null);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -172,13 +181,24 @@ export const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
 
   const handleAddToCart = (e: React.MouseEvent, product: Product) => {
     e.stopPropagation();
-    cartStore.addItem({
-      id: `item_${Date.now()}`,
-      productId: product.slug,
-      name: product.name,
-      price: product.price,
-      image: product.images[0] || ''
-    });
+    
+    // Check if this is a product with variants that need selection
+    const hasProductVariants = product.variants && product.variants.length > 0;
+    
+    if (hasProductVariants) {
+      // For products with variants, show variant selection modal
+      setSelectedProductForModal(product);
+      setShowVariantModal(true);
+    } else {
+      // Regular product without variants - add directly to cart
+      cartStore.addItem({
+        id: `item_${Date.now()}`,
+        productId: product.slug,
+        name: product.name,
+        price: product.price,
+        image: product.images[0] || ''
+      });
+    }
   };
 
   const handleWishlistToggle = (e: React.MouseEvent, product: Product) => {
@@ -371,6 +391,25 @@ export const AutocompleteSearch: React.FC<AutocompleteSearchProps> = ({
             </p>
           </div>
         </div>
+      )}
+
+      {/* Product Variant Selection Modal */}
+      {showVariantModal && selectedProductForModal && (
+        <ProductVariantModal
+          isOpen={showVariantModal}
+          onClose={() => {
+            setShowVariantModal(false);
+            setSelectedProductForModal(null);
+          }}
+          product={{
+            id: selectedProductForModal.id,
+            name: selectedProductForModal.name,
+            slug: selectedProductForModal.slug,
+            price: selectedProductForModal.price,
+            images: selectedProductForModal.images,
+            variants: selectedProductForModal.variants || []
+          }}
+        />
       )}
     </div>
   );

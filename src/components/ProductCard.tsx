@@ -3,6 +3,7 @@ import { Heart, ShoppingCart, ShoppingBag } from 'lucide-react';
 import { cartStore } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
+import { ProductVariantModal } from './product/ProductVariantModal';
 
 interface ProductCardProps {
   id: string;
@@ -52,6 +53,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const cardRef = React.useRef<HTMLElement | null>(null);
   const [isInView, setIsInView] = React.useState(false);
   const [isMobile, setIsMobile] = React.useState(false);
+  const [showVariantModal, setShowVariantModal] = React.useState(false);
 
   // Ensure we have safe data
   const safeName = name || 'Product Name';
@@ -141,8 +143,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     const hasProductVariants = variants && variants.length > 0;
     
     if (hasProductVariants) {
-      // For products with variants, redirect to product detail page to select variants
-      window.location.href = `/products/${slug}`;
+      // For products with variants, show variant selection modal
+      setShowVariantModal(true);
     } else {
       // Regular product without variants - add directly to cart
       cartStore.addItem({
@@ -362,6 +364,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             }
           }
         `}</style>
+
+        {/* Product Variant Selection Modal */}
+        {showVariantModal && (
+          <ProductVariantModal
+            isOpen={showVariantModal}
+            onClose={() => setShowVariantModal(false)}
+            product={{
+              id,
+              name: safeName,
+              slug,
+              price,
+              images: safeImages,
+              variants: variants || []
+            }}
+          />
+        )}
       </>
     );
   }
@@ -567,6 +585,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           }
         }
       `}</style>
+
+      {/* Product Variant Selection Modal */}
+      {showVariantModal && (
+        <ProductVariantModal
+          isOpen={showVariantModal}
+          onClose={() => setShowVariantModal(false)}
+          product={{
+            id,
+            name: safeName,
+            slug,
+            price,
+            images: safeImages,
+            variants: variants || []
+          }}
+        />
+      )}
     </>
   );
 };
