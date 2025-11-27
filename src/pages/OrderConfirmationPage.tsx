@@ -289,14 +289,14 @@ export const OrderConfirmationPage: React.FC = () => {
               <Card>
                 <CardContent className="flex flex-wrap gap-3 justify-center">
                   <a
-                    href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderData?.orderNumber || '')}`}
+                    href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderData?.orderNumber || '')}&v=${Date.now()}`}
                     target="_blank" rel="noopener"
                     className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     <Download className="h-4 w-4 mr-2" /> View Invoice
                   </a>
                   <a
-                    href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderData?.orderNumber || '')}`}
+                    href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderData?.orderNumber || '')}&download=1&v=${Date.now()}`}
                     className="inline-flex items-center px-4 py-2 rounded-md border border-gray-200 text-gray-700 hover:bg-gray-50"
                   >
                     <Download className="h-4 w-4 mr-2" /> Download PDF

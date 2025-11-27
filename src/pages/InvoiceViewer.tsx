@@ -25,7 +25,9 @@ export default function InvoiceViewer() {
 
   const handleDownload = () => {
     if (orderId) {
-      const downloadUrl = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderId)}`;
+      // Add cache-busting version to force fresh PDF
+      const v = Date.now();
+      const downloadUrl = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderId)}&download=1&v=${v}`;
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.download = `BLOM-Receipt-${orderId}.pdf`;
@@ -134,7 +136,7 @@ export default function InvoiceViewer() {
             {/* PDF Viewer */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
               <iframe
-                src={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderId)}&inline=1`}
+                src={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderId)}&inline=1&v=${Date.now()}`}
                 className="w-full h-screen min-h-[800px] border-0"
                 title="Invoice PDF"
               />
