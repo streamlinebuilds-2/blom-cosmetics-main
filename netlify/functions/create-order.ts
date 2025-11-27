@@ -124,8 +124,7 @@ export const handler: Handler = async (event) => {
           body: JSON.stringify({
             p_code: String(coupon.code).toUpperCase(),
             p_email: buyer.email || '',
-            p_order_total_cents: subtotal_cents,
-            p_cart_items: JSON.stringify(cartItemsForValidation)
+            p_order_total_cents: subtotal_cents
           })
         })
 

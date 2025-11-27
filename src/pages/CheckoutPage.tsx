@@ -324,7 +324,7 @@ export const CheckoutPage: React.FC = () => {
         cart_items_count: cartState.items.length
       });
 
-      // Call the new redeem_coupon RPC with cart items
+      // Call redeem_coupon RPC (using existing function signature)
       const res = await fetch(`${supabaseUrl}/rest/v1/rpc/redeem_coupon`, {
         method: 'POST',
         headers: {
@@ -335,12 +335,7 @@ export const CheckoutPage: React.FC = () => {
         body: JSON.stringify({
           p_code: couponCode.trim().toUpperCase(),
           p_email: shippingInfo.email || '',
-          p_order_total_cents: productSubtotal,
-          p_cart_items: JSON.stringify(cartState.items.map(item => ({
-            product_id: String(item.productId || item.id || ''),
-            quantity: Number(item.quantity || 1),
-            unit_price_cents: Math.round(Number(item.price || 0) * 100)
-          })))
+          p_order_total_cents: productSubtotal
         }),
       });
 
@@ -434,8 +429,8 @@ export const CheckoutPage: React.FC = () => {
       }
 
       // For percentage coupons, recalculate based on current subtotal
-      if (couponDetails.percent_off || couponDetails.type === 'percent') {
-        const percent = Number(couponDetails.percent_off || 0);
+      if (couponDetails.percent || couponDetails.type === 'percent') {
+        const percent = Number(couponDetails.percent || 0);
         if (percent > 0) {
           let newDiscountCents = Math.round(productSubtotal * (percent / 100));
           

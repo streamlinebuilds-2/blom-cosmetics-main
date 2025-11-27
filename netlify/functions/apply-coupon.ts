@@ -52,19 +52,17 @@ export const handler: Handler = async (event) => {
       });
     }
 
-    // Use redeem_coupon RPC function with cart items
+    // Use redeem_coupon RPC function
     console.log('🔍 Validating coupon:', {
       code: code.toUpperCase(),
       email: email || '',
-      subtotal_cents: productSubtotalCents,
-      cart_items: cartItemsForValidation
+      subtotal_cents: productSubtotalCents
     });
 
     const { data: couponResult, error } = await supabase.rpc('redeem_coupon', {
       p_code: code.toUpperCase(),
       p_email: email || '',
-      p_order_total_cents: productSubtotalCents,
-      p_cart_items: JSON.stringify(cartItemsForValidation)
+      p_order_total_cents: productSubtotalCents
     });
 
     if (error) {
