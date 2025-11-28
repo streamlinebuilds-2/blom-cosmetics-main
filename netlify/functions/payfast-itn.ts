@@ -4,7 +4,7 @@ import crypto from 'crypto'
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const PF_PASSPHRASE = process.env.PAYFAST_PASSPHRASE || process.env.PF_PASSPHRASE || ''
-const SITE = process.env.SITE_URL || 'https://cute-stroopwafel-203cac.netlify.app'
+const SITE = process.env.SITE_URL || process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za'
 
 function validateSignature(params: Record<string, any>, passphrase?: string): boolean {
   // PayFast signature validation: specific fields in specific order
@@ -277,18 +277,43 @@ export const handler: Handler = async (event) => {
       }
     })()
 
-    // 6) Forward to n8n (non-blocking fan-out)
+    // 6) Call order-status function (which will call your webhook and generate invoice)
     ;(async () => {
       try {
-        const n8nUrl = process.env.N8N_ORDER_STATUS_WEBHOOK || `${process.env.N8N_BASE}/webhook/notify-order`
-        await fetch(n8nUrl, {
+        // Get order details for the order-status call
+        const orderDetailsRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}&select=buyer_name,buyer_email,buyer_phone`,
+          {
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`
+            }
+          }
+        );
+
+        let orderDetails = {};
+        if (orderDetailsRes.ok) {
+          const orderDetailsData = await orderDetailsRes.json();
+          orderDetails = orderDetailsData[0] || {};
+        }
+
+        // Call order-status function
+        const orderStatusUrl = `${SITE}/.netlify/functions/order-status`
+        await fetch(orderStatusUrl, {
           method: 'POST',
-          headers: { 'content-type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams(data).toString()
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            m_payment_id: m_payment_id,
+            status: 'paid',
+            buyer_name: orderDetails.buyer_name || data.name_first ? `${data.name_first || ''} ${data.name_last || ''}`.trim() : '',
+            buyer_email: orderDetails.buyer_email || data.email_address || '',
+            buyer_phone: orderDetails.buyer_phone || data.cell_number || '',
+            site_url: SITE
+          })
         })
-        console.log('Forwarded to n8n')
+        console.log('Order status function called successfully')
       } catch (e: any) {
-        console.warn('n8n forward failed:', e?.message)
+        console.warn('Order status function call failed:', e?.message)
       }
     })()
 
