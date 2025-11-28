@@ -65,7 +65,7 @@ class PayFastService {
       merchant_key: this.config.merchantKey,
       return_url: `${baseUrl}/order-confirmation`,
       cancel_url: `${baseUrl}/checkout`,
-      notify_url: `${baseUrl}/.netlify/functions/payfast-itn`,
+      notify_url: `${baseUrl.replace(/\/$/, '')}/.netlify/functions/payfast-itn`,
       name_first: orderData.customerInfo.firstName,
       name_last: orderData.customerInfo.lastName,
       email_address: orderData.customerInfo.email,

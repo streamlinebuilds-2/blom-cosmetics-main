@@ -7,7 +7,8 @@ import crypto from 'crypto';
 const PF_BASE = 'https://www.payfast.co.za';
 const SITE_BASE_URL = (process.env.SITE_BASE_URL || process.env.URL || 'https://blom-cosmetics.co.za').replace(/\/+$/, '');
 const CANCEL_URL = `${SITE_BASE_URL}/checkout/cancel`;
-const NOTIFY_URL = process.env.PAYFAST_NOTIFY_URL || '';
+// CRITICAL: This must match what PayFast is configured to send to
+const NOTIFY_URL = `${SITE_BASE_URL}/.netlify/functions/payfast-itn`;
 
 // PHP-style urlencode for PayFast: spaces -> +, and encode ! ' ( ) *
 function encPF(v: unknown) {
