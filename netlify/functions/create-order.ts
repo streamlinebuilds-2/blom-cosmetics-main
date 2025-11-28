@@ -13,11 +13,17 @@ export const handler: Handler = async (event) => {
     console.log("📦 Items array:", JSON.stringify(body.items, null, 2));
 
     // --- 1. Extract & Normalize Payloads ---
-
     let items = body.items || []
     let buyer: any = body.buyer || {}
     let fulfillment: any = body.fulfillment || {}
     const coupon = body.coupon || null
+
+    const SUPABASE_URL = process.env.SUPABASE_URL
+    const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!SUPABASE_URL || !SERVICE_KEY) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Server configuration error' }) }
+    }
 
     // 1a. Normalize Buyer
     if (body.customerEmail || body.customerName || body.shippingInfo) {
@@ -53,55 +59,144 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // 1c. Normalize Items (CRITICAL FIX FOR VARIANTS & PRICES)
-    if (items.length > 0) {
-      items = items.map((it: any) => {
-        // Determine the correct name (Product Name + Variant Name)
-        let finalName = it.product_name || it.name || 'Unknown Product';
-        if (it.variant && it.variant.title) {
-          finalName = `${finalName} - ${it.variant.title}`;
-        } else if (it.selectedVariant) {
-           finalName = `${finalName} - ${it.selectedVariant}`;
-        }
-
-        return {
-          product_id: it.product_id || it.productId || it.id,
-          quantity: Number(it.quantity || 1),
-          unit_price: Number(it.unit_price ?? it.price ?? 0),
-          product_name: finalName,
-          sku: it.sku || null
-        };
-      });
-    }
-
     if (!items.length) {
       return { statusCode: 400, body: JSON.stringify({ error: 'No items' }) }
     }
 
-    const SUPABASE_URL = process.env.SUPABASE_URL
-    const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+    // --- 2. CRITICAL FIX: Validate and Create Missing Products ---
+    console.log('🔧 Processing items with product validation...');
+    
+    // Get current products for lookup
+    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,sku,price`, {
+      headers: {
+        apikey: SERVICE_KEY,
+        Authorization: `Bearer ${SERVICE_KEY}`
+      }
+    });
 
-    if (!SUPABASE_URL || !SERVICE_KEY) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'Server configuration error' }) }
+    const existingProducts = productsRes.ok ? await productsRes.json() : [];
+    const productMap = new Map();
+    existingProducts.forEach((p: any) => {
+      productMap.set(p.name.toLowerCase(), p.id);
+    });
+
+    // 2a. Normalize Items and Fix Missing Product IDs
+    const normalizedItems = [];
+    const missingProducts = new Set();
+
+    for (let it of items) {
+      // Determine the correct name (Product Name + Variant Name)
+      let finalName = it.product_name || it.name || 'Unknown Product';
+      if (it.variant && it.variant.title) {
+        finalName = `${finalName} - ${it.variant.title}`;
+      } else if (it.selectedVariant) {
+         finalName = `${finalName} - ${it.selectedVariant}`;
+      }
+
+      // Check if product_id exists and is valid
+      let productId = it.product_id || it.productId || it.id;
+      
+      if (!productId) {
+        // Try to find by name
+        const foundProductId = productMap.get(finalName.toLowerCase());
+        if (foundProductId) {
+          productId = foundProductId;
+        } else {
+          // Mark as missing product - we'll create it
+          missingProducts.add(finalName);
+        }
+      }
+
+      normalizedItems.push({
+        product_id: productId,
+        quantity: Number(it.quantity || 1),
+        unit_price: Number(it.unit_price ?? it.price ?? 0),
+        product_name: finalName,
+        sku: it.sku || null
+      });
     }
 
-    // --- 2. Calculate Totals ---
+    // 2b. Create missing products
+    if (missingProducts.size > 0) {
+      console.log('🚨 Creating missing products:', Array.from(missingProducts));
+      
+      for (const productName of missingProducts) {
+        const item = normalizedItems.find(item => item.product_name === productName);
+        if (!item) continue;
 
+        try {
+          const createProductRes = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+            method: 'POST',
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: productName,
+              slug: productName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              sku: item.sku || `SKU-${Date.now()}`,
+              price: item.unit_price,
+              is_active: true,
+              stock_on_hand: 100,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+          });
+
+          if (createProductRes.ok) {
+            const newProduct = await createProductRes.json();
+            const productId = Array.isArray(newProduct) ? newProduct[0]?.id : newProduct?.id;
+            
+            if (productId) {
+              // Update the item with the new product ID
+              const itemIndex = normalizedItems.findIndex(item => item.product_name === productName);
+              if (itemIndex >= 0) {
+                normalizedItems[itemIndex].product_id = productId;
+              }
+              console.log('✅ Created product:', productName, productId);
+            }
+          } else {
+            console.error('❌ Failed to create product:', productName, await createProductRes.text());
+          }
+        } catch (error) {
+          console.error('❌ Error creating product:', productName, error);
+        }
+      }
+    }
+
+    // 2c. Final validation - ensure all items have product_id
+    const itemsWithoutProductId = normalizedItems.filter(item => !item.product_id);
+    if (itemsWithoutProductId.length > 0) {
+      return {
+        statusCode: 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          error: 'PRODUCT_VALIDATION_FAILED',
+          message: 'Some items could not be mapped to products',
+          missingProducts: itemsWithoutProductId.map(item => item.product_name)
+        })
+      }
+    }
+
+    console.log('✅ All items have valid product IDs');
+
+    // --- 3. Calculate Totals ---
     let subtotal_cents = Number(body.totals?.subtotal_cents)
     let shipping_cents = Number(body.totals?.shipping_cents || 0)
     let tax_cents = Number(body.totals?.tax_cents || 0)
 
     if (!Number.isFinite(subtotal_cents)) {
-      subtotal_cents = items.reduce((sum: number, it: any) => sum + Math.round(Number(it.unit_price) * 100) * Number(it.quantity || 1), 0)
+      subtotal_cents = normalizedItems.reduce((sum: number, it: any) => sum + Math.round(Number(it.unit_price) * 100) * Number(it.quantity || 1), 0)
     }
 
-    // --- 3. Apply Coupon (RPC) with Cart Item Validation ---
+    // --- 4. Apply Coupon (RPC) with Cart Item Validation ---
     let discount_cents = 0
     let applied_coupon_id: string | null = null
     if (coupon?.code) {
       try {
         // Convert cart items to the expected format for coupon validation
-        const cartItemsForValidation = items.map((item: any) => ({
+        const cartItemsForValidation = normalizedItems.map((item: any) => ({
           product_id: String(item.product_id || ''),
           quantity: Number(item.quantity || 1),
           unit_price_cents: Math.round(Number(item.unit_price || 0) * 100)
@@ -198,8 +293,7 @@ export const handler: Handler = async (event) => {
     const m_payment_id = `BL-${Date.now().toString(16).toUpperCase()}`
     const order_number = `BL-${Date.now().toString(36).toUpperCase()}`
 
-    // --- 4. Construct Delivery Address (Robust Mapping) ---
-
+    // --- 5. Construct Delivery Address (Robust Mapping) ---
     let deliveryAddressJson: any = null
     // Only process address if method is explicitly delivery
     if (fulfillment.method === 'delivery') {
@@ -216,8 +310,7 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // --- 5. Save Order to Supabase ---
-
+    // --- 6. Save Order to Supabase ---
     const rpcPayload = {
       p_order_number: order_number,
       p_m_payment_id: m_payment_id,
@@ -225,9 +318,9 @@ export const handler: Handler = async (event) => {
       p_buyer_name: buyer.name || '',
       p_buyer_phone: buyer.phone || '',
       p_channel: 'website',
-      p_items: items.map((it: any) => ({
-        product_id: it.product_id || null,
-        product_name: it.product_name || it.name || 'Unknown Product', // Uses the fixed name from step 1c (includes variant)
+      p_items: normalizedItems.map((it: any) => ({
+        product_id: it.product_id,
+        product_name: it.product_name || it.name || 'Unknown Product', // Uses the fixed name with variant
         sku: it.sku || null,
         quantity: it.quantity || it.qty || 1,
         unit_price: it.unit_price || (it.unit_price_cents ? it.unit_price_cents / 100 : 0)
