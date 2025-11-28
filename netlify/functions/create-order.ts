@@ -190,10 +190,13 @@ export const handler: Handler = async (event) => {
       subtotal_cents = normalizedItems.reduce((sum: number, it: any) => sum + Math.round(Number(it.unit_price) * 100) * Number(it.quantity || 1), 0)
     }
 
-    // --- 4. Apply Coupon (RPC) with Cart Item Validation ---
+    // --- 4. Apply Coupon (RPC) with Cart State Validation ---
     let discount_cents = 0
     let applied_coupon_id: string | null = null
     let validation_token: string | null = null
+    let original_discount_cents = 0
+    let cart_snapshot_changed = false
+    
     if (coupon?.code) {
       try {
         // Convert cart items to the expected format for coupon validation
@@ -203,70 +206,160 @@ export const handler: Handler = async (event) => {
           unit_price_cents: Math.round(Number(item.unit_price || 0) * 100)
         }))
 
-        console.log('🔍 Validating coupon with items:', JSON.stringify({
+        console.log('🔍 Validating coupon with cart state check:', JSON.stringify({
           code: coupon.code,
           email: buyer.email,
           subtotal_cents: subtotal_cents,
-          cart_items: cartItemsForValidation
+          cart_items: cartItemsForValidation,
+          validation_token: coupon.validation_token || 'NEW'
         }, null, 2))
 
-        // Use validation token from frontend or generate one
-        const token = coupon.validation_token || `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-
-        const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
-          method: 'POST',
-          headers: {
-            apikey: SERVICE_KEY,
-            Authorization: `Bearer ${SERVICE_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            p_code: String(coupon.code).toUpperCase(),
-            p_email: buyer.email || '',
-            p_order_total_cents: subtotal_cents,
-            p_cart_items: cartItemsForValidation,
-            p_validation_token: token
-          })
-        })
-
-        if (rpcRes.ok) {
-          const rpcData = await rpcRes.json()
-          const row = Array.isArray(rpcData) ? rpcData[0] : rpcData
-          console.log('✅ Coupon validation result:', JSON.stringify(row, null, 2))
+        // If we have a validation token, validate cart state first
+        if (coupon.validation_token) {
+          console.log('🔍 Cart state validation - checking for manipulation...')
           
-          if (row?.valid) {
-            discount_cents = Number(row.discount_cents) || 0
-            applied_coupon_id = row.coupon_id || null
-            validation_token = row.validation_token || token
-            
-            console.log('✅ Coupon validated successfully:', {
-              discount_cents,
-              applied_coupon_id,
-              validation_token
+          const cartValidationRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/validate_coupon_cart_state`, {
+            method: 'POST',
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              p_validation_token: coupon.validation_token,
+              p_cart_items: cartItemsForValidation,
+              p_discount_type: coupon.discount_type || 'percent'
             })
+          })
+
+          if (cartValidationRes.ok) {
+            const cartValidationData = await cartValidationRes.json()
+            const cartValidationRow = Array.isArray(cartValidationData) ? cartValidationData[0] : cartValidationData
+            
+            if (cartValidationRow?.valid) {
+              discount_cents = Number(cartValidationRow.new_discount_cents || cartValidationRow.discount_cents) || 0
+              original_discount_cents = Number(cartValidationRow.original_discount_cents) || 0
+              cart_snapshot_changed = cartValidationRow.discount_recalculated || false
+              
+              console.log('✅ Cart state validation result:', {
+                discount_cents,
+                original_discount_cents,
+                recalculated: cart_snapshot_changed,
+                message: cartValidationRow.message
+              })
+              
+              if (cart_snapshot_changed) {
+                console.log('🚨 CART MANIPULATION DETECTED AND PREVENTED!')
+                console.log(`Original discount: R${original_discount_cents / 100}`)
+                console.log(`Current discount: R${discount_cents / 100}`)
+                console.log('Savings prevented: R' + ((original_discount_cents - discount_cents) / 100))
+              }
+            } else {
+              console.log('❌ Cart state validation failed:', cartValidationRow?.message || 'Unknown error')
+              return {
+                statusCode: 400,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  error: 'CART_MANIPULATION_DETECTED',
+                  message: 'Cart contents have been modified after coupon application. Please reapply your coupon.',
+                  original_discount: original_discount_cents / 100,
+                  current_discount: discount_cents / 100
+                })
+              }
+            }
           } else {
-            console.log('❌ Coupon validation failed:', row?.message || 'Unknown error')
+            console.log('⚠️ Cart validation failed, proceeding with new validation')
+          }
+        }
+
+        // If we still need to validate the coupon (new validation or validation failed)
+        if (!coupon.validation_token || discount_cents === 0) {
+          console.log('🔍 New coupon validation required...')
+          
+          // Use validation token from frontend or generate one
+          const token = coupon.validation_token || `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
+          const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
+            method: 'POST',
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              p_code: String(coupon.code).toUpperCase(),
+              p_email: buyer.email || '',
+              p_order_total_cents: subtotal_cents,
+              p_cart_items: cartItemsForValidation,
+              p_validation_token: token
+            })
+          })
+
+          if (rpcRes.ok) {
+            const rpcData = await rpcRes.json()
+            const row = Array.isArray(rpcData) ? rpcData[0] : rpcData
+            console.log('✅ Coupon validation result:', JSON.stringify(row, null, 2))
+            
+            if (row?.valid) {
+              discount_cents = Number(row.discount_cents) || 0
+              original_discount_cents = discount_cents
+              applied_coupon_id = row.coupon_id || null
+              validation_token = row.validation_token || token
+              
+              console.log('✅ Coupon validated successfully:', {
+                discount_cents,
+                applied_coupon_id,
+                validation_token,
+                cart_snapshot: row.cart_snapshot ? 'stored' : 'none',
+                cart_hash: row.cart_snapshot_hash || 'none'
+              })
+            } else {
+              console.log('❌ Coupon validation failed:', row?.message || 'Unknown error')
+              return {
+                statusCode: 400,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  error: 'COUPON_INVALID',
+                  message: row?.message || 'Invalid coupon code'
+                })
+              }
+            }
+          } else {
+            const errorText = await rpcRes.text()
+            console.error('❌ Coupon RPC error:', rpcRes.status, errorText)
             return {
               statusCode: 400,
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                error: 'COUPON_INVALID',
-                message: row?.message || 'Invalid coupon code'
+                error: 'COUPON_VALIDATION_ERROR',
+                message: 'Unable to validate coupon at this time'
               })
             }
           }
         } else {
-          const errorText = await rpcRes.text()
-          console.error('❌ Coupon RPC error:', rpcRes.status, errorText)
-          return {
-            statusCode: 400,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              error: 'COUPON_VALIDATION_ERROR',
-              message: 'Unable to validate coupon at this time'
+          // We have a valid cart state validation, get the coupon details
+          validation_token = coupon.validation_token
+          
+          // Get coupon details for response
+          try {
+            const couponDetailsRes = await fetch(`${SUPABASE_URL}/rest/v1/coupons?code=eq.${coupon.code.toUpperCase()}&select=id`, {
+              headers: {
+                apikey: SERVICE_KEY,
+                Authorization: `Bearer ${SERVICE_KEY}`
+              }
             })
+            
+            if (couponDetailsRes.ok) {
+              const couponDetails = await couponDetailsRes.json()
+              if (couponDetails.length > 0) {
+                applied_coupon_id = couponDetails[0].id
+              }
+            }
+          } catch (couponError) {
+            console.error('⚠️ Error getting coupon details:', couponError)
           }
         }
+
       } catch (e) {
         console.error('❌ Coupon validation exception:', e)
         return {
