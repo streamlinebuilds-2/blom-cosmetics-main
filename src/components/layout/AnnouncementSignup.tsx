@@ -269,41 +269,36 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
 
     try {
       const payload = {
-        first_name: '', // Not collected in current form
         email: trimmedEmail,
+        phone: phone.trim(),
+        first_name: '', // Not collected in current form
         consent: true,
         source: 'popup'
       };
 
-      console.info('Sending POST to webhook:', WEBHOOK_URL, 'with payload:', payload);
+      console.info('Sending POST to beauty club signup function:', payload);
 
-      const response = await postJson(WEBHOOK_URL, payload);
+      // Use the new Netlify function that handles duplicate checking
+      const response = await fetch('/.netlify/functions/beauty-club-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
       const responseText = await response.text();
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch {
+        responseData = { message: responseText };
+      }
 
-      console.info('Webhook response status:', response.status, 'body:', responseText);
+      console.info('Beauty Club signup response status:', response.status, 'data:', responseData);
 
       if (response.ok) {
         console.info('Beauty Club signup successful');
         setSuccess(true);
         recentSubmissions.current[trimmedEmail] = now;
-
-        // Save contact info to contacts system for marketing
-        try {
-          await fetch('/.netlify/functions/contacts-intake', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              name: '', // Not collected in Beauty Club signup
-              email: trimmedEmail,
-              phone: phone.trim(),
-              source: 'beauty_club_signup'
-            })
-          });
-          console.info('Contact info saved to contacts system');
-        } catch (contactError) {
-          // Don't block signup if contact save fails
-          console.warn('Failed to save contact info:', contactError);
-        }
 
         // Mark user as signed up to hide popup and banner permanently
         try {
@@ -314,12 +309,20 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
           console.warn('Could not save signup status:', error);
         }
 
-        setTimeout(() => {
-          onSuccess();
-        }, 900);
+        // Show appropriate message based on existing user status
+        const isExistingUser = responseData.existing_user === true;
+        if (isExistingUser) {
+          setTimeout(() => {
+            onSuccess();
+          }, 900);
+        } else {
+          setTimeout(() => {
+            onSuccess();
+          }, 1200); // Slightly longer for new signups
+        }
       } else {
-        console.info('Beauty Club signup failed with status:', response.status, 'response:', responseText);
-        setError(`Signup failed (${response.status}). Please try again.`);
+        console.info('Beauty Club signup failed with status:', response.status, 'response:', responseData);
+        setError(responseData.message || `Signup failed (${response.status}). Please try again.`);
       }
     } catch (err) {
       console.info('Beauty Club signup error:', err);
@@ -384,7 +387,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
       )}
       {success && (
         <div className="text-sm font-semibold text-green-600 bg-green-50 border border-green-200 rounded-lg p-3">
-          🎉 Welcome to the BLOM Beauty Club! Check your email for your 10% discount code.
+          🎉 Welcome to the BLOM Beauty Club! Check your email for your exclusive discount code.
         </div>
       )}
 

@@ -1202,6 +1202,7 @@ export const ShopPage: React.FC = () => {
                     badges={product.badges}
                       isListView={viewMode === 'list'}
                     includedProducts={product.includedProducts || product.bundleProducts || []}
+                    variants={product.variants || []}
                   />
                   );
                 })}

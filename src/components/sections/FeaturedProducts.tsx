@@ -42,7 +42,9 @@ export const FeaturedProducts = () => {
               image: item.custom_image_url || p.thumbnail_url,
               shortDescription: p.short_description,
               slug: p.slug,
-              inStock: (p.stock || 0) > 0
+              inStock: (p.stock || 0) > 0,
+              // Include variants data for products that have variations
+              variants: p.variants || []
             };
           }).filter(Boolean); // Remove empty slots
 
@@ -84,6 +86,7 @@ export const FeaturedProducts = () => {
               images={[item.image]}
               inStock={item.inStock}
               hoverShine={true}
+              variants={item.variants || []}
             />
           ))}
         </div>
