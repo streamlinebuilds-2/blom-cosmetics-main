@@ -266,18 +266,7 @@ export const handler: Handler = async (event) => {
       }
     })()
 
-    // 5) Generate invoice (non-blocking)
-    ;(async () => {
-      try {
-        const base = SITE
-        await fetch(`${base}/.netlify/functions/invoice-generate-pdf?m_payment_id=${encodeURIComponent(m_payment_id)}`)
-        console.log('Invoice generated')
-      } catch (e: any) {
-        console.warn('Invoice gen failed:', e?.message)
-      }
-    })()
-
-    // 6) Call order-status function (which will call your webhook and generate invoice)
+    // 5) Call order-status function (which will call your webhook and generate invoice)
     ;(async () => {
       try {
         // Get order details for the order-status call
@@ -291,7 +280,7 @@ export const handler: Handler = async (event) => {
           }
         );
 
-        let orderDetails = {};
+        let orderDetails: any = {};
         if (orderDetailsRes.ok) {
           const orderDetailsData = await orderDetailsRes.json();
           orderDetails = orderDetailsData[0] || {};
