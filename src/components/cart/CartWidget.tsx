@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, X, Plus, Minus, Trash2 } from 'lucide-react';
+import { ShoppingCart, X, Plus, Minus, Trash2, Edit } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cartStore, CartState, formatPrice } from '../../lib/cart';
+import { ProductVariantModal } from '../product/ProductVariantModal';
 
 export const CartWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
   const [showCart, setShowCart] = useState(false);
+  const [showVariantModal, setShowVariantModal] = useState(false);
+  const [selectedItemForVariant, setSelectedItemForVariant] = useState<any>(null);
   const scrollYRef = React.useRef<number>(0);
 
   useEffect(() => {
@@ -57,6 +60,68 @@ export const CartWidget: React.FC = () => {
 
   const handleRemoveItem = (itemId: string) => {
     cartStore.removeItem(itemId);
+  };
+
+  const handleEditVariant = (item: any) => {
+    // Create product data for variant modal
+    const productData = {
+      id: item.productId,
+      name: item.name,
+      slug: item.productId,
+      price: item.price,
+      images: [item.image],
+      variants: getProductVariants(item.productId)
+    };
+    
+    setSelectedItemForVariant({
+      ...item,
+      productData
+    });
+    setShowVariantModal(true);
+  };
+
+  // Helper function to get product variants (this would typically come from your product data)
+  const getProductVariants = (productId: string) => {
+    // This is a simplified version - in a real app you'd fetch this from your product catalog
+    const variantMap: Record<string, any[]> = {
+      'cuticle-oil': [
+        { name: 'Cotton Candy', inStock: true, image: '/cuticle-oil-cotton-candy.webp' },
+        { name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
+        { name: 'Tiny Touch', inStock: true, image: '/cuticle-oil-tiny-touch.webp' },
+        { name: 'Dragon Fruit Lotus', inStock: true, image: '/cuticle-oil-dragon-fruit-lotus.webp' },
+        { name: 'Watermelon', inStock: true, image: '/cuticle-oil-watermelon.webp' }
+      ],
+      'nail-file': [
+        { name: 'Single File', inStock: true, price: 35, image: '/nail-file-white.webp' },
+        { name: '5-Pack Bundle', inStock: true, price: 160, image: '/nail-file-colorful.webp' }
+      ],
+      'top-coat': [
+        { name: 'Standard', inStock: true, image: '/top-coat-white.webp' }
+      ]
+    };
+    
+    return variantMap[productId] || [];
+  };
+
+  const handleVariantUpdate = (selectedVariant: any, quantity: number) => {
+    if (!selectedItemForVariant) return;
+    
+    // Remove the old item
+    cartStore.removeItem(selectedItemForVariant.id);
+    
+    // Add the new item with selected variant
+    cartStore.addItem({
+      id: `item_${Date.now()}`,
+      productId: selectedItemForVariant.productId,
+      variantId: selectedVariant.name,
+      name: selectedItemForVariant.name,
+      price: selectedVariant.price || selectedItemForVariant.price,
+      image: selectedVariant.image || selectedItemForVariant.image,
+      variant: { title: selectedVariant.name }
+    }, quantity);
+    
+    setShowVariantModal(false);
+    setSelectedItemForVariant(null);
   };
 
   const recommendedProducts = [
@@ -168,7 +233,18 @@ export const CartWidget: React.FC = () => {
                           className="w-16 h-16 object-cover rounded"
                         />
                         <div className="flex-1">
-                          <h4 className="font-medium">{item.name}</h4>
+                          <div className="flex items-start justify-between">
+                            <h4 className="font-medium">{item.name}</h4>
+                            {getProductVariants(item.productId).length > 0 && (
+                              <button
+                                onClick={() => handleEditVariant(item)}
+                                className="p-1 hover:bg-gray-100 rounded text-gray-500 hover:text-gray-700 transition-colors"
+                                title="Edit variant"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                           {item.variant && (
                             <p className="text-sm text-gray-500">{item.variant.title}</p>
                           )}
@@ -268,6 +344,25 @@ export const CartWidget: React.FC = () => {
             )}
         </div>
       </div>
+
+      {/* Product Variant Selection Modal for Cart Items */}
+      <ProductVariantModal
+        isOpen={showVariantModal}
+        onClose={() => {
+          setShowVariantModal(false);
+          setSelectedItemForVariant(null);
+        }}
+        product={selectedItemForVariant?.productData || {
+          id: '',
+          name: '',
+          slug: '',
+          price: 0,
+          images: [],
+          variants: []
+        }}
+        initialQuantity={selectedItemForVariant?.quantity || 1}
+        onVariantSelect={handleVariantUpdate}
+      />
     </>
   );
 };

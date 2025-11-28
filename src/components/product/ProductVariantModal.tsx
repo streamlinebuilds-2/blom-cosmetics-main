@@ -21,13 +21,15 @@ interface ProductVariantModalProps {
     variants: ProductVariant[];
   };
   initialQuantity?: number;
+  onVariantSelect?: (variant: any, quantity: number) => void;
 }
 
 export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
   isOpen,
   onClose,
   product,
-  initialQuantity = 1
+  initialQuantity = 1,
+  onVariantSelect
 }) => {
   const [selectedVariant, setSelectedVariant] = useState<string>('');
   const [quantity, setQuantity] = useState(initialQuantity);
@@ -68,9 +70,14 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         variant: { title: selectedVariant }
       };
 
-      cartStore.addItem(cartItem, quantity);
-      showNotification(`Added ${quantity} ${product.name} (${selectedVariant}) to cart!`);
-      onClose();
+      // Use custom callback if provided (for cart variant updates), otherwise use default cart behavior
+      if (onVariantSelect) {
+        onVariantSelect(selectedVariantData, quantity);
+      } else {
+        cartStore.addItem(cartItem, quantity);
+        showNotification(`Added ${quantity} ${product.name} (${selectedVariant}) to cart!`);
+        onClose();
+      }
     } catch (error) {
       console.error('Error adding product to cart:', error);
       showNotification('Failed to add product to cart. Please try again.');
