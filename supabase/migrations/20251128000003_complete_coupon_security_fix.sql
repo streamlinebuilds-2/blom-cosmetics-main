@@ -60,7 +60,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.calculate_cart_hash(p_cart_items jsonb)
 RETURNS text
 LANGUAGE sql
-AS $$
+AS $
   -- Create a normalized cart representation and hash it
   SELECT md5(
     jsonb_pretty(
@@ -69,8 +69,8 @@ AS $$
       ) ORDER BY key
     )
   )::text
-  FROM jsonb_each_object(p_cart_items) key, value;
-$$;
+  FROM jsonb_each(p_cart_items) key, value;
+$;
 
 -- 4. Create function to validate cart hasn't changed (for percentage coupons)
 CREATE OR REPLACE FUNCTION public.validate_coupon_cart_state(
