@@ -100,7 +100,7 @@ class AdvancedAnalytics {
     this.config = {
       googleAnalyticsId: config.googleAnalyticsId || 'G-H9GCB42G9C',
       facebookPixelId: config.facebookPixelId || 'YOUR_FACEBOOK_PIXEL_ID',
-      hotjarId: config.hotjarId || 'YOUR_HOTJAR_ID',
+      hotjarId: config.hotjarId || undefined,
       enableDebug: config.enableDebug || false,
       enableConversionOptimization: config.enableConversionOptimization || true,
       enableHeatmaps: config.enableHeatmaps || true,
