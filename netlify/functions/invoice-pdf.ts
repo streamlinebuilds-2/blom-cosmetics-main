@@ -39,25 +39,44 @@ export const handler = async (event: any) => {
     }
 
     const q = event.queryStringParameters || {};
-    const m_payment_id =
+    let m_payment_id =
       body.m_payment_id ||
       q.m_payment_id ||
       event.headers['x-m-payment-id'];
+    const order_id =
+      body.order_id ||
+      q.order_id ||
+      event.headers['x-order-id'];
+
+    // If we have order_id but not m_payment_id, look up the m_payment_id
+    if (!m_payment_id && order_id) {
+      try {
+        const orderResponse: any = await fetchJson(
+          `${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id`
+        );
+        if (orderResponse && orderResponse.length > 0) {
+          m_payment_id = orderResponse[0].m_payment_id;
+        }
+      } catch (error) {
+        console.error('Failed to lookup m_payment_id from order_id:', error);
+      }
+    }
 
     if (!m_payment_id) {
       return {
         statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'm_payment_id is required' }),
+        body: JSON.stringify({ error: 'm_payment_id or order_id is required' }),
       };
     }
 
     const site_url = body.site_url || q.site_url || SITE;
 
     // 1) Load order + items (ADDED: subtotal_cents, shipping_cents, discount_cents)
-    const [order] = await fetchJson(
+    const orderResponse: any = await fetchJson(
       `${SUPABASE_URL}/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(m_payment_id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,subtotal_cents,shipping_cents,discount_cents,status,created_at,invoice_url`
     )
+    const order = Array.isArray(orderResponse) ? orderResponse[0] : orderResponse
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
 
     const items = await fetchJson(
