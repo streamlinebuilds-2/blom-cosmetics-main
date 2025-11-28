@@ -60,7 +60,7 @@ $$;
 CREATE OR REPLACE FUNCTION public.calculate_cart_hash(p_cart_items jsonb)
 RETURNS text
 LANGUAGE plpgsql
-AS $
+AS $$
 DECLARE
   v_hash_input text := '';
   v_item record;
@@ -88,7 +88,7 @@ BEGIN
   -- Return the MD5 hash of the normalized cart representation
   RETURN md5(v_hash_input);
 END;
-$;
+$$;
 
 -- 4. Create function to validate cart hasn't changed (for percentage coupons)
 CREATE OR REPLACE FUNCTION public.validate_coupon_cart_state(
@@ -221,6 +221,14 @@ END;
 $$;
 
 -- 5. Enhanced redeem_coupon function with cart snapshot and usage tracking
+-- Drop ALL possible existing redeemer_coupon functions to avoid conflicts
+DROP FUNCTION IF EXISTS public.redeem_coupon();
+DROP FUNCTION IF EXISTS public.redeem_coupon(text);
+DROP FUNCTION IF EXISTS public.redeem_coupon(text, text);
+DROP FUNCTION IF EXISTS public.redeem_coupon(text, text, integer);
+DROP FUNCTION IF EXISTS public.redeem_coupon(text, text, integer, jsonb);
+DROP FUNCTION IF EXISTS public.redeem_coupon(text, text, integer, jsonb, text);
+
 CREATE OR REPLACE FUNCTION public.redeem_coupon(
   p_code text,
   p_email text,
@@ -436,6 +444,13 @@ END;
 $$;
 
 -- 6. Create function to mark validation as completed when order is created
+-- Drop ALL possible existing mark_coupon_validation_completed functions to avoid conflicts
+DROP FUNCTION IF EXISTS public.mark_coupon_validation_completed();
+DROP FUNCTION IF EXISTS public.mark_coupon_validation_completed(text);
+DROP FUNCTION IF EXISTS public.mark_coupon_validation_completed(text, uuid);
+DROP FUNCTION IF EXISTS public.mark_coupon_validation_completed(text, text);
+DROP FUNCTION IF EXISTS public.mark_coupon_validation_completed(text, text, integer);
+
 CREATE OR REPLACE FUNCTION public.mark_coupon_validation_completed(
   p_validation_token text,
   p_order_id uuid
@@ -469,15 +484,21 @@ END;
 $$;
 
 -- 7. Updated function to mark coupon as used (mainly for multi-use coupons)
+-- Drop ALL possible existing mark_coupon_used functions to avoid conflicts
+DROP FUNCTION IF EXISTS public.mark_coupon_used();
 DROP FUNCTION IF EXISTS public.mark_coupon_used(text);
+DROP FUNCTION IF EXISTS public.mark_coupon_used(text, text);
+DROP FUNCTION IF EXISTS public.mark_coupon_used(text, text, integer);
 
 CREATE OR REPLACE FUNCTION public.mark_coupon_used(p_code text)
 RETURNS void
 LANGUAGE plpgsql
 AS $$
+BEGIN
   UPDATE public.coupons
   SET used_count = COALESCE(used_count, 0) + 1
   WHERE upper(code) = upper(p_code);
+END;
 $$;
 
 -- 8. Grant permissions
@@ -488,12 +509,16 @@ GRANT EXECUTE ON FUNCTION public.redeem_coupon(text, text, integer, jsonb, text)
 GRANT EXECUTE ON FUNCTION public.mark_coupon_validation_completed(text, uuid) TO service_role;
 GRANT EXECUTE ON FUNCTION public.mark_coupon_used(text) TO anon, authenticated, service_role;
 
--- 9. Create cleanup job (runs every 5 minutes)
-SELECT cron.schedule(
-  'cleanup-expired-coupon-validations',
-  '*/5 * * * *',
-  'SELECT public.cleanup_expired_coupon_validations();'
-);
+-- 9. Create cleanup job (runs every 5 minutes) - Commented out because pg_cron may not be available
+-- Enable pg_cron extension first if needed: CREATE EXTENSION IF NOT EXISTS pg_cron;
+-- Then uncomment the following lines:
+-- SELECT cron.schedule(
+--   'cleanup-expired-coupon-validations',
+--   '*/5 * * * *',
+--   'SELECT public.cleanup_expired_coupon_validations();'
+-- );
+
+-- For manual cleanup, you can run: SELECT public.cleanup_expired_coupon_validations();
 
 -- 10. Update existing TEST-DISCOUNT to be single-use if it exists
 UPDATE public.coupons 

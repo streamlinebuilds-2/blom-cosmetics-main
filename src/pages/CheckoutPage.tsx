@@ -11,6 +11,76 @@ import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete'
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
 import { ProductVariantModal } from '../components/product/ProductVariantModal';
+// Simple coupon data storage for recalculation
+let simpleCouponData = {
+  couponCode: '',
+  discountType: null as 'percent' | 'fixed' | null,
+  discountValue: 0,
+  originalDiscountCents: 0
+};
+
+const setSimpleCouponData = (data: any) => {
+  console.log('💾 Setting simple coupon data:', data);
+  simpleCouponData = {
+    couponCode: data.code || 'UNKNOWN',
+    discountType: data.discount_type === 'fixed' ? 'fixed' : 
+                  data.discount_type === 'percent' ? 'percent' : null,
+    discountValue: Number(data.discount_value || 0),
+    originalDiscountCents: Number(data.discount_cents || 0)
+  };
+};
+
+const clearSimpleCouponData = () => {
+  console.log('🗑️ Clearing simple coupon data');
+  simpleCouponData = {
+    couponCode: '',
+    discountType: null,
+    discountValue: 0,
+    originalDiscountCents: 0
+  };
+};
+
+const recalculateSimpleDiscount = (cartSubtotal: number): number => {
+  const { discountType, discountValue, originalDiscountCents } = simpleCouponData;
+  
+  console.log('🧮 Simple recalculation:', {
+    discountType,
+    discountValue,
+    cartSubtotal
+  });
+
+  // If no valid coupon data, return 0
+  if (!discountType || discountValue <= 0) {
+    return 0;
+  }
+
+  // For fixed discounts, always use original
+  if (discountType === 'fixed') {
+    return originalDiscountCents / 100;
+  }
+
+  // For percentage discounts, recalculate
+  if (discountType === 'percent') {
+    const productSubtotal = cartSubtotal * 100; // Convert to cents
+    let newDiscountCents = Math.round(productSubtotal * (discountValue / 100));
+    
+    // Safety: Discount cannot exceed the product subtotal
+    if (newDiscountCents > productSubtotal) {
+      newDiscountCents = productSubtotal;
+    }
+    
+    const finalDiscount = newDiscountCents / 100;
+    console.log('✅ Simple percentage recalculation:', {
+      percent: discountValue,
+      cartSubtotal,
+      newDiscount: finalDiscount
+    });
+    
+    return finalDiscount;
+  }
+
+  return 0;
+};
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -373,8 +443,18 @@ export const CheckoutPage: React.FC = () => {
           code: couponCode.trim().toUpperCase() 
         });
         // Store full coupon details for dynamic recalculation
+        console.log('💾 Storing coupon details:', {
+          fullResult: result,
+          discount_type: result.discount_type,
+          discount_value: result.discount_value,
+          allKeys: Object.keys(result)
+        });
         setCouponDetails(result);
         setCouponError('');
+
+        // Also store in simple format for guaranteed recalculation
+        setSimpleCouponData(result);
+        console.log('💾 Simple coupon data also set for fallback recalculation');
       }
 
     } catch (error) {
@@ -391,18 +471,36 @@ export const CheckoutPage: React.FC = () => {
     setCouponCode('');
     setCouponError('');
     setCouponDetails(null);
+    clearSimpleCouponData();
+    console.log('🗑️ Coupon removed and simple data cleared');
   };
 
   const recalculateCouponDiscount = async () => {
-    if (!appliedCoupon || !couponDetails) return;
+    if (!appliedCoupon || !couponDetails) {
+      console.log('❌ Missing data for recalculation:', { hasAppliedCoupon: !!appliedCoupon, hasCouponDetails: !!couponDetails });
+      return;
+    }
 
     try {
+      console.log('🔄 RECALCULATION DEBUG - Start');
+      console.log('📊 Full couponDetails object:', couponDetails);
+      console.log('🔍 couponDetails keys:', Object.keys(couponDetails));
+      console.log('🎯 appliedCoupon:', appliedCoupon);
+      console.log('🛒 cartState.subtotal:', cartState.subtotal);
+      
+      // Debug each field access
+      console.log('💡 discount_type:', couponDetails.discount_type);
+      console.log('💡 discount_value:', couponDetails.discount_value);
+      console.log('💡 type (old field):', couponDetails.type);
+      console.log('💡 percent (old field):', couponDetails.percent);
+      console.log('💡 percent_off (old field):', couponDetails.percent_off);
+
       console.log('🔄 Recalculating coupon discount...', { 
         couponCode: appliedCoupon.code, 
         originalDiscount: couponDetails.discount_cents,
         cartSubtotal: cartState.subtotal,
-        couponType: couponDetails.type,
-        couponPercent: couponDetails.percent_off
+        couponType: couponDetails.discount_type,     // ✅ Fixed: use discount_type from backend
+        couponPercent: couponDetails.discount_value  // ✅ Fixed: use discount_value from backend
       });
 
       // Calculate product subtotal in cents (excluding shipping)
@@ -418,8 +516,15 @@ export const CheckoutPage: React.FC = () => {
         return;
       }
 
+      // Debug the decision logic
+      console.log('🔍 Decision Logic:');
+      console.log('  - Is fixed?', couponDetails.discount_type === 'fixed' || couponDetails.type === 'fixed');
+      console.log('  - Is percent?', couponDetails.discount_type === 'percent' || couponDetails.type === 'percent');
+      console.log('  - discount_value:', couponDetails.discount_value);
+      console.log('  - percent:', couponDetails.percent);
+
       // For fixed amount coupons, always keep the original discount
-      if (couponDetails.type === 'fixed') {
+      if (couponDetails.discount_type === 'fixed' || couponDetails.type === 'fixed') {
         const originalDiscount = Number(couponDetails.discount_cents || 0);
         const finalDiscount = originalDiscount / 100;
         console.log('✅ Fixed coupon - keeping original discount:', finalDiscount, 'Rands');
@@ -429,8 +534,10 @@ export const CheckoutPage: React.FC = () => {
       }
 
       // For percentage coupons, recalculate based on current subtotal
-      if (couponDetails.percent || couponDetails.type === 'percent') {
-        const percent = Number(couponDetails.percent || 0);
+      if (couponDetails.discount_type === 'percent' || couponDetails.type === 'percent') {
+        const percent = Number(couponDetails.discount_value || couponDetails.percent || 0);
+        console.log('🎯 Percentage calculation:', { percent, productSubtotal });
+        
         if (percent > 0) {
           let newDiscountCents = Math.round(productSubtotal * (percent / 100));
           
@@ -438,6 +545,7 @@ export const CheckoutPage: React.FC = () => {
           const maxDiscountCents = couponDetails.max_discount_cents || 0;
           if (maxDiscountCents > 0 && newDiscountCents > maxDiscountCents) {
             newDiscountCents = maxDiscountCents;
+            console.log('🎯 Max discount cap applied:', maxDiscountCents);
           }
 
           // Safety: Discount cannot exceed the product subtotal
@@ -446,17 +554,36 @@ export const CheckoutPage: React.FC = () => {
           }
 
           const finalDiscount = Math.max(0, newDiscountCents / 100);
-          console.log('✅ Percentage coupon recalculated:', finalDiscount, 'Rands');
+          console.log('✅ Percentage coupon recalculated:', {
+            originalPercent: percent,
+            productSubtotal: productSubtotal / 100,
+            newDiscountCents,
+            finalDiscount
+          });
           setDiscount(finalDiscount);
           setCouponError('');
           return;
+        } else {
+          console.log('❌ No valid percentage found:', percent);
         }
       }
 
-      // Fallback: use original discount if we can't determine type
+      console.log('❌ No matching coupon type found');
+
+      // FALLBACK 1: Try simple recalculation
+      console.log('🔄 FALLBACK: Trying simple recalculation...');
+      const simpleDiscount = recalculateSimpleDiscount(cartState.subtotal);
+      if (simpleDiscount > 0) {
+        console.log('✅ Simple recalculation succeeded:', simpleDiscount, 'Rands');
+        setDiscount(simpleDiscount);
+        setCouponError('');
+        return;
+      }
+
+      // FALLBACK 2: use original discount if we can't determine type
       const originalDiscount = Number(couponDetails.discount_cents || 0);
       const finalDiscount = originalDiscount / 100;
-      console.log('✅ Using original discount (fallback):', finalDiscount, 'Rands');
+      console.log('✅ Using original discount (final fallback):', finalDiscount, 'Rands');
       setDiscount(finalDiscount);
       setCouponError('');
 
@@ -1259,7 +1386,21 @@ export const CheckoutPage: React.FC = () => {
                   {/* Coupon Code */}
                   <div className="border-t pt-4">
                     <div className="space-y-3">
-                      <h4 className="font-medium text-sm">Coupon Code</h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium text-sm">Coupon Code</h4>
+                        {appliedCoupon && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              console.log('🧪 TEST BUTTON: Forcing recalculation...');
+                              recalculateCouponDiscount();
+                            }}
+                            className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded hover:bg-blue-200"
+                          >
+                            Test Recalc
+                          </button>
+                        )}
+                      </div>
                       {!appliedCoupon ? (
                         <div className="flex gap-2">
                           <input
@@ -1288,6 +1429,16 @@ export const CheckoutPage: React.FC = () => {
                             <p className="text-xs text-green-600">
                               Discount: -{formatPrice(discount)}
                             </p>
+                            {/* Debug info */}
+                            {process.env.NODE_ENV === 'development' && (
+                              <details className="mt-2 text-xs text-gray-600">
+                                <summary>Debug Info</summary>
+                                <div className="mt-1 p-2 bg-gray-100 rounded">
+                                  <p>Simple Data: {JSON.stringify(simpleCouponData, null, 2)}</p>
+                                  <p>Coupon Details: {couponDetails ? `Type: ${couponDetails.discount_type}, Value: ${couponDetails.discount_value}` : 'null'}</p>
+                                </div>
+                              </details>
+                            )}
                           </div>
                           <button
                             type="button"
