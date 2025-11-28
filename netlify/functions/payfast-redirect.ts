@@ -5,7 +5,7 @@ import crypto from 'crypto';
 
 // Always use live endpoint
 const PF_BASE = 'https://www.payfast.co.za';
-const SITE_BASE_URL = process.env.SITE_BASE_URL || process.env.URL || '';
+const SITE_BASE_URL = (process.env.SITE_BASE_URL || process.env.URL || 'https://blom-cosmetics.co.za').replace(/\/+$/, '');
 const CANCEL_URL = `${SITE_BASE_URL}/checkout/cancel`;
 const NOTIFY_URL = process.env.PAYFAST_NOTIFY_URL || '';
 

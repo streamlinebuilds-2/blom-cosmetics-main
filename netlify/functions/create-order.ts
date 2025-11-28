@@ -193,6 +193,7 @@ export const handler: Handler = async (event) => {
     // --- 4. Apply Coupon (RPC) with Cart Item Validation ---
     let discount_cents = 0
     let applied_coupon_id: string | null = null
+    let validation_token: string | null = null
     if (coupon?.code) {
       try {
         // Convert cart items to the expected format for coupon validation
@@ -209,6 +210,9 @@ export const handler: Handler = async (event) => {
           cart_items: cartItemsForValidation
         }, null, 2))
 
+        // Use validation token from frontend or generate one
+        const token = coupon.validation_token || `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+
         const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
           method: 'POST',
           headers: {
@@ -219,7 +223,9 @@ export const handler: Handler = async (event) => {
           body: JSON.stringify({
             p_code: String(coupon.code).toUpperCase(),
             p_email: buyer.email || '',
-            p_order_total_cents: subtotal_cents
+            p_order_total_cents: subtotal_cents,
+            p_cart_items: cartItemsForValidation,
+            p_validation_token: token
           })
         })
 
@@ -231,27 +237,13 @@ export const handler: Handler = async (event) => {
           if (row?.valid) {
             discount_cents = Number(row.discount_cents) || 0
             applied_coupon_id = row.coupon_id || null
+            validation_token = row.validation_token || token
             
-            // Mark coupon as used immediately after successful validation
-            if (applied_coupon_id) {
-              try {
-                await fetch(`${SUPABASE_URL}/rest/v1/rpc/mark_coupon_used`, {
-                  method: 'POST',
-                  headers: {
-                    apikey: SERVICE_KEY,
-                    Authorization: `Bearer ${SERVICE_KEY}`,
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                    p_code: String(coupon.code).toUpperCase()
-                  })
-                })
-                console.log('✅ Coupon marked as used:', coupon.code)
-              } catch (markError) {
-                console.error('⚠️ Failed to mark coupon as used:', markError)
-                // Don't fail the order if marking fails - just log it
-              }
-            }
+            console.log('✅ Coupon validated successfully:', {
+              discount_cents,
+              applied_coupon_id,
+              validation_token
+            })
           } else {
             console.log('❌ Coupon validation failed:', row?.message || 'Unknown error')
             return {
@@ -352,18 +344,42 @@ export const handler: Handler = async (event) => {
 
     const rpcData = await rpcRes.json()
     const orderRow = Array.isArray(rpcData) ? rpcData[0] : rpcData
+    const orderId = orderRow?.order_id
+
+    // If we have a validation token and order was created successfully, mark validation as completed
+    if (validation_token && orderId) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/rpc/mark_coupon_validation_completed`, {
+          method: 'POST',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            p_validation_token: validation_token,
+            p_order_id: orderId
+          })
+        })
+        console.log('✅ Coupon validation marked as completed:', validation_token)
+      } catch (markError) {
+        console.error('⚠️ Failed to mark validation as completed:', markError)
+        // Don't fail the order if this fails - just log it
+      }
+    }
 
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        order_id: orderRow?.order_id,
+        order_id: orderId,
         order_number,
         m_payment_id,
         merchant_payment_id: m_payment_id,
         amount: amountStr,
         total_cents,
-        discount_cents
+        discount_cents,
+        validation_token: validation_token // Return for frontend reference
       })
     }
 

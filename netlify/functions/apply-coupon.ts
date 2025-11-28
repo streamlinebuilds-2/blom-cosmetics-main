@@ -87,8 +87,9 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Success - return coupon details
+    // Success - return coupon details with validation token
     const discountRands = Number(result.discount_cents) / 100;
+    const validationToken = result.validation_token;
 
     return {
       statusCode: 200,
@@ -105,7 +106,8 @@ export const handler: Handler = async (event) => {
         discount_type: result.discount_type,
         discount_value: result.discount_value,
         message: result.message,
-        min_order_cents: result.min_order_cents
+        min_order_cents: result.min_order_cents,
+        validation_token: validationToken // Frontend should store this and send with order creation
       })
     };
 
