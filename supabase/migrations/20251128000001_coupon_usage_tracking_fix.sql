@@ -264,14 +264,16 @@ END;
 $$;
 
 -- 5. Updated function to mark coupon as used (now mainly for multi-use coupons)
+DROP FUNCTION IF EXISTS public.mark_coupon_used(text);
+
 CREATE OR REPLACE FUNCTION public.mark_coupon_used(p_code text)
 RETURNS void
 LANGUAGE plpgsql
-AS $$
+AS $
   UPDATE public.coupons
   SET used_count = COALESCE(used_count, 0) + 1
   WHERE upper(code) = upper(p_code);
-$$;
+$;
 
 -- 6. Grant permissions
 GRANT EXECUTE ON FUNCTION public.cleanup_expired_coupon_validations() TO service_role;
