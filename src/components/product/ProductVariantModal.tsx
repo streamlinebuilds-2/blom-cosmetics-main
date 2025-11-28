@@ -182,7 +182,11 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
           <button
             onClick={handleAddToCart}
             disabled={!selectedVariant || loading}
-            className="w-full px-6 py-3 bg-pink-400 text-white rounded-full font-semibold hover:bg-pink-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className={`w-full px-6 py-3 rounded-full font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+              !selectedVariant 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                : 'bg-pink-400 text-white hover:bg-pink-500'
+            }`}
           >
             {loading ? (
               <div className="flex items-center justify-center gap-2">
@@ -192,14 +196,14 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <ShoppingCart className="h-4 w-4" />
-                Add to Cart
+                {!selectedVariant ? 'Select a Variant' : 'Add to Cart'}
               </div>
             )}
           </button>
           
           {!selectedVariant && (
-            <div className="mt-2 text-sm text-amber-600 text-center">
-              Select a variant to continue
+            <div className="mt-2 text-sm text-red-600 text-center font-medium">
+              ⚠️ Please select a variant to continue
             </div>
           )}
         </div>

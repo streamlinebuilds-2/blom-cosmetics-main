@@ -145,14 +145,55 @@ export const CartWidget: React.FC = () => {
     }
   ];
 
-  const addRecommendedToCart = (product: any) => {
+  const handleRecommendedProductClick = (product: any) => {
+    // Check if product has variants
+    if (getProductVariants(product.id).length > 0) {
+      // Show variant selector
+      const productData = {
+        id: product.id,
+        name: product.name,
+        slug: product.id,
+        price: product.price,
+        images: [product.image],
+        variants: getProductVariants(product.id)
+      };
+      
+      setSelectedItemForVariant({
+        productData,
+        isRecommendedProduct: true,
+        originalProduct: product
+      });
+      setShowVariantModal(true);
+      return;
+    }
+    
+    // Add directly to cart if no variants
     cartStore.addItem({
       id: `item_${Date.now()}`,
       productId: product.id,
       name: product.name,
       price: product.price,
-      image: product.image
+      image: product.image,
+      variant: { title: 'Default' }
     });
+  };
+
+  const handleRecommendedVariantUpdate = (selectedVariant: any, quantity: number) => {
+    if (!selectedItemForVariant?.originalProduct) return;
+    
+    // Add the recommended product with selected variant
+    cartStore.addItem({
+      id: `item_${Date.now()}`,
+      productId: selectedItemForVariant.originalProduct.id,
+      variantId: selectedVariant.name,
+      name: selectedItemForVariant.originalProduct.name,
+      price: selectedVariant.price || selectedItemForVariant.originalProduct.price,
+      image: selectedVariant.image || selectedItemForVariant.originalProduct.image,
+      variant: { title: selectedVariant.name }
+    }, quantity);
+    
+    setShowVariantModal(false);
+    setSelectedItemForVariant(null);
   };
 
   return (
@@ -293,9 +334,9 @@ export const CartWidget: React.FC = () => {
                           </div>
                           <Button
                             size="sm"
-                            onClick={() => addRecommendedToCart(product)}
+                            onClick={() => handleRecommendedProductClick(product)}
                           >
-                            Add
+                            {getProductVariants(product.id).length > 0 ? 'Choose Variant' : 'Add'}
                           </Button>
                         </div>
                       ))}
@@ -361,7 +402,7 @@ export const CartWidget: React.FC = () => {
           variants: []
         }}
         initialQuantity={selectedItemForVariant?.quantity || 1}
-        onVariantSelect={handleVariantUpdate}
+        onVariantSelect={selectedItemForVariant?.isRecommendedProduct ? handleRecommendedVariantUpdate : handleVariantUpdate}
       />
     </>
   );
