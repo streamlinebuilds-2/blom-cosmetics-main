@@ -16,18 +16,36 @@ ADD COLUMN IF NOT EXISTS original_discount_cents integer;
 -- 2. Create function to calculate cart hash for tamper detection
 CREATE OR REPLACE FUNCTION public.calculate_cart_hash(p_cart_items jsonb)
 RETURNS text
-LANGUAGE sql
-AS $$
-  -- Create a normalized cart representation and hash it
-  SELECT md5(
-    jsonb_pretty(
-      jsonb_object_agg(
-        concat_ws(':', key, value) ORDER BY key
-      ) ORDER BY key
-    )
-  )::text
-  FROM jsonb_each_object(p_cart_items) key, value;
-$$;
+LANGUAGE plpgsql
+AS $
+DECLARE
+  v_hash_input text := '';
+  v_item record;
+BEGIN
+  -- Handle empty or null cart
+  IF p_cart_items IS NULL OR p_cart_items = '[]'::jsonb THEN
+    RETURN md5('empty_cart');
+  END IF;
+  
+  -- Sort cart items by product_id, quantity, and unit_price for consistent hashing
+  FOR v_item IN 
+    SELECT 
+      COALESCE((item->>'product_id')::text, '') as product_id,
+      COALESCE((item->>'quantity')::text, '0') as quantity,
+      COALESCE((item->>'unit_price_cents')::text, '0') as unit_price_cents
+    FROM jsonb_array_elements(p_cart_items) AS item
+    ORDER BY 
+      COALESCE((item->>'product_id')::text, ''),
+      COALESCE((item->>'quantity')::text, '0'),
+      COALESCE((item->>'unit_price_cents')::text, '0')
+  LOOP
+    v_hash_input := v_hash_input || v_item.product_id || ':' || v_item.quantity || ':' || v_item.unit_price_cents || '|';
+  END LOOP;
+  
+  -- Return the MD5 hash of the normalized cart representation
+  RETURN md5(v_hash_input);
+END;
+$;
 
 -- 3. Enhanced redeem_coupon function with cart snapshot
 DROP FUNCTION IF EXISTS public.redeem_coupon(text, text, integer, jsonb, text);
