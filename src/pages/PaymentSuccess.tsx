@@ -76,13 +76,26 @@ export default function PaymentSuccess() {
                 {/* Action Buttons */}
                 <div className="space-y-4">
                   {orderInfo && (
-                    <a
-                      href={`/invoice?m_payment_id=${encodeURIComponent(orderInfo.orderId)}&fallback=1`}
-                      className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <FileText className="w-5 h-5 mr-2" />
-                      View Invoice
-                    </a>
+                    <>
+                      {/* View Receipt Button */}
+                      <a
+                        href={`/.netlify/functions/invoice-pdf?inline=1&m_payment_id=${encodeURIComponent(orderInfo.orderId)}&v=${Date.now()}`}
+                        target="_blank" rel="noopener"
+                        className="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        <FileText className="w-5 h-5 mr-2" />
+                        View Receipt
+                      </a>
+                      
+                      {/* Download Receipt Button */}
+                      <a
+                        href={`/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(orderInfo.orderId)}&download=1&v=${Date.now()}`}
+                        className="w-full flex items-center justify-center px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        <FileText className="w-5 h-5 mr-2" />
+                        Download Receipt (PDF)
+                      </a>
+                    </>
                   )}
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
