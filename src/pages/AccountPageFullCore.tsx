@@ -280,35 +280,61 @@ export default function AccountPageFullCore() {
                                   size="sm" 
                                   onClick={async () => {
                                     const mPaymentId = (o as any).m_payment_id;
-                                    // Add cache-busting version to force fresh PDF
-                                    const v = Date.now();
-                                    const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(mPaymentId)}&download=1&v=${v}`;
+                                    const invoiceUrl = o.invoice_url;
                                     
-                                    // Fetch and trigger download
-                                    try {
-                                      const response = await fetch(url);
-                                      if (response.ok) {
-                                        const blob = await response.blob();
-                                        const downloadUrl = window.URL.createObjectURL(blob);
-                                        const link = document.createElement('a');
-                                        link.href = downloadUrl;
-                                        link.download = `BLOM-Receipt-${mPaymentId}.pdf`;
-                                        document.body.appendChild(link);
-                                        link.click();
-                                        document.body.removeChild(link);
-                                        window.URL.revokeObjectURL(downloadUrl);
-                                      } else {
+                                    if (invoiceUrl) {
+                                      // Use stored invoice URL - direct download
+                                      try {
+                                        const response = await fetch(invoiceUrl);
+                                        if (response.ok) {
+                                          const blob = await response.blob();
+                                          const downloadUrl = window.URL.createObjectURL(blob);
+                                          const link = document.createElement('a');
+                                          link.href = downloadUrl;
+                                          link.download = `BLOM-Receipt-${mPaymentId}.pdf`;
+                                          document.body.appendChild(link);
+                                          link.click();
+                                          document.body.removeChild(link);
+                                          window.URL.revokeObjectURL(downloadUrl);
+                                        } else {
+                                          // Fallback to opening invoice URL in new tab
+                                          window.open(invoiceUrl, '_blank');
+                                        }
+                                      } catch (error) {
+                                        console.error('Download failed:', error);
+                                        // Fallback to opening invoice URL in new tab
+                                        window.open(invoiceUrl, '_blank');
+                                      }
+                                    } else {
+                                      // Fallback to generating PDF on-the-fly
+                                      const v = Date.now();
+                                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(mPaymentId)}&download=1&v=${v}`;
+                                      
+                                      try {
+                                        const response = await fetch(url);
+                                        if (response.ok) {
+                                          const blob = await response.blob();
+                                          const downloadUrl = window.URL.createObjectURL(blob);
+                                          const link = document.createElement('a');
+                                          link.href = downloadUrl;
+                                          link.download = `BLOM-Receipt-${mPaymentId}.pdf`;
+                                          document.body.appendChild(link);
+                                          link.click();
+                                          document.body.removeChild(link);
+                                          window.URL.revokeObjectURL(downloadUrl);
+                                        } else {
+                                          // Fallback to opening in new tab
+                                          window.open(url, '_blank');
+                                        }
+                                      } catch (error) {
+                                        console.error('Download failed:', error);
                                         // Fallback to opening in new tab
                                         window.open(url, '_blank');
                                       }
-                                    } catch (error) {
-                                      console.error('Download failed:', error);
-                                      // Fallback to opening in new tab
-                                      window.open(url, '_blank');
                                     }
                                   }}
                                 >
-                                  Download Receipt
+                                  {o.invoice_url ? 'Download Receipt' : 'Generate Receipt'}
                                 </Button>
                               )}
                             </div>

@@ -25,8 +25,10 @@ type Order = {
   created_at: string;
   buyer_name: string | null;
   buyer_email: string | null;
+  buyer_phone: string | null;
   fulfillment_method: string | null;
   delivery_address: any;
+  invoice_url: string | null;
   items: OrderItem[];
 };
 
@@ -47,7 +49,7 @@ export default function OrderDetailPage() {
         // Try orders_account_v1 view first, fallback to orders table
         let orderQuery = supabase
           .from('orders_account_v1')
-          .select('id, m_payment_id, order_number, status, total, created_at, buyer_name, buyer_email, fulfillment_method, delivery_address')
+          .select('id, m_payment_id, order_number, status, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
           .eq('id', orderId)
           .maybeSingle();
 
@@ -57,7 +59,7 @@ export default function OrderDetailPage() {
         if (orderError && (orderError.code === '42P01' || orderError.message?.includes('does not exist'))) {
           orderQuery = supabase
             .from('orders')
-            .select('id, m_payment_id, order_number, status, total, created_at, buyer_name, buyer_email, fulfillment_method, delivery_address')
+            .select('id, m_payment_id, order_number, status, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
             .eq('id', orderId)
             .maybeSingle();
           
@@ -107,8 +109,10 @@ export default function OrderDetailPage() {
           created_at: String(orderData.created_at || new Date().toISOString()),
           buyer_name: orderData.buyer_name || null,
           buyer_email: orderData.buyer_email || null,
+          buyer_phone: orderData.buyer_phone || null,
           fulfillment_method: orderData.fulfillment_method || null,
           delivery_address: orderData.delivery_address || null,
+          invoice_url: orderData.invoice_url || null,
           items: (itemsData || []).map((item: any) => {
             const qty = Number(item.quantity || 0);
             const unit = Number(item.unit_price || 0);
@@ -276,35 +280,62 @@ export default function OrderDetailPage() {
                   <Button 
                     variant="outline"
                     onClick={async () => {
-                      // Add cache-busting version to force fresh PDF
-                      const v = Date.now();
-                      const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(order.m_payment_id)}&download=1&v=${v}`;
+                      const mPaymentId = order.m_payment_id!;
+                      const invoiceUrl = order.invoice_url;
                       
-                      // Fetch and trigger download
-                      try {
-                        const response = await fetch(url);
-                        if (response.ok) {
-                          const blob = await response.blob();
-                          const downloadUrl = window.URL.createObjectURL(blob);
-                          const link = document.createElement('a');
-                          link.href = downloadUrl;
-                          link.download = `BLOM-Receipt-${order.m_payment_id}.pdf`;
-                          document.body.appendChild(link);
-                          link.click();
-                          document.body.removeChild(link);
-                          window.URL.revokeObjectURL(downloadUrl);
-                        } else {
+                      if (invoiceUrl) {
+                        // Use stored invoice URL - direct download
+                        try {
+                          const response = await fetch(invoiceUrl);
+                          if (response.ok) {
+                            const blob = await response.blob();
+                            const downloadUrl = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = downloadUrl;
+                            link.download = `BLOM-Receipt-${mPaymentId}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(downloadUrl);
+                          } else {
+                            // Fallback to opening invoice URL in new tab
+                            window.open(invoiceUrl, '_blank');
+                          }
+                        } catch (error) {
+                          console.error('Download failed:', error);
+                          // Fallback to opening invoice URL in new tab
+                          window.open(invoiceUrl, '_blank');
+                        }
+                      } else {
+                        // Fallback to generating PDF on-the-fly
+                        const v = Date.now();
+                        const url = `/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(mPaymentId)}&download=1&v=${v}`;
+                        
+                        try {
+                          const response = await fetch(url);
+                          if (response.ok) {
+                            const blob = await response.blob();
+                            const downloadUrl = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = downloadUrl;
+                            link.download = `BLOM-Receipt-${mPaymentId}.pdf`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(downloadUrl);
+                          } else {
+                            // Fallback to opening in new tab
+                            window.open(url, '_blank');
+                          }
+                        } catch (error) {
+                          console.error('Download failed:', error);
                           // Fallback to opening in new tab
                           window.open(url, '_blank');
                         }
-                      } catch (error) {
-                        console.error('Download failed:', error);
-                        // Fallback to opening in new tab
-                        window.open(url, '_blank');
                       }
                     }}
                   >
-                    Download Receipt
+                    {order.invoice_url ? 'Download Receipt' : 'Generate Receipt'}
                   </Button>
                 )}
               </div>
