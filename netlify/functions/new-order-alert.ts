@@ -19,6 +19,7 @@ interface OrderData {
   currency: string;
   created_at: string;
   paid_at?: string;
+  invoice_url?: string | null;
   customer_email: string;
   customer_name: string;
   customer_phone?: string;
@@ -50,7 +51,7 @@ async function fetchOrderDetails(orderId: string): Promise<any> {
 
   // Fetch order details
   const orderRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}&select=*`,
+    `${SUPABASE_URL}/rest/v1/orders?id=eq.${orderId}&select=*,invoice_url`,
     {
       headers: {
         apikey: SERVICE_KEY,
@@ -130,6 +131,7 @@ async function fetchOrderDetails(orderId: string): Promise<any> {
     order_id: order.id,
     order_number: order.order_number || order.m_payment_id || orderId,
     status: order.status,
+    invoice_url: order.invoice_url || null,
     payment_status: order.payment_status,
     total_amount: Number(order.total || order.total_amount || 0),
     currency: order.currency || 'ZAR',
