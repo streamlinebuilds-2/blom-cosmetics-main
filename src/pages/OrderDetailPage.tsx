@@ -21,6 +21,8 @@ type Order = {
   m_payment_id: string | null;
   order_number: string | null;
   status: string;
+  shipping_status: string | null;
+  order_packed_at: string | null;
   total: number;
   created_at: string;
   buyer_name: string | null;
@@ -49,7 +51,7 @@ export default function OrderDetailPage() {
         // Try orders_account_v1 view first, fallback to orders table
         let orderQuery = supabase
           .from('orders_account_v1')
-          .select('id, m_payment_id, order_number, status, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
+          .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
           .eq('id', orderId)
           .maybeSingle();
 
@@ -59,7 +61,7 @@ export default function OrderDetailPage() {
         if (orderError && (orderError.code === '42P01' || orderError.message?.includes('does not exist'))) {
           orderQuery = supabase
             .from('orders')
-            .select('id, m_payment_id, order_number, status, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
+            .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
             .eq('id', orderId)
             .maybeSingle();
           
@@ -105,6 +107,8 @@ export default function OrderDetailPage() {
           m_payment_id: orderData.m_payment_id || null,
           order_number: orderData.order_number || null,
           status: String(orderData.status || 'unknown'),
+          shipping_status: orderData.shipping_status || null,
+          order_packed_at: orderData.order_packed_at || null,
           total: Number(orderData.total || 0),
           created_at: String(orderData.created_at || new Date().toISOString()),
           buyer_name: orderData.buyer_name || null,
@@ -211,6 +215,38 @@ export default function OrderDetailPage() {
                       </div>
                     )}
                   </div>
+                </div>
+              </div>
+
+              {/* Order Status section */}
+              <div className="pb-6 border-b">
+                <h2 className="font-bold text-base mb-3">Order Status</h2>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-600">Payment Status:</span>
+                    <span className="font-medium capitalize">{order.status}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-600">Shipping Status:</span>
+                    <span className="font-medium">
+                      {order.shipping_status === 'ready_for_collection' && order.order_packed_at 
+                        ? 'Ready for Collection' 
+                        : order.shipping_status === 'pending' 
+                          ? 'Processing' 
+                          : order.shipping_status || 'Not Set'}
+                    </span>
+                  </div>
+                  {order.order_packed_at && (
+                    <div className="flex items-center gap-3">
+                      <span className="text-gray-600">Packed On:</span>
+                      <span className="font-medium">
+                        {new Date(order.order_packed_at).toLocaleString('en-ZA', { 
+                          dateStyle: 'medium', 
+                          timeStyle: 'short' 
+                        })}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 

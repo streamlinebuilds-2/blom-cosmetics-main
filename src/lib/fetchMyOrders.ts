@@ -6,6 +6,8 @@ export interface Order {
   order_number: string | null;
   order_display?: string | null;
   status: string;
+  shipping_status: string | null;
+  order_packed_at: string | null;
   total_cents: number | null;
   total: number | null;
   currency: string;
@@ -32,7 +34,7 @@ export async function fetchMyOrders(): Promise<Order[]> {
   // Query orders_account_v1 view if it exists, otherwise fallback to orders table
   let q = supabase
     .from('orders_account_v1')
-    .select('id, m_payment_id, order_number, order_display, status, total, currency, created_at, invoice_url, buyer_name, buyer_email')
+    .select('id, m_payment_id, order_number, order_display, status, shipping_status, order_packed_at, total, currency, created_at, invoice_url, buyer_name, buyer_email')
     .order('created_at', { ascending: false });
 
   // Apply filter: user_id if logged in, otherwise buyer_email
@@ -49,7 +51,7 @@ export async function fetchMyOrders(): Promise<Order[]> {
     // Table/view doesn't exist, use orders table directly
     let fallbackQuery = supabase
       .from('orders')
-      .select('id, m_payment_id, order_number, status, total, currency, created_at, invoice_url, buyer_name, buyer_email')
+      .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, currency, created_at, invoice_url, buyer_name, buyer_email')
       .order('created_at', { ascending: false });
 
     if (user?.id) {

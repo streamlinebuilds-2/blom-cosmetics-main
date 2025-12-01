@@ -16,7 +16,7 @@ export default function AccountPageFullCore() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [orders, setOrders] = useState<Array<{ id: string; m_payment_id?: string | null; order_number?: string | null; order_display?: string | null; status: string; total: number; created_at: string; invoice_url?: string | null; buyer_name?: string | null; buyer_email?: string | null }>>([]);
+  const [orders, setOrders] = useState<Array<{ id: string; m_payment_id?: string | null; order_number?: string | null; order_display?: string | null; status: string; shipping_status?: string | null; order_packed_at?: string | null; total: number; created_at: string; invoice_url?: string | null; buyer_name?: string | null; buyer_email?: string | null }>>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
@@ -64,6 +64,8 @@ export default function AccountPageFullCore() {
           order_number: o.order_number || null,
           order_display: o.order_display || null,
           status: String(o.status || 'unknown'),
+          shipping_status: o.shipping_status || null,
+          order_packed_at: o.order_packed_at || null,
           total: Number(o.total || (o.total_cents ? o.total_cents / 100 : 0)),
           created_at: String(o.created_at || new Date().toISOString()),
           invoice_url: o.invoice_url || null,
@@ -269,7 +271,13 @@ export default function AccountPageFullCore() {
                               </div>
                               <div className="text-right">
                                 <div className="font-bold">R{o.total.toFixed(2)}</div>
-                                <div className="text-sm text-gray-500 capitalize">{o.status}</div>
+                                <div className="text-sm text-gray-500 capitalize">
+                                  {o.shipping_status === 'ready_for_collection' && o.order_packed_at 
+                                    ? 'Ready for Collection' 
+                                    : o.shipping_status === 'pending' 
+                                      ? 'Processing' 
+                                      : o.status}
+                                </div>
                               </div>
                             </div>
                             <div className="mt-4 flex flex-wrap gap-2">
