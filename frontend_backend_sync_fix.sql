@@ -44,6 +44,7 @@ DECLARE
   v_discount_cents integer := 0;
   v_discount_type text;
   v_discount_value integer;
+  v_min_order integer;
   v_eligible_total_cents integer := 0;
   v_excluded_total_cents integer := 0;
   v_item record;
