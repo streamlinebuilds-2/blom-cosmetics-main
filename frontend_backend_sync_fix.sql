@@ -261,18 +261,18 @@ DECLARE
 BEGIN
   -- Call the discount-only function (same calculation, different message)
   SELECT 
-    discount_cents,
-    discount_type,
-    discount_value,
-    coupon_id,
-    format('%s (recalculated)', full_message)
+    r.discount_cents,
+    r.discount_type,
+    r.discount_value,
+    r.coupon_id,
+    format('%s (recalculated)', r.full_message)
   INTO 
     v_discount_cents,
     v_discount_type,
     v_discount_value,
     v_coupon_id,
     v_full_message
-  FROM public.redeem_coupon_discount_only(p_code, p_email, p_order_total_cents, p_cart_items);
+  FROM public.redeem_coupon_discount_only(p_code, p_email, p_order_total_cents, p_cart_items) r;
   
   -- Get min order from coupon
   SELECT min_order_cents INTO v_min_order

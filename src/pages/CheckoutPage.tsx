@@ -487,111 +487,93 @@ export const CheckoutPage: React.FC = () => {
       console.log('🔍 couponDetails keys:', Object.keys(couponDetails));
       console.log('🎯 appliedCoupon:', appliedCoupon);
       console.log('🛒 cartState.subtotal:', cartState.subtotal);
-      
-      // Debug each field access
-      console.log('💡 discount_type:', couponDetails.discount_type);
-      console.log('💡 discount_value:', couponDetails.discount_value);
-      console.log('💡 type (old field):', couponDetails.type);
-      console.log('💡 percent (old field):', couponDetails.percent);
-      console.log('💡 percent_off (old field):', couponDetails.percent_off);
 
-      console.log('🔄 Recalculating coupon discount...', { 
+      console.log('🔄 SECURE BACKEND RECALCULATION - Using backend for max discount enforcement...', { 
         couponCode: appliedCoupon.code, 
         originalDiscount: couponDetails.discount_cents,
-        cartSubtotal: cartState.subtotal,
-        couponType: couponDetails.discount_type,     // ✅ Fixed: use discount_type from backend
-        couponPercent: couponDetails.discount_value  // ✅ Fixed: use discount_value from backend
+        cartSubtotal: cartState.subtotal
       });
 
       // Calculate product subtotal in cents (excluding shipping)
       const productSubtotal = Math.round(cartState.subtotal * 100);
       
-      // Check minimum order requirement if it exists
-      const minOrderCents = couponDetails.min_order_cents || couponDetails.min_order_total || 0;
-      if (minOrderCents > 0 && productSubtotal < minOrderCents) {
-        console.log('❌ Minimum order not met, removing coupon');
-        // Minimum order not met, remove coupon
-        setCouponError(`Order must be over R${(minOrderCents / 100).toFixed(0)} to use this coupon`);
+      // Get Supabase URL and key
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env.SUPABASE_ANON_KEY;
+      
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.log('❌ Supabase configuration missing, using fallback');
+        // Fallback to original discount if config missing
+        const originalDiscount = Number(couponDetails.discount_cents || 0);
+        setDiscount(originalDiscount / 100);
+        return;
+      }
+
+      console.log('🔄 Calling backend recalculate_coupon_discount for secure max discount enforcement...');
+
+      // Call the backend function for secure recalculation (enforces max discount)
+      const res = await fetch(`${supabaseUrl}/rest/v1/rpc/recalculate_coupon_discount`, {
+        method: 'POST',
+        headers: {
+          apikey: supabaseAnonKey,
+          Authorization: `Bearer ${supabaseAnonKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          p_code: appliedCoupon.code,
+          p_email: shippingInfo.email || '',
+          p_order_total_cents: productSubtotal,
+          p_cart_items: '[]'::jsonb  // Empty cart items for now, can be enhanced later
+        }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('❌ Backend recalculation failed:', errorText);
+        // Fallback to original discount
+        const originalDiscount = Number(couponDetails.discount_cents || 0);
+        console.log('🔄 Using original discount as fallback:', originalDiscount / 100, 'Rands');
+        setDiscount(originalDiscount / 100);
+        return;
+      }
+
+      const data = await res.json();
+      const result = Array.isArray(data) ? data[0] : data;
+      
+      if (!result.valid) {
+        console.log('❌ Backend validation failed:', result.message);
+        // If backend says it's invalid, remove the coupon
+        setCouponError(result.message || 'Coupon no longer valid');
         handleRemoveCoupon();
         return;
       }
 
-      // Debug the decision logic
-      console.log('🔍 Decision Logic:');
-      console.log('  - Is fixed?', couponDetails.discount_type === 'fixed' || couponDetails.type === 'fixed');
-      console.log('  - Is percent?', couponDetails.discount_type === 'percent' || couponDetails.type === 'percent');
-      console.log('  - discount_value:', couponDetails.discount_value);
-      console.log('  - percent:', couponDetails.percent);
+      // Use the backend's calculation (which includes max discount enforcement)
+      const backendDiscount = result.discount_cents / 100;
+      console.log('✅ Backend recalculated:', {
+        newDiscount: backendDiscount,
+        message: result.message,
+        originalMessage: couponDetails.message
+      });
 
-      // For fixed amount coupons, always keep the original discount
-      if (couponDetails.discount_type === 'fixed' || couponDetails.type === 'fixed') {
-        const originalDiscount = Number(couponDetails.discount_cents || 0);
-        const finalDiscount = originalDiscount / 100;
-        console.log('✅ Fixed coupon - keeping original discount:', finalDiscount, 'Rands');
-        setDiscount(finalDiscount);
-        setCouponError('');
-        return;
-      }
-
-      // For percentage coupons, recalculate based on current subtotal
-      if (couponDetails.discount_type === 'percent' || couponDetails.type === 'percent') {
-        const percent = Number(couponDetails.discount_value || couponDetails.percent || 0);
-        console.log('🎯 Percentage calculation:', { percent, productSubtotal });
-        
-        if (percent > 0) {
-          let newDiscountCents = Math.round(productSubtotal * (percent / 100));
-          
-          // Apply max discount cap if exists
-          const maxDiscountCents = couponDetails.max_discount_cents || 0;
-          if (maxDiscountCents > 0 && newDiscountCents > maxDiscountCents) {
-            newDiscountCents = maxDiscountCents;
-            console.log('🎯 Max discount cap applied:', maxDiscountCents);
-          }
-
-          // Safety: Discount cannot exceed the product subtotal
-          if (newDiscountCents > productSubtotal) {
-            newDiscountCents = productSubtotal;
-          }
-
-          const finalDiscount = Math.max(0, newDiscountCents / 100);
-          console.log('✅ Percentage coupon recalculated:', {
-            originalPercent: percent,
-            productSubtotal: productSubtotal / 100,
-            newDiscountCents,
-            finalDiscount
-          });
-          setDiscount(finalDiscount);
-          setCouponError('');
-          return;
-        } else {
-          console.log('❌ No valid percentage found:', percent);
-        }
-      }
-
-      console.log('❌ No matching coupon type found');
-
-      // FALLBACK 1: Try simple recalculation
-      console.log('🔄 FALLBACK: Trying simple recalculation...');
-      const simpleDiscount = recalculateSimpleDiscount(cartState.subtotal);
-      if (simpleDiscount > 0) {
-        console.log('✅ Simple recalculation succeeded:', simpleDiscount, 'Rands');
-        setDiscount(simpleDiscount);
-        setCouponError('');
-        return;
-      }
-
-      // FALLBACK 2: use original discount if we can't determine type
-      const originalDiscount = Number(couponDetails.discount_cents || 0);
-      const finalDiscount = originalDiscount / 100;
-      console.log('✅ Using original discount (final fallback):', finalDiscount, 'Rands');
-      setDiscount(finalDiscount);
+      // Update with backend's secure calculation
+      setDiscount(backendDiscount);
       setCouponError('');
+      
+      // Update coupon details with the latest backend response
+      setCouponDetails({
+        ...couponDetails,
+        discount_cents: result.discount_cents,
+        message: result.message
+      });
 
     } catch (error) {
-      console.error('❌ Error recalculating coupon discount:', error);
-      // Don't remove coupon on calculation error, just log and maintain existing state
-      console.log('🔄 Keeping existing discount due to error');
-      setCouponError('Unable to recalculate discount. Current discount may be incorrect.');
+      console.error('❌ Error in secure backend recalculation:', error);
+      // FALLBACK: Use original discount if backend fails
+      const originalDiscount = Number(couponDetails.discount_cents || 0);
+      console.log('🔄 Using original discount due to error:', originalDiscount / 100, 'Rands');
+      setDiscount(originalDiscount / 100);
+      setCouponError('Unable to verify discount. Current discount may be incorrect.');
     }
   };
 
