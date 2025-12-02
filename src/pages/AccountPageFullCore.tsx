@@ -201,6 +201,12 @@ export default function AccountPageFullCore() {
                 >
                   <Settings className="h-5 w-5" /> Settings
                 </button>
+                <button
+                  className="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-gray-50"
+                  onClick={() => (window.location.href = '/admin/stock')}
+                >
+                  <Package className="h-5 w-5" /> Stock Management
+                </button>
               </nav>
             </aside>
 

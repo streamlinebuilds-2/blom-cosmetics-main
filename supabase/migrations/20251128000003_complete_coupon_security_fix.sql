@@ -39,16 +39,9 @@ RETURNS void
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    -- Mark coupons as available again if their validations have expired
-    UPDATE public.coupons 
-    SET used_count = GREATEST(used_count - 1, 0)
-    WHERE id IN (
-        SELECT DISTINCT coupon_id 
-        FROM public.coupon_validations 
-        WHERE cleanup_at <= now() 
-        AND used_for_order = false
-        AND validation_token IS NOT NULL -- Only decrement for single-use coupons
-    );
+    -- Clean up expired validations
+    -- No usage count adjustment needed since we don't increment during validation anymore
+    -- Just remove expired validation records
     
     -- Delete expired validations
     DELETE FROM public.coupon_validations 
@@ -147,16 +140,13 @@ BEGIN
   -- For percentage coupons, always recalculate to prevent manipulation
   IF p_discount_type = 'percent' THEN
     -- Calculate new eligible total
-    v_excluded_ids := ARRAY(
-      SELECT unnest(string_to_array(COALESCE(v_coupon.excluded_product_ids::text, ''), ','))
-      WHERE trim(unnest(string_to_array(COALESCE(v_coupon.excluded_product_ids::text, ''), ','))) <> ''
-    );
+    v_excluded_ids := string_to_array(COALESCE(v_coupon.excluded_product_ids::text, ''), ',');
 
     FOR v_item IN SELECT * FROM jsonb_to_recordset(p_cart_items) AS item(product_id text, quantity integer, unit_price_cents integer)
     LOOP
       -- Check if product is excluded
       IF v_excluded_ids IS NOT NULL AND array_length(v_excluded_ids, 1) > 0 THEN
-        IF v_item.product_id = ANY(v_excluded_ids) THEN
+        IF trim(v_item.product_id) = ANY(ARRAY(SELECT trim(x) FROM unnest(v_excluded_ids) x WHERE trim(x) <> '')) THEN
           CONTINUE;
         END IF;
       END IF;
@@ -291,22 +281,43 @@ BEGIN
     RETURN;
   END IF;
 
-  -- Check if already used (including pending validations)
+  -- IMPROVED: Check usage more intelligently
+  -- Allow multiple validations from same email for single-use coupons
+  -- Only prevent if coupon is actually used up or if different user is trying to use it
   DECLARE
-    v_pending_count integer;
+    v_completed_count integer;
+    v_pending_same_email integer;
   BEGIN
-    SELECT COUNT(*) + COALESCE(v_coupon.used_count, 0) INTO v_pending_count
-    FROM public.coupon_validations 
-    WHERE coupon_id = v_coupon.id 
-    AND used_for_order = false 
-    AND cleanup_at > now();
+    -- Count completed uses
+    SELECT COALESCE(used_count, 0) INTO v_completed_count
+    FROM public.coupons
+    WHERE id = v_coupon.id;
+    
+    -- Count pending validations from same email
+    SELECT COUNT(*) INTO v_pending_same_email
+    FROM public.coupon_validations cv
+    WHERE cv.coupon_id = v_coupon.id 
+    AND lower(cv.email) = lower(p_email)
+    AND cv.used_for_order = false 
+    AND cv.cleanup_at > now();
     
     -- Determine if this is a single-use coupon
     v_is_single_use := COALESCE(v_coupon.max_uses, 1) = 1;
     
-    IF v_pending_count >= COALESCE(v_coupon.max_uses, 1) THEN
+    -- If already used for completed orders, don't allow more
+    IF v_is_single_use AND v_completed_count >= 1 THEN
       RETURN QUERY SELECT false, 'Coupon already used.', 0, 'none', 0, 0, null, p_validation_token, null, null;
       RETURN;
+    END IF;
+    
+    -- For single-use, allow only ONE pending validation per email
+    IF v_is_single_use AND v_pending_same_email >= 1 THEN
+      -- Check if there's already a validation for this email - clean it up first
+      DELETE FROM public.coupon_validations 
+      WHERE coupon_id = v_coupon.id 
+      AND lower(email) = lower(p_email)
+      AND used_for_order = false 
+      AND cleanup_at > now();
     END IF;
   END;
 
@@ -317,17 +328,15 @@ BEGIN
   END IF;
 
   -- Calculate eligible total considering product exclusions
-  v_excluded_ids := ARRAY(
-    SELECT unnest(string_to_array(COALESCE(v_coupon.excluded_product_ids::text, ''), ','))
-    WHERE trim(unnest(string_to_array(COALESCE(v_coupon.excluded_product_ids::text, ''), ','))) <> ''
-  );
+  -- Simplified approach - split the comma-separated string
+  v_excluded_ids := string_to_array(COALESCE(v_coupon.excluded_product_ids::text, ''), ',');
 
   -- Process cart items if provided
   FOR v_item IN SELECT * FROM jsonb_to_recordset(p_cart_items) AS item(product_id text, quantity integer, unit_price_cents integer)
   LOOP
     -- Check if product is excluded
     IF v_excluded_ids IS NOT NULL AND array_length(v_excluded_ids, 1) > 0 THEN
-      IF v_item.product_id = ANY(v_excluded_ids) THEN
+      IF trim(v_item.product_id) = ANY(ARRAY(SELECT trim(x) FROM unnest(v_excluded_ids) x WHERE trim(x) <> '')) THEN
         -- Add to excluded total
         v_excluded_total_cents := v_excluded_total_cents + (v_item.quantity * COALESCE(v_item.unit_price_cents, 0));
         CONTINUE;
@@ -394,12 +403,9 @@ BEGIN
   -- Calculate cart snapshot hash for tamper detection
   SELECT calculate_cart_hash(p_cart_items) INTO v_cart_snapshot_hash;
 
-  -- For single-use coupons, mark as used immediately during validation
-  IF v_is_single_use THEN
-    UPDATE public.coupons
-    SET used_count = COALESCE(used_count, 0) + 1
-    WHERE id = v_coupon.id;
-  END IF;
+  -- IMPROVED: For single-use coupons, track validation but don't mark as permanently used
+  -- This allows reapplication while still preventing abuse
+  -- Only mark as permanently used in mark_coupon_validation_completed()
 
   -- Record the validation attempt with cart snapshot
   INSERT INTO public.coupon_validations (
@@ -478,8 +484,11 @@ BEGIN
       cleanup_at = now() -- Clean up immediately since order is complete
   WHERE validation_token = p_validation_token;
 
-  -- If this was the initial validation (single-use coupon marked as used),
-  -- we don't need to do anything else since the usage count was already incremented
+  -- Mark the coupon as actually used now that order is completed
+  -- This is the correct time to increment used_count for single-use coupons
+  UPDATE public.coupons
+  SET used_count = COALESCE(used_count, 0) + 1
+  WHERE id = v_validation.coupon_id;
 END;
 $$;
 
@@ -529,7 +538,7 @@ WHERE code = 'TEST-DISCOUNT';
 COMMENT ON FUNCTION public.redeem_coupon IS 'Enhanced coupon validation with cart state tracking, usage tracking, and tamper detection. Prevents cart manipulation and percentage discount exploitation.';
 COMMENT ON FUNCTION public.validate_coupon_cart_state IS 'Validates that cart contents have not been manipulated after coupon application, recalculates percentage discounts if needed to prevent exploitation.';
 COMMENT ON FUNCTION public.calculate_cart_hash IS 'Creates a cryptographic hash of cart contents for tamper detection and manipulation prevention.';
-COMMENT ON FUNCTION public.mark_coupon_validation_completed IS 'Marks a coupon validation as completed when the order is successfully created, linking validation to order.';
+COMMENT ON FUNCTION public.mark_coupon_validation_completed IS 'Marks a coupon validation as completed when the order is successfully created, linking validation to order and incrementing the usage count.';
 COMMENT ON TABLE public.coupon_validations IS 'Tracks all coupon validation attempts with cart snapshots and usage monitoring to prevent exploitation and manipulation.';
 COMMENT ON COLUMN public.coupon_validations.cart_snapshot IS 'Complete snapshot of cart contents when coupon was first applied for manipulation detection';
 COMMENT ON COLUMN public.coupon_validations.cart_snapshot_hash IS 'Cryptographic hash of cart contents for tamper detection';

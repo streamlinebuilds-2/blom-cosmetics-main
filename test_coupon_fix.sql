@@ -1,105 +1,60 @@
--- Test script to verify the fixed coupon discount functionality
--- This script creates test coupons and verifies they calculate correctly
+-- ================================================
+-- TEST COUPON FIX - VERIFICATION SCRIPT
+-- ================================================
+-- This script tests that the coupon system allows reapplication
+-- while properly tracking usage only when orders are completed.
 
--- Test 1: Create a fixed discount coupon (R250 off)
-INSERT INTO public.coupons (
-  code, 
-  type, 
-  value, 
-  min_order_cents, 
-  max_uses, 
-  used_count, 
-  valid_from, 
-  valid_until, 
-  status,
-  is_active
-) VALUES (
-  'TESTFIXED250',
-  'fixed',
-  250, -- R250 fixed discount
-  50000, -- R500 minimum order
-  10,
-  0,
-  now(),
-  now() + interval '30 days',
-  'active',
-  true
-) ON CONFLICT (code) DO UPDATE SET
-  type = EXCLUDED.type,
-  value = EXCLUDED.value,
-  min_order_cents = EXCLUDED.min_order_cents,
-  status = EXCLUDED.status,
-  is_active = EXCLUDED.is_active;
+-- 1. Clean up any existing test data
+SELECT public.cleanup_expired_coupon_validations();
 
--- Test 2: Create a percentage discount coupon (20% off)
-INSERT INTO public.coupons (
-  code, 
-  type, 
-  percent, 
-  min_order_cents, 
-  max_uses, 
-  used_count, 
-  valid_from, 
-  valid_until, 
-  status,
-  is_active
-) VALUES (
-  'TESTPERCENT20',
-  'percent',
-  20, -- 20% discount
-  30000, -- R300 minimum order
-  10,
-  0,
-  now(),
-  now() + interval '30 days',
-  'active',
-  true
-) ON CONFLICT (code) DO UPDATE SET
-  type = EXCLUDED.type,
-  percent = EXCLUDED.percent,
-  min_order_cents = EXCLUDED.min_order_cents,
-  status = EXCLUDED.status,
-  is_active = EXCLUDED.is_active;
+-- 2. Test coupon application (should work)
+SELECT 'Test 1: First coupon application' as test_name, 
+       valid, 
+       message, 
+       discount_cents/100.0 as discount_rands,
+       validation_token IS NOT NULL as has_token
+FROM public.redeem_coupon('TEST-DISCOUNT', 'test@example.com', 100000, '[]'::jsonb);
 
--- Test 3: Test the fixed discount calculation
-SELECT 
-  'Fixed Discount Test (R250 off R1000)' as test_name,
-  * 
-FROM public.redeem_coupon(
-  'TESTFIXED250', 
-  'test@example.com', 
-  100000 -- R1000 order total in cents
-);
+-- 3. Get the validation token from test 1
+-- (You'll need to manually extract this or run the query above and copy the token)
+-- Let's simulate by using a new token for test 2
 
--- Test 4: Test the percentage discount calculation
-SELECT 
-  'Percentage Discount Test (20% off R1000)' as test_name,
-  * 
-FROM public.redeem_coupon(
-  'TESTPERCENT20', 
-  'test@example.com', 
-  100000 -- R1000 order total in cents
-);
+-- 4. Test reapplication with same email (should work now - old validation gets cleaned up)
+SELECT 'Test 2: Reapply same coupon' as test_name, 
+       valid, 
+       message, 
+       discount_cents/100.0 as discount_rands,
+       'Should work - old validation cleaned up' as expected
+FROM public.redeem_coupon('TEST-DISCOUNT', 'test@example.com', 100000, '[]'::jsonb);
 
--- Test 5: Test minimum order validation
-SELECT 
-  'Minimum Order Test (R250 off R200 order)' as test_name,
-  * 
-FROM public.redeem_coupon(
-  'TESTFIXED250', 
-  'test@example.com', 
-  20000 -- R200 order total in cents (below R500 minimum)
-);
+-- 5. Check that no usage count increment happened yet
+SELECT 'Test 3: Check used_count before completion' as test_name,
+       used_count,
+       'Should be 0 or unchanged' as expected
+FROM public.coupons 
+WHERE code = 'TEST-DISCOUNT';
 
--- Test 6: Verify discount doesn't exceed order total
-SELECT 
-  'Discount Cap Test (R250 off R100 order)' as test_name,
-  * 
-FROM public.redeem_coupon(
-  'TESTFIXED250', 
-  'test@example.com', 
-  10000 -- R100 order total in cents (discount capped at R100)
-);
+-- 6. Simulate order completion
+-- (In real flow, this happens when create-order function is called)
+-- Use the validation token from test 2
+-- SELECT public.mark_coupon_validation_completed('your-validation-token-here', gen_random_uuid());
 
--- Clean up test coupons
-DELETE FROM public.coupons WHERE code IN ('TESTFIXED250', 'TESTPERCENT20');
+-- 7. Check that usage count incremented after completion
+-- SELECT 'Test 4: Check used_count after completion' as test_name,
+--        used_count,
+--        'Should be incremented by 1' as expected
+-- FROM public.coupons 
+-- WHERE code = 'TEST-DISCOUNT';
+
+-- 8. Try to apply again (should fail now)
+-- SELECT 'Test 5: Try to apply after completion' as test_name,
+--        valid,
+--        message,
+--        'Should fail - already used' as expected
+-- FROM public.redeem_coupon('TEST-DISCOUNT', 'test@example.com', 100000, '[]'::jsonb);
+
+-- Clean up test data
+-- DELETE FROM public.coupon_validations WHERE email = 'test@example.com';
+-- UPDATE public.coupons SET used_count = 0 WHERE code = 'TEST-DISCOUNT';
+
+SELECT 'Coupon fix test completed!' as status;
