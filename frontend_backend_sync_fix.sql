@@ -60,31 +60,31 @@ BEGIN
   LIMIT 1;
 
   IF NOT FOUND THEN
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 'Coupon not found.';
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 'Coupon not found.';
     RETURN;
   END IF;
 
   -- Check if coupon is active
   IF COALESCE(v_coupon.status, 'inactive') <> 'active' THEN
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 'Coupon is not active.';
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 'Coupon is not active.';
     RETURN;
   END IF;
 
   -- Check expiry
   IF v_coupon.valid_until IS NOT NULL AND now() > v_coupon.valid_until THEN
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 'Coupon has expired.';
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 'Coupon has expired.';
     RETURN;
   END IF;
 
   -- Check if used up
   IF COALESCE(v_coupon.used_count, 0) >= COALESCE(v_coupon.max_uses, 1) THEN
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 'Coupon already used.';
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 'Coupon already used.';
     RETURN;
   END IF;
 
   -- Check email lock
   IF v_coupon.locked_email IS NOT NULL AND lower(v_coupon.locked_email) <> lower(p_email) THEN
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 'Coupon locked to another email.';
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 'Coupon locked to another email.';
     RETURN;
   END IF;
 
@@ -112,7 +112,7 @@ BEGIN
   v_min_order := COALESCE(v_min_order, 0); -- Handle NULL
   
   IF v_eligible_total_cents < v_min_order THEN
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 
       format('Order must be at least R%s (excluding restricted items)', v_min_order / 100);
     RETURN;
   END IF;
@@ -157,17 +157,17 @@ BEGIN
     END IF;
     
   ELSE
-    RETURN QUERY SELECT false, 0, 'none', 0, null, 'Invalid discount type.';
+    RETURN QUERY SELECT false, 0, 'none', 0, null::uuid, 'Invalid discount type.';
     RETURN;
   END IF;
   
   -- Return the result with BULLETPROOF enforcement
-  RETURN QUERY SELECT true,
-    v_discount_cents,
-    v_discount_type,
-    v_discount_value,
-    v_coupon.id,
-    v_full_message;
+  RETURN QUERY SELECT true::boolean,
+    v_discount_cents::integer,
+    v_discount_type::text,
+    v_discount_value::integer,
+    v_coupon.id::uuid,
+    v_full_message::text;
 END;
 $$;
 
@@ -221,13 +221,13 @@ BEGIN
   LIMIT 1;
   
   -- Return in the expected format
-  RETURN QUERY SELECT true,
-    v_full_message,
-    v_discount_cents,
-    v_discount_type,
-    v_discount_value,
-    COALESCE(v_min_order, 50000),
-    v_coupon_id;
+  RETURN QUERY SELECT true::boolean,
+    v_full_message::text,
+    v_discount_cents::integer,
+    v_discount_type::text,
+    v_discount_value::integer,
+    COALESCE(v_min_order, 50000)::integer,
+    v_coupon_id::uuid;
 END;
 $$;
 
@@ -280,13 +280,13 @@ BEGIN
   WHERE upper(code) = upper(p_code)
   LIMIT 1;
   
-  RETURN QUERY SELECT true,
-    v_full_message,
-    v_discount_cents,
-    v_discount_type,
-    v_discount_value,
-    COALESCE(v_min_order, 50000),
-    v_coupon_id;
+  RETURN QUERY SELECT true::boolean,
+    v_full_message::text,
+    v_discount_cents::integer,
+    v_discount_type::text,
+    v_discount_value::integer,
+    COALESCE(v_min_order, 50000)::integer,
+    v_coupon_id::uuid;
 END;
 $$;
 
