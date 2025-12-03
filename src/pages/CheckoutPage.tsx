@@ -549,7 +549,7 @@ export const CheckoutPage: React.FC = () => {
           p_code: appliedCoupon.code,
           p_email: shippingInfo.email || '',
           p_order_total_cents: productSubtotal,
-          p_cart_items: '[]'::jsonb  // Empty cart items for now, can be enhanced later
+          p_cart_items: []  // Empty cart items for now, can be enhanced later
         }),
       });
 
