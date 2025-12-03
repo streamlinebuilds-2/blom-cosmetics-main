@@ -102,7 +102,7 @@ export const handler: Handler = async (event) => {
         phone: cleanPhone,
         name: first_name || 'Beauty Club Member',
         status: 'active',
-        source: source || 'beauty_club_signup',
+        source: source || 'popup',
         subscribed: true,
         message: 'Beauty Club Signup'
       })
