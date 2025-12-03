@@ -94,7 +94,7 @@ class CartStore {
     }
   }
 
-  // Ensure legacy/invalid items are fixed so actions like delete work reliably
+  // Ensure legacy/invalid items are fixed or removed
   private normalizeState(): void {
     let didChange = false;
     if (!Array.isArray(this.state.items)) {
@@ -102,12 +102,24 @@ class CartStore {
       didChange = true;
     }
 
-    this.state.items = this.state.items.map((item, index) => {
+    // Filter out items that are completely broken (No ID AND No Name)
+    const validItems = this.state.items.filter(item => {
+      const isValid = item.id && item.name && item.price >= 0;
+      if (!isValid) {
+        console.warn('🗑️ Removing corrupt cart item:', item);
+        didChange = true;
+      }
+      return isValid;
+    });
+
+    this.state.items = validItems.map((item, index) => {
       const normalized = { ...item } as CartItem;
+      // Fix missing IDs if name exists
       if (!normalized.id || typeof normalized.id !== 'string') {
         normalized.id = `item_${Date.now()}_${index}`;
         didChange = true;
       }
+      // Fix invalid quantities
       if (!normalized.quantity || normalized.quantity < 1) {
         normalized.quantity = 1;
         didChange = true;
