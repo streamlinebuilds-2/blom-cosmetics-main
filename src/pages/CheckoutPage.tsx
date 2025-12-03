@@ -401,10 +401,17 @@ export const CheckoutPage: React.FC = () => {
     setCouponError('');
 
     try {
-      // Calculate product subtotal in cents (excluding shipping)
+      // 1. Calculate Subtotal
       const productSubtotal = Math.round(cartState.subtotal * 100);
       
-      // Get Supabase URL and key
+      // 2. PREPARE CART ITEMS FOR BACKEND (The Fix)
+      // This makes your products "visible" to the database logic
+      const cartPayload = cartState.items.map(item => ({
+        product_id: item.productId || item.id, 
+        quantity: item.quantity,
+        unit_price_cents: Math.round(item.price * 100)
+      }));
+
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env.SUPABASE_ANON_KEY;
       
@@ -413,14 +420,14 @@ export const CheckoutPage: React.FC = () => {
         return;
       }
 
-      console.log('🔍 Applying coupon:', {
+      console.log('🔍 Applying coupon with items:', {
         code: couponCode.trim().toUpperCase(),
         email: shippingInfo.email,
-        subtotal_cents: productSubtotal,
-        cart_items_count: cartState.items.length
+        subtotal: productSubtotal,
+        item_count: cartPayload.length
       });
 
-      // Call redeem_coupon RPC (using existing function signature)
+      // 3. Call the RPC with the Items
       const res = await fetch(`${supabaseUrl}/rest/v1/rpc/redeem_coupon`, {
         method: 'POST',
         headers: {
@@ -431,7 +438,8 @@ export const CheckoutPage: React.FC = () => {
         body: JSON.stringify({
           p_code: couponCode.trim().toUpperCase(),
           p_email: shippingInfo.email || '',
-          p_order_total_cents: productSubtotal
+          p_order_total_cents: productSubtotal,
+          p_cart_items: cartPayload // <--- PASSING ITEMS HERE
         }),
       });
 
@@ -443,8 +451,6 @@ export const CheckoutPage: React.FC = () => {
       }
 
       const data = await res.json();
-      
-      // RPC returns array with single row
       const result = Array.isArray(data) ? data[0] : data;
       
       if (!result.valid) {
@@ -453,34 +459,19 @@ export const CheckoutPage: React.FC = () => {
         setDiscount(0);
         setAppliedCoupon(null);
         setCouponDetails(null);
+        clearSimpleCouponData();
       } else {
-        // Success - convert discount_cents to rands
         const discountAmount = result.discount_cents / 100;
-        console.log('✅ Coupon applied successfully:', {
-          discount: discountAmount,
-          type: result.discount_type,
-          value: result.discount_value,
-          message: result.message
-        });
+        console.log('✅ Coupon applied successfully:', result);
         
         setDiscount(discountAmount);
         setAppliedCoupon({ 
           id: result.coupon_id || couponCode.trim().toUpperCase(),
           code: couponCode.trim().toUpperCase() 
         });
-        // Store full coupon details for dynamic recalculation
-        console.log('💾 Storing coupon details:', {
-          fullResult: result,
-          discount_type: result.discount_type,
-          discount_value: result.discount_value,
-          allKeys: Object.keys(result)
-        });
         setCouponDetails(result);
+        setSimpleCouponData(result); // Store for fallback
         setCouponError('');
-
-        // Also store in simple format for guaranteed recalculation
-        setSimpleCouponData(result);
-        console.log('💾 Simple coupon data also set for fallback recalculation');
       }
 
     } catch (error) {
