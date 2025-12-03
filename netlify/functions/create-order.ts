@@ -134,7 +134,8 @@ export const handler: Handler = async (event) => {
       p_buyer_name: buyer.name,
       p_buyer_phone: buyer.phone,
       p_channel: 'website',
-      // CRITICAL: Only send clean data to Postgres
+      
+      // Clean Items List
       p_items: validItems.filter(i => i.resolved_id).map(it => ({
         product_id: it.resolved_id, 
         product_name: it.product_name,
@@ -142,18 +143,30 @@ export const handler: Handler = async (event) => {
         unit_price: it.unit_price,
         sku: it.original_sku
       })),
+      
       p_subtotal_cents: Number(body.totals?.subtotal_cents || 0),
       p_shipping_cents: Number(body.totals?.shipping_cents || 0),
       p_discount_cents: Number(body.totals?.discount_cents || (body.coupon ? body.coupon.discount_cents : 0) || 0),
       p_tax_cents: 0,
+      
+      // Fix 1: Handle Fulfillment Method
       p_fulfillment_method: body.fulfillment?.method || (body.shippingMethod === 'store-pickup' ? 'collection' : 'delivery'),
-      p_delivery_address: body.fulfillment?.method === 'delivery' ? body.shipping?.address : null,
-      p_collection_location: body.fulfillment?.collection_location
+      
+      // Fix 2: Explicit NULLs for optional fields (Prevents PGRST202 Error)
+      p_delivery_address: (body.fulfillment?.method === 'delivery' ? body.shipping?.address : null) || null,
+      p_collection_location: body.fulfillment?.collection_location || null,
+      p_coupon_code: body.coupon?.code || null
     };
+
+    console.log('📦 RPC Payload:', JSON.stringify(rpcPayload)); // Debug log
 
     const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
       method: 'POST',
-      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+      headers: { 
+        apikey: SERVICE_KEY, 
+        Authorization: `Bearer ${SERVICE_KEY}`, 
+        'Content-Type': 'application/json' 
+      },
       body: JSON.stringify(rpcPayload)
     });
 
