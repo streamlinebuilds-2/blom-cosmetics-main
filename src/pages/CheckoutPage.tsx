@@ -11,41 +11,68 @@ import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete'
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
 import { ProductVariantModal } from '../components/product/ProductVariantModal';
-// Simple coupon data storage for recalculation
+// --- Simple Coupon Data (Memory for Recalculation) ---
 let simpleCouponData = {
   couponCode: '',
   discountType: null as 'percent' | 'fixed' | null,
   discountValue: 0,
   originalDiscountCents: 0,
-  maxDiscountCents: null as number | null // <--- ADDED THIS FIELD
+  maxDiscountCents: null as number | null // <--- Stores the limit
 };
 
 const setSimpleCouponData = (data: any) => {
-  console.log('💾 Setting simple coupon data:', data);
+  console.log('💾 Storing Coupon Rules:', data);
   
-  // Safely extract max discount from various possible API response formats
-  // The backend sends 'max_discount_cents', but sometimes it might be nested
-  let maxDiscount = null;
-  if (data.max_discount_cents !== undefined && data.max_discount_cents !== null) {
-    maxDiscount = Number(data.max_discount_cents);
-  } else if (data.coupon && data.coupon.max_discount_cents) {
-    maxDiscount = Number(data.coupon.max_discount_cents);
-  }
+  // Extract Max Discount carefully
+  let maxCap = null;
+  if (data.max_discount_cents) maxCap = Number(data.max_discount_cents);
+  else if (data.coupon?.max_discount_cents) maxCap = Number(data.coupon.max_discount_cents);
 
   simpleCouponData = {
     couponCode: data.code || 'UNKNOWN',
-    discountType: data.discount_type === 'fixed' ? 'fixed' : 
-                  data.discount_type === 'percent' ? 'percent' : null,
-    discountValue: Number(data.discount_value || 0),
+    discountType: (data.discount_type === 'fixed' || data.type === 'fixed') ? 'fixed' : 'percent',
+    discountValue: Number(data.discount_value || data.value || 0),
     originalDiscountCents: Number(data.discount_cents || 0),
-    maxDiscountCents: maxDiscount // <--- STORE IT HERE
+    maxDiscountCents: maxCap
   };
+};
+
+const recalculateSimpleDiscount = (cartSubtotal: number): number => {
+  const { discountType, discountValue, originalDiscountCents, maxDiscountCents } = simpleCouponData;
   
-  console.log('🔒 Max Discount Stored:', simpleCouponData.maxDiscountCents ? `R${simpleCouponData.maxDiscountCents/100}` : 'None');
+  if (!discountType || discountValue <= 0) return 0;
+
+  // Fixed Discount: Can't exceed cart total
+  if (discountType === 'fixed') {
+    const rands = originalDiscountCents / 100;
+    return Math.min(rands, cartSubtotal);
+  }
+
+  // Percentage Discount: Recalculate & Enforce Cap
+  if (discountType === 'percent') {
+    const subtotalCents = Math.round(cartSubtotal * 100);
+    let newDiscountCents = Math.round(subtotalCents * (discountValue / 100));
+
+    // 1. Enforce Max Cap (If exists)
+    if (maxDiscountCents !== null && maxDiscountCents > 0) {
+      if (newDiscountCents > maxDiscountCents) {
+        console.log(`🛑 Discount Capped! R${newDiscountCents/100} -> R${maxDiscountCents/100}`);
+        newDiscountCents = maxDiscountCents;
+      }
+    }
+
+    // 2. Enforce Subtotal Cap (Can't be free+)
+    if (newDiscountCents > subtotalCents) {
+      newDiscountCents = subtotalCents;
+    }
+    
+    return newDiscountCents / 100;
+  }
+
+  return 0;
 };
 
 const clearSimpleCouponData = () => {
-  console.log('🗑️ Clearing simple coupon data');
   simpleCouponData = {
     couponCode: '',
     discountType: null,
@@ -53,59 +80,6 @@ const clearSimpleCouponData = () => {
     originalDiscountCents: 0,
     maxDiscountCents: null
   };
-};
-
-const recalculateSimpleDiscount = (cartSubtotal: number): number => {
-  const { discountType, discountValue, originalDiscountCents, maxDiscountCents } = simpleCouponData;
-  
-  console.log('🧮 Simple recalculation:', {
-    discountType,
-    discountValue,
-    cartSubtotal,
-    maxDiscount: maxDiscountCents
-  });
-
-  // If no valid coupon data, return 0
-  if (!discountType || discountValue <= 0) {
-    return 0;
-  }
-
-  // For fixed discounts, always use original (unless cart total is lower than discount)
-  if (discountType === 'fixed') {
-    const discountRands = originalDiscountCents / 100;
-    return Math.min(discountRands, cartSubtotal);
-  }
-
-  // For percentage discounts, recalculate
-  if (discountType === 'percent') {
-    const productSubtotalCents = Math.round(cartSubtotal * 100);
-    let newDiscountCents = Math.round(productSubtotalCents * (discountValue / 100));
-    
-    // 1. Enforce Cart Limit (Cannot exceed subtotal)
-    if (newDiscountCents > productSubtotalCents) {
-      newDiscountCents = productSubtotalCents;
-    }
-
-    // 2. CRITICAL FIX: Enforce Max Discount Limit
-    if (maxDiscountCents !== null && maxDiscountCents > 0) {
-       if (newDiscountCents > maxDiscountCents) {
-         console.log(`🛑 Cap Hit! Calculated R${newDiscountCents/100}, limited to R${maxDiscountCents/100}`);
-         newDiscountCents = maxDiscountCents;
-       }
-    }
-    
-    const finalDiscount = newDiscountCents / 100;
-    console.log('✅ Simple percentage recalculation:', {
-      percent: discountValue,
-      cartSubtotal,
-      newDiscount: finalDiscount,
-      capped: newDiscountCents === maxDiscountCents
-    });
-    
-    return finalDiscount;
-  }
-
-  return 0;
 };
 
 export const CheckoutPage: React.FC = () => {
