@@ -34,7 +34,7 @@ export const handler: Handler = async (event) => {
       if (p.slug) idMap.set(p.slug.toLowerCase().trim(), p.id); // Slug
     });
 
-    // --- 3. Normalize Items (The Crash Fix) ---
+    // --- 3. Normalize Items (Comprehensive Product Matching + Bundle Support) ---
     const validItems: Array<{
       resolved_id: string | null;
       product_name: string;
@@ -51,17 +51,39 @@ export const handler: Handler = async (event) => {
         finalName = `${finalName} - ${it.variant.title}`;
       }
 
-      // RESOLVE ID: Check input ID, then Name, then Slug
+      // RESOLVE ID: Check input ID, then Name variations
       let rawId = it.product_id || it.productId || it.id;
       let resolvedId = null;
 
-      // A. Is the raw ID a valid UUID that exists?
+      // A. Try Valid UUID
       if (rawId && isUUID(rawId) && idMap.has(String(rawId).toLowerCase())) {
         resolvedId = idMap.get(String(rawId).toLowerCase());
       }
-      // B. Try Name Match
-      if (!resolvedId && idMap.has(finalName.toLowerCase().trim())) {
-        resolvedId = idMap.get(finalName.toLowerCase().trim());
+
+      // B. Try Name Formats (The Fix)
+      if (!resolvedId) {
+        const baseName = (it.product_name || it.name || '').trim();
+        const variantName = it.variant?.title && it.variant.title !== 'Default Title' ? it.variant.title.trim() : '';
+
+        // Try 1: Exact Name ("Cuticle Oil")
+        if (idMap.has(baseName.toLowerCase())) resolvedId = idMap.get(baseName.toLowerCase());
+
+        // Try 2: "Product - Variant" ("Cuticle Oil - Vanilla")
+        if (!resolvedId && variantName) {
+             const fmt1 = `${baseName} - ${variantName}`.toLowerCase();
+             if (idMap.has(fmt1)) resolvedId = idMap.get(fmt1);
+        }
+
+        // Try 3: "Product (Variant)" ("Cuticle Oil (Vanilla)")
+        if (!resolvedId && variantName) {
+             const fmt2 = `${baseName} (${variantName})`.toLowerCase();
+             if (idMap.has(fmt2)) resolvedId = idMap.get(fmt2);
+        }
+
+        // Try 4: Just Variant Name ("Vanilla") - Common for simple products
+        if (!resolvedId && variantName) {
+             if (idMap.has(variantName.toLowerCase())) resolvedId = idMap.get(variantName.toLowerCase());
+        }
       }
 
       // C. Handle Missing
