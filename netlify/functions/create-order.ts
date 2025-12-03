@@ -28,31 +28,67 @@ export const handler: Handler = async (event) => {
     console.log(`📦 Creating Order ${order_number} - Processing Items...`);
 
     // ============================================================
-    // 1. PRE-PROCESS ITEMS: Find Missing IDs
+    // 1. PRE-PROCESS ITEMS: Smart Linking & Validation
     // ============================================================
     const processedItems: any[] = [];
     
     if (orderData.items && orderData.items.length > 0) {
       for (const item of orderData.items) {
+        // 🚨 VALIDATION: Skip items with no name (prevents database corruption)
+        if (!item.name) {
+            console.error("⛔ SKIP: Attempted to add item with no name:", item);
+            continue;
+        }
+
         let finalProductId = item.product_id;
 
-        // If ID is missing, try to find it via the Database Mapping
-        if (!finalProductId && item.name) {
-          console.log(`🔍 ID missing for "${item.name}", attempting lookup...`);
+        // If ID is missing, attempt multiple lookup strategies
+        if (!finalProductId) {
+          console.log(`🔍 ID missing for "${item.name}", attempting deep lookup...`);
           
-          // Try finding via our smart mapping function
+          // Strategy A: Smart Mapping RPC (Best for known aliases)
           const { data: matchData } = await supabase
             .rpc('find_product_match', { order_product_name: item.name });
 
           if (matchData && matchData[0]?.found) {
             finalProductId = matchData[0].product_id;
-            console.log(`✅ Resolved "${item.name}" to ID: ${finalProductId}`);
+            console.log(`✅ Strategy A (Map): Linked "${item.name}" -> ${finalProductId}`);
           }
+
+          // Strategy B: SKU Match (High precision)
+          if (!finalProductId && item.sku) {
+             const { data: skuMatch } = await supabase
+                .from('products')
+                .select('id')
+                .eq('sku', item.sku)
+                .maybeSingle();
+             if (skuMatch) {
+                 finalProductId = skuMatch.id;
+                 console.log(`✅ Strategy B (SKU): Linked "${item.sku}" -> ${finalProductId}`);
+             }
+          }
+
+          // Strategy C: Direct Name Match (Case Insensitive)
+          if (!finalProductId) {
+             const { data: nameMatch } = await supabase
+                .from('products')
+                .select('id')
+                .ilike('name', item.name.trim())
+                .maybeSingle();
+             if (nameMatch) {
+                 finalProductId = nameMatch.id;
+                 console.log(`✅ Strategy C (Name): Linked "${item.name}" -> ${finalProductId}`);
+             }
+          }
+        }
+
+        if (!finalProductId) {
+            console.warn(`⚠️ WARNING: Could not link product "${item.name}" to Inventory. Stock deduction will fail for this item.`);
         }
 
         processedItems.push({
           ...item,
-          product_id: finalProductId // Update the item with the found ID
+          product_id: finalProductId // Updated with found ID or null
         });
       }
     } else {
