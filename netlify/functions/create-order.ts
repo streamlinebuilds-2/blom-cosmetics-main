@@ -1,240 +1,176 @@
 import type { Handler } from '@netlify/functions'
-import { createClient } from "@supabase/supabase-js";
-import { randomUUID } from "crypto";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
-
-function generateOrderNumber() {
-  const date = new Date();
-  const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
-  const random = Math.floor(Math.random() * 1000).toString().padStart(3, "0");
-  return `ORD-${dateStr}-${random}`;
-}
 
 export const handler: Handler = async (event) => {
   try {
+    // 1. Basic Setup
     if (event.httpMethod !== 'POST') {
       return { statusCode: 405, body: 'Method Not Allowed' }
     }
 
-    const orderData = JSON.parse(event.body || "{}");
-    const m_payment_id = randomUUID();
-    const order_number = generateOrderNumber();
-
-    console.log(`📦 Creating Order ${order_number} - Processing Items...`);
-
-    // ============================================================
-    // 1. PRE-PROCESS ITEMS: Smart Linking & Validation
-    // ============================================================
-    const processedItems: any[] = [];
+    const body = JSON.parse(event.body || '{}')
+    const items = body.items || []
     
-    if (orderData.items && orderData.items.length > 0) {
-      for (const item of orderData.items) {
-        // 🚨 VALIDATION: Skip items with no name (prevents database corruption)
-        if (!item.name) {
-            console.error("⛔ SKIP: Attempted to add item with no name:", item);
-            continue;
-        }
+    // UUID Validator
+    const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
-        let finalProductId = item.product_id;
+    const SUPABASE_URL = process.env.SUPABASE_URL
+    const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-        // If ID is missing, attempt multiple lookup strategies
-        if (!finalProductId) {
-          console.log(`🔍 ID missing for "${item.name}", attempting deep lookup...`);
-          
-          // Strategy A: Smart Mapping RPC (Best for known aliases)
-          const { data: matchData } = await supabase
-            .rpc('find_product_match', { order_product_name: item.name });
+    if (!SUPABASE_URL || !SERVICE_KEY) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Server configuration error' }) }
+    }
 
-          if (matchData && matchData[0]?.found) {
-            finalProductId = matchData[0].product_id;
-            console.log(`✅ Strategy A (Map): Linked "${item.name}" -> ${finalProductId}`);
-          }
+    // --- 2. Load Product Dictionary (For lookup) ---
+    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price`, {
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
+    });
+    const dbProducts = productsRes.ok ? await productsRes.json() : [];
+    
+    // Build lookup maps
+    const idMap = new Map();
+    dbProducts.forEach((p: any) => {
+      idMap.set(p.id.toLowerCase(), p.id); // UUID
+      if (p.name) idMap.set(p.name.toLowerCase().trim(), p.id); // Name
+      if (p.slug) idMap.set(p.slug.toLowerCase().trim(), p.id); // Slug
+    });
 
-          // Strategy B: SKU Match (High precision)
-          if (!finalProductId && item.sku) {
-             const { data: skuMatch } = await supabase
-                .from('products')
-                .select('id')
-                .eq('sku', item.sku)
-                .maybeSingle();
-             if (skuMatch) {
-                 finalProductId = skuMatch.id;
-                 console.log(`✅ Strategy B (SKU): Linked "${item.sku}" -> ${finalProductId}`);
-             }
-          }
+    // --- 3. Normalize Items (The Crash Fix) ---
+    const validItems: Array<{
+      resolved_id: string | null;
+      product_name: string;
+      quantity: number;
+      unit_price: number;
+      original_sku?: string;
+    }> = [];
+    const missingProducts = new Map<string, { name: string; sku: string; price: number }>();
 
-          // Strategy C: Direct Name Match (Case Insensitive)
-          if (!finalProductId) {
-             const { data: nameMatch } = await supabase
-                .from('products')
-                .select('id')
-                .ilike('name', item.name.trim())
-                .maybeSingle();
-             if (nameMatch) {
-                 finalProductId = nameMatch.id;
-                 console.log(`✅ Strategy C (Name): Linked "${item.name}" -> ${finalProductId}`);
-             }
-          }
-        }
+    for (const it of items) {
+      // Construct full name (Product + Variant)
+      let finalName = it.product_name || it.name || 'Unknown Product';
+      if (it.variant && it.variant.title && it.variant.title !== 'Default Title') {
+        finalName = `${finalName} - ${it.variant.title}`;
+      }
 
-        if (!finalProductId) {
-            console.warn(`⚠️ WARNING: Could not link product "${item.name}" to Inventory. Stock deduction will fail for this item.`);
-        }
+      // RESOLVE ID: Check input ID, then Name, then Slug
+      let rawId = it.product_id || it.productId || it.id;
+      let resolvedId = null;
 
-        processedItems.push({
-          ...item,
-          product_id: finalProductId // Updated with found ID or null
+      // A. Is the raw ID a valid UUID that exists?
+      if (rawId && isUUID(rawId) && idMap.has(String(rawId).toLowerCase())) {
+        resolvedId = idMap.get(String(rawId).toLowerCase());
+      }
+      // B. Try Name Match
+      if (!resolvedId && idMap.has(finalName.toLowerCase().trim())) {
+        resolvedId = idMap.get(finalName.toLowerCase().trim());
+      }
+
+      // C. Handle Missing
+      if (!resolvedId) {
+        console.log(`⚠️ Product not found: "${finalName}" - Will Auto-Create`);
+        missingProducts.set(finalName, { 
+          name: finalName, 
+          sku: it.sku || `SKU-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+          price: it.unit_price ?? it.price ?? 0
         });
       }
-    } else {
-        console.warn("⚠️ Order created with no items");
+
+      validItems.push({
+        resolved_id: resolvedId, // might be null temporarily
+        product_name: finalName,
+        quantity: Number(it.quantity || 1),
+        unit_price: Number(it.unit_price ?? it.price ?? 0),
+        original_sku: it.sku
+      });
     }
 
-    // ============================================================
-    // 2. VERIFY STOCK (Now using the fixed IDs)
-    // ============================================================
-    const productIds = processedItems
-        .filter(item => item.product_id)
-        .map(item => item.product_id);
-
-    let productsMap = new Map();
-
-    if (productIds.length > 0) {
-        const { data: products, error: productsError } = await supabase
-          .from('products')
-          .select('id, name, price, inventory_quantity, track_inventory, status')
-          .in('id', productIds);
-
-        if (productsError) {
-          console.error("Error fetching products:", productsError);
-          throw new Error('Failed to validate products');
-        }
-        
-        products?.forEach(p => productsMap.set(p.id, p));
-
-        // Check stock
-        for (const item of processedItems) {
-          if (!item.product_id) continue;
-
-          const product = productsMap.get(item.product_id);
+    // --- 4. Create Missing Products ---
+    if (missingProducts.size > 0) {
+      for (const [name, data] of missingProducts) {
+        try {
+          const createRes = await fetch(`${SUPABASE_URL}/rest/v1/products`, {
+            method: 'POST',
+            headers: {
+              apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`,
+              'Content-Type': 'application/json', 'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+              name: data.name,
+              slug: data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              sku: data.sku,
+              price: data.price,
+              is_active: true,
+              stock_on_hand: 100
+            })
+          });
           
-          // Optional: Fail if product not found? Or allow "Custom Items"?
-          // For now, we log warning if not found but don't crash unless it's critical
-          if (product) {
-              if (product.status === 'archived') {
-                  throw new Error(`Product "${product.name}" is no longer available.`);
-              }
-              if (product.track_inventory && product.inventory_quantity < item.qty) {
-                  throw new Error(`Insufficient stock for ${product.name}. Available: ${product.inventory_quantity}`);
-              }
+          if (createRes.ok) {
+            const newProd = await createRes.json();
+            const newId = newProd[0]?.id;
+            if (newId) {
+              // Backfill the new ID into our validItems list
+              validItems.forEach(v => { if (v.product_name === name) v.resolved_id = newId; });
+            }
           }
-        }
-    }
-
-    // ============================================================
-    // 3. CREATE ORDER
-    // ============================================================
-    
-    // Calculate subtotal
-    const subtotal_cents = processedItems.reduce((sum, item) => {
-      return sum + (item.unit_price_cents * item.qty);
-    }, 0);
-
-    // Handle Coupons (Reuse existing logic but ensure variables exist)
-    let discount_cents = 0;
-    if (orderData.coupon_code) {
-        // ... (Keep your existing coupon fetch logic here) ...
-        // Assuming reuse of your existing coupon block for brevity, 
-        // or just trust the passed values if that's your current flow
-        // Ideally, call the validate-coupon function here again.
-    }
-    // Use passed discount if coupon logic didn't run
-    discount_cents = discount_cents || orderData.discount_cents || 0; 
-
-    const shipping_cents = orderData.shipping_cents || 0;
-    const tax_cents = orderData.tax_cents || 0;
-    const total_cents = subtotal_cents + shipping_cents - discount_cents + tax_cents;
-
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .insert({
-        order_number,
-        merchant_payment_id: m_payment_id,
-        customer_name: orderData.customer_name,
-        customer_email: orderData.customer_email,
-        customer_phone: orderData.customer_phone,
-        delivery_method: orderData.delivery_method,
-        shipping_address: orderData.shipping_address,
-        collection_slot: orderData.collection_slot,
-        collection_location: orderData.collection_location,
-        subtotal_cents,
-        shipping_cents,
-        discount_cents,
-        tax_cents,
-        total_cents,
-        currency: orderData.currency || "ZAR",
-        status: "unpaid",
-        payment_status: "unpaid",
-        fulfillment_status: "pending",
-        placed_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
-
-    if (orderError) {
-      console.error("Error creating order:", orderError);
-      throw new Error("Failed to create order");
-    }
-
-    // ============================================================
-    // 4. CREATE ORDER ITEMS (With Fixed IDs)
-    // ============================================================
-    if (processedItems.length > 0) {
-      const itemsToInsert = processedItems.map((item) => ({
-        order_id: order.id,
-        product_id: item.product_id, // Now populated correctly
-        sku: item.sku,
-        name: item.name,
-        variant: item.variant,
-        quantity: item.qty,
-        unit_price_cents: item.unit_price_cents,
-        line_total_cents: item.unit_price_cents * item.qty,
-        variant_index: item.variant_index ?? null,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(itemsToInsert);
-
-      if (itemsError) {
-        console.error("Error creating order items:", itemsError);
+        } catch (e) { console.error(`Failed to create ${name}`, e); }
       }
     }
 
-    // ... (Keep your coupon usage update logic here) ...
+    // --- 5. Create Order (RPC) ---
+    // Normalize Buyer
+    let buyer = body.buyer || {};
+    if (body.shippingInfo) {
+      buyer = {
+        name: `${body.shippingInfo.firstName} ${body.shippingInfo.lastName}`,
+        email: body.shippingInfo.email,
+        phone: body.shippingInfo.phone
+      };
+    }
 
+    // Prepare RPC Payload
+    const rpcPayload = {
+      p_order_number: `BL-${Date.now().toString(36).toUpperCase()}`,
+      p_m_payment_id: `BL-${Date.now().toString(16).toUpperCase()}`,
+      p_buyer_email: buyer.email,
+      p_buyer_name: buyer.name,
+      p_buyer_phone: buyer.phone,
+      p_channel: 'website',
+      // CRITICAL: Only send clean data to Postgres
+      p_items: validItems.filter(i => i.resolved_id).map(it => ({
+        product_id: it.resolved_id, 
+        product_name: it.product_name,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        sku: it.original_sku
+      })),
+      p_subtotal_cents: Number(body.totals?.subtotal_cents || 0),
+      p_shipping_cents: Number(body.totals?.shipping_cents || 0),
+      p_discount_cents: Number(body.totals?.discount_cents || (body.coupon ? body.coupon.discount_cents : 0) || 0),
+      p_tax_cents: 0,
+      p_fulfillment_method: body.fulfillment?.method || (body.shippingMethod === 'store-pickup' ? 'collection' : 'delivery'),
+      p_delivery_address: body.fulfillment?.method === 'delivery' ? body.shipping?.address : null,
+      p_collection_location: body.fulfillment?.collection_location
+    };
+
+    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
+      method: 'POST',
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(rpcPayload)
+    });
+
+    if (!rpcRes.ok) {
+      const err = await rpcRes.text();
+      throw new Error(`Database Error: ${err}`);
+    }
+
+    const orderData = await rpcRes.json();
     return {
       statusCode: 200,
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        order_id: order.id,
-        order_number: order.order_number,
-        m_payment_id,
-        total_cents,
-        total_zar: (total_cents / 100).toFixed(2),
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Array.isArray(orderData) ? orderData[0] : orderData)
     };
+
   } catch (e: any) {
-    console.error("Create order error:", e);
-    return {
-      statusCode: 500,
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ error: e.message || "Server error" }),
-    };
+    console.error('Fatal Error:', e);
+    return { statusCode: 500, body: JSON.stringify({ error: e.message }) };
   }
-};
+}
