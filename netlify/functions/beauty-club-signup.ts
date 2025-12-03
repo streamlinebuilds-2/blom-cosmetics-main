@@ -225,28 +225,18 @@ export const handler: Handler = async (event) => {
 
     const supabase = createClient(supabaseUrl, serviceKey)
 
-    // Check for existing user
+    // STRICT CHECK: Block any duplicate email or phone
     const existingUser = await checkExistingUser(supabase, email, phone)
     
     if (existingUser) {
-      console.log('Existing user found, checking for welcome coupon')
-      
-      // Check if user has a welcome coupon
-      const couponResult = await addWelcomeCouponToUser(supabase, existingUser)
-      
-      // Still send webhook for tracking/notification
-      await sendWebhookToN8N(signupData)
-      
+      // 🛑 BLOCK THE SIGNUP - Do not allow duplicates
+      console.log(`Signup blocked: Duplicate detected for ${email} or ${phone}`)
       return {
-        statusCode: 200,
+        statusCode: 400,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          message: couponResult.hasCoupon 
-            ? `Welcome back! Your Beauty Club discount ${couponResult.coupon.code} is ready to use.`
-            : 'Welcome back to the BLOM Beauty Club!',
-          existing_user: true,
-          has_coupon: couponResult.hasCoupon,
-          coupon_code: couponResult.coupon?.code || null
+          error: 'ALREADY_REGISTERED',
+          message: 'This email or phone number is already a member of the Beauty Club.'
         })
       }
     }
