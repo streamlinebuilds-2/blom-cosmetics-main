@@ -408,6 +408,7 @@ export const CheckoutPage: React.FC = () => {
       // This makes your products "visible" to the database logic
       const cartPayload = cartState.items.map(item => ({
         product_id: item.productId || item.id, 
+        name: item.name, // <--- CRITICAL ADDITION
         quantity: item.quantity,
         unit_price_cents: Math.round(item.price * 100)
       }));
@@ -540,7 +541,12 @@ export const CheckoutPage: React.FC = () => {
           p_code: appliedCoupon.code,
           p_email: shippingInfo.email || '',
           p_order_total_cents: productSubtotal,
-          p_cart_items: []  // Empty cart items for now, can be enhanced later
+          p_cart_items: cartState.items.map(item => ({
+            product_id: item.productId || item.id, 
+            name: item.name, // <--- CRITICAL ADDITION
+            quantity: item.quantity,
+            unit_price_cents: Math.round(item.price * 100)
+          }))
         }),
       });
 
