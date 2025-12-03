@@ -9,6 +9,40 @@ interface BeautyClubSignupData {
   source: string
 }
 
+async function sendWebhookToN8N(signupData: BeautyClubSignupData, couponCode?: string): Promise<boolean> {
+  try {
+    const WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/beauty-club-signup'
+    
+    console.log('Sending webhook to N8N:', WEBHOOK_URL)
+    
+    const response = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'BLOM-Cosmetics-BeautyClub/1.0'
+      },
+      body: JSON.stringify({
+        ...signupData,
+        coupon_code: couponCode || null,
+        timestamp: new Date().toISOString(),
+        source: signupData.source || 'popup'
+      })
+    })
+    
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Webhook request failed:', response.status, errorText)
+      return false
+    }
+    
+    console.log('Webhook sent successfully to N8N')
+    return true
+  } catch (error) {
+    console.error('Error sending webhook to N8N:', error)
+    return false
+  }
+}
+
 export const handler: Handler = async (event) => {
   // 1. Basic Setup
   if (event.httpMethod !== 'POST') {
@@ -33,39 +67,37 @@ export const handler: Handler = async (event) => {
     const cleanEmail = email.toLowerCase().trim()
     const cleanPhone = phone ? phone.replace(/\s+/g, '').trim() : null
 
-    // 2. CHECK: Does this user already exist?
-    // We perform a manual check to prevent "Unique Constraint" crashes
-    let query = supabase.from('contacts').select('id, email').eq('email', cleanEmail)
+    // 2. STRICT CHECK: Is this Email OR Phone already in 'contacts'?
+    let query = supabase.from('contacts').select('id, email, phone')
+    
     if (cleanPhone) {
-       query = supabase.from('contacts').select('id, email').or(`email.eq.${cleanEmail},phone.eq.${cleanPhone}`)
+      query = query.or(`email.eq.${cleanEmail},phone.eq.${cleanPhone}`)
+    } else {
+      query = query.eq('email', cleanEmail)
     }
     
-    const { data: existing } = await query;
+    const { data: existing, error: checkError } = await query
 
-    // 3. IF EXISTS: Do NOT try to create (Prevent 500 Error)
+    if (checkError) {
+      console.error('Error checking existing user:', checkError)
+    }
+
+    // 🛑 STRICT BLOCK: Reject if email or phone already exists
     if (existing && existing.length > 0) {
-      console.log(`ℹ️ User already exists: ${cleanEmail}`);
-      
-      // Just try to get/create their coupon and return success
-      const { data: couponData } = await supabase.rpc('create_beauty_club_welcome_coupon', { p_email: cleanEmail });
-      const code = couponData && couponData[0] ? couponData[0].code : null;
-
+      console.log(`Signup blocked: Duplicate detected for ${cleanEmail} or ${cleanPhone}`)
       return {
-        statusCode: 200,
+        statusCode: 400,
         body: JSON.stringify({
-          success: true,
-          message: 'Welcome back! You are already a member.',
-          coupon_code: code,
-          existing_user: true
+          error: 'ALREADY_REGISTERED',
+          message: 'This email or phone number is already a member of the Beauty Club.'
         })
       }
     }
 
-    // 4. CREATE NEW CONTACT
-    // We use 'upsert' (update if exists) as a final safety net against race conditions
+    // 3. Create New Contact (If we passed the check)
     const { error: insertError } = await supabase
       .from('contacts')
-      .upsert({
+      .insert({
         email: cleanEmail,
         phone: cleanPhone,
         name: first_name || 'Beauty Club Member',
@@ -74,31 +106,35 @@ export const handler: Handler = async (event) => {
         source: source || 'beauty_club_signup',
         subscribed: true,
         message: 'Beauty Club Signup'
-      }, { onConflict: 'email' }) 
+      })
 
     if (insertError) {
-      console.error('❌ Contact Insert Failed:', insertError);
-      // RETURN THE REAL ERROR so we can debug
+      console.error('❌ Contact creation failed:', insertError)
       return { 
         statusCode: 500, 
         body: JSON.stringify({ 
-            error: 'DB_INSERT_FAILED', 
-            message: insertError.message, 
-            details: insertError 
+          error: 'DB_INSERT_FAILED', 
+          message: insertError.message
         }) 
-      };
+      }
     }
 
-    // 5. GENERATE COUPON
+    // 4. Generate the Coupon
     const { data: couponData, error: couponError } = await supabase
       .rpc('create_beauty_club_welcome_coupon', { p_email: cleanEmail })
 
     if (couponError) {
-        console.error('⚠️ Coupon Generation Failed:', couponError);
-        // Don't crash signup if coupon fails, just log it
+      console.error('⚠️ Coupon Generation Failed:', couponError)
     }
 
     const couponCode = couponData && couponData[0] ? couponData[0].code : null
+
+    // 5. Send webhook to N8N
+    const webhookSuccess = await sendWebhookToN8N(data, couponCode)
+    
+    if (!webhookSuccess) {
+      console.warn('Webhook failed but signup was successful')
+    }
 
     return {
       statusCode: 200,
@@ -106,15 +142,15 @@ export const handler: Handler = async (event) => {
         success: true,
         message: 'Welcome to the Beauty Club!',
         coupon_code: couponCode,
-        existing_user: false
+        webhook_sent: webhookSuccess
       })
     }
 
   } catch (err: any) {
     console.error('🔥 Fatal Signup Error:', err)
     return { 
-        statusCode: 500, 
-        body: JSON.stringify({ error: 'FATAL_ERROR', message: err.message }) 
+      statusCode: 500, 
+      body: JSON.stringify({ error: 'FATAL_ERROR', message: err.message }) 
     }
   }
 }
