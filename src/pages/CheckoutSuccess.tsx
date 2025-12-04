@@ -16,6 +16,20 @@ export default function CheckoutSuccess() {
 
   const checkStatus = useCallback(async (orderId: string) => {
     setStatus('checking');
+    
+    // 🚀 BACKUP TRIGGER: Force order confirmation on success page
+    try {
+      console.log('🚀 Backup Trigger: Calling confirm-payment-success for:', orderId);
+      await fetch('/.netlify/functions/confirm-payment-success', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId })
+      });
+      console.log('✅ Backup trigger completed');
+    } catch (err) {
+      console.error('❌ Backup trigger failed:', err);
+    }
+    
     // Poll for 45 seconds (30 attempts x 1.5s)
     for (let i = 0; i < 30; i++) {
       const { data } = await supabase.from('orders').select('*').eq('id', orderId).maybeSingle();
@@ -24,13 +38,6 @@ export default function CheckoutSuccess() {
         setStatus('paid');
         setOrderDetails(data);
         cartStore.clearCart();
-        
-        // SAFETY NET: Force webhook to run in case ITN missed it
-        fetch('/.netlify/functions/order-status', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ m_payment_id: data.m_payment_id, status: 'paid' })
-        }).catch(console.warn);
         
         // Fetch order items for detailed breakdown
         fetchOrderItems(orderId);
