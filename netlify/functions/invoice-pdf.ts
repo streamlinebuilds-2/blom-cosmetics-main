@@ -201,24 +201,26 @@ export const handler = async (event: any) => {
     y -= 8; drawLine(left, y, right, y); y -= 18
 
     // --- TOTALS CALCULATION ---
-    // Ensure Total = Subtotal + Shipping - Discount
-    // This overrides any bad data stored in 'total' column
     const finalTotal = Math.max(0, subtotalAmount + shippingAmount - discountAmount);
 
     // Subtotal
     if (order.subtotal_cents || discountAmount > 0) {
       drawRightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
       drawRightText(money(subtotalAmount), right - 20, y, 10)
-      y -= 16
+      y -= 20 // Increased spacing
     }
 
-    // Total row
-    drawLine(right - 250, y + 6, right, y + 6)
+    // Total row - Adjusted Y coordinates to prevent overlap
+    // Line is drawn 12pts above the text baseline
+    drawLine(right - 250, y + 12, right, y + 12) 
+    
     drawText("Total", right - 140, y, 13, true)
-    drawRightText(money(finalTotal), right - 20, y, 13, true) // Use calculated finalTotal
+    drawRightText(money(finalTotal), right - 20, y, 13, true)
 
     // Footer
-    y -= 32; drawLine(left, y, right, y); y -= 16
+    y -= 32; 
+    drawLine(left, y, right, y); 
+    y -= 16
     drawText("Thank you for your purchase!", left, y, 10, false, rgb(0.35, 0.38, 0.45))
     y -= 12
     drawText("Questions? Contact us: shopblomcosmetics@gmail.com | +27 79 548 3317", left, y, 9, false, rgb(0.4, 0.45, 0.52))

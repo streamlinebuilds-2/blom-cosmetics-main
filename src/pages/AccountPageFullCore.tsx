@@ -57,21 +57,38 @@ export default function AccountPageFullCore() {
       
       try {
         const data = await fetchMyOrders();
-        // Normalize totals to numbers (use total_cents if total is null)
-        const normalized = (data || []).map((o: any) => ({
-          id: String(o.id),
-          m_payment_id: o.m_payment_id || null,
-          order_number: o.order_number || null,
-          order_display: o.order_display || null,
-          status: String(o.status || 'unknown'),
-          shipping_status: o.shipping_status || null,
-          order_packed_at: o.order_packed_at || null,
-          total: Number(o.total || (o.total_cents ? o.total_cents / 100 : 0)),
-          created_at: String(o.created_at || new Date().toISOString()),
-          invoice_url: o.invoice_url || null,
-          buyer_name: o.buyer_name || null,
-          buyer_email: o.buyer_email || null
-        }));
+        const normalized = (data || []).map((o: any) => {
+          // 1. Extract raw values
+          const subtotal = (o.subtotal_cents || 0) / 100;
+          const shipping = (o.shipping_cents || 0) / 100;
+          const discount = (o.discount_cents || 0) / 100;
+          const dbTotal  = o.total || (o.total_cents ? o.total_cents / 100 : 0);
+
+          // 2. Calculate Smart Total (Fixes the "Full Amount" bug)
+          // If we have subtotal & discount, rely on math. Otherwise fallback to DB Total.
+          let displayTotal = dbTotal;
+          if (subtotal > 0) {
+             displayTotal = Math.max(0, subtotal + shipping - discount);
+          }
+
+          return {
+            id: String(o.id),
+            m_payment_id: o.m_payment_id || null,
+            order_number: o.order_number || null,
+            order_display: o.order_display || null,
+            status: String(o.status || 'unknown'),
+            shipping_status: o.shipping_status || null,
+            order_packed_at: o.order_packed_at || null,
+            
+            // USE THE SMART TOTAL HERE
+            total: Number(displayTotal),
+            
+            created_at: String(o.created_at || new Date().toISOString()),
+            invoice_url: o.invoice_url || null,
+            buyer_name: o.buyer_name || null,
+            buyer_email: o.buyer_email || null
+          };
+        });
         setOrders(normalized);
       } catch (error: any) {
         setOrdersError(error.message);
@@ -201,12 +218,7 @@ export default function AccountPageFullCore() {
                 >
                   <Settings className="h-5 w-5" /> Settings
                 </button>
-                <button
-                  className="w-full text-left px-5 py-4 flex items-center gap-3 hover:bg-gray-50"
-                  onClick={() => (window.location.href = '/admin/stock')}
-                >
-                  <Package className="h-5 w-5" /> Stock Management
-                </button>
+
               </nav>
             </aside>
 
