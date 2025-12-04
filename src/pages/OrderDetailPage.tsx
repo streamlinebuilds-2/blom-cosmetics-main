@@ -32,6 +32,8 @@ type Order = {
   delivery_address: any;
   invoice_url: string | null;
   items: OrderItem[];
+  discount_cents?: number;
+  coupon_code?: string;
 };
 
 export default function OrderDetailPage() {
@@ -51,7 +53,7 @@ export default function OrderDetailPage() {
         // Try orders_account_v1 view first, fallback to orders table
         let orderQuery = supabase
           .from('orders_account_v1')
-          .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
+          .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, discount_cents, coupon_code, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
           .eq('id', orderId)
           .maybeSingle();
 
@@ -61,7 +63,7 @@ export default function OrderDetailPage() {
         if (orderError && (orderError.code === '42P01' || orderError.message?.includes('does not exist'))) {
           orderQuery = supabase
             .from('orders')
-            .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
+            .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, discount_cents, coupon_code, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
             .eq('id', orderId)
             .maybeSingle();
           
@@ -110,6 +112,8 @@ export default function OrderDetailPage() {
           shipping_status: orderData.shipping_status || null,
           order_packed_at: orderData.order_packed_at || null,
           total: Number(orderData.total || 0),
+          discount_cents: orderData.discount_cents || 0,
+          coupon_code: orderData.coupon_code || null,
           created_at: String(orderData.created_at || new Date().toISOString()),
           buyer_name: orderData.buyer_name || null,
           buyer_email: orderData.buyer_email || null,
@@ -287,10 +291,36 @@ export default function OrderDetailPage() {
                     )}
                   </tbody>
                   <tfoot>
-                    <tr className="border-t-2">
+                    <tr className="border-t-2 border-gray-100">
+                      <td colSpan={2} className="py-3 px-3"></td>
+                      <td className="text-right py-2 px-3 text-sm text-gray-600">Subtotal</td>
+                      <td className="text-right py-2 px-3 text-sm font-medium">
+                        R {(order.total + (order.discount_cents ? order.discount_cents / 100 : 0)).toFixed(2)}
+                      </td>
+                    </tr>
+                    {/* Discount Row */}
+                    {(order.discount_cents && order.discount_cents > 0) && (
+                      <tr>
+                        <td colSpan={2} className="py-0 px-3"></td>
+                        <td className="text-right py-2 px-3 text-sm text-green-600">
+                          Coupon {order.coupon_code ? `(${order.coupon_code})` : ''}
+                        </td>
+                        <td className="text-right py-2 px-3 text-sm font-medium text-green-600">
+                          -R {(order.discount_cents / 100).toFixed(2)}
+                        </td>
+                      </tr>
+                    )}
+                    {/* Final Total */}
+                    <tr className="border-t">
                       <td colSpan={2} className="py-3 px-3"></td>
                       <td className="text-right py-3 px-3 text-base font-bold">Total</td>
-                      <td className="text-right py-3 px-3 text-base font-bold">R {order.total.toFixed(2)}</td>
+                      <td className="text-right py-3 px-3 text-base font-bold">
+                        R {order.total.toFixed(2)} 
+                        {/* Note: order.total from DB usually reflects the paid amount. 
+                            If it's the pre-discount amount, use:
+                            R {(order.total - (order.discount_cents ? order.discount_cents/100 : 0)).toFixed(2)} 
+                         */}
+                      </td>
                     </tr>
                   </tfoot>
                 </table>
