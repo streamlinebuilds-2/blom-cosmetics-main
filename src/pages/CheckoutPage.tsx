@@ -602,6 +602,7 @@ export const CheckoutPage: React.FC = () => {
           totals: {
             subtotal_cents: Math.round(cartState.subtotal * 100),
             shipping_cents: Math.round(shippingCost * 100),
+            discount_cents: Math.round(discount * 100),
             tax_cents: 0
           },
           coupon: appliedCoupon ? { code: appliedCoupon.code } : null
