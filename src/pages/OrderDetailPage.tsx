@@ -34,6 +34,7 @@ type Order = {
   items: OrderItem[];
   discount_cents?: number;
   coupon_code?: string;
+  shipping_cents?: number;
 };
 
 export default function OrderDetailPage() {
@@ -53,7 +54,7 @@ export default function OrderDetailPage() {
         // Try orders_account_v1 view first, fallback to orders table
         let orderQuery = supabase
           .from('orders_account_v1')
-          .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, discount_cents, coupon_code, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
+          .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, discount_cents, coupon_code, shipping_cents, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
           .eq('id', orderId)
           .maybeSingle();
 
@@ -63,7 +64,7 @@ export default function OrderDetailPage() {
         if (orderError && (orderError.code === '42P01' || orderError.message?.includes('does not exist'))) {
           orderQuery = supabase
             .from('orders')
-            .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, discount_cents, coupon_code, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
+            .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, discount_cents, coupon_code, shipping_cents, created_at, buyer_name, buyer_email, buyer_phone, fulfillment_method, delivery_address, invoice_url')
             .eq('id', orderId)
             .maybeSingle();
           
@@ -114,6 +115,7 @@ export default function OrderDetailPage() {
           total: Number(orderData.total || 0),
           discount_cents: orderData.discount_cents || 0,
           coupon_code: orderData.coupon_code || null,
+          shipping_cents: orderData.shipping_cents || 0,
           created_at: String(orderData.created_at || new Date().toISOString()),
           buyer_name: orderData.buyer_name || null,
           buyer_email: orderData.buyer_email || null,
@@ -295,9 +297,19 @@ export default function OrderDetailPage() {
                       <td colSpan={2} className="py-3 px-3"></td>
                       <td className="text-right py-2 px-3 text-sm text-gray-600">Subtotal</td>
                       <td className="text-right py-2 px-3 text-sm font-medium">
-                        R {(order.total + (order.discount_cents ? order.discount_cents / 100 : 0)).toFixed(2)}
+                        R {(order.total + (order.discount_cents ? order.discount_cents / 100 : 0) + (order.shipping_cents ? order.shipping_cents / 100 : 0)).toFixed(2)}
                       </td>
                     </tr>
+                    {/* Shipping Row */}
+                    {(order.shipping_cents && order.shipping_cents > 0) && (
+                      <tr>
+                        <td colSpan={2} className="py-0 px-3"></td>
+                        <td className="text-right py-2 px-3 text-sm text-gray-600">Shipping & Handling</td>
+                        <td className="text-right py-2 px-3 text-sm font-medium">
+                          R {(order.shipping_cents / 100).toFixed(2)}
+                        </td>
+                      </tr>
+                    )}
                     {/* Discount Row */}
                     {(order.discount_cents && order.discount_cents > 0) && (
                       <tr>
