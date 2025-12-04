@@ -15,7 +15,7 @@ export interface Order {
   invoice_url: string | null;
   buyer_name: string | null;
   buyer_email: string | null;
-  // Added missing financial fields
+  // Financial fields
   subtotal_cents?: number;
   shipping_cents?: number;
   discount_cents?: number;
@@ -35,16 +35,16 @@ export async function fetchMyOrders(): Promise<Order[]> {
     return [];
   }
 
-  // Fields to select - ADDED financial breakdown fields
-  const selectFields = 'id, m_payment_id, order_number, order_display, status, shipping_status, order_packed_at, total, total_cents, subtotal_cents, shipping_cents, discount_cents, currency, created_at, invoice_url, buyer_name, buyer_email';
+  // 1. Define Safe Fields (Columns guaranteed to exist on the 'orders' table)
+  // removed 'order_display' from this list to prevent the 400 error
+  const safeFields = 'id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, total_cents, subtotal_cents, shipping_cents, discount_cents, currency, created_at, invoice_url, buyer_name, buyer_email';
 
-  // Query orders_account_v1 view if it exists, otherwise fallback to orders table
+  // 2. Try querying the VIEW first (It might have extra fields like order_display)
   let q = supabase
     .from('orders_account_v1')
-    .select(selectFields)
+    .select(`${safeFields}, order_display`) // Request order_display ONLY from the view
     .order('created_at', { ascending: false });
 
-  // Apply filter: user_id if logged in, otherwise buyer_email
   if (user?.id) {
     q = q.eq('user_id', user.id);
   } else if (email) {
@@ -53,12 +53,13 @@ export async function fetchMyOrders(): Promise<Order[]> {
 
   const { data, error } = await q;
 
-  // If orders_account_v1 doesn't exist, fallback to orders table
-  if (error && (error.code === '42P01' || error.message?.includes('does not exist'))) {
-    // Table/view doesn't exist, use orders table directly
+  // 3. ROBUST FALLBACK: If the view fails (missing view OR missing column), use the table
+  if (error) {
+    console.warn('View query failed (likely missing column or view), falling back to orders table:', error.message);
+
     let fallbackQuery = supabase
       .from('orders')
-      .select(selectFields)
+      .select(safeFields) // Use ONLY safe fields (no order_display)
       .order('created_at', { ascending: false });
 
     if (user?.id) {
@@ -70,16 +71,11 @@ export async function fetchMyOrders(): Promise<Order[]> {
     const { data: fallbackData, error: fallbackError } = await fallbackQuery;
 
     if (fallbackError) {
-      console.error('Error fetching orders:', fallbackError);
+      console.error('Error fetching orders from fallback:', fallbackError);
       throw fallbackError;
     }
 
     return (fallbackData ?? []) as Order[];
-  }
-
-  if (error) {
-    console.error('Error fetching orders:', error);
-    throw error;
   }
 
   return (data ?? []) as Order[];
