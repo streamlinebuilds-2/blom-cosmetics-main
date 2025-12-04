@@ -12,6 +12,7 @@ interface Slide {
   backgroundImageDesktop: string;
   backgroundImageMobile: string;
   textPosition: 'left' | 'center' | 'right';
+  mobileImagePosition?: string; // Added to control cropping (e.g., 'object-top')
 }
 
 const slides: Slide[] = [
@@ -24,7 +25,8 @@ const slides: Slide[] = [
     ctaHref: '/shop',
     backgroundImageDesktop: '/hero-desktop-1.webp',
     backgroundImageMobile: '/hero-mobile-1.webp',
-    textPosition: 'left'
+    textPosition: 'left',
+    mobileImagePosition: 'object-center'
   },
   {
     id: 2,
@@ -35,7 +37,8 @@ const slides: Slide[] = [
     ctaHref: '/shop#acrylic-system',
     backgroundImageDesktop: '/hero-desktop-2.webp',
     backgroundImageMobile: '/hero-mobile-2.webp',
-    textPosition: 'right'
+    textPosition: 'right',
+    mobileImagePosition: 'object-center'
   },
   {
     id: 3,
@@ -46,7 +49,8 @@ const slides: Slide[] = [
     ctaHref: '/courses',
     backgroundImageDesktop: '/hero-desktop-3.webp',
     backgroundImageMobile: '/hero-mobile-3.webp',
-    textPosition: 'center'
+    textPosition: 'center',
+    mobileImagePosition: 'object-top' // Adjusted to 'top' to prevent cutting off heads/top content
   }
 ];
 
@@ -106,16 +110,11 @@ export const HeroSlider: React.FC = () => {
 
   const slide = slides[currentSlide];
 
-  const textPositionClasses = {
-    left: 'text-left items-start',
-    center: 'text-center items-center',
-    right: 'text-right items-end'
-  };
-
   return (
     <section
       id="heroSlider"
-      className="relative h-screen min-h-[600px] max-h-[800px] md:max-h-none overflow-hidden"
+      // Changed h-screen to h-[100dvh] for better mobile browser support
+      className="relative h-[100dvh] min-h-[600px] max-h-[800px] md:max-h-none overflow-hidden bg-gray-100"
     >
       {/* Background Images */}
       <div className="absolute inset-0">
@@ -133,10 +132,12 @@ export const HeroSlider: React.FC = () => {
               <img
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
-                className={`w-full h-full object-cover transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'} blur-[0.5px]`}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding={index === currentSlide ? 'sync' : 'async'}
-                fetchPriority={index === 0 ? 'high' : 'low'}
+                // Applied mobileImagePosition and fixed loading issues
+                className={`w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'} blur-[0.5px]`}
+                // Changed all to eager to fix loading glitch on carousel rotation
+                loading="eager" 
+                decoding="sync"
+                fetchPriority={index === 0 ? 'high' : 'auto'}
               />
             </picture>
             {/* Subtle overlay to improve text readability */}
@@ -149,20 +150,20 @@ export const HeroSlider: React.FC = () => {
       <div className="relative z-10 h-full flex items-center">
         <div className="container-custom w-full">
           <div className={`flex flex-col justify-center items-center text-center h-full max-w-3xl mx-auto`}>
-            <div className="text-white space-y-6">
+            <div className="text-white space-y-6 px-4">
               <div>
                 {slide.subtitle && (
                   <p className="text-pink-200/90 text-lg font-medium mb-2 animate-fade-in">
                     {slide.subtitle}
                   </p>
                 )}
-                <h1 className="hero-slogan whitespace-pre-line animate-slide-up">
+                <h1 className="hero-slogan whitespace-pre-line animate-slide-up drop-shadow-md">
                   {slide.title}
                 </h1>
               </div>
 
               {slide.description && (
-                <p className="text-xl text-white/95 leading-[1.6] tracking-wide animate-slide-up animation-delay-200">
+                <p className="text-xl text-white/95 leading-[1.6] tracking-wide animate-slide-up animation-delay-200 drop-shadow-sm">
                   {slide.description}
                 </p>
               )}
@@ -170,7 +171,7 @@ export const HeroSlider: React.FC = () => {
               <div className="animate-slide-up animation-delay-400 mt-4 flex justify-center">
                 <a
                   href={slide.ctaHref}
-                  className="btn btn-pink px-10 py-5 text-lg"
+                  className="btn btn-pink px-10 py-5 text-lg shadow-lg"
                   onClick={(e) => {
                     e.preventDefault();
                     window.location.href = slide.ctaHref;
@@ -187,7 +188,7 @@ export const HeroSlider: React.FC = () => {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-6 top-1/2 -translate-y-1/2 z-20 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full transition-all duration-200 text-white hover:scale-110"
+        className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-200 text-white hover:scale-110 border border-white/20"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-6 w-6" />
@@ -195,13 +196,11 @@ export const HeroSlider: React.FC = () => {
 
       <button
         onClick={nextSlide}
-        className="absolute right-6 top-1/2 -translate-y-1/2 z-20 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full transition-all duration-200 text-white hover:scale-110"
+        className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-200 text-white hover:scale-110 border border-white/20"
         aria-label="Next slide"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
-
-
     </section>
   );
 };
