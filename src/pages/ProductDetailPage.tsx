@@ -1307,21 +1307,44 @@ export const ProductDetailPage: React.FC = () => {
             shortDescription: data.short_description || data.short_desc || '',
             overview: data.overview || data.description || '',
 
-            // Price
+            // Price - Fixed to handle multiple formats
             price: data.price || (data.price_cents ? data.price_cents / 100 : 0),
             compareAtPrice: data.compare_at_price || (data.compare_at_price_cents ? data.compare_at_price_cents / 100 : null),
 
-            // Stock
+            // Stock - Fixed logic
             stock: (() => {
+              // 1. If admin explicitly set a label (e.g. "In Stock" or "Archived")
+              if (data.stock_label) return data.stock_label;
+              
+              // 2. If it's a bundle, default to In Stock unless explicitly 0
+              // (Bundles often don't have a tracked 'stock' integer in the bundle table itself)
+              if (isBundle || data.product_type === 'bundle') return 'In Stock';
+
+              // 3. Standard quantity check
               const stockQty = data.stock ?? data.inventory_quantity ?? 0;
               return stockQty > 0 ? 'In Stock' : 'Out of Stock';
             })(),
 
-            // Images
-            images: [
-              data.thumbnail_url || data.image_url,
-              ...(data.gallery_urls || [])
-            ].filter(Boolean),
+            // Images - Fixed logic
+            images: (() => {
+              const imgs = [];
+              // 1. Try standard fields
+              if (data.thumbnail_url) imgs.push(data.thumbnail_url);
+              if (data.image_url) imgs.push(data.image_url);
+              
+              // 2. Try gallery arrays
+              if (data.gallery_urls && Array.isArray(data.gallery_urls)) {
+                imgs.push(...data.gallery_urls);
+              }
+              
+              // 3. Try 'images' column (used by new Admin App)
+              if (data.images && Array.isArray(data.images)) {
+                imgs.push(...data.images);
+              }
+
+              // Deduplicate and filter
+              return [...new Set(imgs)].filter(Boolean);
+            })(),
 
             // Arrays
             features: data.features || [],
