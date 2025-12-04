@@ -39,6 +39,9 @@ import {
   ArrowLeft
 } from 'lucide-react';
 
+// Add a constant for the fallback image URL to keep the code clean and consistent.
+const FALLBACK_IMAGE_URL = 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
+
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const productSlug = slug || '';
@@ -1365,7 +1368,7 @@ export const ProductDetailPage: React.FC = () => {
             mappedProduct.name,
             mappedProduct.shortDescription,
             mappedProduct.price,
-            mappedProduct.images[0]
+            mappedProduct.images[0] || FALLBACK_IMAGE_URL // FIX 1: Safely provide an image URL.
           );
           updateSEO(seoData);
           trackPageView(seoData.title || '', seoData.url || '');
@@ -1396,7 +1399,7 @@ export const ProductDetailPage: React.FC = () => {
             staticProduct.name,
             staticProduct.shortDescription,
             staticProduct.price,
-            staticProduct.images[0]
+            staticProduct.images[0] || FALLBACK_IMAGE_URL // FIX 2: Safely provide an image URL for fallback as well.
           );
           updateSEO(seoData);
           trackPageView(seoData.title || '', seoData.url || '');
