@@ -1632,7 +1632,8 @@ export const ProductDetailPage: React.FC = () => {
             description: product.shortDescription,
             price: product.price,
             originalPrice: product.compareAtPrice,
-            image: product.images[0],
+            // FIX: Add fallback image here to prevent the crash
+            image: product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop',
             inStock: product.stock !== 'Out of Stock',
             category: product.category,
             brand: 'BLOM Cosmetics'

@@ -15,12 +15,16 @@ interface ProductStructuredDataProps {
 }
 
 export const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({ product }) => {
+  // Robust fallback if image is missing
+  const image = product.image || '/blom-academy-favicon.webp';
+  const imageUrl = image.startsWith('http') ? image : `https://blom-cosmetics.co.za${image}`;
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": product.name,
     "description": product.description,
-    "image": product.image.startsWith('http') ? product.image : `https://blom-cosmetics.co.za${product.image}`,
+    "image": imageUrl,
     "brand": {
       "@type": "Brand",
       "name": product.brand
