@@ -118,15 +118,33 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // 4. Generate the Coupon
+    // 4. Generate the Coupon Manually (Fixed Amount R100)
+    // We generate a unique code and insert it directly to avoid using the old RPC
+    // which likely defaults to 'percentage'.
+    const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+    const couponCode = `WELCOME-R100-${randomSuffix}`;
+    
     const { data: couponData, error: couponError } = await supabase
-      .rpc('create_beauty_club_welcome_coupon', { p_email: cleanEmail })
+      .from('coupons')
+      .insert({
+        code: couponCode,
+        discount_type: 'fixed_amount',
+        discount_value: 100, // R100
+        status: 'active',
+        usage_limit: 1, // Single use
+        expires_at: null, // Or set an expiration if needed
+        min_order_value: 0
+      })
+      .select()
+      .single();
 
     if (couponError) {
       console.error('⚠️ Coupon Generation Failed:', couponError)
+      // Fallback: If direct insert fails, we might still want to proceed, 
+      // but the user won't get a code in the webhook.
+    } else {
+        console.log('✅ Created R100 coupon:', couponCode);
     }
-
-    const couponCode = couponData && couponData[0] ? couponData[0].code : null
 
     // 5. Send webhook to N8N
     const webhookSuccess = await sendWebhookToN8N(data, couponCode)

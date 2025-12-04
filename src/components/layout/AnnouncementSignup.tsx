@@ -131,7 +131,7 @@ export const AnnouncementSignup: React.FC = () => {
           <Container className="py-2 px-4">
             <div className="relative flex items-center justify-center gap-3">
               <p className="text-sm font-medium text-center announcement-text">
-                ✨ Join the BLOM Beauty Club & Get 10% Off Your First Order ✨
+                ✨ Join the BLOM Beauty Club & Get R100 Off Your First Order ✨
               </p>
               <Button
                 variant="secondary"
@@ -193,7 +193,7 @@ export const AnnouncementSignup: React.FC = () => {
 
                 <div className="mb-4">
                   <h3 className="text-2xl font-bold text-gray-900 mb-1 text-center">Join Our Blom Beauty Club</h3>
-                  <p className="text-pink-500 font-semibold text-center text-base">Get 10% off + exclusive drops</p>
+                  <p className="text-pink-500 font-semibold text-center text-base">Get R100 off + exclusive drops</p>
                 </div>
 
                 <ul className="mb-4 space-y-2 text-sm text-gray-600">
@@ -201,7 +201,7 @@ export const AnnouncementSignup: React.FC = () => {
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
                       <span className="text-pink-500 font-bold text-xs">✓</span>
                     </div>
-                    <span>Instant 10% welcome code</span>
+                    <span>Instant R100 welcome code</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
@@ -396,7 +396,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
         disabled={submitting}
         className="w-full bg-pink-400 hover:bg-pink-400 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
       >
-        {submitting ? 'Joining...' : 'Join Now & Save 10%'}
+        {submitting ? 'Joining...' : 'Join Now & Save R100'}
       </button>
 
       {/* Dev-only test harness */}
