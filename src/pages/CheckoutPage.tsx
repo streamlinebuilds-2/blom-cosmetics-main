@@ -30,7 +30,7 @@ const setSimpleCouponData = (data: any) => {
 
   simpleCouponData = {
     couponCode: data.code || 'UNKNOWN',
-    discountType: (data.discount_type === 'fixed' || data.type === 'fixed') ? 'fixed' : 'percent',
+    discountType: (data.discount_type === 'fixed_amount' || data.type === 'fixed' || data.discount_type === 'fixed') ? 'fixed' : 'percent',
     discountValue: Number(data.discount_value || data.value || 0),
     originalDiscountCents: Number(data.discount_cents || 0),
     maxDiscountCents: maxCap
