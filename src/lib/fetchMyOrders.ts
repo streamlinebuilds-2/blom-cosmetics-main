@@ -15,6 +15,10 @@ export interface Order {
   invoice_url: string | null;
   buyer_name: string | null;
   buyer_email: string | null;
+  // Added missing financial fields
+  subtotal_cents?: number;
+  shipping_cents?: number;
+  discount_cents?: number;
 }
 
 /**
@@ -31,10 +35,13 @@ export async function fetchMyOrders(): Promise<Order[]> {
     return [];
   }
 
+  // Fields to select - ADDED financial breakdown fields
+  const selectFields = 'id, m_payment_id, order_number, order_display, status, shipping_status, order_packed_at, total, total_cents, subtotal_cents, shipping_cents, discount_cents, currency, created_at, invoice_url, buyer_name, buyer_email';
+
   // Query orders_account_v1 view if it exists, otherwise fallback to orders table
   let q = supabase
     .from('orders_account_v1')
-    .select('id, m_payment_id, order_number, order_display, status, shipping_status, order_packed_at, total, currency, created_at, invoice_url, buyer_name, buyer_email')
+    .select(selectFields)
     .order('created_at', { ascending: false });
 
   // Apply filter: user_id if logged in, otherwise buyer_email
@@ -51,7 +58,7 @@ export async function fetchMyOrders(): Promise<Order[]> {
     // Table/view doesn't exist, use orders table directly
     let fallbackQuery = supabase
       .from('orders')
-      .select('id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, currency, created_at, invoice_url, buyer_name, buyer_email')
+      .select(selectFields)
       .order('created_at', { ascending: false });
 
     if (user?.id) {

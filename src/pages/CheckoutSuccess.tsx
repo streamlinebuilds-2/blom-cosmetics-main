@@ -32,6 +32,9 @@ export default function CheckoutSuccess() {
             body: JSON.stringify({ m_payment_id: data.m_payment_id, status: 'paid' })
         }).catch(console.warn);
         
+        // Fetch order items for detailed breakdown
+        fetchOrderItems(orderId);
+        
         return;
       }
       await new Promise((r) => setTimeout(r, 1500));
@@ -45,6 +48,8 @@ export default function CheckoutSuccess() {
     if (orderId) checkStatus(orderId);
     else setStatus('not-found');
   }, [checkStatus]);
+
+  const formatCurrency = (cents: number) => `R${(cents / 100).toFixed(2)}`;
 
   const downloadReceipt = async () => {
     if (!orderDetails) return;
@@ -64,6 +69,11 @@ export default function CheckoutSuccess() {
         }
     } catch (e) { alert('Download failed. Please try again.'); }
     setLoading(false);
+  };
+
+  const fetchOrderItems = async (orderId: string) => {
+    const { data } = await supabase.from('order_items').select('*').eq('order_id', orderId);
+    if (data) setOrderDetails((prev: any) => prev ? { ...prev, items: data } : null);
   };
 
   return (
@@ -104,6 +114,84 @@ export default function CheckoutSuccess() {
                 )}
               </CardContent>
             </Card>
+
+            {/* ORDER DETAILS - Only show when paid */}
+            {status === 'paid' && orderDetails && (
+              <Card>
+                <CardHeader>
+                  <h3 className="text-xl font-semibold">Order Details</h3>
+                </CardHeader>
+                <CardContent>
+                  {/* Items Table */}
+                  <div className="border rounded-lg overflow-hidden mb-6">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 text-gray-600 font-medium">
+                        <tr>
+                          <th className="px-4 py-3 text-left">Item</th>
+                          <th className="px-4 py-3 text-center">Qty</th>
+                          <th className="px-4 py-3 text-right">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {orderDetails.items?.map((item: any) => (
+                          <tr key={item.id}>
+                            <td className="px-4 py-3">{item.product_name}</td>
+                            <td className="px-4 py-3 text-center">{item.quantity}</td>
+                            <td className="px-4 py-3 text-right font-medium">
+                              R {(item.line_total || (item.quantity * item.unit_price)).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                      
+                      {/* SMART FOOTER with calculated total */}
+                      <tfoot className="bg-gray-50">
+                        <tr>
+                          <td colSpan={2} className="px-4 py-2 text-right text-gray-600">Subtotal</td>
+                          <td className="px-4 py-2 text-right">
+                            {formatCurrency(orderDetails.subtotal_cents || 0)}
+                          </td>
+                        </tr>
+                        
+                        {orderDetails.shipping_cents > 0 && (
+                          <tr>
+                            <td colSpan={2} className="px-4 py-2 text-right text-gray-600">Shipping</td>
+                            <td className="px-4 py-2 text-right">
+                              {formatCurrency(orderDetails.shipping_cents)}
+                            </td>
+                          </tr>
+                        )}
+
+                        {orderDetails.discount_cents > 0 && (
+                          <tr>
+                            <td colSpan={2} className="px-4 py-2 text-right text-green-600 font-medium">
+                              Coupon {orderDetails.coupon_code ? `(${orderDetails.coupon_code})` : ''}
+                            </td>
+                            <td className="px-4 py-2 text-right text-green-600 font-medium">
+                              -{formatCurrency(orderDetails.discount_cents)}
+                            </td>
+                          </tr>
+                        )}
+
+                        <tr>
+                          <td colSpan={2} className="px-4 py-3 text-right font-bold text-lg border-t border-gray-200">Total:</td>
+                          <td className="px-4 py-3 text-right font-bold text-lg border-t border-gray-200">
+                            {/* SMART TOTAL CALCULATION: Subtotal + Shipping - Discount */}
+                            {formatCurrency(
+                              Math.max(0, 
+                                (orderDetails.subtotal_cents || 0) + 
+                                (orderDetails.shipping_cents || 0) - 
+                                (orderDetails.discount_cents || 0)
+                              )
+                            )}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </Container>
       </main>
