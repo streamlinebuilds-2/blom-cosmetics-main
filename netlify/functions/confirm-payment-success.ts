@@ -3,7 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/new-order-alert'
+// UPDATED URL: Using the notify-order endpoint you requested
+const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
 
 const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!)
 
@@ -63,30 +64,20 @@ export const handler: Handler = async (event) => {
       await supabase.rpc('process_order_stock_deduction', { p_order_id: order.id });
     }
 
-    // 6. TRIGGER N8N WORKFLOW (The most important part for you)
-    // We reconstruct the payload manually to ensure it matches what n8n expects
+    // 4. TRIGGER N8N WORKFLOW
+    // Constructing the specific payload you asked for: Amount, Name, Email, Phone, Order ID
     const n8nPayload = {
-      event_type: 'order_paid',
-      timestamp: new Date().toISOString(),
-      order: {
-        order_id: order.id,
-        order_number: order.order_number,
-        status: 'paid', // We just forced this
-        payment_status: 'paid',
-        total_amount: order.total_cents ? order.total_cents / 100 : order.total,
-        currency: order.currency || 'ZAR',
-        customer_email: order.buyer_email || order.customer_email,
-        customer_name: order.buyer_name || order.customer_name,
-        // We send minimal items here as n8n can look them up if needed, 
-        // or you can fetch them if your n8n flow requires them explicitly.
-        payment_details: {
-          provider: 'payfast',
-          source: 'success_page_backup'
-        }
-      }
+      order_id: order.id,
+      order_number: order.order_number,
+      amount: order.total,
+      name: order.buyer_name || order.customer_name || 'Customer',
+      email: order.buyer_email || order.customer_email || 'No Email',
+      phone: order.buyer_phone || order.customer_phone || '',
+      status: 'paid',
+      source: 'website_success_page'
     }
 
-    console.log('📡 Sending Alert to n8n...')
+    console.log(`📡 Sending Alert to n8n: ${N8N_WEBHOOK_URL}`)
     const n8nRes = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
