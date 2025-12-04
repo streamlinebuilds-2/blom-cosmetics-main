@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { cartStore } from '../lib/cart';
-import { Download, CheckCircle, Clock, Package, User, MapPin, RefreshCw } from 'lucide-react';
+import { Download, CheckCircle, Clock, RefreshCw } from 'lucide-react';
 
 export default function CheckoutSuccess() {
   const [status, setStatus] = useState<'checking' | 'paid' | 'pending' | 'not-found'>('checking');
@@ -14,35 +14,44 @@ export default function CheckoutSuccess() {
   const [loading, setLoading] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  const checkStatus = useCallback(async (orderId: string) => {
+  const checkStatus = useCallback(async (rawOrderId: string) => {
+    // 1. Sanitize Order ID (remove whitespace/newlines often added by mobile copy-paste or redirects)
+    const orderId = rawOrderId.trim();
+    
     setStatus('checking');
     
-    // 🚀 BACKUP TRIGGER: Force order confirmation on success page
-    try {
-      console.log('🚀 Backup Trigger: Calling confirm-payment-success for:', orderId);
-      await fetch('/.netlify/functions/confirm-payment-success', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order_id: orderId })
-      });
-      console.log('✅ Backup trigger completed');
-    } catch (err) {
-      console.error('❌ Backup trigger failed:', err);
-    }
+    // 🚀 BACKUP TRIGGER: Fire and forget (Do NOT await). 
+    // This prevents a slow network request from blocking the UI polling loop.
+    fetch('/.netlify/functions/confirm-payment-success', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: orderId })
+    }).catch(err => console.error('❌ Backup trigger background error:', err));
     
     // Poll for 45 seconds (30 attempts x 1.5s)
     for (let i = 0; i < 30; i++) {
-      const { data } = await supabase.from('orders').select('*').eq('id', orderId).maybeSingle();
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .maybeSingle();
       
-      if (data && (data.status === 'paid' || data.payment_status === 'paid' || data.payment_status === 'complete')) {
-        setStatus('paid');
-        setOrderDetails(data);
-        cartStore.clearCart();
-        
-        // Fetch order items for detailed breakdown
-        fetchOrderItems(orderId);
-        
-        return;
+      if (error) console.error('Polling error:', error);
+
+      if (data) {
+        // 2. Case Insensitive Check: Handle 'Paid', 'PAID', 'paid', 'Complete', 'COMPLETE'
+        const currentStatus = data.status?.toLowerCase() || '';
+        const paymentStatus = data.payment_status?.toLowerCase() || '';
+
+        if (currentStatus === 'paid' || paymentStatus === 'paid' || paymentStatus === 'complete') {
+          setStatus('paid');
+          setOrderDetails(data);
+          cartStore.clearCart();
+          
+          // Fetch order items for detailed breakdown
+          fetchOrderItems(orderId);
+          return;
+        }
       }
       await new Promise((r) => setTimeout(r, 1500));
     }
@@ -52,8 +61,23 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order');
-    if (orderId) checkStatus(orderId);
-    else setStatus('not-found');
+    
+    // 3. Fallback: If URL param missing, check if we have a pending order in localStorage
+    if (orderId) {
+      checkStatus(orderId);
+    } else {
+      const localOrder = localStorage.getItem('blom_pending_order');
+      if (localOrder) {
+        try {
+          const parsed = JSON.parse(localOrder);
+          if (parsed.orderId) {
+            checkStatus(parsed.orderId);
+            return;
+          }
+        } catch (e) { console.error('Error parsing local order', e); }
+      }
+      setStatus('not-found');
+    }
   }, [checkStatus]);
 
   const formatCurrency = (cents: number) => `R${(cents / 100).toFixed(2)}`;
@@ -73,6 +97,8 @@ export default function CheckoutSuccess() {
             const a = document.createElement('a');
             a.href = url; a.download = `Invoice-${orderDetails.order_number}.pdf`;
             document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
+        } else {
+          throw new Error('Download failed');
         }
     } catch (e) { alert('Download failed. Please try again.'); }
     setLoading(false);
@@ -107,16 +133,33 @@ export default function CheckoutSuccess() {
                     <div className="mx-auto w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
                       <Clock className="h-10 w-10 text-yellow-600" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Pending</h1>
-                    <p className="text-gray-600 mb-6">We are waiting for the bank confirmation.</p>
-                    <Button onClick={() => setRetryCount(c => c + 1)} variant="outline" className="gap-2">
-                      <RefreshCw className="h-4 w-4" /> Check Again
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Verifying</h1>
+                    <p className="text-gray-600 mb-6">We are still waiting for the final confirmation from the bank.</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                      <Button onClick={() => setRetryCount(c => c + 1)} className="gap-2 bg-pink-500 hover:bg-pink-600 text-white">
+                        <RefreshCw className="h-4 w-4" /> Check Status Again
+                      </Button>
+                      <Button onClick={() => window.location.reload()} variant="outline">
+                        Refresh Page
+                      </Button>
+                    </div>
+                  </>
+                ) : status === 'not-found' ? (
+                  <>
+                     <div className="mx-auto w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                      <Clock className="h-10 w-10 text-gray-400" />
+                    </div>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Info Missing</h1>
+                    <p className="text-gray-600 mb-6">We couldn't find the order ID in the link.</p>
+                    <Button onClick={() => window.location.href = '/shop'} variant="outline">
+                      Return to Shop
                     </Button>
                   </>
                 ) : (
                   <>
                     <div className="mx-auto w-16 h-16 border-4 border-gray-200 border-t-pink-500 rounded-full animate-spin mb-6"></div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Verifying Payment...</h1>
+                    <p className="text-gray-500 text-sm">Please do not close this window</p>
                   </>
                 )}
               </CardContent>
