@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { cartStore } from '../lib/cart';
-import { Download, CheckCircle, Clock, RefreshCw } from 'lucide-react';
+import { Download, CheckCircle, Clock, Package, User, MapPin, RefreshCw } from 'lucide-react';
 
 export default function CheckoutSuccess() {
   const [status, setStatus] = useState<'checking' | 'paid' | 'pending' | 'not-found'>('checking');
@@ -14,45 +14,50 @@ export default function CheckoutSuccess() {
   const [loading, setLoading] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
 
-  const checkStatus = useCallback(async (rawOrderId: string) => {
-    // 1. Sanitize Order ID (remove whitespace/newlines often added by mobile copy-paste or redirects)
-    const orderId = rawOrderId.trim();
-    
+  const checkStatus = useCallback(async (orderId: string) => {
     setStatus('checking');
     
-    // 🚀 BACKUP TRIGGER: Fire and forget (Do NOT await). 
-    // This prevents a slow network request from blocking the UI polling loop.
-    fetch('/.netlify/functions/confirm-payment-success', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order_id: orderId })
-    }).catch(err => console.error('❌ Backup trigger background error:', err));
+    // 🚀 BACKUP TRIGGER: Force order confirmation on success page
+    // This ensures the order is marked paid even if the PayFast webhook failed
+    try {
+      console.log('🚀 Backup Trigger: Calling confirm-payment-success for:', orderId);
+      fetch('/.netlify/functions/confirm-payment-success', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId })
+      }).catch(err => console.error('❌ Backup trigger background error:', err));
+    } catch (err) {
+      console.error('❌ Backup trigger failed:', err);
+    }
     
     // Poll for 45 seconds (30 attempts x 1.5s)
     for (let i = 0; i < 30; i++) {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('id', orderId)
-        .maybeSingle();
+      // FIX: Use RPC to bypass RLS policies for guest users
+      const { data, error } = await supabase.rpc('get_checkout_status', { 
+        p_order_id: orderId 
+      });
       
-      if (error) console.error('Polling error:', error);
+      if (error) {
+        console.error('Polling error:', error);
+      }
 
-      if (data) {
-        // 2. Case Insensitive Check: Handle 'Paid', 'PAID', 'paid', 'Complete', 'COMPLETE'
-        const currentStatus = data.status?.toLowerCase() || '';
-        const paymentStatus = data.payment_status?.toLowerCase() || '';
-
-        if (currentStatus === 'paid' || paymentStatus === 'paid' || paymentStatus === 'complete') {
+      if (data && data.order) {
+        const order = data.order;
+        // Check for various "paid" statuses
+        if (order.status === 'paid' || order.payment_status === 'paid' || order.payment_status === 'complete') {
           setStatus('paid');
-          setOrderDetails(data);
-          cartStore.clearCart();
           
-          // Fetch order items for detailed breakdown
-          fetchOrderItems(orderId);
+          // Combine order and items from the RPC response
+          setOrderDetails({
+            ...order,
+            items: data.items || []
+          });
+          
+          cartStore.clearCart();
           return;
         }
       }
+      
       await new Promise((r) => setTimeout(r, 1500));
     }
     setStatus('pending');
@@ -61,26 +66,11 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order');
-    
-    // 3. Fallback: If URL param missing, check if we have a pending order in localStorage
-    if (orderId) {
-      checkStatus(orderId);
-    } else {
-      const localOrder = localStorage.getItem('blom_pending_order');
-      if (localOrder) {
-        try {
-          const parsed = JSON.parse(localOrder);
-          if (parsed.orderId) {
-            checkStatus(parsed.orderId);
-            return;
-          }
-        } catch (e) { console.error('Error parsing local order', e); }
-      }
-      setStatus('not-found');
-    }
+    if (orderId) checkStatus(orderId);
+    else setStatus('not-found');
   }, [checkStatus]);
 
-  const formatCurrency = (cents: number) => `R${(cents / 100).toFixed(2)}`;
+  const formatCurrency = (cents: number) => `R${((cents || 0) / 100).toFixed(2)}`;
 
   const downloadReceipt = async () => {
     if (!orderDetails) return;
@@ -104,10 +94,7 @@ export default function CheckoutSuccess() {
     setLoading(false);
   };
 
-  const fetchOrderItems = async (orderId: string) => {
-    const { data } = await supabase.from('order_items').select('*').eq('order_id', orderId);
-    if (data) setOrderDetails((prev: any) => prev ? { ...prev, items: data } : null);
-  };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,23 +121,18 @@ export default function CheckoutSuccess() {
                       <Clock className="h-10 w-10 text-yellow-600" />
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Verifying</h1>
-                    <p className="text-gray-600 mb-6">We are still waiting for the final confirmation from the bank.</p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                      <Button onClick={() => setRetryCount(c => c + 1)} className="gap-2 bg-pink-500 hover:bg-pink-600 text-white">
-                        <RefreshCw className="h-4 w-4" /> Check Status Again
-                      </Button>
-                      <Button onClick={() => window.location.reload()} variant="outline">
-                        Refresh Page
-                      </Button>
-                    </div>
+                    <p className="text-gray-600 mb-6">We are verifying your payment status. This typically takes a few seconds.</p>
+                    <Button onClick={() => setRetryCount(c => c + 1)} variant="outline" className="gap-2 bg-white hover:bg-gray-50">
+                      <RefreshCw className="h-4 w-4" /> Check Status Again
+                    </Button>
                   </>
                 ) : status === 'not-found' ? (
                   <>
                      <div className="mx-auto w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
                       <Clock className="h-10 w-10 text-gray-400" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Info Missing</h1>
-                    <p className="text-gray-600 mb-6">We couldn't find the order ID in the link.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Not Found</h1>
+                    <p className="text-gray-600 mb-6">We couldn't locate the order details.</p>
                     <Button onClick={() => window.location.href = '/shop'} variant="outline">
                       Return to Shop
                     </Button>
@@ -203,7 +185,7 @@ export default function CheckoutSuccess() {
                           </td>
                         </tr>
                         
-                        {orderDetails.shipping_cents > 0 && (
+                        {(orderDetails.shipping_cents || 0) > 0 && (
                           <tr>
                             <td colSpan={2} className="px-4 py-2 text-right text-gray-600">Shipping</td>
                             <td className="px-4 py-2 text-right">
@@ -212,7 +194,7 @@ export default function CheckoutSuccess() {
                           </tr>
                         )}
 
-                        {orderDetails.discount_cents > 0 && (
+                        {(orderDetails.discount_cents || 0) > 0 && (
                           <tr>
                             <td colSpan={2} className="px-4 py-2 text-right text-green-600 font-medium">
                               Coupon {orderDetails.coupon_code ? `(${orderDetails.coupon_code})` : ''}
