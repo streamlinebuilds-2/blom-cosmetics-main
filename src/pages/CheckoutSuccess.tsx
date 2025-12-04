@@ -43,6 +43,56 @@ export default function CheckoutSuccess() {
   const [status, setStatus] = useState<'checking' | 'paid' | 'pending' | 'not-found'>('checking');
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [loading, setLoading] = useState(false);
+  const [retryCount, setRetryCount] = useState(0); // Add this to track manual retries
+
+  // Extract the check logic into a reusable function
+  const checkOrderStatus = async (orderId: string) => {
+    setStatus('checking');
+    
+    // Poll for 30 seconds (20 attempts x 1.5s) instead of 10s
+    for (let i = 0; i < 20; i++) {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .maybeSingle();
+      
+      if (!error && data) {
+        // Check for ANY positive status
+        if (data.status === 'paid' || data.payment_status === 'paid' || data.payment_status === 'complete') {
+          setStatus('paid');
+          setOrderDetails(data);
+          cartStore.clearCart();
+          
+          // SAFETY NET: Ensure n8n gets notified even if ITN missed it
+          try {
+            console.log('🚀 Triggering Safety Net Webhook...');
+            await fetch('/.netlify/functions/order-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                m_payment_id: data.m_payment_id || orderId,
+                status: 'paid',
+                buyer_name: data.buyer_name || '',
+                buyer_email: data.buyer_email || '',
+                buyer_phone: data.buyer_phone || '',
+                site_url: window.location.origin
+              })
+            });
+            console.log('✅ Safety Net Webhook Sent');
+          } catch (e) {
+            console.warn('⚠️ Safety Net Webhook failed (non-critical):', e);
+          }
+          
+          fetchOrderItems(orderId);
+          return;
+        }
+      }
+      // Wait 1.5s between checks
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    setStatus('pending');
+  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -51,51 +101,8 @@ export default function CheckoutSuccess() {
       setStatus('not-found');
       return;
     }
-
-    (async () => {
-      // Poll a few times in case ITN takes a second to update the order
-      for (let i = 0; i < 8; i++) {
-        const { data, error } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('id', orderId)
-          .maybeSingle();
-        
-        if (!error && data) {
-          if (data.status === 'paid' || data.payment_status === 'paid') {
-            setStatus('paid');
-            setOrderDetails(data);
-            // Clear cart on successful payment
-            cartStore.clearCart();
-            // Notify admin pipeline (n8n) via order-status function
-            try {
-              await fetch('/.netlify/functions/order-status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  m_payment_id: data.m_payment_id || orderId,
-                  status: 'paid',
-                  buyer_name: data.buyer_name || '',
-                  buyer_email: data.buyer_email || '',
-                  buyer_phone: data.buyer_phone || '',
-                  site_url: window.location.origin
-                })
-              });
-              console.log('D: order-status posted for paid order', data.m_payment_id || orderId);
-            } catch (e) {
-              console.warn('order-status send failed', e);
-            }
-            
-            // Fetch order items
-            fetchOrderItems(orderId);
-            return;
-          }
-        }
-        await new Promise((r) => setTimeout(r, 1200));
-      }
-      setStatus('pending');
-    })();
-  }, []);
+    checkOrderStatus(orderId);
+  }, [retryCount]); // Re-run if user clicks retry
 
   const fetchOrderItems = async (orderId: string) => {
     try {
@@ -200,7 +207,18 @@ export default function CheckoutSuccess() {
                     <p className="text-gray-700 text-lg mb-4">
                       We're confirming your payment. This may take a few minutes.
                     </p>
-                    <p className="text-sm text-gray-500">
+                    
+                    {/* NEW MANUAL CHECK BUTTON */}
+                    <Button 
+                      onClick={() => setRetryCount(c => c + 1)} 
+                      variant="outline"
+                      className="mt-4 border-yellow-500 text-yellow-700 hover:bg-yellow-50"
+                    >
+                      <Clock className="h-4 w-4 mr-2" />
+                      Check Again
+                    </Button>
+                    
+                    <p className="text-sm text-gray-500 mt-4">
                       If this doesn't update automatically, we'll email you once confirmed.
                     </p>
                   </div>
@@ -333,13 +351,13 @@ export default function CheckoutSuccess() {
                         <div className="flex-1">
                           <h4 className="font-medium">{item.product_name}</h4>
                           {item.sku && (
-                            <p className="text-sm text-gray-500">SKU: {item.sku}</p>
+                            <p className="sm text-gray-500">SKU: {item.sku}</p>
                           )}
-                          <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
+                          <p className="sm text-gray-600">Quantity: {item.quantity}</p>
                         </div>
                         <div className="text-right">
                           <p className="font-medium">R{item.line_total.toFixed(2)}</p>
-                          <p className="text-sm text-gray-500">R{item.unit_price.toFixed(2)} each</p>
+                          <p className="sm text-gray-500">R{item.unit_price.toFixed(2)} each</p>
                         </div>
                       </div>
                     ))}
