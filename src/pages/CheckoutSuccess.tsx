@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { supabase } from '../lib/supabase';
 import { cartStore } from '../lib/cart';
-import { Download, CheckCircle, Clock, Package, User, MapPin, RefreshCw } from 'lucide-react';
+import { Download, CheckCircle, Clock, RefreshCw } from 'lucide-react';
 
 export default function CheckoutSuccess() {
   const [status, setStatus] = useState<'checking' | 'paid' | 'pending' | 'not-found'>('checking');
@@ -17,45 +17,46 @@ export default function CheckoutSuccess() {
   const checkStatus = useCallback(async (orderId: string) => {
     setStatus('checking');
     
-    // 🚀 BACKUP TRIGGER: Force order confirmation on success page
-    // This ensures the order is marked paid even if the PayFast webhook failed
+    // 🚀 BACKUP TRIGGER: Fire and forget
     try {
-      console.log('🚀 Backup Trigger: Calling confirm-payment-success for:', orderId);
       fetch('/.netlify/functions/confirm-payment-success', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ order_id: orderId })
-      }).catch(err => console.error('❌ Backup trigger background error:', err));
-    } catch (err) {
-      console.error('❌ Backup trigger failed:', err);
-    }
+      }).catch(err => console.error('Background trigger error:', err));
+    } catch (e) { /* ignore */ }
     
     // Poll for 45 seconds (30 attempts x 1.5s)
     for (let i = 0; i < 30; i++) {
-      // FIX: Use RPC to bypass RLS policies for guest users
-      const { data, error } = await supabase.rpc('get_checkout_status', { 
-        p_order_id: orderId 
-      });
-      
-      if (error) {
-        console.error('Polling error:', error);
-      }
-
-      if (data && data.order) {
-        const order = data.order;
-        // Check for various "paid" statuses
-        if (order.status === 'paid' || order.payment_status === 'paid' || order.payment_status === 'complete') {
-          setStatus('paid');
-          
-          // Combine order and items from the RPC response
-          setOrderDetails({
-            ...order,
-            items: data.items || []
-          });
-          
-          cartStore.clearCart();
-          return;
+      try {
+        // CALL THE SECURE RPC FUNCTION
+        const { data, error } = await supabase.rpc('get_checkout_status', { 
+          p_order_id: orderId 
+        });
+        
+        if (error) {
+          console.warn('Polling Attempt', i + 1, 'Error:', error.message);
+          // If 404/RPC error, we wait and try again, maybe DB migration hasn't propagated
         }
+
+        if (data && data.order) {
+          const order = data.order;
+          // Check for paid status (case-insensitive)
+          const currentStatus = order.status?.toLowerCase() || '';
+          const paymentStatus = order.payment_status?.toLowerCase() || '';
+
+          if (currentStatus === 'paid' || paymentStatus === 'paid' || paymentStatus === 'complete') {
+            setStatus('paid');
+            setOrderDetails({
+              ...order,
+              items: data.items || []
+            });
+            cartStore.clearCart();
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Polling exception:', err);
       }
       
       await new Promise((r) => setTimeout(r, 1500));
@@ -66,8 +67,23 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order');
-    if (orderId) checkStatus(orderId);
-    else setStatus('not-found');
+    
+    // Fallback to local storage if URL param is missing
+    if (orderId) {
+      checkStatus(orderId);
+    } else {
+      const localOrder = localStorage.getItem('blom_pending_order');
+      if (localOrder) {
+        try {
+          const parsed = JSON.parse(localOrder);
+          if (parsed.orderId) {
+            checkStatus(parsed.orderId);
+            return;
+          }
+        } catch (e) {}
+      }
+      setStatus('not-found');
+    }
   }, [checkStatus]);
 
   const formatCurrency = (cents: number) => `R${((cents || 0) / 100).toFixed(2)}`;
@@ -85,16 +101,19 @@ export default function CheckoutSuccess() {
             const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url; a.download = `Invoice-${orderDetails.order_number}.pdf`;
-            document.body.appendChild(a); a.click(); window.URL.revokeObjectURL(url);
+            a.href = url;
+            a.download = `Invoice-${orderDetails.order_number}.pdf`;
+            document.body.appendChild(a); 
+            a.click(); 
+            window.URL.revokeObjectURL(url);
         } else {
-          throw new Error('Download failed');
+            alert('Could not generate receipt. Please try again later.');
         }
-    } catch (e) { alert('Download failed. Please try again.'); }
+    } catch (e) { 
+        alert('Download failed. Please try again.'); 
+    }
     setLoading(false);
   };
-
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -111,17 +130,22 @@ export default function CheckoutSuccess() {
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
                     <p className="text-gray-600">Your payment was successful.</p>
-                    <Button onClick={downloadReceipt} disabled={loading} variant="outline" className="mt-6 gap-2">
-                        <Download className="h-4 w-4" /> {loading ? 'Generating...' : 'Download Receipt'}
-                    </Button>
+                    <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
+                      <Button onClick={downloadReceipt} disabled={loading} variant="outline" className="gap-2">
+                          <Download className="h-4 w-4" /> {loading ? 'Generating...' : 'Download Receipt'}
+                      </Button>
+                      <Button onClick={() => window.location.href = '/shop'} className="bg-pink-500 hover:bg-pink-600 text-white">
+                          Continue Shopping
+                      </Button>
+                    </div>
                   </>
                 ) : status === 'pending' ? (
                   <>
                     <div className="mx-auto w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
                       <Clock className="h-10 w-10 text-yellow-600" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Verifying</h1>
-                    <p className="text-gray-600 mb-6">We are verifying your payment status. This typically takes a few seconds.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Processing</h1>
+                    <p className="text-gray-600 mb-6">We're verifying your payment. If confirmed, this page will update automatically.</p>
                     <Button onClick={() => setRetryCount(c => c + 1)} variant="outline" className="gap-2 bg-white hover:bg-gray-50">
                       <RefreshCw className="h-4 w-4" /> Check Status Again
                     </Button>
@@ -151,7 +175,7 @@ export default function CheckoutSuccess() {
             {status === 'paid' && orderDetails && (
               <Card>
                 <CardHeader>
-                  <h3 className="text-xl font-semibold">Order Details</h3>
+                  <h3 className="text-xl font-semibold">Order Details #{orderDetails.order_number}</h3>
                 </CardHeader>
                 <CardContent>
                   {/* Items Table */}
@@ -170,13 +194,12 @@ export default function CheckoutSuccess() {
                             <td className="px-4 py-3">{item.product_name}</td>
                             <td className="px-4 py-3 text-center">{item.quantity}</td>
                             <td className="px-4 py-3 text-right font-medium">
-                              R {(item.line_total || (item.quantity * item.unit_price)).toFixed(2)}
+                              R {((item.line_total || (item.quantity * item.unit_price) || 0) / 100).toFixed(2)}
                             </td>
                           </tr>
                         ))}
                       </tbody>
                       
-                      {/* SMART FOOTER with calculated total */}
                       <tfoot className="bg-gray-50">
                         <tr>
                           <td colSpan={2} className="px-4 py-2 text-right text-gray-600">Subtotal</td>
@@ -197,7 +220,7 @@ export default function CheckoutSuccess() {
                         {(orderDetails.discount_cents || 0) > 0 && (
                           <tr>
                             <td colSpan={2} className="px-4 py-2 text-right text-green-600 font-medium">
-                              Coupon {orderDetails.coupon_code ? `(${orderDetails.coupon_code})` : ''}
+                              Discount
                             </td>
                             <td className="px-4 py-2 text-right text-green-600 font-medium">
                               -{formatCurrency(orderDetails.discount_cents)}
@@ -208,13 +231,8 @@ export default function CheckoutSuccess() {
                         <tr>
                           <td colSpan={2} className="px-4 py-3 text-right font-bold text-lg border-t border-gray-200">Total:</td>
                           <td className="px-4 py-3 text-right font-bold text-lg border-t border-gray-200">
-                            {/* SMART TOTAL CALCULATION: Subtotal + Shipping - Discount */}
-                            {formatCurrency(
-                              Math.max(0, 
-                                (orderDetails.subtotal_cents || 0) + 
-                                (orderDetails.shipping_cents || 0) - 
-                                (orderDetails.discount_cents || 0)
-                              )
+                            {formatCurrency(orderDetails.total_cents || 
+                              ((orderDetails.subtotal_cents || 0) + (orderDetails.shipping_cents || 0) - (orderDetails.discount_cents || 0))
                             )}
                           </td>
                         </tr>
