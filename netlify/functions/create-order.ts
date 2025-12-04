@@ -37,6 +37,7 @@ export const handler: Handler = async (event) => {
     // --- 3. Normalize Items (Comprehensive Product Matching + Bundle Support) ---
     const validItems: Array<{
       resolved_id: string | null;
+      resolved_product: any | null;
       product_name: string;
       quantity: number;
       unit_price: number;
@@ -54,10 +55,12 @@ export const handler: Handler = async (event) => {
       // RESOLVE ID: Check input ID, then Name variations
       let rawId = it.product_id || it.productId || it.id;
       let resolvedId = null;
+      let resolvedProduct = null;
 
       // A. Try Valid UUID
       if (rawId && isUUID(rawId) && idMap.has(String(rawId).toLowerCase())) {
         resolvedId = idMap.get(String(rawId).toLowerCase());
+        resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
       }
 
       // B. Try Name Formats (The Fix)
@@ -66,23 +69,35 @@ export const handler: Handler = async (event) => {
         const variantName = it.variant?.title && it.variant.title !== 'Default Title' ? it.variant.title.trim() : '';
 
         // Try 1: Exact Name ("Cuticle Oil")
-        if (idMap.has(baseName.toLowerCase())) resolvedId = idMap.get(baseName.toLowerCase());
+        if (idMap.has(baseName.toLowerCase())) {
+          resolvedId = idMap.get(baseName.toLowerCase());
+          resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
+        }
 
         // Try 2: "Product - Variant" ("Cuticle Oil - Vanilla")
         if (!resolvedId && variantName) {
              const fmt1 = `${baseName} - ${variantName}`.toLowerCase();
-             if (idMap.has(fmt1)) resolvedId = idMap.get(fmt1);
+             if (idMap.has(fmt1)) {
+               resolvedId = idMap.get(fmt1);
+               resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
+             }
         }
 
         // Try 3: "Product (Variant)" ("Cuticle Oil (Vanilla)")
         if (!resolvedId && variantName) {
              const fmt2 = `${baseName} (${variantName})`.toLowerCase();
-             if (idMap.has(fmt2)) resolvedId = idMap.get(fmt2);
+             if (idMap.has(fmt2)) {
+               resolvedId = idMap.get(fmt2);
+               resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
+             }
         }
 
         // Try 4: Just Variant Name ("Vanilla") - Common for simple products
         if (!resolvedId && variantName) {
-             if (idMap.has(variantName.toLowerCase())) resolvedId = idMap.get(variantName.toLowerCase());
+             if (idMap.has(variantName.toLowerCase())) {
+               resolvedId = idMap.get(variantName.toLowerCase());
+               resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
+             }
         }
       }
 
@@ -98,6 +113,7 @@ export const handler: Handler = async (event) => {
 
       validItems.push({
         resolved_id: resolvedId, // might be null temporarily
+        resolved_product: resolvedProduct,
         product_name: finalName,
         quantity: Number(it.quantity || 1),
         unit_price: Number(it.unit_price ?? it.price ?? 0),
@@ -129,8 +145,13 @@ export const handler: Handler = async (event) => {
             const newProd = await createRes.json();
             const newId = newProd[0]?.id;
             if (newId) {
-              // Backfill the new ID into our validItems list
-              validItems.forEach(v => { if (v.product_name === name) v.resolved_id = newId; });
+              // Backfill the new ID and product reference into our validItems list
+              validItems.forEach(v => { 
+                if (v.product_name === name) {
+                  v.resolved_id = newId;
+                  v.resolved_product = newProd[0];
+                }
+              });
             }
           }
         } catch (e) { console.error(`Failed to create ${name}`, e); }
@@ -157,14 +178,21 @@ export const handler: Handler = async (event) => {
       p_buyer_phone: buyer.phone,
       p_channel: 'website',
       
-      // Clean Items List
-      p_items: validItems.filter(i => i.resolved_id).map(it => ({
-        product_id: it.resolved_id, 
-        product_name: it.product_name,
-        quantity: it.quantity,
-        unit_price: it.unit_price,
-        sku: it.original_sku
-      })),
+      // Clean Items List - FORCE USE OF DATABASE PRODUCT NAMES
+      p_items: validItems.filter(i => i.resolved_id).map(it => {
+        // 🔍 CRITICAL FIX: Use REAL database product name, ignore frontend input
+        const officialName = it.resolved_product ? it.resolved_product.name : it.product_name;
+        
+        console.log(`📦 Order Item: Frontend said "${it.product_name}" → Using DB name "${officialName}"`);
+        
+        return {
+          product_id: it.resolved_id, 
+          product_name: officialName, // Uses REAL database name (fixes the root cause)
+          quantity: it.quantity,
+          unit_price: it.unit_price,
+          sku: it.original_sku
+        };
+      }),
       
       p_subtotal_cents: Number(body.totals?.subtotal_cents || 0),
       p_shipping_cents: Number(body.totals?.shipping_cents || 0),

@@ -351,6 +351,39 @@ export const handler: Handler = async (event) => {
       }
     })()
 
+    // 6) Adjust Stock using ENHANCED function (fuzzy matching for product names)
+    if (order.status === 'paid') { // Only process stock if this is a new payment
+      try {
+        const { data: stockResult, error: rpcError } = await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_order_stock_deduction`, {
+          method: 'POST',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ p_order_id: order.id })
+        }).then(res => res.json());
+
+        if (rpcError) {
+          console.error(`Error triggering enhanced stock deduction for ${order.id}:`, rpcError);
+          // Fallback to simple method if enhanced one fails or doesn't exist
+          await fetch(`${SUPABASE_URL}/rest/v1/rpc/adjust_stock_for_order`, {
+            method: 'POST',
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ p_order_id: order.id })
+          });
+        } else {
+          console.log('✅ Enhanced stock deduction result:', JSON.stringify(stockResult));
+        }
+      } catch (stockError) {
+        console.error('Stock deduction failed:', stockError);
+      }
+    }
+
     // Return 200 immediately to PayFast (acknowledgement)
     return {
       statusCode: 200,
