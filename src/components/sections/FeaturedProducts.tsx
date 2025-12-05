@@ -10,7 +10,7 @@ export const FeaturedProducts = () => {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        // 1. Fetch the 3 slots from your new 'featured_items' table
+        // 1. Fetch the 3 slots + INCLUDE product_variants
         const { data, error } = await supabase
           .from('featured_items')
           .select(`
@@ -18,7 +18,13 @@ export const FeaturedProducts = () => {
             custom_image_url,
             products (
               id, name, slug, price, compare_at_price,
-              short_description, thumbnail_url, category, stock
+              short_description, thumbnail_url, category, stock,
+              product_variants (
+                id,
+                title,
+                price,
+                inventory_quantity
+              )
             )
           `)
           .not('product_id', 'is', null) // Only get slots that have products
@@ -33,6 +39,14 @@ export const FeaturedProducts = () => {
             // Safety check if product was deleted
             if (!p) return null;
 
+            // Map database variants to ProductCard format
+            const variants = p.product_variants?.map((v: any) => ({
+              id: v.id,
+              name: v.title,
+              price: v.price,
+              inStock: (v.inventory_quantity || 0) > 0
+            })) || [];
+
             return {
               id: p.id,
               name: p.name,
@@ -43,8 +57,7 @@ export const FeaturedProducts = () => {
               shortDescription: p.short_description,
               slug: p.slug,
               inStock: (p.stock || 0) > 0,
-              // Include variants data for products that have variations
-              variants: p.variants || []
+              variants: variants // <--- Pass the fetched variants here
             };
           }).filter(Boolean); // Remove empty slots
 
@@ -82,11 +95,10 @@ export const FeaturedProducts = () => {
               price={item.price}
               compareAtPrice={item.compareAtPrice}
               shortDescription={item.shortDescription}
-              // CRITICAL FIX: ProductCard expects an array of strings for 'images'
               images={[item.image]}
               inStock={item.inStock}
               hoverShine={true}
-              variants={item.variants || []}
+              variants={item.variants} // <--- Ensure variants are passed to the card
             />
           ))}
         </div>
