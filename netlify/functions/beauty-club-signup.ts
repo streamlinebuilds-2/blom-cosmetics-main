@@ -9,14 +9,17 @@ interface BeautyClubSignupData {
   source: string
 }
 
-// Helper to send data to N8N automation
+// Helper to send data to N8N with a 5-second timeout prevention
 async function sendWebhookToN8N(signupData: BeautyClubSignupData, couponCode?: string): Promise<boolean> {
   try {
-    // Use environment variable or fallback
     const WEBHOOK_URL = process.env.N8N_BEAUTY_CLUB_WEBHOOK || 'https://dockerfile-1n82.onrender.com/webhook/beauty-club-signup'
     
-    console.log('Sending webhook to N8N:', WEBHOOK_URL)
+    console.log('Sending webhook to N8N...')
     
+    // Abort signal to prevent Netlify function timeout (5s limit for webhook)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
       headers: {
@@ -30,23 +33,32 @@ async function sendWebhookToN8N(signupData: BeautyClubSignupData, couponCode?: s
         source: signupData.source || 'popup',
         discount_value: 'R100',
         min_spend: 'R500'
-      })
+      }),
+      signal: controller.signal
     })
     
+    clearTimeout(timeoutId)
+    
     if (!response.ok) {
-      console.error('Webhook request failed:', response.status)
+      console.warn(`Webhook responded with status ${response.status}`)
       return false
     }
     return true
   } catch (error) {
-    console.error('Error sending webhook to N8N:', error)
+    console.error('Webhook failed (timeout or network error):', error)
+    // Return false but don't crash the signup flow
     return false
   }
 }
 
 export const handler: Handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Content-Type': 'application/json'
+  }
+
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) }
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method Not Allowed' }) }
   }
 
   // Support both SUPABASE_URL and VITE_SUPABASE_URL environment variables
@@ -67,6 +79,7 @@ export const handler: Handler = async (event) => {
     })
     return { 
       statusCode: 500, 
+      headers,
       body: JSON.stringify({ 
         error: 'Server Configuration Error', 
         message: 'Supabase environment variables are not properly configured',
@@ -85,15 +98,15 @@ export const handler: Handler = async (event) => {
     const { email, phone, first_name } = data
 
     if (!email) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Email is required' }) }
+      return { statusCode: 400, headers, body: JSON.stringify({ error: 'Email is required' }) }
     }
 
     const cleanEmail = email.toLowerCase().trim()
     const cleanPhone = phone ? phone.replace(/\s+/g, '').trim() : null
 
-    // 1. Check for existing user
     console.log('Checking for existing user:', { email: cleanEmail, phone: cleanPhone })
-    
+
+    // 1. Check for existing user
     let query = supabase.from('contacts').select('id, email, phone')
     if (cleanPhone) {
       query = query.or(`email.eq.${cleanEmail},phone.eq.${cleanPhone}`)
@@ -107,6 +120,7 @@ export const handler: Handler = async (event) => {
       console.error('Error checking existing user:', existingError)
       return { 
         statusCode: 500, 
+        headers, 
         body: JSON.stringify({ 
           error: 'DATABASE_ERROR', 
           message: 'Failed to check existing user',
@@ -117,16 +131,17 @@ export const handler: Handler = async (event) => {
 
     if (existing && existing.length > 0) {
       return {
-        statusCode: 400,
+        statusCode: 200, // Return 200 for existing users to show "Already Registered" message nicely
+        headers,
         body: JSON.stringify({
-          error: 'ALREADY_REGISTERED',
-          message: 'This email or phone number is already a member of the Beauty Club.'
+          existing_user: true,
+          message: 'You are already a member of the Beauty Club.'
         })
       }
     }
 
     console.log('Creating new contact:', { email: cleanEmail, phone: cleanPhone, name: first_name || 'Beauty Club Member' })
-    
+
     // 2. Create Contact
     const { data: contactData, error: insertError } = await supabase
       .from('contacts')
@@ -142,13 +157,17 @@ export const handler: Handler = async (event) => {
       .select()
 
     if (insertError) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'DB_INSERT_FAILED', message: insertError.message }) }
+      console.error('Contact insert error:', insertError)
+      return { statusCode: 500, headers, body: JSON.stringify({ error: 'DB_INSERT_FAILED', details: insertError.message }) }
     }
 
     // 3. Create Coupon (R100 Fixed, R500 Min Spend)
-    // We insert directly to bypass any old DB functions
-    const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const couponCode = `WELCOME-R100-${randomSuffix}`;
+    // Use a more readable coupon code format with date
+    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+    // Get MMDD format
+    const date = new Date();
+    const mmdd = String(date.getMonth() + 1).padStart(2, '0') + String(date.getDate()).padStart(2, '0');
+    const couponCode = `WELCOME-R100-${mmdd}-${randomSuffix}`;
     
     console.log('Creating coupon:', { code: couponCode, locked_email: cleanEmail })
     
@@ -156,12 +175,12 @@ export const handler: Handler = async (event) => {
       .from('coupons')
       .insert({
         code: couponCode,
-        discount_type: 'fixed_amount', // FORCE FIXED
+        discount_type: 'fixed',        // Fixed Amount
         discount_value: 100,           // R100
         percent: 0,                    // 0%
         status: 'active',
         usage_limit: 1,
-        min_order_value: 50000,        // R500.00 in cents
+        min_order_cents: 50000,        // R500.00 in cents (CORRECTED COLUMN NAME)
         description: 'Beauty Club Welcome - R100 Off',
         locked_email: cleanEmail
       })
@@ -172,8 +191,13 @@ export const handler: Handler = async (event) => {
       // Continue anyway so we don't block the user signup flow
     }
 
-    // 4. Trigger Webhook
-    await sendWebhookToN8N(data, couponCode)
+    // 4. Trigger Webhook (Non-blocking / Safe)
+    try {
+      await sendWebhookToN8N(data, couponCode)
+    } catch (webhookError) {
+      console.warn('Webhook failed but continuing:', webhookError)
+      // Don't block signup if webhook fails
+    }
 
     console.log('Beauty Club signup completed successfully:', {
       email: cleanEmail,
@@ -184,16 +208,16 @@ export const handler: Handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         success: true,
         message: 'Welcome to the Beauty Club!',
-        coupon_code: couponCode,
-        existing_user: existing && existing.length > 0
+        coupon_code: couponCode
       })
     }
 
   } catch (err: any) {
     console.error('Fatal Error:', err)
-    return { statusCode: 500, body: JSON.stringify({ error: 'FATAL_ERROR', message: err.message }) }
+    return { statusCode: 500, headers, body: JSON.stringify({ error: 'FATAL_ERROR', message: err.message }) }
   }
 }
