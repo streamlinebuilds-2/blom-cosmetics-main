@@ -595,7 +595,7 @@ export const CheckoutPage: React.FC = () => {
           items: cartState.items.map((it) => ({
             product_id: it.productId || it.id,
             name: it.name,
-            unit_price: it.price,
+            unit_price: Math.round(it.price * 100), // <--- FIXED: Convert to Cents
             quantity: it.quantity,
             variant: it.variant
           })),
