@@ -139,8 +139,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     
     if (!inStock || price === -1) return;
     
-    // Check if this is a product with MULTIPLE variants that need selection
-    const hasProductVariants = variants && variants.length > 1;
+    // Check if this is a product with ANY variants that need selection
+    const hasProductVariants = variants && variants.length > 0;
     
     if (hasProductVariants) {
       // For products with multiple variants, show variant selection modal
@@ -391,41 +391,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
         onClick={handleCardClick}
       >
-        {/* Image Container with 3D Flip Effect */}
-        <div className="relative aspect-square overflow-hidden bg-gray-50 product-card-flip-container">
-          <div className="product-card-flip-inner">
-            {/* Front Face - White Background Image */}
-            <div className="product-card-flip-front">
-              <OptimizedImage
-                src={safeImages[0]}
-                alt={safeName}
-                productName={safeName}
-                productPrice={price}
-                productCategory="Nail Care Products"
-                className="w-full h-full object-cover"
-                width={400}
-                height={400}
-                loading="lazy"
-              />
+        {/* Image Container with or without Shimmer Effect */}
+        <div className="relative aspect-square overflow-hidden bg-gray-50">
+          <OptimizedImage
+            src={safeImages[0]}
+            alt={safeName}
+            productName={safeName}
+            productPrice={price}
+            productCategory="Nail Care Products"
+            className="w-full h-full object-cover"
+            width={400}
+            height={400}
+            loading="lazy"
+          />
+          
+          {/* Shimmer Effect - Only for Featured Products */}
+          {hoverShine && (
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="shimmer"></div>
             </div>
-
-            {/* Back Face - Colorful Image */}
-            {safeImages[1] && (
-              <div className="product-card-flip-back">
-                <OptimizedImage
-                  src={safeImages[1]}
-                  alt={`${safeName} - Colorful view`}
-                  productName={safeName}
-                  productPrice={price}
-                  productCategory="Nail Care Products"
-                  className="w-full h-full object-cover"
-                  width={400}
-                  height={400}
-                  loading="lazy"
-                />
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Bestseller Badge */}
           {badges.includes('Bestseller') && (
@@ -523,65 +508,61 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           overflow: hidden;
         }
 
-        /* ========================================
-           3D CARD FLIP EFFECT - PRODUCT CARDS
-           Premium smooth transition on hover
-           ======================================== */
-
-        /* 3D perspective container */
-        .product-card-flip-container {
-          perspective: 1000px;
-          position: relative;
+        /* Premium Shimmer effect - Luxurious light beam */
+        .shimmer {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, 
+            transparent 0%, 
+            transparent 30%,
+            rgba(255, 255, 255, 0.6) 50%, 
+            transparent 70%,
+            transparent 100%
+          );
+          transform: translate(-150%, -150%);
+          opacity: 0;
+          pointer-events: none;
+          animation-fill-mode: forwards;
         }
 
-        /* Card inner wrapper for flip animation */
-        .product-card-flip-inner {
-          position: relative;
-          width: 100%;
-          height: 100%;
-          transition: transform 700ms cubic-bezier(0.4, 0.0, 0.2, 1);
-          transform-style: preserve-3d;
-        }
-
-        /* Trigger flip on hover */
+        /* Desktop - shimmer on hover only for the hovered card */
         @media (hover: hover) and (pointer: fine) {
-          .product-card:hover .product-card-flip-inner {
-            transform: rotateY(180deg);
+          .product-card:hover .shimmer {
+            animation: luxurious-light-beam 1.2s ease-in-out 1;
+            opacity: 1;
+          }
+
+          /* Reset shimmer when not hovering */
+          .product-card .shimmer {
+            animation: none;
+            transform: translate(-150%, -150%);
+            opacity: 0;
           }
         }
 
-        /* Front and back faces */
-        .product-card-flip-front,
-        .product-card-flip-back {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          backface-visibility: hidden;
-          -webkit-backface-visibility: hidden;
+        /* Mobile - shimmer on tap/touch */
+        @media (hover: none) and (pointer: coarse) {
+          .product-card:active .shimmer {
+            animation: luxurious-light-beam 1.2s ease-in-out 1 !important;
+            opacity: 1 !important;
+          }
         }
 
-        /* Front face (white background image) */
-        .product-card-flip-front {
-          z-index: 2;
-          transform: rotateY(0deg);
-        }
-
-        /* Back face (colorful image) */
-        .product-card-flip-back {
-          transform: rotateY(180deg);
-        }
-
-        /* Smooth image transitions */
-        .product-card-flip-front img,
-        .product-card-flip-back img {
-          transition: transform 700ms cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-
-        /* Subtle scale on hover for premium feel */
-        @media (hover: hover) and (pointer: fine) {
-          .product-card:hover .product-card-flip-front img,
-          .product-card:hover .product-card-flip-back img {
-            transform: scale(1.05);
+        /* Fast, luxurious light beam animation */
+        @keyframes luxurious-light-beam {
+          0% { 
+            transform: translate(-150%, -150%);
+            opacity: 0;
+          }
+          15% {
+            opacity: 1;
+          }
+          85% {
+            opacity: 1;
+          }
+          100% { 
+            transform: translate(150%, 150%);
+            opacity: 0;
           }
         }
       `}</style>
