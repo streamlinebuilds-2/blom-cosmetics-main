@@ -12,9 +12,24 @@ interface BeautyClubSignupData {
 // Helper to send data to N8N with a 5-second timeout prevention
 async function sendWebhookToN8N(signupData: BeautyClubSignupData, couponCode?: string): Promise<boolean> {
   try {
-    const WEBHOOK_URL = process.env.N8N_BEAUTY_CLUB_WEBHOOK || 'https://dockerfile-1n82.onrender.com/webhook/beauty-club-signup'
+    // Always use the specific webhook URL for beauty club signups
+    const WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/beauty-club-signup'
     
-    console.log('Sending webhook to N8N...')
+    const webhookPayload = {
+      ...signupData,
+      coupon_code: couponCode || null,
+      timestamp: new Date().toISOString(),
+      source: signupData.source || 'popup',
+      discount_value: 'R100',
+      min_spend: 'R500',
+      website: 'BLOM Cosmetics',
+      signup_type: 'beauty_club'
+    }
+    
+    console.log('🔔 SENDING WEBHOOK TO N8N:', {
+      url: WEBHOOK_URL,
+      payload: webhookPayload
+    })
     
     // Abort signal to prevent Netlify function timeout (5s limit for webhook)
     const controller = new AbortController()
@@ -26,26 +41,28 @@ async function sendWebhookToN8N(signupData: BeautyClubSignupData, couponCode?: s
         'Content-Type': 'application/json',
         'User-Agent': 'BLOM-Cosmetics-BeautyClub/1.0'
       },
-      body: JSON.stringify({
-        ...signupData,
-        coupon_code: couponCode || null,
-        timestamp: new Date().toISOString(),
-        source: signupData.source || 'popup',
-        discount_value: 'R100',
-        min_spend: 'R500'
-      }),
+      body: JSON.stringify(webhookPayload),
       signal: controller.signal
     })
     
     clearTimeout(timeoutId)
     
+    const responseText = await response.text()
+    console.log('📥 WEBHOOK RESPONSE:', {
+      status: response.status,
+      statusText: response.statusText,
+      body: responseText
+    })
+    
     if (!response.ok) {
-      console.warn(`Webhook responded with status ${response.status}`)
+      console.warn(`❌ Webhook responded with status ${response.status}: ${responseText}`)
       return false
     }
+    
+    console.log('✅ WEBHOOK SUCCESS: Payload sent successfully to N8N')
     return true
   } catch (error) {
-    console.error('Webhook failed (timeout or network error):', error)
+    console.error('❌ Webhook failed (timeout or network error):', error)
     // Return false but don't crash the signup flow
     return false
   }
@@ -104,10 +121,10 @@ export const handler: Handler = async (event) => {
     const cleanEmail = email.toLowerCase().trim()
     const cleanPhone = phone ? phone.replace(/\s+/g, '').trim() : null
 
-    console.log('Checking for existing user:', { email: cleanEmail, phone: cleanPhone })
+    console.log('🔍 Checking for existing user:', { email: cleanEmail, phone: cleanPhone })
 
-    // 1. Check for existing user
-    let query = supabase.from('contacts').select('id, email, phone')
+    // 1. Check for existing user - Enhanced duplicate prevention
+    let query = supabase.from('contacts').select('id, email, phone, created_at')
     if (cleanPhone) {
       query = query.or(`email.eq.${cleanEmail},phone.eq.${cleanPhone}`)
     } else {
@@ -117,7 +134,7 @@ export const handler: Handler = async (event) => {
     const { data: existing, error: existingError } = await query
     
     if (existingError) {
-      console.error('Error checking existing user:', existingError)
+      console.error('❌ Error checking existing user:', existingError)
       return { 
         statusCode: 500, 
         headers, 
@@ -129,14 +146,33 @@ export const handler: Handler = async (event) => {
       }
     }
 
+    console.log('📊 Existing users found:', existing?.length || 0, existing)
+
     if (existing && existing.length > 0) {
-      return {
-        statusCode: 200, // Return 200 for existing users to show "Already Registered" message nicely
-        headers,
-        body: JSON.stringify({
-          existing_user: true,
-          message: 'You are already a member of the Beauty Club.'
+      // Check if any of the existing contacts are for Beauty Club
+      const beautyClubExisting = existing.filter(contact => 
+        contact.email === cleanEmail || 
+        (cleanPhone && contact.phone === cleanPhone)
+      )
+      
+      if (beautyClubExisting.length > 0) {
+        console.log('🚫 DUPLICATE DETECTED - User already registered:', {
+          email: cleanEmail,
+          phone: cleanPhone,
+          existingCount: beautyClubExisting.length
         })
+        
+        return {
+          statusCode: 409, // Conflict status for duplicates
+          headers,
+          body: JSON.stringify({
+            duplicate: true,
+            existing_user: true,
+            message: 'This email or phone number is already registered with the Beauty Club.',
+            details: 'Please use a different email or phone number to sign up.',
+            count: beautyClubExisting.length
+          })
+        }
       }
     }
 
@@ -191,12 +227,15 @@ export const handler: Handler = async (event) => {
       // Continue anyway so we don't block the user signup flow
     }
 
-    // 4. Trigger Webhook (Non-blocking / Safe)
-    try {
-      await sendWebhookToN8N(data, couponCode)
-    } catch (webhookError) {
-      console.warn('Webhook failed but continuing:', webhookError)
-      // Don't block signup if webhook fails
+    // 4. Trigger Webhook (Critical - Must succeed for automation)
+    console.log('🚀 Starting webhook process...')
+    const webhookSuccess = await sendWebhookToN8N(data, couponCode)
+    
+    if (!webhookSuccess) {
+      console.warn('⚠️ WEBHOOK FAILED - This is critical for email automation!')
+      // Don't block signup if webhook fails, but log it clearly
+    } else {
+      console.log('✅ WEBHOOK SUCCESSFUL - Email automation will be triggered')
     }
 
     console.log('Beauty Club signup completed successfully:', {
