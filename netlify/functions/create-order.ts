@@ -68,6 +68,17 @@ export const handler: Handler = async (event) => {
       });
     }
 
+    // --- FIX 1 & 2: Normalize Fulfillment Method ---
+    // The checkout sends 'shipping.method' as 'store-pickup' or 'door-to-door'
+    // We need to map this to 'collection' or 'delivery' for the DB
+    const rawMethod = body.shipping?.method || body.fulfillment?.method || 'delivery';
+    const fulfillmentMethod = (rawMethod === 'store-pickup' || rawMethod === 'collection') ? 'collection' : 'delivery';
+    
+    // Select the correct address object
+    // If delivery, use shipping address. If collection, it is null.
+    const deliveryAddress = fulfillmentMethod === 'delivery' ? (body.shipping?.address || body.fulfillment?.address || body.delivery_address) : null;
+    const collectionLocation = fulfillmentMethod === 'collection' ? 'BLOM HQ' : null;
+
     // 3. Create Order via RPC
     const rpcPayload = {
       p_order_number: `BL-${Date.now().toString(36).toUpperCase()}`,
@@ -77,7 +88,7 @@ export const handler: Handler = async (event) => {
       p_buyer_phone: body.shippingInfo?.phone || body.buyer?.phone,
       p_channel: 'website',
       
-      // 4. CONSTRUCT ITEM NAMES CORRECTLY
+      // 4. CONSTRUCT ITEM NAMES & PRICES CORRECTLY
       p_items: validItems.map(it => {
         // Start with the Real DB Name if we found it, otherwise use what the frontend sent
         let finalDisplayName = it.resolved_product ? it.resolved_product.name : it.base_name;
@@ -87,11 +98,16 @@ export const handler: Handler = async (event) => {
             finalDisplayName = `${finalDisplayName} - ${it.variant_name}`;
         }
 
+        // --- FIX 3: Price Scaling ---
+        // Checkout sends cents (e.g., 59000). Invoice expects Rands (e.g., 590.00).
+        // We divide by 100 to convert Cents -> Rands for the unit price column.
+        const unitPriceRands = it.unit_price / 100;
+
         return {
           product_id: it.resolved_id, 
-          product_name: finalDisplayName, // e.g. "Cuticle Oil - Peach"
+          product_name: finalDisplayName,
           quantity: it.quantity,
-          unit_price: it.unit_price,
+          unit_price: unitPriceRands, // Store as Rands (e.g. 590.00)
           sku: it.original_sku
         };
       }),
@@ -100,9 +116,9 @@ export const handler: Handler = async (event) => {
       p_shipping_cents: Number(body.totals?.shipping_cents || 0),
       p_discount_cents: Number(body.totals?.discount_cents || 0),
       p_tax_cents: 0,
-      p_fulfillment_method: body.fulfillment?.method || 'delivery',
-      p_delivery_address: (body.fulfillment?.method === 'delivery' ? body.shipping?.address : null) || null,
-      p_collection_location: body.fulfillment?.collection_location || null,
+      p_fulfillment_method: fulfillmentMethod,
+      p_delivery_address: deliveryAddress,
+      p_collection_location: collectionLocation,
       p_coupon_code: body.coupon?.code || null
     };
 
