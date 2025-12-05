@@ -22,12 +22,11 @@ export const ShopPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [dbProducts, setDbProducts] = useState<any[]>([]);
+  const [displayProducts, setDisplayProducts] = useState<any[]>([]); // Renamed from dbProducts for clarity
   const [error, setError] = useState<string | null>(null);
-  // Discount system disabled
 
   // Static products - Keep existing products working while database is being populated
-  const staticProducts = [
+  const staticProducts = useMemo(() => [
     // Bundle Deals
     {
       id: 'bundle-1',
@@ -531,7 +530,7 @@ export const ShopPage: React.FC = () => {
       materialsFinish: 'Premium wood construction with orchid-inspired decorative details.',
       productionDelivery: 'Custom built to order. Delivery within 3-4 weeks. Professional installation available.'
     }
-  ];
+  ], []);
 
   // Helper function to normalize category names to slugs
   const normalizeCategoryToSlug = (category: string): string => {
@@ -577,8 +576,11 @@ export const ShopPage: React.FC = () => {
           console.error('Error fetching bundles from database:', bundlesError);
         }
 
+        // If errors occur, rely on static products, don't wipe state
         if (productsError && bundlesError) {
-          setError('Failed to load some products');
+          console.warn('Using static products due to DB error');
+          setDisplayProducts(staticProducts);
+          setLoading(false);
           return;
         }
 
@@ -783,25 +785,39 @@ export const ShopPage: React.FC = () => {
           bundleProducts: bundle.bundle_products || [] // Will be populated if needed
         }));
 
-        // Combine products and bundles
-        const allDbProducts = [...mappedProducts, ...mappedBundles];
-        setDbProducts(allDbProducts);
+        // Merge DB products with static products
+        // We prioritize DB products if they exist, checking by slug
+        const dbProductSlugs = new Set([...mappedProducts, ...mappedBundles].map(p => p.slug));
+        
+        // Only add static products that are NOT in the DB results
+        const uniqueStaticProducts = staticProducts.filter(p => !dbProductSlugs.has(p.slug));
+
+        // Combine everything
+        const combinedProducts = [...uniqueStaticProducts, ...mappedProducts, ...mappedBundles];
+        
+        // If we still have no products (DB fail + static fail?), fallback purely to static
+        if (combinedProducts.length === 0) {
+           setDisplayProducts(staticProducts);
+        } else {
+           setDisplayProducts(combinedProducts);
+        }
       } catch (err: any) {
         console.error('Error loading database products:', err);
-        setError('Failed to load some products');
+        // Fallback to static on critical error
+        setDisplayProducts(staticProducts);
       } finally {
         setLoading(false);
       }
     }
 
     loadDbProducts();
-  }, []);
+  }, [staticProducts]);
 
-  // Use database products (fetched from Supabase) merged with static bundle products
-  // Ensure bundle products have correct local images (not placeholder URLs from database)
-  const allProducts = dbProducts.map(product => {
-    // Override bundle images with local images
-    if (product.slug === 'prep-primer-bundle') {
+  // Use merged products
+  // Ensure bundle products have correct local images if needed (legacy override)
+  const allProducts = displayProducts.map((product: any) => {
+    // Override bundle images with local images if specifically the prep-primer-bundle
+    if (product.slug === 'prep-primer-bundle' && product.images.length === 0) {
       return {
         ...product,
         images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp']
@@ -879,7 +895,7 @@ export const ShopPage: React.FC = () => {
     }
   }, []);
 
-  const filteredProducts = allProducts.filter(product => {
+  const filteredProducts = allProducts.filter((product: any) => {
     const matchesCategory = selectedCategory === 'all' ||
       product.category === selectedCategory;
 
