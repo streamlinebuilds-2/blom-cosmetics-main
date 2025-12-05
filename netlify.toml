@@ -5,6 +5,7 @@
 
 [build.environment]
   NPM_FLAGS = "--include=dev"
+  NODE_VERSION = "18"
 
 [functions]
   directory = "netlify/functions"
