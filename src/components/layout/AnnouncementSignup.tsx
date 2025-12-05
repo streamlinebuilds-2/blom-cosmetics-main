@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 import { postJson } from '../../lib/api';
 
 declare global {
@@ -199,19 +199,19 @@ export const AnnouncementSignup: React.FC = () => {
                 <ul className="mb-4 space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
-                      <span className="text-pink-500 font-bold text-xs">✓</span>
+                      <Check className="w-3 h-3 text-pink-500" />
                     </div>
                     <span>Instant R100 welcome code</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
-                      <span className="text-pink-500 font-bold text-xs">✓</span>
+                      <Check className="w-3 h-3 text-pink-500" />
                     </div>
                     <span>Early access to launches</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
-                      <span className="text-pink-500 font-bold text-xs">✓</span>
+                      <Check className="w-3 h-3 text-pink-500" />
                     </div>
                     <span>Member-only promos</span>
                   </li>
@@ -248,6 +248,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
 
     const trimmedEmail = email.trim();
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail);
+    // Simple validation for phone, flexible for international
     const isValidPhone = /^[\+]?[0-9\s\-\(\)]{10,}$/.test(phone.trim());
 
     if (!isValidEmail || !isValidPhone || !consent) {
@@ -278,7 +279,7 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
 
       console.info('Sending POST to beauty club signup function:', payload);
 
-      // Use the new Netlify function that handles duplicate checking
+      // Use the Netlify function that handles duplicate checking
       const response = await fetch('/.netlify/functions/beauty-club-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -427,5 +428,3 @@ const SignupForm: React.FC<{ onSuccess: () => void }> = ({ onSuccess }) => {
     </form>
   );
 };
-
-
