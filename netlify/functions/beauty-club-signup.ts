@@ -49,12 +49,35 @@ export const handler: Handler = async (event) => {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method Not Allowed' }) }
   }
 
-  const supabaseUrl = process.env.SUPABASE_URL
+  // Support both SUPABASE_URL and VITE_SUPABASE_URL environment variables
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   
+  console.log('Environment check:', { 
+    hasUrl: !!supabaseUrl, 
+    hasServiceKey: !!serviceKey,
+    urlValue: supabaseUrl ? supabaseUrl.substring(0, 30) + '...' : 'missing'
+  })
+  
   if (!supabaseUrl || !serviceKey) {
-    return { statusCode: 500, body: JSON.stringify({ error: 'Server Config Error' }) }
+    console.error('Missing Supabase environment variables:', { 
+      SUPABASE_URL: !!process.env.SUPABASE_URL,
+      VITE_SUPABASE_URL: !!process.env.VITE_SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    })
+    return { 
+      statusCode: 500, 
+      body: JSON.stringify({ 
+        error: 'Server Configuration Error', 
+        message: 'Supabase environment variables are not properly configured',
+        details: {
+          supabase_url_configured: !!supabaseUrl,
+          service_key_configured: !!serviceKey
+        }
+      }) 
+    }
   }
+  
   const supabase = createClient(supabaseUrl, serviceKey)
 
   try {
@@ -69,6 +92,8 @@ export const handler: Handler = async (event) => {
     const cleanPhone = phone ? phone.replace(/\s+/g, '').trim() : null
 
     // 1. Check for existing user
+    console.log('Checking for existing user:', { email: cleanEmail, phone: cleanPhone })
+    
     let query = supabase.from('contacts').select('id, email, phone')
     if (cleanPhone) {
       query = query.or(`email.eq.${cleanEmail},phone.eq.${cleanPhone}`)
@@ -76,7 +101,19 @@ export const handler: Handler = async (event) => {
       query = query.eq('email', cleanEmail)
     }
     
-    const { data: existing } = await query
+    const { data: existing, error: existingError } = await query
+    
+    if (existingError) {
+      console.error('Error checking existing user:', existingError)
+      return { 
+        statusCode: 500, 
+        body: JSON.stringify({ 
+          error: 'DATABASE_ERROR', 
+          message: 'Failed to check existing user',
+          details: existingError.message
+        }) 
+      }
+    }
 
     if (existing && existing.length > 0) {
       return {
@@ -88,8 +125,10 @@ export const handler: Handler = async (event) => {
       }
     }
 
+    console.log('Creating new contact:', { email: cleanEmail, phone: cleanPhone, name: first_name || 'Beauty Club Member' })
+    
     // 2. Create Contact
-    const { error: insertError } = await supabase
+    const { data: contactData, error: insertError } = await supabase
       .from('contacts')
       .insert({
         email: cleanEmail,
@@ -100,6 +139,7 @@ export const handler: Handler = async (event) => {
         subscribed: true,
         message: 'Beauty Club Signup'
       })
+      .select()
 
     if (insertError) {
       return { statusCode: 500, body: JSON.stringify({ error: 'DB_INSERT_FAILED', message: insertError.message }) }
@@ -110,7 +150,9 @@ export const handler: Handler = async (event) => {
     const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
     const couponCode = `WELCOME-R100-${randomSuffix}`;
     
-    const { error: couponError } = await supabase
+    console.log('Creating coupon:', { code: couponCode, locked_email: cleanEmail })
+    
+    const { data: couponData, error: couponError } = await supabase
       .from('coupons')
       .insert({
         code: couponCode,
@@ -123,6 +165,7 @@ export const handler: Handler = async (event) => {
         description: 'Beauty Club Welcome - R100 Off',
         locked_email: cleanEmail
       })
+      .select()
 
     if (couponError) {
       console.error('Coupon creation failed:', couponError)
@@ -132,12 +175,20 @@ export const handler: Handler = async (event) => {
     // 4. Trigger Webhook
     await sendWebhookToN8N(data, couponCode)
 
+    console.log('Beauty Club signup completed successfully:', {
+      email: cleanEmail,
+      couponCode,
+      contactCreated: !!contactData,
+      couponCreated: !!couponData
+    })
+
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
         message: 'Welcome to the Beauty Club!',
-        coupon_code: couponCode
+        coupon_code: couponCode,
+        existing_user: existing && existing.length > 0
       })
     }
 
