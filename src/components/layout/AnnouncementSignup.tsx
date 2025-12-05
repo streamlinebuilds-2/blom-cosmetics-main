@@ -131,7 +131,7 @@ export const AnnouncementSignup: React.FC = () => {
           <Container className="py-2 px-4">
             <div className="relative flex items-center justify-center gap-3">
               <p className="text-sm font-medium text-center announcement-text">
-                ✨ Join the BLOM Beauty Club & Get R100 Off Your First Order ✨
+                ✨ Join the BLOM Beauty Club & Get R100 Off Your First Order (Min R500) ✨
               </p>
               <Button
                 variant="secondary"
@@ -201,7 +201,7 @@ export const AnnouncementSignup: React.FC = () => {
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
                       <Check className="w-3 h-3 text-pink-500" />
                     </div>
-                    <span>Instant R100 welcome code</span>
+                    <span>Instant R100 welcome code (Min spend R500)</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-pink-100 rounded-full flex items-center justify-center">
