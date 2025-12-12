@@ -69,20 +69,30 @@ export const handler: Handler = async (event) => {
         })
       })
 
-      // B) GENERATE INVOICE (Crucial Step Added)
+      // B) INCREMENT COUPON USAGE (New Feature)
+      if (order.coupon_code) {
+        try {
+          console.log(`Incrementing usage for coupon: ${order.coupon_code}`);
+          await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_coupon_usage`, {
+            method: 'POST',
+            headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ p_code: order.coupon_code })
+          });
+        } catch (couponErr) {
+          console.error('Failed to increment coupon usage:', couponErr);
+        }
+      }
+
+      // C) GENERATE INVOICE
       try {
         console.log('Generating Invoice PDF...')
-        // Call the invoice generator internally
-        const invoiceUrl = `${SITE.replace(/\/$/, '')}/.netlify/functions/invoice-generate-pdf?m_payment_id=${encodeURIComponent(m_payment_id)}`
-        // We use a fetch here to trigger the function
+        const invoiceUrl = `${SITE.replace(/\/$/, '')}/.netlify/functions/invoice-pdf?m_payment_id=${encodeURIComponent(m_payment_id)}`
         const invRes = await fetch(invoiceUrl)
         if (invRes.ok) console.log('✅ Invoice generated successfully')
         else console.error('❌ Invoice generation failed:', await invRes.text())
-      } catch (e) {
-        console.error('Invoice trigger error:', e)
-      }
+      } catch (e) { console.error('Invoice trigger error:', e) }
 
-      // C) Trigger Stock Deduction
+      // D) Trigger Stock Deduction
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_order_stock_deduction`, {
           method: 'POST',
@@ -92,7 +102,7 @@ export const handler: Handler = async (event) => {
         console.log('✅ Stock deducted')
       } catch (e) { console.error('Stock error:', e) }
 
-      // D) Send Notification to N8N (Email/WhatsApp)
+      // E) Send Notification to N8N
       try {
         await fetch(N8N_WEBHOOK_URL, {
           method: 'POST',
