@@ -36,27 +36,15 @@ export const handler = async (event: any) => {
     let m_payment_id = body.m_payment_id || q.m_payment_id || event.headers['x-m-payment-id'];
     const order_id = body.order_id || q.order_id || event.headers['x-order-id'];
 
-    // ID Lookup logic
     if (!m_payment_id && order_id) {
       try {
-        console.log('Looking up m_payment_id for order_id:', order_id);
-        const orderResponse: any = await fetchJson(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id,order_number,buyer_name`);
-        console.log('Order lookup response:', orderResponse);
-        if (orderResponse && orderResponse.length > 0) {
-          m_payment_id = orderResponse[0].m_payment_id;
-          console.log('Found m_payment_id:', m_payment_id);
-        } else {
-          console.log('No order found for order_id:', order_id);
-        }
-      } catch (error) { 
-        console.error('ID Lookup Error:', error); 
-        return { statusCode: 404, body: JSON.stringify({ error: 'Order not found', order_id: order_id }) };
-      }
+        const orderResponse: any = await fetchJson(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id`);
+        if (orderResponse && orderResponse.length > 0) m_payment_id = orderResponse[0].m_payment_id;
+      } catch (error) { console.error('ID Lookup Error', error); }
     }
 
     if (!m_payment_id) {
-      console.log('ID required - order_id:', order_id, 'm_payment_id:', m_payment_id);
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'ID required', order_id: order_id }) };
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'ID required' }) };
     }
 
     // 1) Load Order Data
@@ -70,9 +58,18 @@ export const handler = async (event: any) => {
       `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,variant_title`
     ) as any[]
 
+    // --- FIX 1: Detect Furniture ---
+    const furnitureKeywords = ['table', 'station', 'desk', 'dresser', 'bed', 'chair', 'rack'];
+    const hasFurniture = items.some((it: any) => {
+      const name = (it.product_name || '').toLowerCase();
+      return furnitureKeywords.some(k => name.includes(k));
+    });
+
     // Calculate totals
     const itemsSum = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unit_price || 0)), 0)
-    order.total = Number(order.total) > 0 ? Number(order.total) : itemsSum
+    
+    // Use stored total if valid, otherwise fallback to sum
+    const totalPaid = Number(order.total) > 0 ? Number(order.total) : itemsSum;
 
     // 2) PDF Generation
     const pdf = await PDFDocument.create()
@@ -171,40 +168,41 @@ export const handler = async (event: any) => {
       y -= 16
     })
 
-    // --- LOGIC: Smart Discount Calculation ---
+    // --- FINANCIALS SECTION ---
     const shippingAmount = order.shipping_cents ? order.shipping_cents / 100 : 0
     const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : itemsSum
-    
-    // 1. Get explicit discount from DB
     let discountAmount = order.discount_cents ? order.discount_cents / 100 : 0
 
-    // 2. If missing, try to infer from the math (Self-Healing for old orders)
-    if (discountAmount === 0) {
-      const expectedTotal = subtotalAmount + shippingAmount
-      const paidTotal = Number(order.total)
-      // If customer paid less than expected, the diff is a discount
-      if (paidTotal > 0 && paidTotal < expectedTotal - 0.05) {
-        discountAmount = expectedTotal - paidTotal
-      }
-    }
-
-    // Free shipping check
-    const isFreeShipping = subtotalAmount >= 2000 && shippingAmount === 0
-    if (isFreeShipping) {
+    // --- FIX 2: Stop "Phantom" Discounts ---
+    // If discount is 0 in DB, force it to 0 here. Do NOT infer it from total mismatch.
+    // This solves the issue where R4300 Item + R500 Shipping showed a -R500 Coupon.
+    
+    // --- FIX 3: Furniture Shipping Logic ---
+    const isFreeShipping = !hasFurniture && subtotalAmount >= 2000 && shippingAmount === 0;
+    
+    if (hasFurniture && shippingAmount === 0) {
+      // Furniture Case: Show special message instead of Free Shipping
+      drawText("Shipping (Furniture)", left, y, 10)
+      drawRightText("Invoiced Later", right - 20, y, 10)
+      y -= 16
+    } else if (isFreeShipping) {
+      // Standard Free Shipping
       drawText("FREE SHIPPING - Order over R2000", left, y, 10)
       drawRightText("R 0.00", right - 20, y, 10)
       y -= 16
     } else if (shippingAmount > 0) {
-      drawText("Shipping & Handling", left, y, 10)
+      // Paid Shipping / Collection
+      const label = order.fulfillment_method === 'collection' ? 'Collection Fee' : 'Shipping & Handling';
+      drawText(label, left, y, 10)
       drawRightText("1", right - 150, y, 10)
       drawRightText(money(shippingAmount), right - 90, y, 10)
       drawRightText(money(shippingAmount), right - 20, y, 10)
       y -= 16
     }
 
-    // Display Discount
+    // Display Discount (Only if real)
     if (discountAmount > 0) {
-      drawText("Coupon Discount", left, y, 10, false, rgb(0, 0.5, 0.2)) // Green text
+      drawText("Coupon Discount", left, y, 10, false, rgb(0, 0.5, 0.2))
       drawRightText("-" + money(discountAmount), right - 20, y, 10, false, rgb(0, 0.5, 0.2))
       y -= 16
     }
@@ -212,21 +210,29 @@ export const handler = async (event: any) => {
     y -= 8; drawLine(left, y, right, y); y -= 18
 
     // --- TOTALS CALCULATION ---
-    const finalTotal = Math.max(0, subtotalAmount + shippingAmount - discountAmount);
+    // We calculate the theoretical total to show on the invoice.
+    // If the customer underpaid (e.g. Total Paid 4300 vs Invoice 4800), we show the Invoice Total (4800).
+    // This prevents the "fake coupon" but might show a discrepancy with "Amount Paid".
+    const invoiceTotal = Math.max(0, subtotalAmount + shippingAmount - discountAmount);
 
     // Subtotal
     if (order.subtotal_cents || discountAmount > 0) {
       drawRightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
       drawRightText(money(subtotalAmount), right - 20, y, 10)
-      y -= 20 // Increased spacing
+      y -= 20
     }
 
-    // Total row - Adjusted Y coordinates to prevent overlap
-    // Line is drawn 12pts above the text baseline
     drawLine(right - 250, y + 12, right, y + 12) 
     
     drawText("Total", right - 140, y, 13, true)
-    drawRightText(money(finalTotal), right - 20, y, 13, true)
+    drawRightText(money(invoiceTotal), right - 20, y, 13, true)
+
+    // Optional: Show "Paid" amount if different from Total (e.g. for the collection error)
+    if (Math.abs(totalPaid - invoiceTotal) > 1 && totalPaid > 0) {
+       y -= 20;
+       drawRightText("Amount Paid", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45));
+       drawRightText(money(totalPaid), right - 20, y, 10, false, rgb(0.4, 0.4, 0.45));
+    }
 
     // Footer
     y -= 32; 
@@ -268,7 +274,6 @@ export const handler = async (event: any) => {
       isBase64Encoded: true
     }
   } catch (e: any) {
-    console.error('Invoice PDF generation error:', e);
-    return { statusCode: 500, body: JSON.stringify({ error: e?.message ?? "Error", stack: e?.stack }) }
+    return { statusCode: 500, body: e?.message ?? "Error" }
   }
 }
