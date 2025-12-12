@@ -39,13 +39,24 @@ export const handler = async (event: any) => {
     // ID Lookup logic
     if (!m_payment_id && order_id) {
       try {
-        const orderResponse: any = await fetchJson(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id`);
-        if (orderResponse && orderResponse.length > 0) m_payment_id = orderResponse[0].m_payment_id;
-      } catch (error) { console.error('ID Lookup Error', error); }
+        console.log('Looking up m_payment_id for order_id:', order_id);
+        const orderResponse: any = await fetchJson(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id,order_number,buyer_name`);
+        console.log('Order lookup response:', orderResponse);
+        if (orderResponse && orderResponse.length > 0) {
+          m_payment_id = orderResponse[0].m_payment_id;
+          console.log('Found m_payment_id:', m_payment_id);
+        } else {
+          console.log('No order found for order_id:', order_id);
+        }
+      } catch (error) { 
+        console.error('ID Lookup Error:', error); 
+        return { statusCode: 404, body: JSON.stringify({ error: 'Order not found', order_id: order_id }) };
+      }
     }
 
     if (!m_payment_id) {
-      return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'ID required' }) };
+      console.log('ID required - order_id:', order_id, 'm_payment_id:', m_payment_id);
+      return { statusCode: 400, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'ID required', order_id: order_id }) };
     }
 
     // 1) Load Order Data
@@ -257,6 +268,7 @@ export const handler = async (event: any) => {
       isBase64Encoded: true
     }
   } catch (e: any) {
-    return { statusCode: 500, body: e?.message ?? "Error" }
+    console.error('Invoice PDF generation error:', e);
+    return { statusCode: 500, body: JSON.stringify({ error: e?.message ?? "Error", stack: e?.stack }) }
   }
 }

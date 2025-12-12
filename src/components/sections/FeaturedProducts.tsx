@@ -39,13 +39,22 @@ export const FeaturedProducts = () => {
             // Safety check if product was deleted
             if (!p) return null;
 
-            // Map database variants to ProductCard format
-            const variants = p.product_variants?.map((v: any) => ({
-              id: v.id,
-              name: v.title,
-              price: v.price,
-              inStock: (v.inventory_quantity || 0) > 0
-            })) || [];
+            // Map database variants to ProductCard format (same robust logic as ShopPage)
+            const variants = Array.isArray(p.product_variants)
+              ? p.product_variants.map((v: any) => {
+                  // Handle both object and string variants
+                  if (typeof v === 'string') {
+                    return { name: v, inStock: true };
+                  }
+                  return {
+                    name: v.name || v.label || v.title || '',
+                    label: v.label || v.name || v.title || '',
+                    inStock: v.inStock ?? v.in_stock ?? (v.inventory_quantity || 0) > 0,
+                    image: v.image || v.image_url || null,
+                    price: v.price || null
+                  };
+                })
+              : [];
 
             return {
               id: p.id,

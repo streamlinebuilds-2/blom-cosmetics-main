@@ -5,7 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
-import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2 } from 'lucide-react';
+import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2, AlertCircle } from 'lucide-react';
 import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
@@ -155,6 +155,14 @@ export const CheckoutPage: React.FC = () => {
   const [userSession, setUserSession] = useState<any>(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [selectedProductForVariant, setSelectedProductForVariant] = useState<any>(null);
+
+  // --- FURNITURE DETECTION LOGIC ---
+  const isFurnitureItem = (itemName: string) => {
+    const furnitureKeywords = ['table', 'station', 'desk', 'dresser', 'bed', 'chair', 'rack'];
+    return furnitureKeywords.some(keyword => itemName.toLowerCase().includes(keyword));
+  };
+
+  const hasFurniture = cartState.items.some(item => isFurnitureItem(item.name));
 
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
@@ -718,10 +726,19 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  // Calculate shipping cost
+  // --- UPDATED SHIPPING CALCULATION ---
   const calculateShipping = () => {
-    if (shippingMethod === 'store-pickup') return 0;
-    // Door-to-door: Free over R2000, otherwise R120 (use items subtotal)
+    // 1. Collection is now R500.00
+    if (shippingMethod === 'store-pickup') return 500;
+    
+    // 2. Furniture Delivery Handling
+    if (hasFurniture) {
+      // Furniture shipping is calculated separately, so we charge R0 now
+      // and invoice them later.
+      return 0;
+    }
+
+    // 3. Standard Delivery Rules
     return cartState.subtotal >= 2000 ? 0 : 120;
   };
 
@@ -792,6 +809,20 @@ export const CheckoutPage: React.FC = () => {
                           <Truck className="h-5 w-5 text-gray-500" />
                           Choose Your Delivery Option
                         </h3>
+                        
+                        {/* Furniture Warning Alert */}
+                        {hasFurniture && (
+                          <div className="mb-4 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex gap-3">
+                            <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <h4 className="font-semibold text-yellow-800 text-sm">Furniture Shipping Notice</h4>
+                              <p className="text-sm text-yellow-700 mt-1">
+                                Your cart contains furniture items. Shipping costs for furniture will be <strong>calculated separately</strong> after your order is placed. We will contact you with a shipping invoice.
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
                         <div className="space-y-3">
                           
                           {/* Store Pickup */}
@@ -814,10 +845,10 @@ export const CheckoutPage: React.FC = () => {
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Collect from BLOM HQ, Randfontein</span>
-                                  <span className="text-lg font-bold text-gray-900">FREE</span>
+                                  <span className="text-lg font-bold text-gray-900">R 500.00</span>
                                 </div>
                                 <p className="text-sm text-gray-600">Ready within 24 hours. We'll WhatsApp you when it's ready.</p>
-                                <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free Pickup</span>
+                                <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Standard Collection Fee</span>
                               </div>
                             </div>
                           </label>
@@ -843,15 +874,25 @@ export const CheckoutPage: React.FC = () => {
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Door-to-Door Delivery</span>
                                   <span className="text-lg font-bold text-gray-900">
-                                    {cartState.subtotal >= 2000 ? 'FREE' : 'R120'}
+                                    {hasFurniture ? 'Calculated Later' : (cartState.subtotal >= 2000 ? 'FREE' : 'R120')}
                                   </span>
                                 </div>
-                                <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
-                                {cartState.subtotal >= 2000 && (
-                                  <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free over R2000</span>
-                                )}
-                                {cartState.subtotal < 2000 && (
-                                  <p className="text-xs text-gray-500 mt-1">Add R{(2000 - cartState.subtotal).toFixed(2)} more for free delivery!</p>
+                                
+                                {hasFurniture ? (
+                                  <>
+                                    <p className="text-sm text-gray-600">Shipping calculated separately for furniture items.</p>
+                                    <span className="inline-block mt-2 px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">Invoice to follow</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
+                                    {cartState.subtotal >= 2000 && (
+                                      <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free over R2000</span>
+                                    )}
+                                    {cartState.subtotal < 2000 && (
+                                      <p className="text-xs text-gray-500 mt-1">Add R{(2000 - cartState.subtotal).toFixed(2)} more for free delivery!</p>
+                                    )}
+                                  </>
                                 )}
                               </div>
                             </div>
@@ -1444,10 +1485,12 @@ export const CheckoutPage: React.FC = () => {
                     <div className="flex justify-between text-sm">
                       <span>Shipping:</span>
                       <span className={shippingCost === 0 ? 'text-green-600 font-medium' : ''}>
-                        {shippingCost === 0 ? 'FREE' : formatPrice(shippingCost)}
+                        {hasFurniture && shippingMethod === 'door-to-door'
+                          ? 'Calculated Later'
+                          : (shippingCost === 0 ? 'FREE' : formatPrice(shippingCost))}
                       </span>
                     </div>
-                    {shippingMethod === 'door-to-door' && cartState.subtotal >= 2000 && (
+                    {shippingMethod === 'door-to-door' && cartState.subtotal >= 2000 && !hasFurniture && (
                       <div className="flex justify-between text-xs text-green-600">
                         <span>✨ Free shipping applied!</span>
                         <span>-R120</span>
@@ -1466,7 +1509,7 @@ export const CheckoutPage: React.FC = () => {
                   </div>
 
                   {/* Shipping Notice */}
-                  {cartState.subtotal < 2000 && (
+                  {!hasFurniture && cartState.subtotal < 2000 && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-sm text-blue-800">
                         Add {formatPrice(2000 - cartState.subtotal)} more for free shipping!

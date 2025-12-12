@@ -92,24 +92,31 @@ export default function CheckoutSuccess() {
     if (!orderDetails) return;
     setLoading(true);
     try {
+        // Use order_id (UUID) which the backend can look up to get m_payment_id
         const res = await fetch('/.netlify/functions/invoice-pdf', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ order_id: orderDetails.id, download: true })
         });
+        
         if (res.ok) {
             const blob = await res.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Invoice-${orderDetails.order_number}.pdf`;
+            a.download = `Invoice-${orderDetails.order_number || orderDetails.m_payment_id || orderDetails.id}.pdf`;
             document.body.appendChild(a); 
             a.click(); 
             window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
         } else {
-            alert('Could not generate receipt. Please try again later.');
+            // Show more specific error message
+            const errorText = await res.text();
+            console.error('Invoice generation failed:', res.status, errorText);
+            alert(`Could not generate receipt. Error: ${res.status}. Please contact support if this persists.`);
         }
     } catch (e) { 
+        console.error('Download error:', e);
         alert('Download failed. Please try again.'); 
     }
     setLoading(false);
