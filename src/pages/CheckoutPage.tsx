@@ -728,8 +728,13 @@ export const CheckoutPage: React.FC = () => {
 
   // --- UPDATED SHIPPING CALCULATION ---
   const calculateShipping = () => {
-    // 1. Collection is now R500.00
-    if (shippingMethod === 'store-pickup') return 500;
+    // 1. Collection Handling
+    if (shippingMethod === 'store-pickup') {
+      // If ANY furniture is present, charge R500
+      if (hasFurniture) return 500;
+      // Normal products = FREE collection
+      return 0;
+    }
     
     // 2. Furniture Delivery Handling
     if (hasFurniture) {
@@ -845,10 +850,14 @@ export const CheckoutPage: React.FC = () => {
                               <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Collect from BLOM HQ, Randfontein</span>
-                                  <span className="text-lg font-bold text-gray-900">R 500.00</span>
+                                  <span className="text-lg font-bold text-gray-900">
+                                    {hasFurniture ? 'R 500.00' : 'FREE'}
+                                  </span>
                                 </div>
                                 <p className="text-sm text-gray-600">Ready within 24 hours. We'll WhatsApp you when it's ready.</p>
-                                <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Standard Collection Fee</span>
+                                {hasFurniture && (
+                                  <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Furniture Collection Fee</span>
+                                )}
                               </div>
                             </div>
                           </label>
