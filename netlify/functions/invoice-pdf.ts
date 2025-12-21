@@ -58,7 +58,7 @@ export const handler = async (event: any) => {
       `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,variant_title`
     ) as any[]
 
-    // --- FIX 1: Detect Furniture ---
+    // --- Detect Furniture ---
     const furnitureKeywords = ['table', 'station', 'desk', 'dresser', 'bed', 'chair', 'rack'];
     const hasFurniture = items.some((it: any) => {
       const name = (it.product_name || '').toLowerCase();
@@ -68,9 +68,6 @@ export const handler = async (event: any) => {
     // Calculate totals
     const itemsSum = items.reduce((s: number, it: any) => s + (Number(it.quantity || 0) * Number(it.unit_price || 0)), 0)
     
-    // Use stored total if valid, otherwise fallback to sum
-    const totalPaid = Number(order.total) > 0 ? Number(order.total) : itemsSum;
-
     // 2) PDF Generation
     const pdf = await PDFDocument.create()
     const page = pdf.addPage([595.28, 841.89]) // A4
@@ -173,25 +170,18 @@ export const handler = async (event: any) => {
     const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : itemsSum
     let discountAmount = order.discount_cents ? order.discount_cents / 100 : 0
 
-    // --- FIX 2: Stop "Phantom" Discounts ---
-    // If discount is 0 in DB, force it to 0 here. Do NOT infer it from total mismatch.
-    // This solves the issue where R4300 Item + R500 Shipping showed a -R500 Coupon.
-    
-    // --- FIX 3: Furniture Shipping Logic ---
+    // Shipping
     const isFreeShipping = !hasFurniture && subtotalAmount >= 2000 && shippingAmount === 0;
     
     if (hasFurniture && shippingAmount === 0) {
-      // Furniture Case: Show special message instead of Free Shipping
       drawText("Shipping (Furniture)", left, y, 10)
       drawRightText("Invoiced Later", right - 20, y, 10)
       y -= 16
     } else if (isFreeShipping) {
-      // Standard Free Shipping
       drawText("FREE SHIPPING - Order over R2000", left, y, 10)
       drawRightText("R 0.00", right - 20, y, 10)
       y -= 16
     } else if (shippingAmount > 0) {
-      // Paid Shipping / Collection
       const label = order.fulfillment_method === 'collection' ? 'Collection Fee' : 'Shipping & Handling';
       drawText(label, left, y, 10)
       drawRightText("1", right - 150, y, 10)
@@ -200,7 +190,7 @@ export const handler = async (event: any) => {
       y -= 16
     }
 
-    // Display Discount (Only if real)
+    // Discount
     if (discountAmount > 0) {
       drawText("Coupon Discount", left, y, 10, false, rgb(0, 0.5, 0.2))
       drawRightText("-" + money(discountAmount), right - 20, y, 10, false, rgb(0, 0.5, 0.2))
@@ -209,30 +199,15 @@ export const handler = async (event: any) => {
 
     y -= 8; drawLine(left, y, right, y); y -= 18
 
-    // --- TOTALS CALCULATION ---
-    // We calculate the theoretical total to show on the invoice.
-    // If the customer underpaid (e.g. Total Paid 4300 vs Invoice 4800), we show the Invoice Total (4800).
-    // This prevents the "fake coupon" but might show a discrepancy with "Amount Paid".
+    // --- TOTALS (SIMPLIFIED) ---
     const invoiceTotal = Math.max(0, subtotalAmount + shippingAmount - discountAmount);
 
-    // Subtotal
-    if (order.subtotal_cents || discountAmount > 0) {
-      drawRightText("Subtotal", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45))
-      drawRightText(money(subtotalAmount), right - 20, y, 10)
-      y -= 20
-    }
-
-    drawLine(right - 250, y + 12, right, y + 12) 
+    // Removed "Subtotal" line
+    // Removed "Amount Paid" line
+    // Only showing final "Total"
     
     drawText("Total", right - 140, y, 13, true)
     drawRightText(money(invoiceTotal), right - 20, y, 13, true)
-
-    // Optional: Show "Paid" amount if different from Total (e.g. for the collection error)
-    if (Math.abs(totalPaid - invoiceTotal) > 1 && totalPaid > 0) {
-       y -= 20;
-       drawRightText("Amount Paid", right - 140, y, 10, false, rgb(0.4, 0.4, 0.45));
-       drawRightText(money(totalPaid), right - 20, y, 10, false, rgb(0.4, 0.4, 0.45));
-    }
 
     // Footer
     y -= 32; 
@@ -255,7 +230,6 @@ export const handler = async (event: any) => {
 
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(filename)}`
     
-    // Update Order Invoice URL
     await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
       method: "PATCH",
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
