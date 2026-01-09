@@ -1380,8 +1380,96 @@ export const ProductDetailPage: React.FC = () => {
             features: data.features || [],
             howToUse: data.how_to_use || [],
             ingredients: {
-              inci: data.inci_ingredients || [],
-              key: data.key_ingredients || []
+              inci: (() => {
+                const inciData = data.inci_ingredients;
+                console.log('DEBUG: inci_ingredients data:', inciData, 'Type:', typeof inciData, 'Is Array:', Array.isArray(inciData));
+                
+                // Handle null/undefined
+                if (inciData === null || inciData === undefined) {
+                  console.log('DEBUG: inci_ingredients is null or undefined, returning empty array');
+                  return [];
+                }
+                
+                // Handle array - ensure it's a valid array
+                if (Array.isArray(inciData)) {
+                  console.log('DEBUG: inci_ingredients is already an array, length:', inciData.length);
+                  return inciData;
+                }
+                
+                // Handle string (could be JSON string or plain string)
+                if (typeof inciData === 'string') {
+                  console.log('DEBUG: inci_ingredients is a string, attempting JSON parse');
+                  try {
+                    const parsed = JSON.parse(inciData);
+                    console.log('DEBUG: JSON parse successful, result:', parsed, 'Is Array:', Array.isArray(parsed));
+                    if (Array.isArray(parsed)) {
+                      return parsed;
+                    } else if (typeof parsed === 'object' && parsed !== null) {
+                      return Object.values(parsed);
+                    } else {
+                      return [parsed];
+                    }
+                  } catch (e: unknown) {
+                    console.log('DEBUG: JSON parse failed, treating as plain string:', e instanceof Error ? e.message : 'Unknown error');
+                    return inciData ? [inciData] : [];
+                  }
+                }
+                
+                // Handle object (convert to array of values)
+                if (typeof inciData === 'object') {
+                  console.log('DEBUG: inci_ingredients is an object, converting to array');
+                  return Object.values(inciData);
+                }
+                
+                // Handle other types (numbers, booleans, etc.)
+                console.log('DEBUG: inci_ingredients is unknown type, converting to array');
+                return [String(inciData)];
+              })(),
+              key: (() => {
+                const keyData = data.key_ingredients;
+                console.log('DEBUG: key_ingredients data:', keyData, 'Type:', typeof keyData, 'Is Array:', Array.isArray(keyData));
+                
+                // Handle null/undefined
+                if (keyData === null || keyData === undefined) {
+                  console.log('DEBUG: key_ingredients is null or undefined, returning empty array');
+                  return [];
+                }
+                
+                // Handle array - ensure it's a valid array
+                if (Array.isArray(keyData)) {
+                  console.log('DEBUG: key_ingredients is already an array, length:', keyData.length);
+                  return keyData;
+                }
+                
+                // Handle string (could be JSON string or plain string)
+                if (typeof keyData === 'string') {
+                  console.log('DEBUG: key_ingredients is a string, attempting JSON parse');
+                  try {
+                    const parsed = JSON.parse(keyData);
+                    console.log('DEBUG: JSON parse successful, result:', parsed, 'Is Array:', Array.isArray(parsed));
+                    if (Array.isArray(parsed)) {
+                      return parsed;
+                    } else if (typeof parsed === 'object' && parsed !== null) {
+                      return Object.values(parsed);
+                    } else {
+                      return [parsed];
+                    }
+                  } catch (e: unknown) {
+                    console.log('DEBUG: JSON parse failed, treating as plain string:', e instanceof Error ? e.message : 'Unknown error');
+                    return keyData ? [keyData] : [];
+                  }
+                }
+                
+                // Handle object (convert to array of values)
+                if (typeof keyData === 'object') {
+                  console.log('DEBUG: key_ingredients is an object, converting to array');
+                  return Object.values(keyData);
+                }
+                
+                // Handle other types (numbers, booleans, etc.)
+                console.log('DEBUG: key_ingredients is unknown type, converting to array');
+                return [String(keyData)];
+              })()
             },
             variants: data.variants || [],
 
@@ -2003,7 +2091,7 @@ export const ProductDetailPage: React.FC = () => {
             <Container>
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
-                 
+                
                 <div className="space-y-4">
                   {/* Overview - Only show if has content */}
                   {hasContent(product.overview) && (
@@ -2199,22 +2287,125 @@ export const ProductDetailPage: React.FC = () => {
                               <div>
                                 <h4 className="font-medium mb-3">INCI Names:</h4>
                                 <ul className="space-y-2">
-                                  {product.ingredients.inci && product.ingredients.inci.map((ingredient: string, index: number) => (
-                                    <li key={index} className="flex items-center gap-2">
-                                      <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                                      <span className="text-sm">{ingredient}</span>
-                                    </li>
-                                  ))}
+                                  {(() => {
+                                    const inciData = product.ingredients?.inci;
+                                    
+                                    // Handle null/undefined
+                                    if (inciData === null || inciData === undefined) {
+                                      return <li className="text-sm text-gray-500">No INCI ingredients available</li>;
+                                    }
+                                    
+                                    // Check if data is an array - render as list
+                                    if (Array.isArray(inciData)) {
+                                      if (inciData.length === 0) {
+                                        return <li className="text-sm text-gray-500">No INCI ingredients available</li>;
+                                      }
+                                      return inciData.map((ingredient: string, index: number) => (
+                                        <li key={index} className="flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                          <span className="text-sm">{ingredient}</span>
+                                        </li>
+                                      ));
+                                    }
+                                    
+                                    // Check if data is a string - could be HTML or plain text
+                                    if (typeof inciData === 'string') {
+                                      // Check if it looks like HTML (contains HTML tags)
+                                      if (inciData.includes('<') && inciData.includes('>')) {
+                                        return (
+                                          <li className="text-sm">
+                                            <div dangerouslySetInnerHTML={{ __html: inciData }} />
+                                          </li>
+                                        );
+                                      } else {
+                                        return (
+                                          <li className="flex items-center gap-2">
+                                            <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                            <span className="text-sm">{inciData}</span>
+                                          </li>
+                                        );
+                                      }
+                                    }
+                                    
+                                    // Handle object (convert to array)
+                                    if (typeof inciData === 'object') {
+                                      const inciArray = Object.values(inciData);
+                                      return inciArray.map((ingredient: any, index: number) => (
+                                        <li key={index} className="flex items-center gap-2">
+                                          <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                          <span className="text-sm">{String(ingredient)}</span>
+                                        </li>
+                                      ));
+                                    }
+                                    
+                                    // Fallback for any other type
+                                    return (
+                                      <li className="flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                        <span className="text-sm">{String(inciData)}</span>
+                                      </li>
+                                    );
+                                  })()}
                                 </ul>
                               </div>
                               <div>
                                 <h4 className="font-medium mb-3">Key Ingredients:</h4>
                                 <ul className="space-y-2">
-                                  {product.ingredients.key && product.ingredients.key.map((ingredient: string, index: number) => (
-                                    <li key={index} className="text-sm text-gray-600">
-                                      {ingredient}
-                                    </li>
-                                  ))}
+                                  {(() => {
+                                    const keyData = product.ingredients?.key;
+                                    
+                                    // Handle null/undefined
+                                    if (keyData === null || keyData === undefined) {
+                                      return <li className="text-sm text-gray-500">No key ingredients available</li>;
+                                    } 
+                                      
+                                    // Check if data is an array - render as list
+                                    if (Array.isArray(keyData)) {
+                                      if (keyData.length === 0) {
+                                        return <li className="text-sm text-gray-500">No key ingredients available</li>;
+                                      }
+                                      return keyData.map((ingredient: string, index: number) => (
+                                        <li key={index} className="text-sm text-gray-600">
+                                          {ingredient}
+                                        </li>
+                                      ));
+                                    } 
+                                      
+                                    // Check if data is a string - could be HTML or plain text
+                                    if (typeof keyData === 'string') {
+                                      // Check if it looks like HTML (contains HTML tags)
+                                      if (keyData.includes('<') && keyData.includes('>')) {
+                                        return (
+                                          <li className="text-sm">
+                                            <div dangerouslySetInnerHTML={{ __html: keyData }} />
+                                          </li>
+                                        );
+                                      } else {
+                                        return (
+                                          <li className="text-sm text-gray-600">
+                                            {keyData}
+                                          </li>
+                                        );
+                                      }
+                                    } 
+                                      
+                                    // Handle object (convert to array)
+                                    if (typeof keyData === 'object') {
+                                      const keyArray = Object.values(keyData);
+                                      return keyArray.map((ingredient: any, index: number) => (
+                                        <li key={index} className="text-sm text-gray-600">
+                                          {String(ingredient)}
+                                        </li>
+                                      ));
+                                    } 
+                                      
+                                    // Fallback for any other type
+                                    return (
+                                      <li className="text-sm text-gray-600">
+                                        {String(keyData)}
+                                      </li>
+                                    );
+                                  })()}
                                 </ul>
                               </div>
                             </div>

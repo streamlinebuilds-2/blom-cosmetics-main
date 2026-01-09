@@ -47,6 +47,7 @@ interface ProductData {
   category: string;
   shortDescription: string;
   overview: string;
+  description: string;
   price: string;
   compareAtPrice?: string;
   stock: string;
@@ -139,6 +140,30 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
         return <Award className="h-4 w-4 text-purple-500" />;
     }
   };
+
+  // --- START: CONTENT CHECKS ---
+  // 1. Check if we have a description
+  const hasDescription = product.description && product.description.trim().length > 0;
+
+  // 2. Check if we have ingredients (Safety Fix Included)
+  // This handles both "List" (Array) and "Text" (String) to prevent crashes
+  const rawIngredients = product.ingredients?.inci;
+  let safeIngredients: string[] = [];
+  
+  if (Array.isArray(rawIngredients)) {
+    safeIngredients = rawIngredients;
+  } else if (typeof rawIngredients === 'string') {
+    safeIngredients = rawIngredients.split(',').map(i => i.trim()).filter(i => i);
+  }
+  
+  const hasIngredients = safeIngredients.length > 0;
+
+  // 3. Check other sections (assuming you have a 'howToUse' field, adjust if named differently)
+  const hasHowToUse = product.howToUse && product.howToUse.trim().length > 0;
+
+  // 4. Master Switch: Do we show the Product Information section at all?
+  const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse;
+  // --- END: CONTENT CHECKS ---
 
   const relatedProducts = [
     {
@@ -385,167 +410,54 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           </Container>
         </section>
 
-        {/* Product Information Accordions */}
-        <section className="section-padding bg-pink-50">
-          <Container>
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
-              
-              <div className="space-y-4">
-                {/* Overview */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('overview')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Overview</h3>
-                    {expandedAccordion === 'overview' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'overview' && (
-                    <div className="px-6 pb-6">
-                      <p className="text-gray-600 leading-relaxed">{product.overview}</p>
-                    </div>
-                  )}
-                </Card>
+        {/* Product Information Section - Conditional Rendering */}
+        {/* Only show this whole section if there is actually content */}
+        {showProductInfoSection && (
+          <section className="section-padding bg-pink-50">
+            <Container>
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
+                
+                <div className="mt-16 border-t border-gray-200 pt-10">
+                  <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">Product Information</h2>
+                  
+                  <div className="flex flex-col space-y-8">
+                    
+                   {/* Description Tab - Only show if hasDescription is true */}
+                   {hasDescription && (
+                     <div>
+                       <h3 className="text-lg font-semibold mb-2">Description</h3>
+                       <div className="prose prose-sm text-gray-600" dangerouslySetInnerHTML={{ __html: product.description }} />
+                     </div>
+                   )}
 
-                {/* Features */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('features')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Features & Benefits</h3>
-                    {expandedAccordion === 'features' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'features' && (
-                    <div className="px-6 pb-6">
-                      <ul className="space-y-3">
-                        {product.features.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </Card>
+                   {/* Ingredients Tab - Only show if hasIngredients is true */}
+                   {hasIngredients && (
+                     <div>
+                       <h3 className="text-lg font-semibold mb-2">Ingredients</h3>
+                       <ul className="list-disc pl-5 space-y-1 text-gray-600 text-sm">
+                         {safeIngredients.map((item, index) => (
+                           <li key={index}>{item}</li>
+                         ))}
+                       </ul>
+                     </div>
+                   )}
 
-                {/* How to Use */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('how-to-use')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">How to Use</h3>
-                    {expandedAccordion === 'how-to-use' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'how-to-use' && (
-                    <div className="px-6 pb-6">
-                      <ol className="space-y-3">
-                        {product.howToUse.map((step, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <span className="w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
-                              {index + 1}
-                            </span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-                </Card>
-
-                {/* Ingredients */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('ingredients')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Ingredients</h3>
-                    {expandedAccordion === 'ingredients' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'ingredients' && (
-                    <div className="px-6 pb-6">
-                      <div className="grid md:grid-cols-2 gap-6">
-                        <div>
-                          <h4 className="font-medium mb-3">INCI Names:</h4>
-                          <ul className="space-y-2">
-                            {product.ingredients.inci.map((ingredient, index) => (
-                              <li key={index} className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                                <span className="text-sm">{ingredient}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <h4 className="font-medium mb-3">Key Ingredients:</h4>
-                          <ul className="space-y-2">
-                            {product.ingredients.key.map((ingredient, index) => (
-                              <li key={index} className="text-sm text-gray-600">
-                                {ingredient}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Card>
-
-                {/* Details */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('details')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Product Details</h3>
-                    {expandedAccordion === 'details' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'details' && (
-                    <div className="px-6 pb-6">
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>Size:</span>
-                          <span>{product.details.size}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Shelf Life:</span>
-                          <span>{product.details.shelfLife}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Claims:</span>
-                          <span>{product.details.claims.join(', ')}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Card>
+                   {/* How to Use Tab - Only show if hasHowToUse is true */}
+                   {hasHowToUse && (
+                     <div>
+                       <h3 className="text-lg font-semibold mb-2">How to Use</h3>
+                       <div className="prose prose-sm text-gray-600">
+                         {product.howToUse}
+                       </div>
+                     </div>
+                   )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </Container>
-        </section>
+            </Container>
+          </section>
+        )}
 
         {/* Related Products */}
         <section className="section-padding">
