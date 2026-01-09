@@ -58,6 +58,36 @@ export const ProductDetailPage: React.FC = () => {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [showVariantModal, setShowVariantModal] = useState(false);
 
+  // Helper function to check if HTML string has actual content
+  const hasContent = (htmlString: string | string[] | undefined | null): boolean => {
+    // Handle null/undefined
+    if (htmlString === null || htmlString === undefined) {
+      return false;
+    }
+
+    // Handle arrays (like howToUse, features, etc.)
+    if (Array.isArray(htmlString)) {
+      return htmlString.length > 0 && htmlString.some(item => hasContent(item));
+    }
+
+    // Handle empty strings
+    if (typeof htmlString !== 'string' || htmlString.trim() === '') {
+      return false;
+    }
+
+    // Strip HTML tags
+    const textWithoutTags = htmlString.replace(/<[^>]*>/g, '');
+
+    // Trim whitespace and check if content remains
+    return textWithoutTags.trim().length > 0;
+  };
+
+  // Calculate whether to show the entire Product Information section
+  const showProductInfo = hasContent(product?.overview) ||
+                          hasContent(product?.howToUse) ||
+                          hasContent(product?.ingredients?.inci) ||
+                          hasContent(product?.shipping_info);
+
   // Static product database - Keep existing products working
   const productDatabase = {
     'prep-primer-bundle': {
@@ -1362,6 +1392,9 @@ export const ProductDetailPage: React.FC = () => {
               claims: data.claims || []
             },
 
+            // Shipping Info
+            shipping_info: data.shipping_info || '',
+
             // Meta
             rating: 0,
             reviewCount: 0,
@@ -1962,92 +1995,98 @@ export const ProductDetailPage: React.FC = () => {
             </div>
           </Container>
         </section>
+      )}
 
-        {/* Product Information Accordions */}
-        <section className="section-padding bg-pink-50">
-          <Container>
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
-              
-              <div className="space-y-4">
-                {/* Overview */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('overview')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Overview</h3>
-                    {expandedAccordion === 'overview' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'overview' && (
-                    <div className="px-6 pb-6">
-                      <p className="text-gray-600 leading-relaxed">{product.overview}</p>
-                    </div>
-                  )}
-                </Card>
-
-                {/* Features & Benefits */}
-                <Card>
-                  <button
-                    onClick={() => toggleAccordion('features')}
-                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                  >
-                    <h3 className="font-semibold text-lg">Features & Benefits</h3>
-                    {expandedAccordion === 'features' ? (
-                      <ChevronUp className="h-5 w-5 text-pink-400" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-pink-400" />
-                    )}
-                  </button>
-                  {expandedAccordion === 'features' && (
-                    <div className="px-6 pb-6">
-                      <ul className="space-y-3">
-                        {product.features && product.features.map((feature: string, index: number) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
-                            <span className="text-gray-700">{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </Card>
-
-                {/* Furniture-specific sections */}
-                {product.category === 'Furniture' ? (
-                  <>
-                    {/* Dimensions */}
-                    {product.dimensions && (
-                      <Card>
-                        <button
-                          onClick={() => toggleAccordion('dimensions')}
-                          className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                        >
-                          <h3 className="font-semibold text-lg">Dimensions</h3>
-                          {expandedAccordion === 'dimensions' ? (
-                            <ChevronUp className="h-5 w-5 text-pink-400" />
-                          ) : (
-                            <ChevronDown className="h-5 w-5 text-pink-400" />
-                          )}
-                        </button>
-                        {expandedAccordion === 'dimensions' && (
-                          <div className="px-6 pb-6">
-                            <ul className="space-y-3">
-                              {product.dimensions.map((dim: string, index: number) => (
-                                <li key={index} className="flex items-start gap-3">
-                                  <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
-                                  <span className="text-gray-700">{dim}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
+        {/* Product Information Accordions - Only show if there's content */}
+        {showProductInfo && (
+          <section className="section-padding bg-pink-50">
+            <Container>
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
+                 
+                <div className="space-y-4">
+                  {/* Overview - Only show if has content */}
+                  {hasContent(product.overview) && (
+                    <Card>
+                      <button
+                        onClick={() => toggleAccordion('overview')}
+                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      >
+                        <h3 className="font-semibold text-lg">Overview</h3>
+                        {expandedAccordion === 'overview' ? (
+                          <ChevronUp className="h-5 w-5 text-pink-400" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-pink-400" />
                         )}
-                      </Card>
-                    )}
+                      </button>
+                      {expandedAccordion === 'overview' && (
+                        <div className="px-6 pb-6">
+                          <p className="text-gray-600 leading-relaxed">{product.overview}</p>
+                        </div>
+                      )}
+                    </Card>
+                  )}
+
+                  {/* Features & Benefits - Only show if has content */}
+                  {hasContent(product.features) && (
+                    <Card>
+                      <button
+                        onClick={() => toggleAccordion('features')}
+                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      >
+                        <h3 className="font-semibold text-lg">Features & Benefits</h3>
+                        {expandedAccordion === 'features' ? (
+                          <ChevronUp className="h-5 w-5 text-pink-400" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-pink-400" />
+                        )}
+                      </button>
+                      {expandedAccordion === 'features' && (
+                        <div className="px-6 pb-6">
+                          <ul className="space-y-3">
+                            {product.features && product.features.map((feature: string, index: number) => (
+                              <li key={index} className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                                <span className="text-gray-700">{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </Card>
+                  )}
+
+                  {/* Furniture-specific sections */}
+                  {product.category === 'Furniture' ? (
+                    <>
+                      {/* Dimensions - Only show if has content */}
+                      {hasContent(product.dimensions) && (
+                        <Card>
+                          <button
+                            onClick={() => toggleAccordion('dimensions')}
+                            className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                          >
+                            <h3 className="font-semibold text-lg">Dimensions</h3>
+                            {expandedAccordion === 'dimensions' ? (
+                              <ChevronUp className="h-5 w-5 text-pink-400" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5 text-pink-400" />
+                            )}
+                          </button>
+                          {expandedAccordion === 'dimensions' && (
+                            <div className="px-6 pb-6">
+                              <ul className="space-y-3">
+                                {product.dimensions.map((dim: string, index: number) => (
+                                  <li key={index} className="flex items-start gap-3">
+                                    <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                                    <span className="text-gray-700">{dim}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </Card>
+                      )}
 
                     {/* Materials & Finish */}
                     {product.materialsFinish && (
@@ -2228,61 +2267,62 @@ export const ProductDetailPage: React.FC = () => {
                 )}
 
                 {/* What's Included in This Bundle - Only for bundles */}
-                {product.includedProducts && product.includedProducts.length > 0 && (
-                  <Card className="mt-6">
-                    <button
-                      onClick={() => toggleAccordion('bundle-contents')}
-                      className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                    >
-                      <h3 className="font-semibold text-lg">What's Included in This Bundle</h3>
-                      {expandedAccordion === 'bundle-contents' ? (
-                        <ChevronUp className="h-5 w-5 text-pink-400" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-pink-400" />
-                      )}
-                    </button>
-                    {expandedAccordion === 'bundle-contents' && (
-                      <div className="px-6 pb-6">
-                        <div className="bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-6 space-y-4">
-                          {product.includedProducts.map((item: any, index: number) => (
-                            <div key={index} className="flex items-center justify-between bg-white rounded-xl p-4 shadow-sm">
-                              <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                  <Check className="h-6 w-6 text-pink-600" />
-                                </div>
-                                <div>
-                                  <h4 className="font-semibold text-gray-900">{item.name}</h4>
-                                  <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
-                                </div>
+              {product.includedProducts && product.includedProducts.length > 0 && (
+                <Card className="mt-6">
+                  <button
+                    onClick={() => toggleAccordion('bundle-contents')}
+                    className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <h3 className="font-semibold text-lg">What's Included in This Bundle</h3>
+                    {expandedAccordion === 'bundle-contents' ? (
+                      <ChevronUp className="h-5 w-5 text-pink-400" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-pink-400" />
+                    )}
+                  </button>
+                  {expandedAccordion === 'bundle-contents' && (
+                    <div className="px-6 pb-6">
+                      <div className="bg-gradient-to-br from-pink-50 to-blue-50 rounded-2xl p-6 space-y-4">
+                        {product.includedProducts.map((item: any, index: number) => (
+                          <div key={index} className="flex items-center justify-between bg-white rounded-xl p-4 shadow-sm">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Check className="h-6 w-6 text-pink-600" />
                               </div>
-                              <span className="text-gray-600 font-medium">R{item.price}</span>
-                            </div>
-                          ))}
-                          <div className="border-t-2 border-gray-200 pt-4 mt-4">
-                            <div className="flex justify-between items-center">
-                              <span className="text-lg font-bold text-gray-900">Bundle Total:</span>
-                              <div className="text-right">
-                                <span className="text-2xl font-bold text-pink-600">R{product.price}</span>
-                                {product.compareAtPrice && (
-                                  <div className="text-sm text-gray-500 line-through">R{product.compareAtPrice}</div>
-                                )}
+                              <div>
+                                <h4 className="font-semibold text-gray-900">{item.name}</h4>
+                                <p className="text-sm text-gray-600">Quantity: {item.quantity}</p>
                               </div>
                             </div>
-                            <div className="mt-2 text-right">
-                              <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                                Save R{product.compareAtPrice - product.price} ({Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% off)
-                              </span>
+                            <span className="text-gray-600 font-medium">R{item.price}</span>
+                          </div>
+                        ))}
+                        <div className="border-t-2 border-gray-200 pt-4 mt-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-lg font-bold text-gray-900">Bundle Total:</span>
+                            <div className="text-right">
+                              <span className="text-2xl font-bold text-pink-600">R{product.price}</span>
+                              {product.compareAtPrice && (
+                                <div className="text-sm text-gray-500 line-through">R{product.compareAtPrice}</div>
+                              )}
                             </div>
+                          </div>
+                          <div className="mt-2 text-right">
+                            <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
+                              Save R{product.compareAtPrice - product.price} ({Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}% off)
+                            </span>
                           </div>
                         </div>
                       </div>
-                    )}
-                  </Card>
-                )}
-              </div>
+                    </div>
+                  )}
+                </Card>
+              )}
             </div>
-          </Container>
-        </section>
+          </div>
+        </Container>
+      </section>
+     )}
 
         {/* Related Products */}
         <section className="section-padding">
