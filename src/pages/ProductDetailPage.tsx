@@ -83,9 +83,9 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   // Calculate whether to show the entire Product Information section
-  const showProductInfo = hasContent(product?.overview) ||
-                          hasContent(product?.howToUse) ||
-                          hasContent(product?.ingredients?.inci) ||
+  const showProductInfo = hasContent(product?.description) ||
+                          hasContent(product?.how_to_use) ||
+                          hasContent(product?.inci_ingredients) ||
                           hasContent(product?.shipping_info);
 
   // Static product database - Keep existing products working
