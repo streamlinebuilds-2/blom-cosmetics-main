@@ -60,9 +60,10 @@ interface ProductData {
   };
   details: {
     size: string;
-    shelfLife: string;
     claims: string[];
   };
+  shelfLife: string;
+  storage: string;
   variants: string[];
   related: string[];
   rating: number;
@@ -141,33 +142,38 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
     }
   };
 
-  // --- SAFETY CHECKS START ---
-  
-  // 1. Safe Ingredients Check (Fixes the crash)
-  // We check if ingredients exist, if 'inci' exists, and handle both String and Array formats
+  // ============================================================================
+  // 1. ADD THIS LOGIC BLOCK AT THE START OF YOUR COMPONENT (Before 'return')
+  // ============================================================================
+
+  // --- SAFE INGREDIENTS LOGIC ---
+  // This prevents the "map is not a function" crash by forcing data into a list
   const rawInci = product.ingredients?.inci;
   let safeIngredients: string[] = [];
 
   if (Array.isArray(rawInci)) {
     safeIngredients = rawInci;
   } else if (typeof rawInci === 'string') {
-    // If it's a string, we split it manually so .map() can work later
+    // If Admin saved it as text, we split it here so it doesn't crash
     safeIngredients = rawInci.split(',').map(s => s.trim()).filter(s => s !== '');
   }
 
-  const hasIngredients = safeIngredients.length > 0;
-
-  // 2. Safe Description Check
+  // --- CONTENT EXISTENCE CHECKS ---
+  // We create "flags" to decide what to show
   const hasDescription = product.description && product.description.trim().length > 0;
-
-  // 3. Safe "How to Use" Check (Assuming the field is named 'howToUse' or 'usage')
-  // Adjust 'product.howToUse' if your database field is named differently, e.g. 'product.usage'
+  const hasIngredients = safeIngredients.length > 0;
   const hasHowToUse = product.howToUse && product.howToUse.trim().length > 0;
 
-  // 4. Master Switch: Should we show the "Product Information" section at all?
-  const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse;
+  // Check for "Shelf Life" or "Storage" (adjust field names to match your DB)
+  const hasShelfLife = product.shelfLife && product.shelfLife.trim().length > 0;
+  const hasStorage = product.storage && product.storage.trim().length > 0;
 
-  // --- SAFETY CHECKS END ---
+  // MASTER SWITCH: If ALL of these are false, the whole section disappears
+  const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse || hasShelfLife || hasStorage;
+
+  // ============================================================================
+  // 2. REPLACE YOUR EXISTING "PRODUCT INFORMATION" JSX WITH THIS
+  // ============================================================================
 
   const relatedProducts = [
     {
@@ -414,14 +420,16 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           </Container>
         </section>
 
-      {/* Product Information Section - Only renders if there is data */}
+      {/* ONLY render this entire block if there is actually information to show */}
       {showProductInfoSection && (
         <div className="mt-16 border-t border-gray-200 pt-10">
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">Product Information</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">
+            Product Information
+          </h2>
           
           <div className="flex flex-col space-y-8">
             
-            {/* Description - Only renders if populated */}
+            {/* DESCRIPTION - Hides if empty */}
             {hasDescription && (
               <div>
                 <h3 className="text-lg font-semibold mb-2">Description</h3>
@@ -432,7 +440,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               </div>
             )}
 
-            {/* Ingredients - Only renders if populated (CRASH PROOF) */}
+            {/* INGREDIENTS - Hides if empty & CRASH PROOF */}
             {hasIngredients && (
               <div>
                 <h3 className="text-lg font-semibold mb-2">Ingredients</h3>
@@ -444,13 +452,33 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               </div>
             )}
 
-            {/* How to Use - Only renders if populated */}
+            {/* HOW TO USE - Hides if empty */}
             {hasHowToUse && (
               <div>
                 <h3 className="text-lg font-semibold mb-2">How to Use</h3>
                 <div className="prose prose-sm text-gray-600">
                   {product.howToUse}
                 </div>
+              </div>
+            )}
+
+            {/* SHELF LIFE - Hides if empty */}
+            {hasShelfLife && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Shelf Life</h3>
+                <p className="text-sm text-gray-600">
+                  {product.shelfLife}
+                </p>
+              </div>
+            )}
+
+             {/* STORAGE - Hides if empty */}
+             {hasStorage && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Storage Instructions</h3>
+                <p className="text-sm text-gray-600">
+                  {product.storage}
+                </p>
               </div>
             )}
 
