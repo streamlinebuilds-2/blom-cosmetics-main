@@ -141,29 +141,33 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
     }
   };
 
-  // --- START: CONTENT CHECKS ---
-  // 1. Check if we have a description
-  const hasDescription = product.description && product.description.trim().length > 0;
-
-  // 2. Check if we have ingredients (Safety Fix Included)
-  // This handles both "List" (Array) and "Text" (String) to prevent crashes
-  const rawIngredients = product.ingredients?.inci;
+  // --- SAFETY CHECKS START ---
+  
+  // 1. Safe Ingredients Check (Fixes the crash)
+  // We check if ingredients exist, if 'inci' exists, and handle both String and Array formats
+  const rawInci = product.ingredients?.inci;
   let safeIngredients: string[] = [];
-  
-  if (Array.isArray(rawIngredients)) {
-    safeIngredients = rawIngredients;
-  } else if (typeof rawIngredients === 'string') {
-    safeIngredients = rawIngredients.split(',').map(i => i.trim()).filter(i => i);
+
+  if (Array.isArray(rawInci)) {
+    safeIngredients = rawInci;
+  } else if (typeof rawInci === 'string') {
+    // If it's a string, we split it manually so .map() can work later
+    safeIngredients = rawInci.split(',').map(s => s.trim()).filter(s => s !== '');
   }
-  
+
   const hasIngredients = safeIngredients.length > 0;
 
-  // 3. Check other sections (assuming you have a 'howToUse' field, adjust if named differently)
+  // 2. Safe Description Check
+  const hasDescription = product.description && product.description.trim().length > 0;
+
+  // 3. Safe "How to Use" Check (Assuming the field is named 'howToUse' or 'usage')
+  // Adjust 'product.howToUse' if your database field is named differently, e.g. 'product.usage'
   const hasHowToUse = product.howToUse && product.howToUse.trim().length > 0;
 
-  // 4. Master Switch: Do we show the Product Information section at all?
+  // 4. Master Switch: Should we show the "Product Information" section at all?
   const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse;
-  // --- END: CONTENT CHECKS ---
+
+  // --- SAFETY CHECKS END ---
 
   const relatedProducts = [
     {
@@ -410,54 +414,49 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           </Container>
         </section>
 
-        {/* Product Information Section - Conditional Rendering */}
-        {/* Only show this whole section if there is actually content */}
-        {showProductInfoSection && (
-          <section className="section-padding bg-pink-50">
-            <Container>
-              <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
-                
-                <div className="mt-16 border-t border-gray-200 pt-10">
-                  <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">Product Information</h2>
-                  
-                  <div className="flex flex-col space-y-8">
-                    
-                   {/* Description Tab - Only show if hasDescription is true */}
-                   {hasDescription && (
-                     <div>
-                       <h3 className="text-lg font-semibold mb-2">Description</h3>
-                       <div className="prose prose-sm text-gray-600" dangerouslySetInnerHTML={{ __html: product.description }} />
-                     </div>
-                   )}
+      {/* Product Information Section - Only renders if there is data */}
+      {showProductInfoSection && (
+        <div className="mt-16 border-t border-gray-200 pt-10">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">Product Information</h2>
+          
+          <div className="flex flex-col space-y-8">
+            
+            {/* Description - Only renders if populated */}
+            {hasDescription && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Description</h3>
+                <div
+                  className="prose prose-sm text-gray-600"
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                />
+              </div>
+            )}
 
-                   {/* Ingredients Tab - Only show if hasIngredients is true */}
-                   {hasIngredients && (
-                     <div>
-                       <h3 className="text-lg font-semibold mb-2">Ingredients</h3>
-                       <ul className="list-disc pl-5 space-y-1 text-gray-600 text-sm">
-                         {safeIngredients.map((item, index) => (
-                           <li key={index}>{item}</li>
-                         ))}
-                       </ul>
-                     </div>
-                   )}
+            {/* Ingredients - Only renders if populated (CRASH PROOF) */}
+            {hasIngredients && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Ingredients</h3>
+                <ul className="list-disc pl-5 space-y-1 text-gray-600 text-sm">
+                  {safeIngredients.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-                   {/* How to Use Tab - Only show if hasHowToUse is true */}
-                   {hasHowToUse && (
-                     <div>
-                       <h3 className="text-lg font-semibold mb-2">How to Use</h3>
-                       <div className="prose prose-sm text-gray-600">
-                         {product.howToUse}
-                       </div>
-                     </div>
-                   )}
-                  </div>
+            {/* How to Use - Only renders if populated */}
+            {hasHowToUse && (
+              <div>
+                <h3 className="text-lg font-semibold mb-2">How to Use</h3>
+                <div className="prose prose-sm text-gray-600">
+                  {product.howToUse}
                 </div>
               </div>
-            </Container>
-          </section>
-        )}
+            )}
+
+          </div>
+        </div>
+      )}
 
         {/* Related Products */}
         <section className="section-padding">
