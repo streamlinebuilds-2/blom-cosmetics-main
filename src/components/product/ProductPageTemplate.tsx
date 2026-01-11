@@ -143,42 +143,61 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
   };
 
   // ==============================================================================
-  // STRICT CONTENT CHECKER
+  // 1. ADVANCED CONTENT CHECKER (Filters out "Ghost" Data)
   // ==============================================================================
-  
-  // Helper: Returns FALSE if text is just HTML tags (like <p></p>) or spaces
   const hasRealContent = (content: any) => {
+    // 1. Null/Undefined check
     if (!content) return false;
-    if (Array.isArray(content)) return content.length > 0;
     
-    // Convert to string and remove all HTML tags and whitespace
-    const stripped = String(content).replace(/<[^>]*>?/gm, '').trim();
-    return stripped.length > 0;
+    // 2. Array check (e.g. Ingredients list)
+    if (Array.isArray(content)) {
+      return content.length > 0 && content.some(item => item && item.trim().length > 0);
+    }
+    
+    // 3. String check (Strips HTML tags like <p><br></p> and whitespace)
+    if (typeof content === 'string') {
+      const stripped = content.replace(/<[^>]*>?/gm, '').replace(/&nbsp;/g, ' ').trim();
+      return stripped.length > 0;
+    }
+    
+    return false;
   };
 
-  // 1. Safe Ingredients Logic (Convert text to list if needed)
+  // ==============================================================================
+  // 2. CRASH PREVENTION (Data Type Normalization)
+  // ==============================================================================
+  
+  // --- Fix Ingredients (Force into Array) ---
   const rawInci = product.ingredients?.inci;
   let safeIngredients: string[] = [];
-
+  
   if (Array.isArray(rawInci)) {
     safeIngredients = rawInci;
   } else if (typeof rawInci === 'string') {
-    safeIngredients = rawInci.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '');
+    // If Admin saved as text, split by commas to make it a list
+    safeIngredients = rawInci.split(',').map(s => s.trim()).filter(s => s !== '');
   }
 
-  // 2. STRICT Visibility Flags
+  // --- Fix How To Use (Handle BOTH Text and Arrays) ---
+  const rawHowToUse = product.howToUse;
+  const isHowToUseArray = Array.isArray(rawHowToUse);
+  
+  // ==============================================================================
+  // 3. VISIBILITY FLAGS (Controls what actually appears)
+  // ==============================================================================
   const hasDescription = hasRealContent(product.description);
   const hasIngredients = safeIngredients.length > 0;
-  const hasHowToUse = hasRealContent(product.howToUse);
+  
+  // Special check for How to Use since it can be mixed types
+  const hasHowToUse = isHowToUseArray
+    ? (rawHowToUse as string[]).length > 0
+    : hasRealContent(rawHowToUse);
+
   const hasShelfLife = hasRealContent(product.shelfLife);
   const hasStorage = hasRealContent(product.storage);
 
-  // 3. Master Switch
+  // MASTER SWITCH: Hide entire section if all tabs are empty
   const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse || hasShelfLife || hasStorage;
-
-  // ============================================================================
-  // 2. REPLACE YOUR EXISTING "PRODUCT INFORMATION" JSX WITH THIS
-  // ============================================================================
 
   const relatedProducts = [
     {
@@ -457,15 +476,22 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               </div>
             )}
 
-            {/* How to Use - Hides if empty */}
+            {/* HOW TO USE SECTION - CRASH PROOF */}
             {hasHowToUse && (
               <div className="animate-fade-in-up delay-200">
                 <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">How to Use</h3>
                 <div className="prose prose-sm text-gray-600 leading-relaxed">
-                   {/* Handle both array and string format for 'How To Use' */}
-                   {Array.isArray(product.howToUse)
-                     ? product.howToUse.join('. ')
-                     : product.howToUse}
+                  {isHowToUseArray ? (
+                    /* Case A: It's a List (Bullet points) */
+                    <ul className="list-disc pl-5 space-y-1">
+                      {(rawHowToUse as string[]).map((step, index) => (
+                        <li key={index}>{step}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    /* Case B: It's Text (Paragraphs) */
+                    <div dangerouslySetInnerHTML={{ __html: String(rawHowToUse) }} />
+                  )}
                 </div>
               </div>
             )}
