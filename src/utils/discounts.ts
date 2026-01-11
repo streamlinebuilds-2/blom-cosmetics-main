@@ -32,6 +32,8 @@ export interface DiscountContext {
 }
 
 export interface ProductItem {
+  id: string; // Simple product ID or variant ID
+  productId?: string; // Parent product ID for variants
   slug: string;
   category: string;
   type: 'product' | 'bundle';
@@ -53,13 +55,22 @@ export function isActive(nowISO: string, discount: Discount): boolean {
 
 /**
  * Check if a discount applies to a specific item
+ * Updated to handle both simple products and variants
  */
 export function matchesScope(item: ProductItem, discount: Discount): boolean {
   const { scope } = discount;
   
   // Check product-specific scope
   if (scope.products && scope.products.length > 0) {
-    if (!scope.products.includes(item.slug)) {
+    // Check if discount applies to this item's slug (simple product)
+    // OR to this item's productId (parent product for variants)
+    const itemSlug = item.slug;
+    const parentProductId = item.productId;
+    
+    const matchesSlug = scope.products.includes(itemSlug);
+    const matchesParent = parentProductId ? scope.products.includes(parentProductId) : false;
+    
+    if (!matchesSlug && !matchesParent) {
       return false;
     }
   }

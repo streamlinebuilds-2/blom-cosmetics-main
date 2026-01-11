@@ -59,6 +59,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const safeName = name || 'Product Name';
   const safeShortDescription = shortDescription || 'Professional quality nail care product';
   const safeImages = Array.isArray(images) && images.length > 0 ? images : ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'];
+  
+  // Variant logic - available for both list and grid views
+  const hasVariants = variants && variants.length > 0;
+  const lowestPrice = hasVariants
+    ? Math.min(...variants.map(v => v.price || price), price)
+    : price;
 
   React.useEffect(() => {
     setIsWishlisted(wishlistStore.isInWishlist(slug));
@@ -183,7 +189,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   if (isListView) {
     return (
       <>
-        <article 
+        <article
           ref={cardRef as any}
           className={`product-card group cursor-pointer bg-white rounded-[18px] overflow-hidden relative transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] md:flex md:items-center md:gap-6 md:p-4 ${className}`}
           style={{ boxShadow: '0 10px 30px rgba(15,23,42,0.06)' }}
@@ -221,7 +227,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 loading="lazy"
               />
             )}
-            
+             
             {/* Shimmer Effect */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="shimmer"></div>
@@ -254,8 +260,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 aria-label="Toggle wishlist"
               >
                 <Heart className={`h-6 w-6 transition-all md:h-4 md:w-4 ${
-                  isWishlisted 
-                    ? 'fill-current text-pink-400' 
+                  isWishlisted
+                    ? 'fill-current text-pink-400'
                     : 'text-gray-700'
                 }`} />
               </button>
@@ -268,7 +274,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-pink-400 transition-colors duration-[800ms] ease-out md:text-base md:mb-1">
                 {safeName}
               </h3>
-              
+               
               {/* Short Description - ALWAYS SHOW */}
               <p className="text-sm text-gray-600 mb-4 line-clamp-2 md:text-xs md:mb-2">
                 {safeShortDescription}
@@ -276,7 +282,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
               <div className="flex items-center gap-2 md:mb-0">
                 <span className="text-xl font-bold text-gray-900 md:text-lg">
-                  {price === -1 ? 'Coming Soon' : formatPrice(price)}
+                  {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
                 </span>
                 {compareAtPrice && price !== -1 && (
                   <span className="text-sm text-gray-500 line-through md:text-xs">
@@ -288,11 +294,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
             <button
               type="button"
-              onClick={handleAddToCart}
+              onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
               className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-full transition-all duration-300 ease-out hover:-translate-y-[1px] hover:shadow-[0_6px_20px_rgba(255,116,164,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none md:w-auto md:px-6 md:py-2 md:text-sm"
             >
-              {price === -1 ? 'Coming Soon' : inStock ? 'Add to Cart' : 'Out of Stock'}
+              {price === -1 ? 'Coming Soon' : inStock ? (hasVariants ? 'Select Options' : 'Add to Cart') : 'Out of Stock'}
             </button>
           </div>
         </article>
@@ -454,17 +460,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem]">
             {safeName}
           </h3>
-
+ 
           {/* Short Description - ALWAYS SHOW */}
           <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed">
             {safeShortDescription}
           </p>
-
+ 
           {/* Price - Centered */}
           <div className="text-center mb-2 sm:mb-3 md:mb-4">
             <div className="flex items-center justify-center gap-2 sm:gap-3">
               <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
-                {price === -1 ? 'Coming Soon' : formatPrice(price)}
+                {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
               </span>
               {compareAtPrice && (
                 <>
@@ -478,12 +484,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               )}
             </div>
           </div>
-
+ 
           {/* Add to Cart Button - Centered */}
           <div className="text-center">
             <button
               type="button"
-              onClick={handleAddToCart}
+              onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
               className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-3 sm:py-2.5 sm:px-5 md:py-3.5 md:px-8 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 ${
                 inStock && price !== -1
@@ -493,7 +499,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               aria-disabled={!inStock || price === -1}
             >
               <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
-              {price === -1 ? 'COMING SOON' : inStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+              {price === -1 ? 'COMING SOON' : inStock ? (hasVariants ? 'SELECT OPTIONS' : 'ADD TO CART') : 'OUT OF STOCK'}
             </button>
           </div>
         </div>
