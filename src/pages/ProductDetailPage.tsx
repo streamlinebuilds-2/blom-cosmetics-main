@@ -643,12 +643,12 @@ export const ProductDetailPage: React.FC = () => {
       id: '17',
       name: 'Glitter Acrylic',
       slug: 'glitter-acrylic',
-      category: 'Acrylic System',
+      category: 'Archived',
       shortDescription: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
       overview: 'This glitter-acrylic blend looks like a soft, opalescent crushed-ice mix — a dreamy combination of translucent and iridescent shards suspended in clear acrylic. The mix features fine to medium reflective flakes that shift between white-silver, icy blue, and lilac hues, giving it a prismatic, pearl-crystal effect.',
       price: 250,
       compareAtPrice: null,
-      stock: 'In Stock',
+      stock: 'Archived',
       images: [
         '/glitter-acrylic-white.webp',
         '/glitter-acrylic-colorful.webp'
@@ -691,7 +691,7 @@ export const ProductDetailPage: React.FC = () => {
         claims: ['Professional Grade', 'Prismatic Effect', 'Dimensional Sparkle']
       },
       variants: [
-        { name: '56g', inStock: true, price: 250 }
+        { name: '56g', inStock: false, price: 250 }
       ],
       rating: 4.8,
       reviewCount: 156,

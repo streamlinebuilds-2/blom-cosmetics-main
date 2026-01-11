@@ -326,13 +326,13 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
       description: 'This glitter-acrylic blend looks like a soft, opalescent crushed-ice mix — a dreamy combination of translucent and iridescent shards suspended in clear acrylic. Features fine to medium reflective flakes that shift between white-silver, icy blue, and lilac hues.',
       images: ['/glitter-acrylic-white.webp', '/glitter-acrylic-colorful.webp'],
-      category: 'acrylic-system',
+      category: 'archived',
       rating: 4.8,
       reviews: 156,
-      badges: ['New'],
-      inStock: true,
+      badges: ['Archived'],
+      inStock: false,
       variants: [
-        { name: '56g', price: 250, inStock: true }
+        { name: '56g', price: 250, inStock: false }
       ]
     },
     // Furniture Products
