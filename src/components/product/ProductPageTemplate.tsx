@@ -143,40 +143,38 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
   };
 
   // ==============================================================================
-  // START: DEFENSIVE DATA CHECKING
+  // STRICT CONTENT CHECKER
   // ==============================================================================
   
-  // 1. Fix Ingredients Crash (Handle both String and Array data types)
+  // Helper: Returns FALSE if text is just HTML tags (like <p></p>) or spaces
+  const hasRealContent = (content: any) => {
+    if (!content) return false;
+    if (Array.isArray(content)) return content.length > 0;
+    
+    // Convert to string and remove all HTML tags and whitespace
+    const stripped = String(content).replace(/<[^>]*>?/gm, '').trim();
+    return stripped.length > 0;
+  };
+
+  // 1. Safe Ingredients Logic (Convert text to list if needed)
   const rawInci = product.ingredients?.inci;
   let safeIngredients: string[] = [];
 
   if (Array.isArray(rawInci)) {
-    // It's already a list (Correct format)
     safeIngredients = rawInci;
   } else if (typeof rawInci === 'string') {
-    // It's text (Admin save format) - Split it manually to prevent crash
     safeIngredients = rawInci.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '');
   }
 
-  // 2. Check which sections actually have content
-  const hasDescription = product.description && product.description.trim().length > 0;
+  // 2. STRICT Visibility Flags
+  const hasDescription = hasRealContent(product.description);
   const hasIngredients = safeIngredients.length > 0;
-  
-  // Handle both string and string[] for howToUse
-  const hasHowToUse = Array.isArray(product.howToUse) ?
-    product.howToUse.some(item => item.trim().length > 0) :
-    (product.howToUse && product.howToUse.trim().length > 0);
-  
-  // Check typical extra fields (Adjust 'shelfLife' to match your exact database column name)
-  const hasShelfLife = product.shelfLife && product.shelfLife.trim().length > 0;
-  const hasStorage = product.storage && product.storage.trim().length > 0;
+  const hasHowToUse = hasRealContent(product.howToUse);
+  const hasShelfLife = hasRealContent(product.shelfLife);
+  const hasStorage = hasRealContent(product.storage);
 
-  // 3. Master Switch: If NO data exists in any tab, hide the whole section
+  // 3. Master Switch
   const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse || hasShelfLife || hasStorage;
-
-  // ==============================================================================
-  // END: DEFENSIVE DATA CHECKING
-  // ==============================================================================
 
   // ============================================================================
   // 2. REPLACE YOUR EXISTING "PRODUCT INFORMATION" JSX WITH THIS
@@ -464,7 +462,10 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               <div className="animate-fade-in-up delay-200">
                 <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">How to Use</h3>
                 <div className="prose prose-sm text-gray-600 leading-relaxed">
-                  {Array.isArray(product.howToUse) ? product.howToUse.join(' ') : product.howToUse}
+                   {/* Handle both array and string format for 'How To Use' */}
+                   {Array.isArray(product.howToUse)
+                     ? product.howToUse.join('. ')
+                     : product.howToUse}
                 </div>
               </div>
             )}
