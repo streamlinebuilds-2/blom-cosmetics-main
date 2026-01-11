@@ -2289,12 +2289,12 @@ export const ProductDetailPage: React.FC = () => {
                                 <ul className="space-y-2">
                                   {(() => {
                                     const inciData = product.ingredients?.inci;
-                                    
+                                     
                                     // Handle null/undefined
                                     if (inciData === null || inciData === undefined) {
                                       return <li className="text-sm text-gray-500">No INCI ingredients available</li>;
                                     }
-                                    
+                                     
                                     // Check if data is an array - render as list
                                     if (Array.isArray(inciData)) {
                                       if (inciData.length === 0) {
@@ -2307,7 +2307,7 @@ export const ProductDetailPage: React.FC = () => {
                                         </li>
                                       ));
                                     }
-                                    
+                                     
                                     // Check if data is a string - could be HTML or plain text
                                     if (typeof inciData === 'string') {
                                       // Check if it looks like HTML (contains HTML tags)
@@ -2326,7 +2326,7 @@ export const ProductDetailPage: React.FC = () => {
                                         );
                                       }
                                     }
-                                    
+                                     
                                     // Handle object (convert to array)
                                     if (typeof inciData === 'object') {
                                       const inciArray = Object.values(inciData);
@@ -2337,7 +2337,7 @@ export const ProductDetailPage: React.FC = () => {
                                         </li>
                                       ));
                                     }
-                                    
+                                     
                                     // Fallback for any other type
                                     return (
                                       <li className="flex items-center gap-2">
@@ -2353,12 +2353,12 @@ export const ProductDetailPage: React.FC = () => {
                                 <ul className="space-y-2">
                                   {(() => {
                                     const keyData = product.ingredients?.key;
-                                    
+                                     
                                     // Handle null/undefined
                                     if (keyData === null || keyData === undefined) {
                                       return <li className="text-sm text-gray-500">No key ingredients available</li>;
-                                    } 
-                                      
+                                    }
+                                       
                                     // Check if data is an array - render as list
                                     if (Array.isArray(keyData)) {
                                       if (keyData.length === 0) {
@@ -2369,8 +2369,8 @@ export const ProductDetailPage: React.FC = () => {
                                           {ingredient}
                                         </li>
                                       ));
-                                    } 
-                                      
+                                    }
+                                       
                                     // Check if data is a string - could be HTML or plain text
                                     if (typeof keyData === 'string') {
                                       // Check if it looks like HTML (contains HTML tags)
@@ -2387,8 +2387,8 @@ export const ProductDetailPage: React.FC = () => {
                                           </li>
                                         );
                                       }
-                                    } 
-                                      
+                                    }
+                                       
                                     // Handle object (convert to array)
                                     if (typeof keyData === 'object') {
                                       const keyArray = Object.values(keyData);
@@ -2397,8 +2397,8 @@ export const ProductDetailPage: React.FC = () => {
                                           {String(ingredient)}
                                         </li>
                                       ));
-                                    } 
-                                      
+                                    }
+                                       
                                     // Fallback for any other type
                                     return (
                                       <li className="text-sm text-gray-600">
@@ -2410,7 +2410,6 @@ export const ProductDetailPage: React.FC = () => {
                               </div>
                             </div>
                           </div>
-                        )}
                       </Card>
                     )}
 

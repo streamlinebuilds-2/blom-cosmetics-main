@@ -53,9 +53,9 @@ interface ProductData {
   stock: string;
   images: string[];
   features: string[];
-  howToUse: string[];
+  howToUse: string[] | string;
   ingredients: {
-    inci: string[];
+    inci: string[] | string;
     key: string[];
   };
   details: {
@@ -142,34 +142,41 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
     }
   };
 
-  // ============================================================================
-  // 1. ADD THIS LOGIC BLOCK AT THE START OF YOUR COMPONENT (Before 'return')
-  // ============================================================================
-
-  // --- SAFE INGREDIENTS LOGIC ---
-  // This prevents the "map is not a function" crash by forcing data into a list
+  // ==============================================================================
+  // START: DEFENSIVE DATA CHECKING
+  // ==============================================================================
+  
+  // 1. Fix Ingredients Crash (Handle both String and Array data types)
   const rawInci = product.ingredients?.inci;
   let safeIngredients: string[] = [];
 
   if (Array.isArray(rawInci)) {
+    // It's already a list (Correct format)
     safeIngredients = rawInci;
   } else if (typeof rawInci === 'string') {
-    // If Admin saved it as text, we split it here so it doesn't crash
-    safeIngredients = rawInci.split(',').map(s => s.trim()).filter(s => s !== '');
+    // It's text (Admin save format) - Split it manually to prevent crash
+    safeIngredients = rawInci.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '');
   }
 
-  // --- CONTENT EXISTENCE CHECKS ---
-  // We create "flags" to decide what to show
+  // 2. Check which sections actually have content
   const hasDescription = product.description && product.description.trim().length > 0;
   const hasIngredients = safeIngredients.length > 0;
-  const hasHowToUse = product.howToUse && product.howToUse.trim().length > 0;
-
-  // Check for "Shelf Life" or "Storage" (adjust field names to match your DB)
+  
+  // Handle both string and string[] for howToUse
+  const hasHowToUse = Array.isArray(product.howToUse) ?
+    product.howToUse.some(item => item.trim().length > 0) :
+    (product.howToUse && product.howToUse.trim().length > 0);
+  
+  // Check typical extra fields (Adjust 'shelfLife' to match your exact database column name)
   const hasShelfLife = product.shelfLife && product.shelfLife.trim().length > 0;
   const hasStorage = product.storage && product.storage.trim().length > 0;
 
-  // MASTER SWITCH: If ALL of these are false, the whole section disappears
+  // 3. Master Switch: If NO data exists in any tab, hide the whole section
   const showProductInfoSection = hasDescription || hasIngredients || hasHowToUse || hasShelfLife || hasStorage;
+
+  // ==============================================================================
+  // END: DEFENSIVE DATA CHECKING
+  // ==============================================================================
 
   // ============================================================================
   // 2. REPLACE YOUR EXISTING "PRODUCT INFORMATION" JSX WITH THIS
@@ -420,7 +427,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           </Container>
         </section>
 
-      {/* ONLY render this entire block if there is actually information to show */}
+      {/* Only show this entire section if we actually have information to display */}
       {showProductInfoSection && (
         <div className="mt-16 border-t border-gray-200 pt-10">
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-6">
@@ -429,21 +436,21 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
           
           <div className="flex flex-col space-y-8">
             
-            {/* DESCRIPTION - Hides if empty */}
+            {/* Description - Hides if empty */}
             {hasDescription && (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Description</h3>
+              <div className="animate-fade-in-up">
+                <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">Description</h3>
                 <div
-                  className="prose prose-sm text-gray-600"
+                  className="prose prose-sm text-gray-600 leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: product.description }}
                 />
               </div>
             )}
 
-            {/* INGREDIENTS - Hides if empty & CRASH PROOF */}
+            {/* Ingredients - Hides if empty & CRASH PROOF */}
             {hasIngredients && (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Ingredients</h3>
+              <div className="animate-fade-in-up delay-100">
+                <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">Ingredients</h3>
                 <ul className="list-disc pl-5 space-y-1 text-gray-600 text-sm">
                   {safeIngredients.map((item, index) => (
                     <li key={index}>{item}</li>
@@ -452,30 +459,30 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               </div>
             )}
 
-            {/* HOW TO USE - Hides if empty */}
+            {/* How to Use - Hides if empty */}
             {hasHowToUse && (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">How to Use</h3>
-                <div className="prose prose-sm text-gray-600">
-                  {product.howToUse}
+              <div className="animate-fade-in-up delay-200">
+                <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">How to Use</h3>
+                <div className="prose prose-sm text-gray-600 leading-relaxed">
+                  {Array.isArray(product.howToUse) ? product.howToUse.join(' ') : product.howToUse}
                 </div>
               </div>
             )}
 
-            {/* SHELF LIFE - Hides if empty */}
+            {/* Shelf Life - Hides if empty */}
             {hasShelfLife && (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Shelf Life</h3>
+              <div className="animate-fade-in-up delay-300">
+                <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">Shelf Life</h3>
                 <p className="text-sm text-gray-600">
                   {product.shelfLife}
                 </p>
               </div>
             )}
 
-             {/* STORAGE - Hides if empty */}
+             {/* Storage - Hides if empty */}
              {hasStorage && (
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Storage Instructions</h3>
+              <div className="animate-fade-in-up delay-400">
+                <h3 className="text-lg font-semibold mb-2 font-serif text-gray-900">Storage Instructions</h3>
                 <p className="text-sm text-gray-600">
                   {product.storage}
                 </p>
