@@ -455,9 +455,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-3 sm:p-4 md:p-6 text-center">
+        <div className="p-3 sm:p-4 md:p-6 text-center flex flex-col items-center">
           {/* Product Name */}
-          <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-black group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem]">
+          <h3 className="font-bold text-lg sm:text-xl md:text-2xl mb-2 text-black group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem]">
             {safeName}
           </h3>
  
@@ -467,38 +467,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </p>
  
           {/* Price - Centered */}
-          <div className="mb-3 sm:mb-4">
-            <div className="flex items-center justify-center gap-2 sm:gap-3">
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-black">
-                {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
-              </span>
-              {compareAtPrice && (
-                <>
-                  <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
-                    {formatPrice(compareAtPrice)}
-                  </span>
-                  <span className="text-[10px] sm:text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full">
-                    {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
-                  </span>
-                </>
-              )}
-            </div>
+          <div className="mb-2">
+            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-black">
+              {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
+            </span>
+            {compareAtPrice && (
+              <div className="mt-1">
+                <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
+                  {formatPrice(compareAtPrice)}
+                </span>
+                <span className="ml-2 text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
+                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+                </span>
+              </div>
+            )}
           </div>
  
           {/* Add to Cart Button - Centered */}
-          <div className="mt-3">
+          <div className="mt-2 w-full max-w-[200px]">
             <button
               type="button"
               onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
-              className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-4 sm:py-2.5 sm:px-5 md:py-3 md:px-6 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 ${
+              className={`w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full font-bold text-sm sm:text-base uppercase transition-all duration-200 ${
                 inStock && price !== -1
-                  ? 'bg-pink-400 text-white hover:bg-blue-100 hover:text-black hover:border-2 hover:border-black active:scale-95'
+                  ? 'bg-pink-500 text-white hover:bg-pink-600 active:scale-95'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               aria-disabled={!inStock || price === -1}
             >
-              <ShoppingCart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4" />
+              <ShoppingCart className="h-4 w-4" />
               {price === -1 ? 'COMING SOON' : inStock ? (hasVariants ? 'SELECT OPTIONS' : 'ADD TO CART') : 'OUT OF STOCK'}
             </button>
           </div>

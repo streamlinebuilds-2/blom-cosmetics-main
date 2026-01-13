@@ -1074,25 +1074,7 @@ export const ShopPage: React.FC = () => {
             className="mb-6"
           />
 
-          {/* Category Pills - Mobile Optimized */}
-          <div className="mb-4">
-            <div className="flex flex-wrap gap-1.5">
-                      {productCategories.map((category) => (
-                        <button
-                          key={category.slug}
-                          onClick={() => setSelectedCategory(category.slug)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                            selectedCategory === category.slug
-                      ? 'bg-pink-400 text-white shadow-md'
-                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                          }`}
-                        >
-                  {category.name}
-                  <span className="ml-1 text-xs opacity-75">({category.count})</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+          {/* Removed top category pills as requested */}
 
           {/* Sticky Filter Bar - Mobile Optimized */}
           <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
@@ -1204,71 +1186,61 @@ export const ShopPage: React.FC = () => {
                   </div>
                   
                   <div className="space-y-6">
-                    {/* Categories - Mobile Version */}
+                    {/* Categories - Mobile Version - Updated with bigger, bolder heading */}
                     <div>
-                      <h3 className="font-medium text-lg mb-4">Category</h3>
-                      <ul className="space-y-3">
+                      <h3 className="font-bold text-xl mb-4">Categories</h3>
+                      <div className="max-h-60 overflow-y-auto">
                         {productCategories.map(cat => (
-                          <li key={cat.slug}>
-                            <div
-                              className="flex items-center group cursor-pointer py-1"
-                              onClick={() => {
-                                setSelectedCategory(cat.slug);
-                                setSelectedSubcategory(null);
-                              }}
-                            >
-                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedCategory === cat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
-                                {selectedCategory === cat.slug && <div className="w-2 h-2 bg-white rounded-full" />}
+                          <div
+                            key={cat.slug}
+                            className={`flex items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
+                              selectedCategory === cat.slug
+                                ? 'bg-pink-100 border-l-4 border-pink-500'
+                                : 'hover:bg-gray-50'
+                            }`}
+                            onClick={() => {
+                              setSelectedCategory(cat.slug);
+                              setSelectedSubcategory(null);
+                            }}
+                          >
+                            <div className="mr-3">
+                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedCategory === cat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                {selectedCategory === cat.slug && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
                               </div>
-                              <span className={`${selectedCategory === cat.slug ? 'text-black font-semibold' : 'text-gray-600'} group-hover:text-black transition-colors`}>
-                                {cat.name}
-                              </span>
-                              <span className="ml-auto bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">
-                                {cat.count}
-                              </span>
                             </div>
-                            
-                            {selectedCategory === cat.slug && cat.subcategories && cat.subcategories.length > 0 && (
-                              <ul className="pl-8 mt-2 space-y-2">
-                                {cat.subcategories.map((subcat: { slug: string; name: string; count: number }) => (
-                                  <li
-                                    key={subcat.slug}
-                                    className="flex items-center group cursor-pointer py-1"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSelectedSubcategory(subcat.slug);
-                                    }}
-                                  >
-                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-3 ${selectedSubcategory === subcat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
-                                      {selectedSubcategory === subcat.slug && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
-                                    </div>
-                                    <span className={`${selectedSubcategory === subcat.slug ? 'text-black font-medium' : 'text-gray-500'} text-sm group-hover:text-black transition-colors`}>
-                                      {subcat.name}
-                                    </span>
-                                    <span className="ml-auto bg-gray-100 text-xs px-2 py-0.5 rounded-full text-gray-500">
-                                      {subcat.count}
-                                    </span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </li>
+                            <span className={`${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-700'}`}>
+                              {cat.name}
+                            </span>
+                            <span className="ml-auto bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">
+                              {cat.count}
+                            </span>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
 
-                    {/* Price Ranges - Mobile Version */}
+                    {/* Price Ranges - Mobile Version - Updated with bigger, bolder heading and fixed selection */}
                     <div>
-                      <h3 className="font-medium text-lg mb-4">Price</h3>
+                      <h3 className="font-bold text-xl mb-4">Price</h3>
                       <div className="space-y-3">
                         {priceRanges.map(range => (
-                          <label key={range.label} className="flex items-center cursor-pointer group py-1">
-                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
-                              {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                          <div
+                            key={range.label}
+                            className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
+                              selectedPriceRange?.label === range.label
+                                ? 'bg-pink-100 border-l-4 border-pink-500'
+                                : 'hover:bg-gray-50'
+                            }`}
+                            onClick={() => setSelectedPriceRange(range)}
+                          >
+                            <div className="mr-3">
+                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                              </div>
                             </div>
                             <span className="text-gray-600 flex-1">{range.label}</span>
                             <span className="text-xs text-gray-400">({getPriceRangeCount(range)})</span>
-                          </label>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -1329,31 +1301,53 @@ export const ShopPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Sidebar - Filters */}
             <div className="w-64 flex-shrink-0 pr-8 hidden lg:block">
-              {/* Categories */}
+              {/* Categories - Updated with bigger, bolder heading and scrollable */}
               <div className="mb-8">
-                <h3 className="font-medium text-lg mb-4">Categories</h3>
-                <ul className="space-y-3">
+                <h3 className="font-bold text-xl mb-4">Categories</h3>
+                <div className="max-h-60 overflow-y-auto">
                   {productCategories.map(cat => (
-                    <li key={cat.name} className="flex justify-between items-center group cursor-pointer" onClick={() => setSelectedCategory(cat.slug)}>
-                      <span className={`${selectedCategory === cat.slug ? 'text-black font-semibold' : 'text-gray-600'} group-hover:text-black transition-colors`}>{cat.name}</span>
-                      <span className="bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">{cat.count}</span>
-                    </li>
+                    <div
+                      key={cat.slug}
+                      className={`flex justify-between items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
+                        selectedCategory === cat.slug
+                          ? 'bg-pink-100 border-l-4 border-pink-500'
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => setSelectedCategory(cat.slug)}
+                    >
+                      <span className={`${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-700'}`}>
+                        {cat.name}
+                      </span>
+                      <span className="bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">
+                        {cat.count}
+                      </span>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </div>
 
-              {/* Price Ranges */}
+              {/* Price Ranges - Updated with bigger, bolder heading and fixed selection */}
               <div>
-                <h3 className="font-medium text-lg mb-4">Price</h3>
+                <h3 className="font-bold text-xl mb-4">Price</h3>
                 <div className="space-y-3">
                   {priceRanges.map(range => (
-                    <label key={range.label} className="flex items-center cursor-pointer group py-1">
-                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
-                        {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                    <div
+                      key={range.label}
+                      className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
+                        selectedPriceRange?.label === range.label
+                          ? 'bg-pink-100 border-l-4 border-pink-500'
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => setSelectedPriceRange(range)}
+                    >
+                      <div className="mr-3">
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                          {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                        </div>
                       </div>
                       <span className="text-gray-600 flex-1">{range.label}</span>
                       <span className="text-xs text-gray-400">({getPriceRangeCount(range)})</span>
-                    </label>
+                    </div>
                   ))}
                 </div>
               </div>
