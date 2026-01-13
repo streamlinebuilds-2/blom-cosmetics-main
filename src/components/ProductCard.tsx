@@ -491,9 +491,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               type="button"
               onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
-              className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-4 sm:py-2.5 sm:px-5 md:py-3 md:px-6 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 border-2 border-transparent ${
+              className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-4 sm:py-2.5 sm:px-5 md:py-3 md:px-6 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 ${
                 inStock && price !== -1
-                  ? 'bg-pink-400 text-white hover:bg-blue-100 hover:border-black hover:text-black active:scale-95'
+                  ? 'bg-pink-400 text-white hover:bg-blue-100 hover:text-black hover:border-2 hover:border-black active:scale-95'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               aria-disabled={!inStock || price === -1}
