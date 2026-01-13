@@ -394,7 +394,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <>
       <article
-        className={`product-card group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-2 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
+        className={`product-card group relative bg-white rounded-3xl border border-gray-200 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:-translate-y-3 ${hoverShine ? 'best-seller-card' : ''} ${className}`}
         onClick={handleCardClick}
       >
         {/* Image Container with or without Shimmer Effect */}
@@ -447,17 +447,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             aria-label="Toggle wishlist"
           >
             <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5 transition-all ${
-              isWishlisted 
-                ? 'fill-current text-pink-400 group-hover/heart:text-pink-500' 
+              isWishlisted
+                ? 'fill-current text-pink-400 group-hover/heart:text-pink-500'
                 : 'text-gray-600 group-hover/heart:text-pink-500 group-hover/heart:fill-current'
             }`} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-3 sm:p-4 md:p-6">
+        <div className="p-3 sm:p-4 md:p-6 text-center">
           {/* Product Name */}
-          <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem]">
+          <h3 className="font-bold text-sm sm:text-base md:text-xl mb-2 text-black group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] md:min-h-[3.5rem]">
             {safeName}
           </h3>
  
@@ -467,9 +467,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </p>
  
           {/* Price - Centered */}
-          <div className="text-center mb-2 sm:mb-3 md:mb-4">
+          <div className="mb-3 sm:mb-4">
             <div className="flex items-center justify-center gap-2 sm:gap-3">
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-black">
                 {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
               </span>
               {compareAtPrice && (
@@ -486,14 +486,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
  
           {/* Add to Cart Button - Centered */}
-          <div className="text-center">
+          <div className="mt-3">
             <button
               type="button"
               onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
-              className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-3 sm:py-2.5 sm:px-5 md:py-3.5 md:px-8 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 ${
+              className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 md:gap-2 py-2 px-4 sm:py-2.5 sm:px-5 md:py-3 md:px-6 rounded-full font-bold text-[10px] sm:text-xs md:text-sm uppercase transition-all duration-200 border-2 border-transparent ${
                 inStock && price !== -1
-                  ? 'bg-pink-400 text-white hover:bg-pink-400 hover:shadow-lg transform hover:scale-[1.02] active:scale-95'
+                  ? 'bg-pink-400 text-white hover:bg-blue-100 hover:border-black hover:text-black active:scale-95'
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
               aria-disabled={!inStock || price === -1}

@@ -1378,34 +1378,36 @@ export const ShopPage: React.FC = () => {
                     <h2 className="text-xl font-bold text-gray-900 mb-4">{subcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
                     <div className={`grid ${getGridClasses()} gap-6`}>
                       {products.map((product) => (
-                        <div key={product.id} className="group cursor-pointer">
-                          <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                            <div className="aspect-[4/5] bg-gray-50">
-                              <img
-                                src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="p-4 flex flex-col h-40">
-                              <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors">{product.name}</h3>
-                              <p className="text-gray-600 text-sm mb-3 flex-grow">{product.shortDescription}</p>
-                              <div className="flex justify-between items-center mt-auto">
-                                <span className="text-xl font-bold text-gray-900">R{product.price.toFixed(2)}</span>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    // Add to cart logic would go here
-                                    console.log('Add to cart:', product.name);
-                                  }}
-                                  className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center"
-                                  title="Add to Cart"
-                                >
-                                  <ShoppingCart className="h-4 w-4 mr-1" />
-                                  <span className="text-sm">Add</span>
-                                </button>
+                        <div key={product.id} className="group">
+                          <a href={`/product/${product.slug}`} className="block">
+                            <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                              <div className="aspect-[4/5] bg-gray-50">
+                                <img
+                                  src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+                                  alt={product.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <div className="p-4 flex flex-col h-40">
+                                <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors">{product.name}</h3>
+                                <p className="text-gray-600 text-sm mb-3 flex-grow">{product.shortDescription}</p>
                               </div>
                             </div>
+                          </a>
+                          <div className="flex justify-between items-center mt-2 px-2">
+                            <span className="text-xl font-bold text-gray-900">R{product.price.toFixed(2)}</span>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // Add to cart logic would go here
+                                console.log('Add to cart:', product.name);
+                              }}
+                              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center"
+                              title="Add to Cart"
+                            >
+                              <ShoppingCart className="h-4 w-4 mr-1" />
+                              <span className="text-sm">Add</span>
+                            </button>
                           </div>
                         </div>
                       ))}

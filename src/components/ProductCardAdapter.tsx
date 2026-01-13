@@ -8,18 +8,20 @@ interface ProductCardAdapterProps {
 }
 
 export function ProductCardAdapter({ product }: ProductCardAdapterProps) {
-  // Safe extraction of first image
-  const image = Array.isArray(product.images) && product.images.length > 0
-    ? product.images[0]
-    : (product.image || '/placeholder.png');
-
   return (
     <ProductCard
       id={product.id}
       name={product.name}
       slug={product.slug}
       price={product.price}
+      compareAtPrice={product.compareAtPrice}
+      badges={product.badges}
       images={product.images}
+      shortDescription={product.shortDescription}
+      variants={product.variants}
+      inStock={product.inStock}
+      hoverShine={true}
+      className="border border-gray-200 hover:-translate-y-3"
     />
   );
 }
