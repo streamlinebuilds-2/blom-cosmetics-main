@@ -48,8 +48,7 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState('');
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState<'overview' | 'features' | 'how-to-use' | 'ingredients' | 'details'>('overview');
-  const [expandedAccordion, setExpandedAccordion] = useState<string | null>('overview');
+  const [activeTab, setActiveTab] = useState('description');
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -1684,9 +1683,6 @@ export const ProductDetailPage: React.FC = () => {
     setThumbnailScrollIndex((prev) => Math.max(prev - 1, 0));
   };
 
-  const toggleAccordion = (section: string) => {
-    setExpandedAccordion(expandedAccordion === section ? null : section);
-  };
 
   const formatPrice = (price: number) => `R${price.toFixed(2)}`;
 
@@ -2634,10 +2630,9 @@ export const ProductDetailPage: React.FC = () => {
                 </Card>
               )}
             </div>
-          </div>
-        </Container>
-      </section>
-    )}
+          </Container>
+        </section>
+      )}
 
         {/* Related Products */}
         <section className="section-padding">
