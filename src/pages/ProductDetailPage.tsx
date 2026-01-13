@@ -2080,10 +2080,9 @@ export const ProductDetailPage: React.FC = () => {
                   <PaymentMethods />
                 </div>
               </div>
-            </div>
+           </div>
           </Container>
         </section>
-      )}
 
         {/* Product Information Tabs - Only show if there's content */}
         {showProductInfo && (
@@ -2531,10 +2530,11 @@ export const ProductDetailPage: React.FC = () => {
                                       </li>
                                     );
                                   })()}
-                                </ul>
+                               </ul>
                               </div>
                             </div>
                           </div>
+                        )} {/* <-- Add this closing brace/paren here */}
                       </Card>
                     )}
 
