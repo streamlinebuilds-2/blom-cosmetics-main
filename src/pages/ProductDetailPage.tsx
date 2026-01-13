@@ -2085,20 +2085,28 @@ export const ProductDetailPage: React.FC = () => {
           <section className="section-padding bg-pink-50">
             <Container>
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
+                <h2 className="text-2xl font-bold text-center mb-6">Product Information</h2>
 
-                {/* Tabs Interface */}
-                <div className="mt-16">
-                  <div className="border-b border-gray-200">
-                    <div className="flex space-x-8">
+                {/* Compact Tab Bar */}
+                <div className="sticky top-0 z-10 bg-white shadow-sm rounded-lg mb-8">
+                  <div className="flex overflow-x-auto scrollbar-hide p-2 -mx-2">
+                    <style jsx global>{`
+                      .scrollbar-hide {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
+                      }
+                      .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
+                      }
+                    `}</style>
+                    <div className="flex space-x-2 md:space-x-4 mx-auto px-2">
                       {hasContent(product.overview) && (
                         <button
-                          key="Description"
                           onClick={() => setActiveTab('Description')}
-                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                          className={`px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
                             activeTab === 'Description'
-                              ? 'border-black text-black'
-                              : 'border-transparent text-gray-500 hover:text-black'
+                              ? 'bg-pink-100 text-pink-600'
+                              : 'bg-white text-gray-500 hover:text-pink-600'
                           }`}
                         >
                           Description
@@ -2106,12 +2114,11 @@ export const ProductDetailPage: React.FC = () => {
                       )}
                       {hasContent(product.features) && (
                         <button
-                          key="Features"
                           onClick={() => setActiveTab('Features')}
-                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                          className={`px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
                             activeTab === 'Features'
-                              ? 'border-black text-black'
-                              : 'border-transparent text-gray-500 hover:text-black'
+                              ? 'bg-pink-100 text-pink-600'
+                              : 'bg-white text-gray-500 hover:text-pink-600'
                           }`}
                         >
                           Features
@@ -2119,12 +2126,11 @@ export const ProductDetailPage: React.FC = () => {
                       )}
                       {hasContent(product.howToUse) && (
                         <button
-                          key="HowToUse"
                           onClick={() => setActiveTab('HowToUse')}
-                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                          className={`px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
                             activeTab === 'HowToUse'
-                              ? 'border-black text-black'
-                              : 'border-transparent text-gray-500 hover:text-black'
+                              ? 'bg-pink-100 text-pink-600'
+                              : 'bg-white text-gray-500 hover:text-pink-600'
                           }`}
                         >
                           How to Use
@@ -2132,12 +2138,11 @@ export const ProductDetailPage: React.FC = () => {
                       )}
                       {hasContent(product.ingredients) && (
                         <button
-                          key="Ingredients"
                           onClick={() => setActiveTab('Ingredients')}
-                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                          className={`px-4 py-2 text-sm font-medium rounded-full transition-colors whitespace-nowrap ${
                             activeTab === 'Ingredients'
-                              ? 'border-black text-black'
-                              : 'border-transparent text-gray-500 hover:text-black'
+                              ? 'bg-pink-100 text-pink-600'
+                              : 'bg-white text-gray-500 hover:text-pink-600'
                           }`}
                         >
                           Ingredients
@@ -2145,45 +2150,47 @@ export const ProductDetailPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <div className="py-8 prose max-w-none">
+                  <div className="py-6 px-4 bg-white rounded-lg shadow-sm mt-4">
                     {activeTab === 'Description' && hasContent(product.overview) && (
-                      <div>
-                        <h3 className="font-semibold text-lg mb-4">Overview</h3>
-                        <p className="text-gray-600 leading-relaxed">{product.overview}</p>
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg text-gray-900">Overview</h3>
+                        <p className="text-gray-600 leading-relaxed text-sm md:text-base">{product.overview}</p>
                       </div>
                     )}
                     {activeTab === 'Features' && hasContent(product.features) && (
-                      <div>
-                        <h3 className="font-semibold text-lg mb-4">Features & Benefits</h3>
-                        <ul className="space-y-3">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg text-gray-900">Features & Benefits</h3>
+                        <ul className="space-y-3 divide-y divide-gray-100">
                           {product.features.map((feature: string, index: number) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
-                              <span className="text-gray-700">{feature}</span>
+                            <li key={index} className="flex items-center gap-3 py-3">
+                              <div className="flex-shrink-0 w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                                <Check className="h-4 w-4 text-pink-600" />
+                              </div>
+                              <span className="text-gray-700 text-sm md:text-base">{feature}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
                     {activeTab === 'HowToUse' && hasContent(product.howToUse) && (
-                      <div>
-                        <h3 className="font-semibold text-lg mb-4">How to Use</h3>
-                        <ol className="space-y-3">
+                      <div className="space-y-4">
+                        <h3 className="font-semibold text-lg text-gray-900">How to Use</h3>
+                        <ol className="space-y-4 list-none">
                           {product.howToUse.map((step: string, index: number) => (
-                            <li key={index} className="flex items-start gap-3">
-                              <span className="w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
-                                {index + 1}
-                              </span>
-                              <span>{step}</span>
+                            <li key={index} className="flex items-center gap-4 py-3">
+                              <div className="flex-shrink-0 w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                                <span className="text-pink-600 text-sm font-medium">{index + 1}</span>
+                              </div>
+                              <span className="text-gray-700 text-sm md:text-base">{step}</span>
                             </li>
                           ))}
                         </ol>
                       </div>
                     )}
                     {activeTab === 'Ingredients' && hasContent(product.ingredients) && (
-                      <div>
-                        <h3 className="font-semibold text-lg mb-4">Ingredients</h3>
-                        <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-6">
+                        <h3 className="font-semibold text-lg text-gray-900">Ingredients</h3>
+                        <div className="grid md:grid-cols-2 gap-8">
                           <div>
                             <h4 className="font-medium mb-3">INCI Names:</h4>
                             <ul className="space-y-2">
@@ -2194,9 +2201,9 @@ export const ProductDetailPage: React.FC = () => {
                                 }
                                 if (Array.isArray(inciData)) {
                                   return inciData.map((ingredient: string, index: number) => (
-                                    <li key={index} className="flex items-center gap-2">
-                                      <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                                      <span className="text-sm">{ingredient}</span>
+                                    <li key={index} className="flex items-center gap-3 py-2">
+                                      <div className="w-2 h-2 bg-pink-100 border border-pink-300 rounded-full"></div>
+                                      <span className="text-gray-600 text-sm">{ingredient}</span>
                                     </li>
                                   ));
                                 }
