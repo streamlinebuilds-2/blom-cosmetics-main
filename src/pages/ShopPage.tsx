@@ -3,7 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
-import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download } from 'lucide-react';
+import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download, ShoppingCart, X } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
 import { PageLoadingSpinner, ProductGridSkeleton } from '../components/ui/LoadingSpinner';
 import { supabase } from '../lib/supabase';
@@ -12,6 +12,7 @@ import { supabase } from '../lib/supabase';
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 768 ? 'list' : 'grid-3';
@@ -24,6 +25,7 @@ export const ShopPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [displayProducts, setDisplayProducts] = useState<any[]>([]); // Renamed from dbProducts for clarity
   const [error, setError] = useState<string | null>(null);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<{label: string, min: number, max: number} | null>(null);
 
   // Static products - Keep existing products working while database is being populated
   const staticProducts = useMemo(() => [
@@ -38,6 +40,7 @@ export const ShopPage: React.FC = () => {
       description: 'Perfect nail preparation starts here. Get both our Prep Solution and Vitamin Primer together and save.',
       images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp'],
       category: 'bundle-deals',
+      subcategory: 'bundles',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -60,6 +63,7 @@ export const ShopPage: React.FC = () => {
       description: 'A nourishing blend that deeply hydrates and softens cuticles while promoting healthy nail growth. Lightweight, fast-absorbing, and enriched with restorative oils, it leaves nails and skin feeling smooth, conditioned, and beautifully cared for.',
       images: ['/cuticle-oil-white.webp', '/cuticle-oil-colorful.webp'],
       category: 'prep-finishing',
+      subcategory: 'finishing',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -83,6 +87,7 @@ export const ShopPage: React.FC = () => {
       description: 'Strengthens bond between natural nail and product — essential for long-lasting wear.',
       images: ['/vitamin-primer-white.webp', '/vitamin-primer-colorful.webp'],
       category: 'prep-finishing',
+      subcategory: 'prep',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -100,6 +105,7 @@ export const ShopPage: React.FC = () => {
       description: 'Removes oils and moisture from the nail surface for better product adhesion and long-lasting results.',
       images: ['/prep-solution-white.webp', '/prep-solution-colorful.webp'],
       category: 'prep-finishing',
+      subcategory: 'prep',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -117,6 +123,7 @@ export const ShopPage: React.FC = () => {
       description: 'A crystal-clear, high-shine finish that seals and protects your nail art without leaving a sticky layer. Long-lasting, scratch-resistant, and easy to use — perfect for a flawless, glossy look every time.',
       images: ['/top-coat-white.webp', '/top-coat-colorful.webp'],
       category: 'gel-system',
+      subcategory: 'top-coats',
       rating: 0,
       reviews: 201,
       badges: [],
@@ -134,6 +141,7 @@ export const ShopPage: React.FC = () => {
       description: 'A dazzling, non-wipe top coat infused with fine sparkles that adds a touch of glamour to any set. Provides long-lasting shine, strength, and protection while giving nails a radiant, shimmering finish.',
       images: ['/fairy-dust-top-coat-white.webp', '/fairy-dust-top-coat-colorful.webp'],
       category: 'gel-system',
+      subcategory: 'top-coats',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -151,6 +159,7 @@ export const ShopPage: React.FC = () => {
       description: 'Durable nail files for professional shaping and smoothing.',
       images: ['/nail-file-white.webp', '/nail-file-colorful.webp'],
       category: 'tools-essentials',
+      subcategory: 'files',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -171,6 +180,7 @@ export const ShopPage: React.FC = () => {
       description: 'Super sturdy and strong nail forms for acrylic and gel applications.',
       images: ['/nail-forms-white.webp', '/nail-forms-colorful.webp'],
       category: 'tools-essentials',
+      subcategory: 'forms',
       rating: 0,
       reviews: 0,
       badges: [],
@@ -878,6 +888,41 @@ export const ShopPage: React.FC = () => {
     { value: 'price-high', label: 'Price: High to Low' }
   ];
 
+  // Price ranges for filtering
+  const priceRanges = [
+    { label: 'All Prices', min: 0, max: 100000 },
+    { label: 'Under R200', min: 0, max: 200 },
+    { label: 'R200 - R500', min: 200, max: 500 },
+    { label: 'R500 - R1000', min: 500, max: 1000 },
+    { label: 'R1000+', min: 1000, max: 100000 },
+  ];
+
+  // Helper to count products in price range
+  const filteredWithoutPriceRange = useMemo(() => {
+    return allProducts.filter((product: any) => {
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.shortDescription || '').toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
+      const isNotArchived = product.category !== 'archived';
+      return matchesCategory && matchesSearch && matchesStock && isNotArchived;
+    });
+  }, [allProducts, selectedCategory, searchTerm, showInStockOnly]);
+
+  const filteredProducts = useMemo(() => {
+    return filteredWithoutPriceRange.filter((product: any) => {
+      const matchesPriceRange = !selectedPriceRange ||
+        (product.price >= selectedPriceRange.min && product.price <= selectedPriceRange.max);
+      return matchesPriceRange;
+    });
+  }, [filteredWithoutPriceRange, selectedPriceRange]);
+
+  const getPriceRangeCount = (range: { min: number, max: number }) => {
+    return filteredWithoutPriceRange.filter((product: any) =>
+      product.price >= range.min && product.price <= range.max
+    ).length;
+  };
+
   useEffect(() => {
     document.title = 'Shop - BLOM Cosmetics';
     const metaDescription = document.querySelector('meta[name="description"]');
@@ -895,20 +940,6 @@ export const ShopPage: React.FC = () => {
     }
   }, []);
 
-  const filteredProducts = allProducts.filter((product: any) => {
-    const matchesCategory = selectedCategory === 'all' ||
-      product.category === selectedCategory;
-
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (product.shortDescription || '').toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
-
-    // Exclude archived products
-    const isNotArchived = product.category !== 'archived';
-
-    return matchesCategory && matchesSearch && matchesStock && isNotArchived;
-  });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     // Define priority order for specific products (most important first)
@@ -1001,6 +1032,9 @@ export const ShopPage: React.FC = () => {
     setSortBy('featured');
     setShowInStockOnly(false);
     setSelectedCategory('all');
+    setSelectedSubcategory(null);
+    setSelectedPriceRange(null);
+    setShowFilters(false); // Close mobile drawer when clearing filters
   };
 
   if (loading) {
@@ -1018,11 +1052,11 @@ export const ShopPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-pink-100 to-blue-100">
+    <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
 
       <main className="pt-8 pb-16">
-          <Container>
+        <Container>
           {/* Page Header - Clean & Modern */}
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Shop</h1>
@@ -1146,34 +1180,125 @@ export const ShopPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Modern Mobile Filter Sheet */}
-          {showFilters && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6">
-              <div className="space-y-4">
-                {/* In Stock Only */}
-                      <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-gray-900 text-sm">Availability</h3>
-                    <p className="text-xs text-gray-500">Show only in-stock items</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={showInStockOnly}
-                      onChange={(e) => setShowInStockOnly(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
-                  </label>
-                </div>
+          {/* Floating Filter Button for Mobile */}
+          <button
+            onClick={() => setShowFilters(true)}
+            className="fixed bottom-4 right-4 lg:hidden bg-pink-400 text-white rounded-full p-4 shadow-lg hover:bg-pink-500 transition-colors z-40"
+          >
+            <Filter className="h-6 w-6" />
+          </button>
 
-                {/* Clear Filters */}
-                <button
-                  onClick={clearFilters}
-                  className="w-full px-4 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-medium"
-                >
-                  Clear All Filters
-                </button>
+          {/* Mobile Filter Drawer */}
+          {showFilters && (
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-50 lg:bg-transparent lg:relative lg:inset-auto">
+              <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white overflow-y-auto lg:static lg:w-auto lg:max-w-none lg:bg-transparent">
+                <div className="p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold">Filters</h2>
+                    <button
+                      onClick={() => setShowFilters(false)}
+                      className="text-gray-500 hover:text-gray-700 lg:hidden"
+                    >
+                      <X className="h-6 w-6" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    {/* Categories - Mobile Version */}
+                    <div>
+                      <h3 className="font-medium text-lg mb-4">Category</h3>
+                      <ul className="space-y-3">
+                        {productCategories.map(cat => (
+                          <li key={cat.slug}>
+                            <div
+                              className="flex items-center group cursor-pointer py-1"
+                              onClick={() => {
+                                setSelectedCategory(cat.slug);
+                                setSelectedSubcategory(null);
+                              }}
+                            >
+                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedCategory === cat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                {selectedCategory === cat.slug && <div className="w-2 h-2 bg-white rounded-full" />}
+                              </div>
+                              <span className={`${selectedCategory === cat.slug ? 'text-black font-semibold' : 'text-gray-600'} group-hover:text-black transition-colors`}>
+                                {cat.name}
+                              </span>
+                              <span className="ml-auto bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">
+                                {cat.count}
+                              </span>
+                            </div>
+                            
+                            {selectedCategory === cat.slug && cat.subcategories && cat.subcategories.length > 0 && (
+                              <ul className="pl-8 mt-2 space-y-2">
+                                {cat.subcategories.map((subcat: { slug: string; name: string; count: number }) => (
+                                  <li
+                                    key={subcat.slug}
+                                    className="flex items-center group cursor-pointer py-1"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedSubcategory(subcat.slug);
+                                    }}
+                                  >
+                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center mr-3 ${selectedSubcategory === subcat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                      {selectedSubcategory === subcat.slug && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                                    </div>
+                                    <span className={`${selectedSubcategory === subcat.slug ? 'text-black font-medium' : 'text-gray-500'} text-sm group-hover:text-black transition-colors`}>
+                                      {subcat.name}
+                                    </span>
+                                    <span className="ml-auto bg-gray-100 text-xs px-2 py-0.5 rounded-full text-gray-500">
+                                      {subcat.count}
+                                    </span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Price Ranges - Mobile Version */}
+                    <div>
+                      <h3 className="font-medium text-lg mb-4">Price</h3>
+                      <div className="space-y-3">
+                        {priceRanges.map(range => (
+                          <label key={range.label} className="flex items-center cursor-pointer group py-1">
+                            <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                              {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                            </div>
+                            <span className="text-gray-600 flex-1">{range.label}</span>
+                            <span className="text-xs text-gray-400">({getPriceRangeCount(range)})</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* In Stock Only */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div>
+                        <h3 className="font-medium text-gray-900 text-sm">Availability</h3>
+                        <p className="text-xs text-gray-500">Show only in-stock items</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={showInStockOnly}
+                          onChange={(e) => setShowInStockOnly(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
+                      </label>
+                    </div>
+
+                    {/* Clear Filters */}
+                    <button
+                      onClick={clearFilters}
+                      className="w-full px-4 py-3 text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                    >
+                      Clear All Filters
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -1200,29 +1325,96 @@ export const ShopPage: React.FC = () => {
             </div>
           )}
 
-          {/* Products Grid - Clean Modern Layout */}
-          <div className={`grid ${getGridClasses()} gap-6`}>
-                {sortedProducts.map((product) => {
-                  // Compute discount for this product
-                  return (
-                  <ProductCard
-                      key={product.id}
-                    id={product.id}
-                    name={product.name}
-                    slug={product.slug}
-                    price={product.price}
-                    compareAtPrice={product.compareAtPrice}
-                    shortDescription={product.shortDescription}
-                    images={product.images}
-                    inStock={product.inStock}
-                    badges={product.badges}
-                      isListView={viewMode === 'list'}
-                    includedProducts={product.includedProducts || product.bundleProducts || []}
-                    variants={product.variants || []}
-                  />
-                  );
-                })}
+          {/* Main Content Grid with Sidebar */}
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Sidebar - Filters */}
+            <div className="w-64 flex-shrink-0 pr-8 hidden lg:block">
+              {/* Categories */}
+              <div className="mb-8">
+                <h3 className="font-medium text-lg mb-4">Categories</h3>
+                <ul className="space-y-3">
+                  {productCategories.map(cat => (
+                    <li key={cat.name} className="flex justify-between items-center group cursor-pointer" onClick={() => setSelectedCategory(cat.slug)}>
+                      <span className={`${selectedCategory === cat.slug ? 'text-black font-semibold' : 'text-gray-600'} group-hover:text-black transition-colors`}>{cat.name}</span>
+                      <span className="bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">{cat.count}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              {/* Price Ranges */}
+              <div>
+                <h3 className="font-medium text-lg mb-4">Price</h3>
+                <div className="space-y-3">
+                  {priceRanges.map(range => (
+                    <label key={range.label} className="flex items-center cursor-pointer group py-1">
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                        {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                      </div>
+                      <span className="text-gray-600 flex-1">{range.label}</span>
+                      <span className="text-xs text-gray-400">({getPriceRangeCount(range)})</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Content - Products */}
+            <div className="flex-1">
+              {/* Products Grid with Subcategory Grouping */}
+              {(() => {
+                // Group products by subcategory
+                const groupedProducts: Record<string, any[]> = {};
+                sortedProducts.forEach(product => {
+                  const subcategory = product.subcategory || 'uncategorized';
+                  if (!groupedProducts[subcategory]) {
+                    groupedProducts[subcategory] = [];
+                  }
+                  groupedProducts[subcategory].push(product);
+                });
+
+                return Object.entries(groupedProducts).map(([subcategory, products]) => (
+                  <div key={subcategory} className="mb-10">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">{subcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
+                    <div className={`grid ${getGridClasses()} gap-6`}>
+                      {products.map((product) => (
+                        <div key={product.id} className="group cursor-pointer">
+                          <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                            <div className="aspect-[4/5] bg-gray-50">
+                              <img
+                                src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="p-4 flex flex-col h-40">
+                              <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors">{product.name}</h3>
+                              <p className="text-gray-600 text-sm mb-3 flex-grow">{product.shortDescription}</p>
+                              <div className="flex justify-between items-center mt-auto">
+                                <span className="text-xl font-bold text-gray-900">R{product.price.toFixed(2)}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    // Add to cart logic would go here
+                                    console.log('Add to cart:', product.name);
+                                  }}
+                                  className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center"
+                                  title="Add to Cart"
+                                >
+                                  <ShoppingCart className="h-4 w-4 mr-1" />
+                                  <span className="text-sm">Add</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
 
           {/* Empty State */}
           {sortedProducts.length === 0 && (

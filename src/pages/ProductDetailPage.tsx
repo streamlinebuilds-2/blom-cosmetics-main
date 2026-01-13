@@ -2085,35 +2085,160 @@ export const ProductDetailPage: React.FC = () => {
         </section>
       )}
 
-        {/* Product Information Accordions - Only show if there's content */}
+        {/* Product Information Tabs - Only show if there's content */}
         {showProductInfo && (
           <section className="section-padding bg-pink-50">
             <Container>
               <div className="max-w-4xl mx-auto">
                 <h2 className="text-3xl font-bold text-center mb-12">Product Information</h2>
-                
-                <div className="space-y-4">
-                  {/* Overview - Only show if has content */}
-                  {hasContent(product.overview) && (
-                    <Card>
-                      <button
-                        onClick={() => toggleAccordion('overview')}
-                        className="w-full p-6 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-                      >
-                        <h3 className="font-semibold text-lg">Overview</h3>
-                        {expandedAccordion === 'overview' ? (
-                          <ChevronUp className="h-5 w-5 text-pink-400" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-pink-400" />
-                        )}
-                      </button>
-                      {expandedAccordion === 'overview' && (
-                        <div className="px-6 pb-6">
-                          <p className="text-gray-600 leading-relaxed">{product.overview}</p>
-                        </div>
+
+                {/* Tabs Interface */}
+                <div className="mt-16">
+                  <div className="border-b border-gray-200">
+                    <div className="flex space-x-8">
+                      {hasContent(product.overview) && (
+                        <button
+                          key="Description"
+                          onClick={() => setActiveTab('Description')}
+                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                            activeTab === 'Description'
+                              ? 'border-black text-black'
+                              : 'border-transparent text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Description
+                        </button>
                       )}
-                    </Card>
-                  )}
+                      {hasContent(product.features) && (
+                        <button
+                          key="Features"
+                          onClick={() => setActiveTab('Features')}
+                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                            activeTab === 'Features'
+                              ? 'border-black text-black'
+                              : 'border-transparent text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Features
+                        </button>
+                      )}
+                      {hasContent(product.howToUse) && (
+                        <button
+                          key="HowToUse"
+                          onClick={() => setActiveTab('HowToUse')}
+                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                            activeTab === 'HowToUse'
+                              ? 'border-black text-black'
+                              : 'border-transparent text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          How to Use
+                        </button>
+                      )}
+                      {hasContent(product.ingredients) && (
+                        <button
+                          key="Ingredients"
+                          onClick={() => setActiveTab('Ingredients')}
+                          className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
+                            activeTab === 'Ingredients'
+                              ? 'border-black text-black'
+                              : 'border-transparent text-gray-500 hover:text-black'
+                          }`}
+                        >
+                          Ingredients
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="py-8 prose max-w-none">
+                    {activeTab === 'Description' && hasContent(product.overview) && (
+                      <div>
+                        <h3 className="font-semibold text-lg mb-4">Overview</h3>
+                        <p className="text-gray-600 leading-relaxed">{product.overview}</p>
+                      </div>
+                    )}
+                    {activeTab === 'Features' && hasContent(product.features) && (
+                      <div>
+                        <h3 className="font-semibold text-lg mb-4">Features & Benefits</h3>
+                        <ul className="space-y-3">
+                          {product.features.map((feature: string, index: number) => (
+                            <li key={index} className="flex items-start gap-3">
+                              <Check className="h-5 w-5 text-pink-400 flex-shrink-0 mt-0.5" />
+                              <span className="text-gray-700">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {activeTab === 'HowToUse' && hasContent(product.howToUse) && (
+                      <div>
+                        <h3 className="font-semibold text-lg mb-4">How to Use</h3>
+                        <ol className="space-y-3">
+                          {product.howToUse.map((step: string, index: number) => (
+                            <li key={index} className="flex items-start gap-3">
+                              <span className="w-6 h-6 bg-pink-400 text-white rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0">
+                                {index + 1}
+                              </span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                    {activeTab === 'Ingredients' && hasContent(product.ingredients) && (
+                      <div>
+                        <h3 className="font-semibold text-lg mb-4">Ingredients</h3>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <div>
+                            <h4 className="font-medium mb-3">INCI Names:</h4>
+                            <ul className="space-y-2">
+                              {(() => {
+                                const inciData = product.ingredients?.inci;
+                                if (!inciData || (Array.isArray(inciData) && inciData.length === 0)) {
+                                  return <li className="text-sm text-gray-500">No INCI ingredients available</li>;
+                                }
+                                if (Array.isArray(inciData)) {
+                                  return inciData.map((ingredient: string, index: number) => (
+                                    <li key={index} className="flex items-center gap-2">
+                                      <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
+                                      <span className="text-sm">{ingredient}</span>
+                                    </li>
+                                  ));
+                                }
+                                return (
+                                  <li className="text-sm">
+                                    {typeof inciData === 'string' ? inciData : String(inciData)}
+                                  </li>
+                                );
+                              })()}
+                            </ul>
+                          </div>
+                          <div>
+                            <h4 className="font-medium mb-3">Key Ingredients:</h4>
+                            <ul className="space-y-2">
+                              {(() => {
+                                const keyData = product.ingredients?.key;
+                                if (!keyData || (Array.isArray(keyData) && keyData.length === 0)) {
+                                  return <li className="text-sm text-gray-500">No key ingredients available</li>;
+                                }
+                                if (Array.isArray(keyData)) {
+                                  return keyData.map((ingredient: string, index: number) => (
+                                    <li key={index} className="text-sm text-gray-600">{ingredient}</li>
+                                  ));
+                                }
+                                return (
+                                  <li className="text-sm text-gray-600">
+                                    {typeof keyData === 'string' ? keyData : String(keyData)}
+                                  </li>
+                                );
+                              })()}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
                   {/* Features & Benefits - Only show if has content */}
                   {hasContent(product.features) && (
@@ -2512,7 +2637,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </Container>
       </section>
-     )}
+    )}
 
         {/* Related Products */}
         <section className="section-padding">
