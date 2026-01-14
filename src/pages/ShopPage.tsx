@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { cartStore } from '../lib/cart';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -12,21 +13,37 @@ import { supabase } from '../lib/supabase';
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'single' | 'grid' | 'compact'>(() => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth < 768 ? 'single' : 'compact';
+      // Default to single column on mobile, grid on tablet, compact (3x3) on desktop
+      if (window.innerWidth >= 1024) return 'compact';
+      if (window.innerWidth >= 768) return 'grid';
+      return 'single';
     }
-    return 'compact';
+    return 'single'; // Default for SSR
   });
 
-  // Update viewMode to use 3x3 grid as default on desktop
+  // Update viewMode based on screen size
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const isDesktop = window.innerWidth >= 1024;
-      if (isDesktop && viewMode === 'compact') {
-        setViewMode('grid-3x3');
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width >= 1024) {
+        setViewMode('compact');
+      } else if (width >= 768) {
+        setViewMode('grid');
+      } else {
+        setViewMode('single');
       }
-    }
-  }, [viewMode]);
+    };
+
+    // Initial check
+    handleResize();
+
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
@@ -1022,19 +1039,14 @@ export const ShopPage: React.FC = () => {
 
   const getGridClasses = () => {
     switch (viewMode) {
-      case 'grid-3':
-        // On mobile show 2 columns, tablet 2, desktop 3
-        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
-      case 'grid-2':
-        // On mobile show 2 columns, tablet+ show 2 columns
-        return 'grid-cols-2 sm:grid-cols-2';
-      case 'list':
+      case 'single':
         return 'grid-cols-1';
-      case 'grid-3x3':
-        // On mobile show 2 columns, tablet 2, desktop 3
+      case 'grid':
+        return 'grid-cols-2 sm:grid-cols-2';
+      case 'compact':
         return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
       default:
-        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
+        return 'grid-cols-1';
     }
   };
 
@@ -1105,12 +1117,31 @@ export const ShopPage: React.FC = () => {
                  </span>
                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                    <button
-                     onClick={() => setViewMode('grid-2')}
+                     onClick={() => setViewMode('single')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
+                     title="Single column view"
+                   >
+                     <List className="h-3 w-3" />
+                   </button>
+                   <button
+                     onClick={() => setViewMode('grid')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'grid' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                     title="Grid view (2x2)"
                    >
                      <Grid2X2 className="h-3 w-3" />
+                   </button>
+                   <button
+                     onClick={() => setViewMode('compact')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                     title="Compact view (3x3)"
+                   >
+                     <Grid3X3 className="h-3 w-3" />
                    </button>
                  </div>
                </div>
@@ -1142,28 +1173,31 @@ export const ShopPage: React.FC = () => {
                  </span>
                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                    <button
-                     onClick={() => setViewMode('grid-3')}
+                     onClick={() => setViewMode('single')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
+                     title="Single column view"
                    >
-                     <Grid3X3 className="h-3 w-3" />
+                     <List className="h-3 w-3" />
                    </button>
                    <button
-                     onClick={() => setViewMode('grid-2')}
+                     onClick={() => setViewMode('grid')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'grid' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
+                     title="Grid view (2x2)"
                    >
                      <Grid2X2 className="h-3 w-3" />
                    </button>
                    <button
-                     onClick={() => setViewMode('list')}
+                     onClick={() => setViewMode('compact')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
+                     title="Compact view (3x3)"
                    >
-                     <List className="h-3 w-3" />
+                     <Grid3X3 className="h-3 w-3" />
                    </button>
                  </div>
                </div>
@@ -1426,59 +1460,13 @@ export const ShopPage: React.FC = () => {
                   const productsInCategory = groupedProducts[selectedCategory] || [];
                   return (
                     <div key={selectedCategory} className="mb-10">
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
+                      <div className={`grid ${getGridClasses()} gap-6 sm:gap-8`}>
                         {productsInCategory.map((product) => (
-                          <div key={product.id} className="group flex flex-col">
-                            <a href={`/products/${product.slug}`} className="block relative aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden mb-3">
-                              <img
-                                src={product.images[0]}
-                                alt={product.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                loading="lazy"
-                              />
-                              {!product.inStock && (
-                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                                  <span className="bg-black text-white text-[10px] font-bold px-2 py-1 rounded">SOLD OUT</span>
-                                </div>
-                              )}
-                            </a>
-
-                            {/* Content - Removed Description as requested */}
-                            <div className="flex flex-col flex-1">
-                              <a href={`/products/${product.slug}`} className="block">
-                                <h3 className="text-sm font-bold text-gray-900 leading-tight mb-1 line-clamp-2 min-h-[2.5em]">
-                                  {product.name}
-                                </h3>
-                              </a>
-                              
-                              <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-                                <span className="text-sm font-bold text-gray-900 whitespace-nowrap">
-                                  R{product.price.toFixed(2)}
-                                </span>
-                                
-                                <button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (!product.inStock) return;
-                                    
-                                    cartStore.addItem({
-                                      id: product.id,
-                                      productId: product.id,
-                                      name: product.name,
-                                      price: product.price,
-                                      image: product.images[0],
-                                      quantity: 1
-                                    });
-                                  }}
-                                  disabled={!product.inStock}
-                                  className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:scale-110 transition-transform active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                                >
-                                  <ShoppingCart className="w-4 h-4" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                          <ProductCard
+                            key={product.id}
+                            {...product}
+                            isListView={viewMode === 'single'}
+                          />
                         ))}
                       </div>
                     </div>
@@ -1489,59 +1477,13 @@ export const ShopPage: React.FC = () => {
                 return Object.entries(groupedProducts).map(([category, products]) => (
                   <div key={category} className="mb-10">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">{category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
+                    <div className={`grid ${getGridClasses()} gap-6 sm:gap-8`}>
                       {products.map((product) => (
-                        <div key={product.id} className="group flex flex-col">
-                          <a href={`/products/${product.slug}`} className="block relative aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden mb-3">
-                            <img
-                              src={product.images[0]}
-                              alt={product.name}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                              loading="lazy"
-                            />
-                            {!product.inStock && (
-                              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
-                                <span className="bg-black text-white text-[10px] font-bold px-2 py-1 rounded">SOLD OUT</span>
-                              </div>
-                            )}
-                          </a>
-
-                          {/* Content - Removed Description as requested */}
-                          <div className="flex flex-col flex-1">
-                            <a href={`/products/${product.slug}`} className="block">
-                              <h3 className="text-sm font-bold text-gray-900 leading-tight mb-1 line-clamp-2 min-h-[2.5em]">
-                                {product.name}
-                              </h3>
-                            </a>
-                            
-                            <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-gray-900 whitespace-nowrap">
-                                R{product.price.toFixed(2)}
-                              </span>
-                              
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  if (!product.inStock) return;
-                                  
-                                  cartStore.addItem({
-                                    id: product.id,
-                                    productId: product.id,
-                                    name: product.name,
-                                    price: product.price,
-                                    image: product.images[0],
-                                    quantity: 1
-                                  });
-                                }}
-                                disabled={!product.inStock}
-                                className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:scale-110 transition-transform active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
-                              >
-                                <ShoppingCart className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        <ProductCard
+                          key={product.id}
+                          {...product}
+                          isListView={viewMode === 'single'}
+                        />
                       ))}
                     </div>
                   </div>
