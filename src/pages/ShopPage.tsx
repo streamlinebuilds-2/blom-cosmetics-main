@@ -14,14 +14,8 @@ export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'single' | 'grid' | 'compact'>(() => {
-    if (typeof window !== 'undefined') {
-      // Default to single column on mobile, grid on tablet, compact (3x3) on desktop
-      if (window.innerWidth >= 1024) return 'compact';
-      if (window.innerWidth >= 768) return 'grid';
-      return 'single';
-    }
-    return 'single'; // Default for SSR
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'single' | 'compact'>(() => {
+    return 'grid'; // Default to grid view
   });
 
   // Update viewMode based on screen size
@@ -29,11 +23,11 @@ export const ShopPage: React.FC = () => {
     const handleResize = () => {
       const width = window.innerWidth;
       if (width >= 1024) {
-        setViewMode('compact');
+        setViewMode('grid');
       } else if (width >= 768) {
         setViewMode('grid');
       } else {
-        setViewMode('single');
+        setViewMode('list');
       }
     };
 
@@ -212,23 +206,6 @@ export const ShopPage: React.FC = () => {
       inStock: true,
       variants: []
     },
-    {
-      id: '8',
-      name: 'Acetone (Remover)',
-      slug: 'acetone-remover',
-      price: 60,
-      compareAtPrice: undefined,
-      short_description: 'Professional-grade, fast acting nail remover.',
-      shortDescription: 'Professional-grade, fast acting nail remover.',
-      description: 'Professional acetone for fast and effective nail polish removal.',
-      images: ['/acetone-remover-white.webp', '/acetone-remover-colorful.webp'],
-      category: 'archived',
-      rating: 0,
-      reviews: 112,
-      badges: [],
-      inStock: false,
-      variants: []
-    },
 
     // Coming Soon Products (Prices TBA) - HIDDEN
     // {
@@ -349,25 +326,6 @@ export const ShopPage: React.FC = () => {
       inStock: true,
       variants: [
         { name: '10mm', price: 320, inStock: true }
-      ]
-    },
-    {
-      id: '17',
-      name: 'Glitter Acrylic',
-      slug: 'glitter-acrylic',
-      price: 250,
-      compareAtPrice: undefined,
-      short_description: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
-      shortDescription: 'Opalescent crushed-ice acrylic blend with prismatic shimmer.',
-      description: 'This glitter-acrylic blend looks like a soft, opalescent crushed-ice mix — a dreamy combination of translucent and iridescent shards suspended in clear acrylic. Features fine to medium reflective flakes that shift between white-silver, icy blue, and lilac hues.',
-      images: ['/glitter-acrylic-white.webp', '/glitter-acrylic-colorful.webp'],
-      category: 'archived',
-      rating: 4.8,
-      reviews: 156,
-      badges: ['Archived'],
-      inStock: false,
-      variants: [
-        { name: '56g', price: 250, inStock: false }
       ]
     },
     // Furniture Products
@@ -1141,11 +1099,11 @@ export const ShopPage: React.FC = () => {
                      <Grid2X2 className="h-3 w-3" />
                    </button>
                    <button
-                     onClick={() => setViewMode('compact')}
+                     onClick={() => setViewMode('single')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
-                     title="Compact view (3x3)"
+                     title="Single view"
                    >
                      <Grid3X3 className="h-3 w-3" />
                    </button>
@@ -1168,9 +1126,9 @@ export const ShopPage: React.FC = () => {
                  </button>
                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                    <button
-                     onClick={() => setViewMode('single')}
+                     onClick={() => setViewMode('list')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
                    >
                      <List className="h-3 w-3" />
@@ -1184,9 +1142,9 @@ export const ShopPage: React.FC = () => {
                      <Grid2X2 className="h-3 w-3" />
                    </button>
                    <button
-                     onClick={() => setViewMode('compact')}
+                     onClick={() => setViewMode('single')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
                    >
                      <Grid3X3 className="h-3 w-3" />
@@ -1467,7 +1425,7 @@ export const ShopPage: React.FC = () => {
                           <ProductCard
                             key={product.id}
                             {...product}
-                            isListView={viewMode === 'single'}
+                            isListView={viewMode === 'list'}
                           />
                         ))}
                       </div>
@@ -1484,7 +1442,7 @@ export const ShopPage: React.FC = () => {
                         <ProductCard
                           key={product.id}
                           {...product}
-                          isListView={viewMode === 'single'}
+                          isListView={viewMode === 'list'}
                         />
                       ))}
                     </div>
