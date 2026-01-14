@@ -455,52 +455,52 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Content */}
-        <div className="p-3 sm:p-4 md:p-6 text-center flex flex-col items-center">
-          {/* Product Name */}
-          <h3 className="font-bold text-lg sm:text-xl md:text-2xl mb-2 text-black group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem]">
-            {safeName}
-          </h3>
- 
-          {/* Short Description - ALWAYS SHOW */}
-          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed">
-            {safeShortDescription}
-          </p>
- 
-          {/* Price - Centered */}
-          <div className="mb-2">
-            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-black">
-              {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
-            </span>
-            {compareAtPrice && (
-              <div className="mt-1">
-                <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
-                  {formatPrice(compareAtPrice)}
-                </span>
-                <span className="ml-2 text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
-                  {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
-                </span>
-              </div>
-            )}
-          </div>
- 
-          {/* Add to Cart Button - Centered */}
-          <div className="mt-2 w-full max-w-[200px]">
-            <button
-              type="button"
-              onClick={hasVariants ? handleCardClick : handleAddToCart}
-              disabled={!inStock || price === -1}
-              className={`w-full flex items-center justify-center gap-2 py-3 px-6 rounded-full font-bold text-sm sm:text-base uppercase transition-all duration-200 ${
-                inStock && price !== -1
-                  ? 'bg-pink-500 text-white hover:bg-pink-600 active:scale-95'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-              aria-disabled={!inStock || price === -1}
-            >
-              <ShoppingCart className="h-4 w-4" />
-              {price === -1 ? 'COMING SOON' : inStock ? (hasVariants ? 'SELECT OPTIONS' : 'ADD TO CART') : 'OUT OF STOCK'}
-            </button>
-          </div>
-        </div>
+         <div className="p-3 sm:p-4 md:p-6 text-center flex flex-col items-center">
+           {/* Product Name */}
+           <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl mb-2 text-gray-900 group-hover:text-pink-500 transition-colors line-clamp-2 min-h-[2.5rem]">
+             {safeName}
+           </h3>
+   
+           {/* Short Description - ALWAYS SHOW */}
+           <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 md:mb-4 line-clamp-2 leading-relaxed">
+             {safeShortDescription}
+           </p>
+   
+           {/* Price - Centered */}
+           <div className="mb-2">
+             <span className="text-2xl sm:text-3xl md:text-4xl font-semibold text-gray-900">
+               {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
+             </span>
+             {compareAtPrice && (
+               <div className="mt-1">
+                 <span className="text-sm sm:text-base md:text-lg text-gray-400 line-through">
+                   {formatPrice(compareAtPrice)}
+                 </span>
+                 <span className="ml-2 text-xs font-semibold text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
+                   {Math.round(((compareAtPrice - price) / compareAtPrice) * 100)}% OFF
+                 </span>
+               </div>
+             )}
+           </div>
+   
+           {/* Add to Cart Button - Centered */}
+           <div className="mt-2 w-full max-w-[200px]">
+             <button
+               type="button"
+               onClick={hasVariants ? handleCardClick : handleAddToCart}
+               disabled={!inStock || price === -1}
+               className={`w-full flex items-center justify-center gap-2 py-4 px-8 rounded-full font-bold text-base sm:text-lg md:text-xl uppercase transition-all duration-200 ${
+                 inStock && price !== -1
+                   ? 'bg-pink-500 text-white hover:bg-pink-600 active:scale-95'
+                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+               }`}
+               aria-disabled={!inStock || price === -1}
+             >
+               <ShoppingCart className="h-4 w-4" />
+               {price === -1 ? 'COMING SOON' : inStock ? (hasVariants ? 'SELECT OPTIONS' : 'ADD TO CART') : 'OUT OF STOCK'}
+             </button>
+           </div>
+         </div>
       </article>
 
       {/* CSS Styles */}

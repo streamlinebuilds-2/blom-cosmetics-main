@@ -1065,102 +1065,91 @@ export const ShopPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Professional Autocomplete Search */}
-          <AutocompleteSearch
-            products={allProducts}
-            onSearchChange={setSearchTerm}
-            searchTerm={searchTerm}
-            placeholder="Search products... (try 'brush', 'acrylic', 'primer')"
-            className="mb-6"
-          />
-
-          {/* Removed top category pills as requested */}
-
-          {/* Sticky Filter Bar - Mobile Optimized */}
-          <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
-            <div className="flex items-center justify-between gap-2">
-              {/* Left: Sort & Filter */}
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
-                      >
-                  <Filter className="h-4 w-4" />
-                  <span className="hidden sm:inline font-medium">Filters</span>
-                  <ChevronDown className={`h-4 w-4 transition-transform ${showFilters ? 'rotate-180' : ''}`} />
-                      </button>
-
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                  className="px-2 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none min-w-0 flex-1"
-                    >
-                      {sortOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                      Sort: {option.label}
-                        </option>
-                      ))}
-                    </select>
-              </div>
-
-              {/* Right: View Toggle & Count */}
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 hidden lg:block">
-                  {sortedProducts.length} of {allProducts.length}
-                </span>
-                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                      <button
-                        onClick={() => setViewMode('grid-3')}
-                    className={`p-1.5 rounded-md transition-colors ${
-                      viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                      >
-                    <Grid3X3 className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('grid-2')}
-                    className={`p-1.5 rounded-md transition-colors ${
-                      viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                      >
-                    <Grid2X2 className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('list')}
-                    className={`p-1.5 rounded-md transition-colors ${
-                      viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                      >
-                    <List className="h-3 w-3" />
-                      </button>
-                </div>
-
-                {/* Catalogue Buttons */}
-                <div className="flex items-center gap-2 ml-2">
-                  <button
-                    onClick={() => window.open('https://heyzine.com/flip-book/6d112b7bc1.html', '_blank')}
-                    className="flex items-center gap-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-                    title="View Catalogue Online"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    <span className="hidden sm:inline">Catalogue</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = '/catalogue.pdf';
-                      link.download = 'BLOM-Catalogue.pdf';
-                      link.click();
-                    }}
-                    className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                    title="Download Catalogue PDF"
-                  >
-                    <Download className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+           {/* Professional Autocomplete Search */}
+           <AutocompleteSearch
+             products={allProducts}
+             onSearchChange={setSearchTerm}
+             searchTerm={searchTerm}
+             placeholder="Search products... (try 'brush', 'acrylic', 'primer')"
+             className="mb-6 mx-auto max-w-2xl"
+           />
+           
+           {/* Sticky Filter Bar - Mobile Optimized */}
+           <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
+             <div className="flex items-center justify-between gap-2">
+               {/* Left: Sort & Filter */}
+               <div className="flex items-center gap-2 min-w-0 flex-1">
+                 <select
+                   value={sortBy}
+                   onChange={(e) => setSortBy(e.target.value)}
+                   className="px-2 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none min-w-0 flex-1"
+                 >
+                   {sortOptions.map((option) => (
+                     <option key={option.value} value={option.value}>
+                       Sort: {option.label}
+                     </option>
+                   ))}
+                 </select>
+               </div>
+               
+               {/* Right: View Toggle & Count */}
+               <div className="flex items-center gap-2">
+                 <span className="text-xs text-gray-500 hidden lg:block">
+                   {sortedProducts.length} of {allProducts.length}
+                 </span>
+                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                   <button
+                     onClick={() => setViewMode('grid-3')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                   >
+                     <Grid3X3 className="h-3 w-3" />
+                   </button>
+                   <button
+                     onClick={() => setViewMode('grid-2')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                   >
+                     <Grid2X2 className="h-3 w-3" />
+                   </button>
+                   <button
+                     onClick={() => setViewMode('list')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                   >
+                     <List className="h-3 w-3" />
+                   </button>
+                 </div>
+                 
+                 {/* Catalogue Buttons */}
+                 <div className="flex items-center gap-2 ml-2">
+                   <button
+                     onClick={() => window.open('https://heyzine.com/flip-book/6d112b7bc1.html', '_blank')}
+                     className="flex items-center gap-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-black transition-colors text-sm font-medium"
+                     title="View Catalogue Online"
+                   >
+                     <BookOpen className="h-4 w-4" />
+                     <span className="hidden sm:inline">Catalogue</span>
+                   </button>
+                   <button
+                     onClick={() => {
+                       const link = document.createElement('a');
+                       link.href = '/catalogue.pdf';
+                       link.download = 'BLOM-Catalogue.pdf';
+                       link.click();
+                     }}
+                     className="p-2 border border-gray-300 text-gray-700 rounded-lg hover:border-black transition-colors"
+                     title="Download Catalogue PDF"
+                   >
+                     <Download className="h-4 w-4" />
+                   </button>
+                 </div>
+               </div>
+             </div>
+           </div>
 
           {/* Floating Filter Button for Mobile */}
           <button
@@ -1301,6 +1290,33 @@ export const ShopPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Sidebar - Filters */}
             <div className="w-64 flex-shrink-0 pr-8 hidden lg:block">
+              {/* Sort By - Added as requested */}
+              <div className="mb-8">
+                <h3 className="font-bold text-xl mb-4">Sort By</h3>
+                <div className="space-y-2">
+                  {sortOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
+                        sortBy === option.value
+                          ? 'bg-pink-100 border-l-4 border-pink-500'
+                          : 'hover:bg-gray-50'
+                      }`}
+                      onClick={() => setSortBy(option.value)}
+                    >
+                      <div className="mr-3">
+                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${sortBy === option.value ? 'border-black bg-black' : 'border-gray-300'}`}>
+                          {sortBy === option.value && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                        </div>
+                      </div>
+                      <span className={`${sortBy === option.value ? 'font-bold text-black' : 'text-gray-700'}`}>
+                        {option.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Categories - Updated with bigger, bolder heading and scrollable */}
               <div className="mb-8">
                 <h3 className="font-bold text-xl mb-4">Categories</h3>
@@ -1373,7 +1389,7 @@ export const ShopPage: React.FC = () => {
                     <div className={`grid ${getGridClasses()} gap-6`}>
                       {products.map((product) => (
                         <div key={product.id} className="group">
-                          <a href={`/product/${product.slug}`} className="block">
+                          <a href={`/products/${product.slug}`} className="block">
                             <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
                               <div className="aspect-[4/5] bg-gray-50">
                                 <img
