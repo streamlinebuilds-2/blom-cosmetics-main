@@ -26,6 +26,16 @@ export const ShopPage: React.FC = () => {
     { value: 'grid-2', label: '2x2 Grid', icon: Grid2X2 },
     { value: 'list', label: 'List', icon: List }
   ];
+
+  // Update viewMode to use 3x3 grid as default on desktop
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop && viewMode === 'grid-3') {
+        setViewMode('grid-3x3');
+      }
+    }
+  }, [viewMode]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
@@ -1068,9 +1078,9 @@ export const ShopPage: React.FC = () => {
       <main className="pt-8 pb-16">
         <Container>
           {/* Page Header */}
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Shop</h1>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-lg max-w-3xl mx-auto">
               Discover our premium collection of professional nail care products, acrylic systems, and tools.
               High-quality products trusted by nail artists and beauty professionals worldwide.
             </p>
@@ -1163,30 +1173,6 @@ export const ShopPage: React.FC = () => {
                      }`}
                    >
                      <List className="h-3 w-3" />
-                   </button>
-                 </div>
-                 
-                 {/* Catalogue Buttons */}
-                 <div className="flex items-center gap-2 ml-2">
-                   <button
-                     onClick={() => window.open('https://heyzine.com/flip-book/6d112b7bc1.html', '_blank')}
-                     className="flex items-center gap-1 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:border-black transition-colors text-sm font-medium"
-                     title="View Catalogue Online"
-                   >
-                     <BookOpen className="h-4 w-4" />
-                     <span className="hidden sm:inline">Catalogue</span>
-                   </button>
-                   <button
-                     onClick={() => {
-                       const link = document.createElement('a');
-                       link.href = '/catalogue.pdf';
-                       link.download = 'BLOM-Catalogue.pdf';
-                       link.click();
-                     }}
-                     className="p-2 border border-gray-300 text-gray-700 rounded-lg hover:border-black transition-colors"
-                     title="Download Catalogue PDF"
-                   >
-                     <Download className="h-4 w-4" />
                    </button>
                  </div>
                </div>
