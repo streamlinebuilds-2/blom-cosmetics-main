@@ -10,7 +10,7 @@ import { PageLoadingSpinner } from '../components/ui/LoadingSpinner';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [product, setProduct] = useState(null);
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('details');
@@ -227,5 +227,6 @@ export const ProductDetailPage: React.FC = () => {
         </div>
       </Container>
     </main>
+  );
   );
 };
