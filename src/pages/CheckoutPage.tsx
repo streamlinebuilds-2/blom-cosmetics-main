@@ -1110,17 +1110,16 @@ export const CheckoutPage: React.FC = () => {
                       )}
 
                       <div className="flex flex-col sm:flex-row justify-between gap-3">
+                        <Button type="submit" size="lg" className="w-full sm:w-auto">
+                          <span className="text-xs sm:text-sm">Continue to Payment</span>
+                        </Button>
                         <Button
                           type="button"
                           variant="outline"
                           className="w-full sm:w-auto"
                           onClick={() => window.location.href = '/shop'}
                         >
-                          <ArrowLeft className="h-4 w-4 mr-1 sm:mr-2" />
                           <span className="text-xs sm:text-sm">Continue Shopping</span>
-                        </Button>
-                        <Button type="submit" size="lg" className="w-full sm:w-auto">
-                          <span className="text-xs sm:text-sm">Continue to Payment</span>
                         </Button>
                       </div>
                     </form>

@@ -1067,6 +1067,7 @@ export const ShopPage: React.FC = () => {
           </div>
 
            {/* Professional Autocomplete Search */}
+           {/* Simplified Search Bar */}
            <div className="mb-6 mx-auto max-w-2xl">
              <div className="relative">
                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -1074,8 +1075,8 @@ export const ShopPage: React.FC = () => {
                  type="text"
                  value={searchTerm}
                  onChange={(e) => setSearchTerm(e.target.value)}
-                 placeholder="Search products... (try 'brush', 'acrylic', 'primer')"
-                 className="w-full rounded-lg border border-gray-200 py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                 placeholder="Search products..."
+                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none text-lg"
                />
              </div>
            </div>
