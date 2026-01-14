@@ -12,25 +12,17 @@ import { supabase } from '../lib/supabase';
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list' | 'grid-3x3'>(() => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth < 768 ? 'list' : 'grid-3';
+      return window.innerWidth < 768 ? 'single' : 'compact';
     }
-    return 'grid-3';
+    return 'compact';
   });
-
-  // Remove old view options and add 3x3 grid view
-  const viewOptions = [
-    { value: 'grid-3', label: '3x3 Grid', icon: Grid3X3 },
-    { value: 'grid-2', label: '2x2 Grid', icon: Grid2X2 },
-    { value: 'list', label: 'List', icon: List }
-  ];
 
   // Update viewMode to use 3x3 grid as default on desktop
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const isDesktop = window.innerWidth >= 1024;
-      if (isDesktop && viewMode === 'grid-3') {
+      if (isDesktop && viewMode === 'compact') {
         setViewMode('grid-3x3');
       }
     }
