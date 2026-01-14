@@ -58,7 +58,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Essential prep duo - Dehydrator & Primer - save R40!',
       description: 'Perfect nail preparation starts here. Get both our Prep Solution and Vitamin Primer together and save.',
       images: ['/bundle-prep-primer-white.webp', '/bundle-prep-primer-colorful.webp'],
-      category: 'bundle-deals',
+      categories: ['bundle-deals', 'prep-finishing', 'acrylic-system'],
       subcategory: 'bundles',
       rating: 0,
       reviews: 0,
@@ -81,7 +81,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'A nourishing blend that deeply hydrates and softens cuticles while promoting healthy nail growth.',
       description: 'A nourishing blend that deeply hydrates and softens cuticles while promoting healthy nail growth. Lightweight, fast-absorbing, and enriched with restorative oils, it leaves nails and skin feeling smooth, conditioned, and beautifully cared for.',
       images: ['/cuticle-oil-white.webp', '/cuticle-oil-colorful.webp'],
-      category: 'prep-finishing',
+      categories: ['prep-finishing', 'tools-essentials'],
       subcategory: 'finishing',
       rating: 0,
       reviews: 0,
@@ -105,7 +105,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Strengthens bond between natural nail and product — essential for long-lasting wear.',
       description: 'Strengthens bond between natural nail and product — essential for long-lasting wear.',
       images: ['/vitamin-primer-white.webp', '/vitamin-primer-colorful.webp'],
-      category: 'prep-finishing',
+      categories: ['prep-finishing', 'gel-system'],
       subcategory: 'prep',
       rating: 0,
       reviews: 0,
@@ -123,7 +123,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Removes oils and moisture from the nail surface for better product adhesion and long-lasting results.',
       description: 'Removes oils and moisture from the nail surface for better product adhesion and long-lasting results.',
       images: ['/prep-solution-white.webp', '/prep-solution-colorful.webp'],
-      category: 'prep-finishing',
+      categories: ['prep-finishing', 'tools-essentials', 'gel-system'],
       subcategory: 'prep',
       rating: 0,
       reviews: 0,
@@ -141,7 +141,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'A crystal-clear, high-shine finish that seals and protects your nail art without leaving a sticky layer.',
       description: 'A crystal-clear, high-shine finish that seals and protects your nail art without leaving a sticky layer. Long-lasting, scratch-resistant, and easy to use — perfect for a flawless, glossy look every time.',
       images: ['/top-coat-white.webp', '/top-coat-colorful.webp'],
-      category: 'gel-system',
+      categories: ['gel-system', 'acrylic-system'],
       subcategory: 'top-coats',
       rating: 0,
       reviews: 201,
@@ -159,7 +159,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'A dazzling, non-wipe top coat infused with fine sparkles that adds a touch of glamour to any set.',
       description: 'A dazzling, non-wipe top coat infused with fine sparkles that adds a touch of glamour to any set. Provides long-lasting shine, strength, and protection while giving nails a radiant, shimmering finish.',
       images: ['/fairy-dust-top-coat-white.webp', '/fairy-dust-top-coat-colorful.webp'],
-      category: 'gel-system',
+      categories: ['gel-system', 'acrylic-system'],
       subcategory: 'top-coats',
       rating: 0,
       reviews: 0,
@@ -177,7 +177,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Durable nail files for professional shaping and smoothing.',
       description: 'Durable nail files for professional shaping and smoothing.',
       images: ['/nail-file-white.webp', '/nail-file-colorful.webp'],
-      category: 'tools-essentials',
+      categories: ['tools-essentials', 'prep-finishing', 'acrylic-system'],
       subcategory: 'files',
       rating: 0,
       reviews: 0,
@@ -198,7 +198,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Super sturdy and strong nail forms for acrylic and gel applications.',
       description: 'Super sturdy and strong nail forms for acrylic and gel applications.',
       images: ['/nail-forms-white.webp', '/nail-forms-colorful.webp'],
-      category: 'tools-essentials',
+      categories: ['tools-essentials', 'prep-finishing', 'acrylic-system'],
       subcategory: 'forms',
       rating: 0,
       reviews: 0,
@@ -300,7 +300,7 @@ export const ShopPage: React.FC = () => {
       shortDescription: 'Premium Kolinsky brush with floating glitter handle.',
       description: 'Premium 100% Kolinsky brush with floating glitter handle for professional acrylic work.',
       images: ['/acrylic-sculpture-brush-white.webp', '/acrylic-sculpture-brush-colorful.webp'],
-      category: 'tools-essentials',
+      categories: ['tools-essentials', 'acrylic-system'],
       rating: 0,
       reviews: 23,
       badges: [],
@@ -651,11 +651,38 @@ export const ShopPage: React.FC = () => {
           }
           
           // Regular product
+          // Start with base category and add cross-categorization
+          const baseCategory = normalizeCategoryToSlug(p.category || 'all');
+          const categories = [baseCategory];
+
+          // Add cross-categorization based on product name and type
+          const productNameLower = (p.name || '').toLowerCase();
+
+          // Brushes and tools
+          if (productNameLower.includes('brush') || productNameLower.includes('file') || productNameLower.includes('form')) {
+            if (!categories.includes('tools-essentials')) categories.push('tools-essentials');
+          }
+
+          // Prep products
+          if (productNameLower.includes('prep') || productNameLower.includes('primer') || productNameLower.includes('dehydrator')) {
+            if (!categories.includes('prep-finishing')) categories.push('prep-finishing');
+          }
+
+          // Acrylic products
+          if (productNameLower.includes('acrylic') || productNameLower.includes('monomer') || productNameLower.includes('liquid')) {
+            if (!categories.includes('acrylic-system')) categories.push('acrylic-system');
+          }
+
+          // Gel products
+          if (productNameLower.includes('gel') || productNameLower.includes('top coat') || productNameLower.includes('base coat')) {
+            if (!categories.includes('gel-system')) categories.push('gel-system');
+          }
+
           return {
             id: p.id,
             name: p.name,
             slug: p.slug,
-            category: normalizeCategoryToSlug(p.category || 'all'),
+            categories: categories,
 
             // Price - check all variations
             price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
@@ -675,7 +702,7 @@ export const ShopPage: React.FC = () => {
             // We insert hover_image at index 1 for the card flip effect
             images: [
               p.thumbnail_url || p.image_main || p.image_url,
-              p.hover_image || p.hover_url, 
+              p.hover_image || p.hover_url,
               ...(p.gallery_urls || p.image_gallery || p.gallery || [])
             ].filter(Boolean),
 
@@ -778,6 +805,20 @@ export const ShopPage: React.FC = () => {
           bundleProducts: bundle.bundle_products || [] // Will be populated if needed
         }));
 
+        // Ensure all products have categories arrays (for static products that might not have been updated)
+        const ensureCategories = (products: any[]) => {
+          return products.map(product => {
+            if (!product.categories && product.category) {
+              // Convert single category to array
+              return { ...product, categories: [product.category] };
+            }
+            return product;
+          });
+        };
+
+        // Apply categories to all products
+        const combinedProductsWithCategories = ensureCategories([...uniqueStaticProducts, ...mappedProducts, ...mappedBundles]);
+
         // Merge DB products with static products
         // We prioritize DB products if they exist, checking by slug
         const dbProductSlugs = new Set([...mappedProducts, ...mappedBundles].map(p => p.slug));
@@ -792,7 +833,20 @@ export const ShopPage: React.FC = () => {
         if (combinedProducts.length === 0) {
            setDisplayProducts(staticProducts);
         } else {
-           setDisplayProducts(combinedProducts);
+           // Ensure all products have categories arrays (for static products that might not have been updated)
+           const ensureCategories = (products: any[]) => {
+             return products.map(product => {
+               if (!product.categories && product.category) {
+                 // Convert single category to array
+                 return { ...product, categories: [product.category] };
+               }
+               return product;
+             });
+           };
+
+           // Apply categories to all products
+           const combinedProductsWithCategories = ensureCategories(combinedProducts);
+           setDisplayProducts(combinedProductsWithCategories);
         }
       } catch (err: any) {
         console.error('Error loading database products:', err);
@@ -883,11 +937,11 @@ export const ShopPage: React.FC = () => {
   // Helper to count products in price range
   const filteredWithoutPriceRange = useMemo(() => {
     return allProducts.filter((product: any) => {
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || (product.categories && product.categories.includes(selectedCategory));
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (product.shortDescription || '').toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
-      const isNotArchived = product.category !== 'archived';
+      const isNotArchived = !product.categories || !product.categories.includes('archived');
       return matchesCategory && matchesSearch && matchesStock && isNotArchived;
     });
   }, [allProducts, selectedCategory, searchTerm, showInStockOnly]);
