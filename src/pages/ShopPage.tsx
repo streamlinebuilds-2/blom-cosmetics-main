@@ -1405,9 +1405,9 @@ export const ShopPage: React.FC = () => {
                                   className="w-full h-full object-cover"
                                 />
                               </div>
-                              <div className="p-4 flex flex-col h-40 text-center">
-                                <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors">{product.name}</h3>
-                                <p className="text-gray-600 text-sm mb-3 flex-grow">{product.shortDescription}</p>
+                              <div className="p-4 flex flex-col h-48 text-center">
+                                <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors line-clamp-2">{product.name}</h3>
+                                <p className="text-gray-600 text-sm mb-3 line-clamp-3">{product.shortDescription}</p>
                                 <div className="flex justify-center items-center mt-2">
                                   <span className="text-xl font-bold text-gray-900 mr-2">R{product.price.toFixed(2)}</span>
                                   <button
@@ -1416,11 +1416,11 @@ export const ShopPage: React.FC = () => {
                                       // Add to cart logic would go here
                                       console.log('Add to cart:', product.name);
                                     }}
-                                    className="bg-pink-400 text-white px-4 py-2 rounded-lg hover:bg-pink-500 transition-colors flex items-center"
+                                    className="bg-pink-400 text-white px-6 py-3 rounded-lg hover:bg-pink-500 transition-colors flex items-center min-w-[100px]"
                                     title="Add to Cart"
                                   >
-                                    <ShoppingCart className="h-4 w-4 mr-1" />
-                                    <span className="text-sm">Add</span>
+                                    <ShoppingCart className="h-5 w-5 mr-1" />
+                                    <span className="text-sm font-medium">Add</span>
                                   </button>
                                 </div>
                               </div>
