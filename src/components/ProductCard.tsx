@@ -170,12 +170,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         onClick={handleCardClick}
       >
         {/* Image Area */}
-        <div className="relative aspect-[4/5] bg-gray-50 overflow-hidden">
+        <div className="relative aspect-square bg-gray-50 overflow-hidden">
           <OptimizedImage
             src={safeImages[0]}
             alt={safeName}
             width={400}
-            height={500}
+            height={400}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           
@@ -195,51 +195,37 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           >
             <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-pink-500 text-pink-500' : 'text-gray-600'}`} />
           </button>
-          
-          {/* Quick Add Button (Slide Up Effect) */}
-          <div className="absolute bottom-4 left-4 right-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hidden md:block">
-            <button
-              onClick={hasVariants ? handleCardClick : handleAddToCart}
-              disabled={!inStock || price === -1}
-              className="w-full bg-pink-500 text-white font-semibold py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-colors flex items-center justify-center gap-2"
-            >
-              <ShoppingCart className="w-4 h-4" />
-              {inStock ? (hasVariants ? 'Select Options' : 'Add to Cart') : 'Out of Stock'}
-            </button>
-          </div>
         </div>
         
         {/* Content Area */}
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-900 mb-1 truncate group-hover:text-pink-500 transition-colors">
+        <div className="p-4 text-center">
+          <h3 className="font-semibold text-gray-900 mb-1">
             {safeName}
           </h3>
           
           {!hideDescription && (
-            <p className="text-sm text-gray-500 line-clamp-2 mb-3 h-10">
+            <p className="text-sm text-gray-500 mb-3 h-10">
               {safeShortDescription}
             </p>
           )}
           
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="font-bold text-lg text-gray-900">
-                {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
+          <div className="flex flex-col items-center gap-3">
+            <span className="font-bold text-lg text-gray-900">
+              {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
+            </span>
+            {compareAtPrice && price !== -1 && (
+              <span className="text-xs text-gray-400 line-through">
+                {formatPrice(compareAtPrice)}
               </span>
-              {compareAtPrice && price !== -1 && (
-                <span className="text-xs text-gray-400 line-through">
-                  {formatPrice(compareAtPrice)}
-                </span>
-              )}
-            </div>
+            )}
             
-            {/* Mobile Add Button (Always Visible) */}
             <button 
               onClick={hasVariants ? handleCardClick : handleAddToCart}
-              className="md:hidden bg-pink-500 text-white p-2 rounded-lg"
               disabled={!inStock}
+              className="bg-pink-500 text-white font-semibold px-6 py-2 rounded-full shadow-lg hover:bg-pink-600 transition-colors flex items-center justify-center gap-2"
             >
               <ShoppingCart className="w-4 h-4" />
+              {inStock ? (hasVariants ? 'Select Options' : 'Add to Cart') : 'Out of Stock'}
             </button>
           </div>
         </div>
