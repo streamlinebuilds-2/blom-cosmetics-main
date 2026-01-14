@@ -174,7 +174,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <>
       <article 
         className={`
-          group relative bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 
+          group relative bg-off-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1
           ${className}
         `}
         onClick={handleCardClick}
