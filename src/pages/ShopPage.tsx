@@ -900,7 +900,10 @@ export const ShopPage: React.FC = () => {
     
     // Process products in priority order to maintain desired sequence
     priorityOrder.forEach(slug => {
-      const productsInCategory = allProducts.filter((product: any) => product.category === slug);
+      const productsInCategory = allProducts.filter((product: any) =>
+        (product.category === slug) ||
+        (product.categories && product.categories.includes(slug))
+      );
       if (productsInCategory.length > 0) {
         const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         cats.set(slug, { name, slug, count: productsInCategory.length });
@@ -910,14 +913,17 @@ export const ShopPage: React.FC = () => {
 
     // 4. Add any remaining categories that aren't in our priority list
     allProducts.forEach((product: any) => {
-      const slug = product.category;
-      if (!slug || slug === 'all' || foundCategories.has(slug)) return;
+      // Get category from either categories array or single category
+      const productCategories = product.categories || (product.category ? [product.category] : []);
+      productCategories.forEach((slug: string) => {
+        if (!slug || slug === 'all' || foundCategories.has(slug)) return;
 
-      if (!cats.has(slug)) {
-        const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        cats.set(slug, { name, slug, count: 0 });
-      }
-      cats.get(slug).count++;
+        if (!cats.has(slug)) {
+          const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          cats.set(slug, { name, slug, count: 0 });
+        }
+        cats.get(slug).count++;
+      });
     });
 
     return Array.from(cats.values());
@@ -942,11 +948,13 @@ export const ShopPage: React.FC = () => {
   // Helper to count products in price range
   const filteredWithoutPriceRange = useMemo(() => {
     return allProducts.filter((product: any) => {
-      const matchesCategory = selectedCategory === 'all' || (product.categories && product.categories.includes(selectedCategory));
+      // Fix category matching to handle both array and string categories
+      const productCategories = product.categories || (product.category ? [product.category] : []);
+      const matchesCategory = selectedCategory === 'all' || productCategories.includes(selectedCategory);
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (product.shortDescription || '').toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
-      const isNotArchived = !product.categories || !product.categories.includes('archived');
+      const isNotArchived = !productCategories.includes('archived');
       return matchesCategory && matchesSearch && matchesStock && isNotArchived;
     });
   }, [allProducts, selectedCategory, searchTerm, showInStockOnly]);
@@ -1439,14 +1447,15 @@ export const ShopPage: React.FC = () => {
             <div className="flex-1">
               {/* Products Grid with Subcategory Grouping */}
               {(() => {
-                // Group products by main category
+                // Group products by main category - handle both array and string categories
                 const groupedProducts: Record<string, any[]> = {};
                 sortedProducts.forEach(product => {
-                  const category = product.category || 'uncategorized';
-                  if (!groupedProducts[category]) {
-                    groupedProducts[category] = [];
+                  // Get the primary category (first from array or single category)
+                  const primaryCategory = product.categories ? product.categories[0] : (product.category || 'uncategorized');
+                  if (!groupedProducts[primaryCategory]) {
+                    groupedProducts[primaryCategory] = [];
                   }
-                  groupedProducts[category].push(product);
+                  groupedProducts[primaryCategory].push(product);
                 });
 
                 // If a specific category is selected, show flat grid
