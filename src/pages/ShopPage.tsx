@@ -15,7 +15,12 @@ export const ShopPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid' | 'single' | 'compact'>(() => {
-    return 'grid'; // Default to grid view
+    // Default view mode based on screen size
+    if (window.innerWidth >= 1024) {
+      return 'compact'; // Desktop: 3x3 grid
+    } else {
+      return 'single'; // Mobile: 1x1 grid
+    }
   });
 
   // Update viewMode based on screen size
@@ -23,11 +28,11 @@ export const ShopPage: React.FC = () => {
     const handleResize = () => {
       const width = window.innerWidth;
       if (width >= 1024) {
-        setViewMode('grid');
-      } else if (width >= 768) {
-        setViewMode('grid');
+        // Desktop: Force 3x3 grid, no options to change
+        setViewMode('compact');
       } else {
-        setViewMode('list');
+        // Mobile: Default to 1x1 grid
+        setViewMode('single');
       }
     };
 
@@ -1052,11 +1057,13 @@ export const ShopPage: React.FC = () => {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'single':
-        return 'grid-cols-1'; // Default for mobile
+        return 'grid-cols-1'; // Mobile: 1x1 grid
       case 'grid':
-        return 'grid-cols-2'; // 2x2 grid
+        return 'grid-cols-2'; // Mobile: 2x2 grid
+      case 'list':
+        return 'grid-cols-1'; // Mobile: List view
       case 'compact':
-        return 'grid-cols-3'; // 3x3 grid
+        return 'grid-cols-3'; // Desktop: 3x3 grid
       default:
         return 'grid-cols-1';
     }
@@ -1065,7 +1072,8 @@ export const ShopPage: React.FC = () => {
   // Get responsive grid classes based on screen size and view mode
   const getResponsiveGridClasses = () => {
     const baseClasses = getGridClasses();
-    return `${baseClasses} sm:${viewMode === 'single' ? 'grid-cols-1' : 'grid-cols-2'} lg:${viewMode === 'compact' ? 'grid-cols-3' : viewMode === 'grid' ? 'grid-cols-2' : 'grid-cols-1'}`;
+    // Desktop always uses 3x3 grid, mobile uses selected view mode
+    return `${baseClasses} sm:${viewMode === 'single' || viewMode === 'list' ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3`;
   };
 
   const clearFilters = () => {
@@ -1133,35 +1141,7 @@ export const ShopPage: React.FC = () => {
                  <span className="text-xs text-gray-500 hidden lg:block">
                    {sortedProducts.length} of {allProducts.length}
                  </span>
-                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                   <button
-                     onClick={() => setViewMode('single')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                     title="Single column view"
-                   >
-                     <List className="h-3 w-3" />
-                   </button>
-                   <button
-                     onClick={() => setViewMode('grid')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'grid' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                     title="Grid view (2x2)"
-                   >
-                     <Grid2X2 className="h-3 w-3" />
-                   </button>
-                   <button
-                     onClick={() => setViewMode('single')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                     title="Single view"
-                   >
-                     <Grid3X3 className="h-3 w-3" />
-                   </button>
-                 </div>
+                 {/* Desktop view mode controls removed - only 3x3 grid available */}
                </div>
              </div>
            </div>
@@ -1196,9 +1176,9 @@ export const ShopPage: React.FC = () => {
                      <Grid2X2 className="h-3 w-3" />
                    </button>
                    <button
-                     onClick={() => setViewMode('single')}
+                     onClick={() => setViewMode('compact')}
                      className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                       viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
                    >
                      <Grid3X3 className="h-3 w-3" />
