@@ -1040,14 +1040,20 @@ export const ShopPage: React.FC = () => {
   const getGridClasses = () => {
     switch (viewMode) {
       case 'single':
-        return 'grid-cols-1';
+        return 'grid-cols-1'; // Default for mobile
       case 'grid':
-        return 'grid-cols-2 sm:grid-cols-2';
+        return 'grid-cols-2'; // 2x2 grid
       case 'compact':
-        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
+        return 'grid-cols-3'; // 3x3 grid
       default:
         return 'grid-cols-1';
     }
+  };
+
+  // Get responsive grid classes based on screen size and view mode
+  const getResponsiveGridClasses = () => {
+    const baseClasses = getGridClasses();
+    return `${baseClasses} sm:${viewMode === 'single' ? 'grid-cols-1' : 'grid-cols-2'} lg:${viewMode === 'compact' ? 'grid-cols-3' : viewMode === 'grid' ? 'grid-cols-2' : 'grid-cols-1'}`;
   };
 
   const clearFilters = () => {
@@ -1148,36 +1154,24 @@ export const ShopPage: React.FC = () => {
              </div>
            </div>
            
-           {/* Sticky Filter Bar - Mobile Optimized */}
-           <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
+           {/* Mobile Filter Bar */}
+           <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3 lg:hidden">
              <div className="flex items-center justify-between gap-2">
-               {/* Left: Sort & Filter */}
-               <div className="flex items-center gap-2 min-w-0 flex-1">
-                 <select
-                   value={sortBy}
-                   onChange={(e) => setSortBy(e.target.value)}
-                   className="rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
-                 >
-                   {sortOptions.map((option) => (
-                     <option key={option.value} value={option.value}>
-                       Sort: {option.label}
-                     </option>
-                   ))}
-                 </select>
-               </div>
-               
-               {/* Right: View Toggle & Count */}
+               <span className="text-sm text-gray-600">{sortedProducts.length} Results</span>
                <div className="flex items-center gap-2">
-                 <span className="text-xs text-gray-500 hidden lg:block">
-                   {sortedProducts.length} of {allProducts.length}
-                 </span>
+                 <button
+                   onClick={() => setShowFilters(true)}
+                   className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                 >
+                   <Filter className="w-4 h-4" />
+                   Filters
+                 </button>
                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                    <button
                      onClick={() => setViewMode('single')}
                      className={`p-1.5 rounded-md transition-colors ${
                        viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
-                     title="Single column view"
                    >
                      <List className="h-3 w-3" />
                    </button>
@@ -1186,7 +1180,6 @@ export const ShopPage: React.FC = () => {
                      className={`p-1.5 rounded-md transition-colors ${
                        viewMode === 'grid' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
-                     title="Grid view (2x2)"
                    >
                      <Grid2X2 className="h-3 w-3" />
                    </button>
@@ -1195,7 +1188,6 @@ export const ShopPage: React.FC = () => {
                      className={`p-1.5 rounded-md transition-colors ${
                        viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
-                     title="Compact view (3x3)"
                    >
                      <Grid3X3 className="h-3 w-3" />
                    </button>
@@ -1343,10 +1335,25 @@ export const ShopPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Sidebar - Filters */}
             <div className="w-64 flex-shrink-0 pr-8 hidden lg:block">
-              {/* Filters - Updated with bigger, bolder heading and consistent styling */}
+              {/* Desktop Sidebar Filters */}
               <div className="mb-8">
                 <h3 className="font-bold text-xl mb-4">Filters</h3>
                 <div className="space-y-6">
+                  {/* Sort By - Moved to sidebar */}
+                  <div className="mb-6">
+                    <h4 className="font-semibold text-gray-900 mb-3">Sort By</h4>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="w-full rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+                    >
+                      {sortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                   {/* Categories */}
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-3">Categories</h4>
@@ -1423,18 +1430,13 @@ export const ShopPage: React.FC = () => {
                     </label>
                   </div>
 
-                  {/* Apply All Filters Button */}
-                  <div className="pt-4 border-t border-gray-100">
+                  {/* Apply All Filters Button - Mobile Only */}
+                  <div className="pt-4 border-t border-gray-100 lg:hidden">
                     <button
-                      onClick={() => {
-                        // Apply all current filters
-                        // This will trigger re-render with updated filters
-                        // No need to do anything as filters are already reactive
-                        console.log('Applying all filters');
-                      }}
+                      onClick={() => setShowFilters(false)}
                       className="w-full px-4 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors font-medium"
                     >
-                      Apply All Filters
+                      Apply Filters
                     </button>
                   </div>
                 </div>
@@ -1460,7 +1462,7 @@ export const ShopPage: React.FC = () => {
                   const productsInCategory = groupedProducts[selectedCategory] || [];
                   return (
                     <div key={selectedCategory} className="mb-10">
-                      <div className={`grid ${getGridClasses()} gap-6 sm:gap-8`}>
+                      <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
                         {productsInCategory.map((product) => (
                           <ProductCard
                             key={product.id}
@@ -1477,7 +1479,7 @@ export const ShopPage: React.FC = () => {
                 return Object.entries(groupedProducts).map(([category, products]) => (
                   <div key={category} className="mb-10">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">{category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
-                    <div className={`grid ${getGridClasses()} gap-6 sm:gap-8`}>
+                    <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
                       {products.map((product) => (
                         <ProductCard
                           key={product.id}
