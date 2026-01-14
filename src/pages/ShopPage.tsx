@@ -1217,14 +1217,14 @@ export const ShopPage: React.FC = () => {
                             key={range.label}
                             className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
                               selectedPriceRange?.label === range.label
-                                ? 'bg-pink-100 border-l-4 border-pink-500'
+                                ? 'bg-gray-100'
                                 : 'hover:bg-gray-50'
                             }`}
                             onClick={() => setSelectedPriceRange(range)}
                           >
                             <div className="mr-3">
-                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
-                                {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                              <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                {selectedPriceRange?.label === range.label && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                               </div>
                             </div>
                             <span className="text-gray-600 flex-1">{range.label}</span>
@@ -1396,36 +1396,36 @@ export const ShopPage: React.FC = () => {
                     <div className={`grid ${getGridClasses()} gap-6`}>
                       {products.map((product) => (
                         <div key={product.id} className="group">
-                          <a href={`/products/${product.slug}`} className="block">
-                            <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                              <div className="aspect-square bg-gray-50">
-                                <img
-                                  src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-                                  alt={product.name}
-                                  className="w-full h-full object-cover"
-                                />
+                          <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                            <div className="aspect-square bg-gray-50">
+                              <img
+                                src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
+                                alt={product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="p-4 flex flex-col h-56 text-center">
+                              <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors line-clamp-2">{product.name}</h3>
+                              <p className="text-gray-600 text-sm mb-3 line-clamp-3">{product.shortDescription}</p>
+                              <div className="flex justify-center items-center mt-2">
+                                <span className="text-xl font-bold text-gray-900">R{product.price.toFixed(2)}</span>
                               </div>
-                              <div className="p-4 flex flex-col h-48 text-center">
-                                <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors line-clamp-2">{product.name}</h3>
-                                <p className="text-gray-600 text-sm mb-3 line-clamp-3">{product.shortDescription}</p>
-                                <div className="flex justify-center items-center mt-2">
-                                  <span className="text-xl font-bold text-gray-900 mr-2">R{product.price.toFixed(2)}</span>
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      // Add to cart logic would go here
-                                      console.log('Add to cart:', product.name);
-                                    }}
-                                    className="bg-pink-400 text-white px-6 py-3 rounded-lg hover:bg-pink-500 transition-colors flex items-center min-w-[100px]"
-                                    title="Add to Cart"
-                                  >
-                                    <ShoppingCart className="h-5 w-5 mr-1" />
-                                    <span className="text-sm font-medium">Add</span>
-                                  </button>
-                                </div>
+                              <div className="flex justify-center items-center mt-3">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    // Add to cart logic would go here
+                                    console.log('Add to cart:', product.name);
+                                  }}
+                                  className="bg-pink-400 text-white px-6 py-3 rounded-full hover:bg-pink-500 transition-colors flex items-center min-w-[120px]"
+                                  title="Add to Cart"
+                                >
+                                  <ShoppingCart className="h-5 w-5 mr-1" />
+                                  <span className="text-sm font-medium">Add</span>
+                                </button>
                               </div>
                             </div>
-                          </a>
+                          </div>
                         </div>
                       ))}
                     </div>
