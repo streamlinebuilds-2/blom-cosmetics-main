@@ -1405,27 +1405,27 @@ export const ShopPage: React.FC = () => {
                                   className="w-full h-full object-cover"
                                 />
                               </div>
-                              <div className="p-4 flex flex-col h-40">
+                              <div className="p-4 flex flex-col h-40 text-center">
                                 <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors">{product.name}</h3>
                                 <p className="text-gray-600 text-sm mb-3 flex-grow">{product.shortDescription}</p>
+                                <div className="flex justify-center items-center mt-2">
+                                  <span className="text-xl font-bold text-gray-900 mr-2">R{product.price.toFixed(2)}</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      // Add to cart logic would go here
+                                      console.log('Add to cart:', product.name);
+                                    }}
+                                    className="bg-pink-400 text-white px-4 py-2 rounded-lg hover:bg-pink-500 transition-colors flex items-center"
+                                    title="Add to Cart"
+                                  >
+                                    <ShoppingCart className="h-4 w-4 mr-1" />
+                                    <span className="text-sm">Add</span>
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </a>
-                          <div className="flex justify-between items-center mt-2 px-2">
-                            <span className="text-xl font-bold text-gray-900">R{product.price.toFixed(2)}</span>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // Add to cart logic would go here
-                                console.log('Add to cart:', product.name);
-                              }}
-                              className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center"
-                              title="Add to Cart"
-                            >
-                              <ShoppingCart className="h-4 w-4 mr-1" />
-                              <span className="text-sm">Add</span>
-                            </button>
-                          </div>
                         </div>
                       ))}
                     </div>
