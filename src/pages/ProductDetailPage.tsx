@@ -228,5 +228,4 @@ export const ProductDetailPage: React.FC = () => {
       </Container>
     </main>
   );
-  );
 };
