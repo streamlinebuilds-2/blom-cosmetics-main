@@ -10,23 +10,24 @@ import { supabase } from '../lib/supabase';
 // Discount system disabled
 
 export const ShopPage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
-    if (typeof window !== 'undefined') {
-      return window.innerWidth < 768 ? 'single' : 'compact';
-    }
-    return 'compact';
-  });
+const [loading, setLoading] = useState(true);
+const [selectedCategory, setSelectedCategory] = useState('all');
+const [viewMode, setViewMode] = useState(() => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth < 768 ? 'single' : 'compact';
+  }
+  return 'compact';
+});
 
-  // Update viewMode to use 3x3 grid as default on desktop
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const isDesktop = window.innerWidth >= 1024;
-      if (isDesktop && viewMode === 'compact') {
-        setViewMode('grid-3x3');
-      }
+// Update viewMode to use 3x3 grid as default on desktop
+useEffect(() => {
+  if (typeof window !== 'undefined') {
+    const isDesktop = window.innerWidth >= 1024;
+    if (isDesktop && viewMode === 'compact') {
+      setViewMode('grid-3x3');
     }
-  }, [viewMode]);
+  }
+}, [viewMode]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
