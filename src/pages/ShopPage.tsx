@@ -12,7 +12,6 @@ import { supabase } from '../lib/supabase';
 export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list' | 'grid-3x3'>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 768 ? 'list' : 'grid-3';
@@ -1211,7 +1210,6 @@ export const ShopPage: React.FC = () => {
                             }`}
                             onClick={() => {
                               setSelectedCategory(cat.slug);
-                              setSelectedSubcategory(null);
                             }}
                           >
                             <div className="mr-3">
@@ -1421,19 +1419,84 @@ export const ShopPage: React.FC = () => {
             <div className="flex-1">
               {/* Products Grid with Subcategory Grouping */}
               {(() => {
-                // Group products by subcategory
+                // Group products by main category
                 const groupedProducts: Record<string, any[]> = {};
                 sortedProducts.forEach(product => {
-                  const subcategory = product.subcategory || 'uncategorized';
-                  if (!groupedProducts[subcategory]) {
-                    groupedProducts[subcategory] = [];
+                  const category = product.category || 'uncategorized';
+                  if (!groupedProducts[category]) {
+                    groupedProducts[category] = [];
                   }
-                  groupedProducts[subcategory].push(product);
+                  groupedProducts[category].push(product);
                 });
 
-                return Object.entries(groupedProducts).map(([subcategory, products]) => (
-                  <div key={subcategory} className="mb-10">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">{subcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
+                // If a specific category is selected, show flat grid
+                if (selectedCategory !== 'all') {
+                  const productsInCategory = groupedProducts[selectedCategory] || [];
+                  return (
+                    <div key={selectedCategory} className="mb-10">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
+                        {productsInCategory.map((product) => (
+                          <div key={product.id} className="group flex flex-col">
+                            <a href={`/products/${product.slug}`} className="block relative aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden mb-3">
+                              <img
+                                src={product.images[0]}
+                                alt={product.name}
+                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                loading="lazy"
+                              />
+                              {!product.inStock && (
+                                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                                  <span className="bg-black text-white text-[10px] font-bold px-2 py-1 rounded">SOLD OUT</span>
+                                </div>
+                              )}
+                            </a>
+
+                            {/* Content - Removed Description as requested */}
+                            <div className="flex flex-col flex-1">
+                              <a href={`/products/${product.slug}`} className="block">
+                                <h3 className="text-sm font-bold text-gray-900 leading-tight mb-1 line-clamp-2 min-h-[2.5em]">
+                                  {product.name}
+                                </h3>
+                              </a>
+                              
+                              <div className="mt-auto pt-2 flex items-center justify-between gap-2">
+                                <span className="text-sm font-bold text-gray-900 whitespace-nowrap">
+                                  R{product.price.toFixed(2)}
+                                </span>
+                                
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (!product.inStock) return;
+                                    
+                                    cartStore.addItem({
+                                      id: product.id,
+                                      productId: product.id,
+                                      name: product.name,
+                                      price: product.price,
+                                      image: product.images[0],
+                                      quantity: 1
+                                    });
+                                  }}
+                                  disabled={!product.inStock}
+                                  className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:scale-110 transition-transform active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                                >
+                                  <ShoppingCart className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                // If "All Products" is selected, group by main category
+                return Object.entries(groupedProducts).map(([category, products]) => (
+                  <div key={category} className="mb-10">
+                    <h2 className="text-xl font-bold text-gray-900 mb-4">{category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
                       {products.map((product) => (
                         <div key={product.id} className="group flex flex-col">
