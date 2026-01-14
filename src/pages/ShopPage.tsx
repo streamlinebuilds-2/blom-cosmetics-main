@@ -1146,8 +1146,9 @@ export const ShopPage: React.FC = () => {
                    <List className="h-3 w-3" />
                  </button>
                </div>
-             </div>
-           </div>
+              </div>
+            </div>
+          </div>
 
           {/* Removed floating filter button */}
 
