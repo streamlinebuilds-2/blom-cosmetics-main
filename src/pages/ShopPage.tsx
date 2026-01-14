@@ -1112,7 +1112,15 @@ export const ShopPage: React.FC = () => {
            <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3 lg:hidden">
              <div className="flex items-center justify-between gap-2">
                <span className="text-sm text-gray-600">{sortedProducts.length} Results</span>
-               <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+               <div className="flex items-center gap-2">
+                 <button
+                   onClick={() => setShowFilters(true)}
+                   className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                 >
+                   <Filter className="w-4 h-4" />
+                   Filters
+                 </button>
+                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                  <button
                    onClick={() => setViewMode('list')}
                    className={`p-1.5 rounded-md transition-colors ${

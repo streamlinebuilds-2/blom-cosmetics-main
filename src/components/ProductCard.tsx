@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart, ShoppingCart, Plus } from 'lucide-react';
-import { cartStore } from '../lib/cart';
+import { cartStore, showNotification } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
 import { ProductVariantModal } from './product/ProductVariantModal';
@@ -77,6 +77,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         price,
         image: safeImages[0]
       });
+      // Show notification that item was added
+      showNotification(`${safeName} added to cart!`, 'success');
     }
   };
 
@@ -131,7 +133,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
             <button
-              onClick={hasVariants ? handleCardClick : handleAddToCart}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (hasVariants) {
+                  handleCardClick();
+                } else {
+                  handleAddToCart(e);
+                }
+              }}
               disabled={!inStock || price === -1}
               className="bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors whitespace-nowrap shadow-md"
             >
@@ -219,7 +229,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             
             {/* Pink Pill Button */}
             <button
-              onClick={hasVariants ? handleCardClick : handleAddToCart}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (hasVariants) {
+                  handleCardClick();
+                } else {
+                  handleAddToCart(e);
+                }
+              }}
               disabled={!inStock || price === -1}
               className="w-full bg-pink-500 text-white font-bold py-2 md:py-3 px-4 rounded-full shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
             >
