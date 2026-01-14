@@ -1057,13 +1057,7 @@ export const ShopPage: React.FC = () => {
 
       <main className="pt-8 pb-16">
         <Container>
-          {/* Page Header - Clean & Modern */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Shop</h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Professional nail products and furniture trusted by beauty professionals
-            </p>
-          </div>
+          {/* Removed page header */}
 
            {/* Professional Autocomplete Search */}
            <AutocompleteSearch
@@ -1151,13 +1145,7 @@ export const ShopPage: React.FC = () => {
              </div>
            </div>
 
-          {/* Floating Filter Button for Mobile */}
-          <button
-            onClick={() => setShowFilters(true)}
-            className="fixed bottom-4 right-4 lg:hidden bg-pink-400 text-white rounded-full p-4 shadow-lg hover:bg-pink-500 transition-colors z-40"
-          >
-            <Filter className="h-6 w-6" />
-          </button>
+          {/* Removed floating filter button */}
 
           {/* Mobile Filter Drawer */}
           {showFilters && (
