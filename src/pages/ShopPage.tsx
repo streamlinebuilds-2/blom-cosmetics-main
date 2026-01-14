@@ -1455,12 +1455,12 @@ export const ShopPage: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
                 <p className="text-gray-500 mb-6">Try adjusting your filters or search terms</p>
-                      <button
+                <button
                   onClick={clearFilters}
                   className="px-6 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors font-medium"
                 >
                   Clear All Filters
-                    </button>
+                </button>
               </div>
             </div>
           )}
@@ -1471,3 +1471,5 @@ export const ShopPage: React.FC = () => {
     </div>
   );
 };
+
+export default ShopPage;
