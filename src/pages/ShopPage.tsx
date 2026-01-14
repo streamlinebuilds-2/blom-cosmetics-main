@@ -1057,16 +1057,28 @@ export const ShopPage: React.FC = () => {
 
       <main className="pt-8 pb-16">
         <Container>
-          {/* Removed page header */}
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Shop</h1>
+            <p className="text-gray-600 text-lg">
+              Discover our premium collection of professional nail care products, acrylic systems, and tools.
+              High-quality products trusted by nail artists and beauty professionals worldwide.
+            </p>
+          </div>
 
            {/* Professional Autocomplete Search */}
-           <AutocompleteSearch
-             products={allProducts}
-             onSearchChange={setSearchTerm}
-             searchTerm={searchTerm}
-             placeholder="Search products... (try 'brush', 'acrylic', 'primer')"
-             className="mb-6 mx-auto max-w-2xl"
-           />
+           <div className="mb-6 mx-auto max-w-2xl">
+             <div className="relative">
+               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+               <input
+                 type="text"
+                 value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 placeholder="Search products... (try 'brush', 'acrylic', 'primer')"
+                 className="w-full rounded-lg border border-gray-200 py-3 pl-10 pr-4 text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
+               />
+             </div>
+           </div>
            
            {/* Sticky Filter Bar - Mobile Optimized */}
            <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3">
@@ -1076,7 +1088,7 @@ export const ShopPage: React.FC = () => {
                  <select
                    value={sortBy}
                    onChange={(e) => setSortBy(e.target.value)}
-                   className="px-2 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none min-w-0 flex-1"
+                   className="rounded-lg border border-gray-200 py-2 pl-3 pr-8 text-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none"
                  >
                    {sortOptions.map((option) => (
                      <option key={option.value} value={option.value}>
@@ -1172,7 +1184,7 @@ export const ShopPage: React.FC = () => {
                             key={cat.slug}
                             className={`flex items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
                               selectedCategory === cat.slug
-                                ? 'bg-pink-100 border-l-4 border-pink-500'
+                                ? 'bg-gray-100'
                                 : 'hover:bg-gray-50'
                             }`}
                             onClick={() => {
@@ -1181,8 +1193,8 @@ export const ShopPage: React.FC = () => {
                             }}
                           >
                             <div className="mr-3">
-                              <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedCategory === cat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
-                                {selectedCategory === cat.slug && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                              <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedCategory === cat.slug ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                {selectedCategory === cat.slug && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                               </div>
                             </div>
                             <span className={`${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-700'}`}>
@@ -1273,6 +1285,13 @@ export const ShopPage: React.FC = () => {
               <p className="text-gray-600 mb-6">Professional nail tools, files, brushes, and essential accessories for nail artistry.</p>
             </div>
           )}
+          
+          {selectedCategory === 'furniture' && (
+            <div id="furniture" className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Furniture</h2>
+              <p className="text-gray-600 mb-6">Professional manicure tables, workstations, and salon furniture for your space.</p>
+            </div>
+          )}
 
           {/* Main Content Grid with Sidebar */}
           <div className="flex flex-col lg:flex-row gap-8">
@@ -1314,7 +1333,7 @@ export const ShopPage: React.FC = () => {
                       key={cat.slug}
                       className={`flex justify-between items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
                         selectedCategory === cat.slug
-                          ? 'bg-pink-100 border-l-4 border-pink-500'
+                          ? 'bg-gray-100'
                           : 'hover:bg-gray-50'
                       }`}
                       onClick={() => setSelectedCategory(cat.slug)}
@@ -1339,14 +1358,14 @@ export const ShopPage: React.FC = () => {
                       key={range.label}
                       className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
                         selectedPriceRange?.label === range.label
-                          ? 'bg-pink-100 border-l-4 border-pink-500'
+                          ? 'bg-gray-100'
                           : 'hover:bg-gray-50'
                       }`}
                       onClick={() => setSelectedPriceRange(range)}
                     >
                       <div className="mr-3">
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
-                          {selectedPriceRange?.label === range.label && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                        <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                          {selectedPriceRange?.label === range.label && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                         </div>
                       </div>
                       <span className="text-gray-600 flex-1">{range.label}</span>
@@ -1379,7 +1398,7 @@ export const ShopPage: React.FC = () => {
                         <div key={product.id} className="group">
                           <a href={`/products/${product.slug}`} className="block">
                             <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                              <div className="aspect-[4/5] bg-gray-50">
+                              <div className="aspect-square bg-gray-50">
                                 <img
                                   src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
                                   alt={product.name}
