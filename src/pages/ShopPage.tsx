@@ -212,89 +212,89 @@ export const ShopPage: React.FC = () => {
       variants: []
     },
 
-    // Coming Soon Products (Prices TBA) - HIDDEN
-    // {
-    //   id: '10',
-    //   name: 'Crystal Clear Acrylic',
-    //   slug: 'crystal-clear-acrylic',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'Glass-like powder for encapsulation & overlays.',
-    //   shortDescription: 'Glass-like powder for encapsulation & overlays.',
-    //   description: 'Professional grade acrylic powder for encapsulation and overlays.',
-    //   images: ['/crystal-clear-acrylic-white.webp', '/crystal-clear-acrylic-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.9,
-    //   reviews: 156,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: [
-    //     { name: 'Baby Blue', inStock: false, image: '/acrylic-powder-baby-blue.webp' },
-    //     { name: 'Lilac Mist', inStock: false, image: '/acrylic-powder-baby-ligt-purple.webp' },
-    //     { name: 'Blush Pink', inStock: false, image: '/acrylic-powder-baby-pink.webp' },
-    //     { name: 'Ballet Pink', inStock: false, image: '/acrylic-powder-ballet-pink.webp' },
-    //     { name: 'Fuchsia Pink', inStock: false, image: '/acrylic-powder-hot-pink.webp' },
-    //     { name: 'Cloud Grey', inStock: false, image: '/acrylic-powder-light-grey.webp' },
-    //     { name: 'Mint Mist', inStock: false, image: '/acrylic-powder-light-mint.webp' },
-    //     { name: 'Rose Pink', inStock: false, image: '/acrylic-powder-light-pink.webp' },
-    //     { name: 'Fresh Mint', inStock: false, image: '/acrylic-powder-mint.webp' },
-    //     { name: 'Soft Nude', inStock: false, image: '/acrylic-powder-nude.webp' },
-    //     { name: 'Petal Pink', inStock: false, image: '/acrylic-powder-pink.webp' },
-    //     { name: 'Sky Blue', inStock: false, image: '/acrylic-powder-sky-blue.webp' },
-    //     { name: 'Lemon Glow', inStock: false, image: '/acrylic-powder-yellow.webp' }
-    //   ]
-    // },
-    // {
-    //   id: '11',
-    //   name: 'Snow White Acrylic',
-    //   slug: 'snow-white-acrylic',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'Bright opaque white acrylic for French designs.',
-    //   shortDescription: 'Bright opaque white acrylic for French designs.',
-    //   description: 'Bright opaque white acrylic powder perfect for French designs and nail art.',
-    //   images: ['/snow-white-acrylic-white.webp', '/snow-white-acrylic-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.8,
-    //   reviews: 89,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: []
-    // },
-    // {
-    //   id: '12',
-    //   name: 'Colour Acrylics',
-    //   slug: 'colour-acrylics',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'High-pigment powders for creative nail art.',
-    //   shortDescription: 'High-pigment powders for creative nail art.',
-    //   description: 'High-pigment acrylic powders in vibrant colors for creative nail art.',
-    //   images: ['/colour-acrylics-white.webp', '/colour-acrylics-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.7,
-    //   reviews: 73,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: []
-    // },
-    // {
-    //   id: '13',
-    //   name: 'Glitter Acrylics',
-    //   slug: 'glitter-acrylics',
-    //   price: -1,
-    //   compareAtPrice: undefined,
-    //   short_description: 'Sparkle acrylics for encapsulated effects.',
-    //   shortDescription: 'Sparkle acrylics for encapsulated effects.',
-    //   description: 'Sparkle acrylic powders for creating encapsulated glitter effects.',
-    //   images: ['/glitter-acrylics-white.webp', '/glitter-acrylics-colorful.webp'],
-    //   category: 'acrylic-system',
-    //   rating: 4.6,
-    //   reviews: 45,
-    //   badges: ['Coming Soon'],
-    //   inStock: false,
-    //   variants: []
-    // },
+    // Acrylic Products
+    {
+      id: '10',
+      name: 'Crystal Clear Acrylic',
+      slug: 'crystal-clear-acrylic',
+      price: 180,
+      compareAtPrice: undefined,
+      short_description: 'Glass-like powder for encapsulation & overlays.',
+      shortDescription: 'Glass-like powder for encapsulation & overlays.',
+      description: 'Professional grade acrylic powder for encapsulation and overlays.',
+      images: ['/crystal-clear-acrylic-white.webp', '/crystal-clear-acrylic-colorful.webp'],
+      categories: ['acrylic-system'],
+      rating: 4.9,
+      reviews: 156,
+      badges: [],
+      inStock: true,
+      variants: [
+        { name: 'Baby Blue', inStock: true, image: '/acrylic-powder-baby-blue.webp' },
+        { name: 'Lilac Mist', inStock: true, image: '/acrylic-powder-baby-ligt-purple.webp' },
+        { name: 'Blush Pink', inStock: true, image: '/acrylic-powder-baby-pink.webp' },
+        { name: 'Ballet Pink', inStock: true, image: '/acrylic-powder-ballet-pink.webp' },
+        { name: 'Fuchsia Pink', inStock: true, image: '/acrylic-powder-hot-pink.webp' },
+        { name: 'Cloud Grey', inStock: true, image: '/acrylic-powder-light-grey.webp' },
+        { name: 'Mint Mist', inStock: true, image: '/acrylic-powder-light-mint.webp' },
+        { name: 'Rose Pink', inStock: true, image: '/acrylic-powder-light-pink.webp' },
+        { name: 'Fresh Mint', inStock: true, image: '/acrylic-powder-mint.webp' },
+        { name: 'Soft Nude', inStock: true, image: '/acrylic-powder-nude.webp' },
+        { name: 'Petal Pink', inStock: true, image: '/acrylic-powder-pink.webp' },
+        { name: 'Sky Blue', inStock: true, image: '/acrylic-powder-sky-blue.webp' },
+        { name: 'Lemon Glow', inStock: true, image: '/acrylic-powder-yellow.webp' }
+      ]
+    },
+    {
+      id: '11',
+      name: 'Snow White Acrylic',
+      slug: 'snow-white-acrylic',
+      price: 180,
+      compareAtPrice: undefined,
+      short_description: 'Bright opaque white acrylic for French designs.',
+      shortDescription: 'Bright opaque white acrylic for French designs.',
+      description: 'Bright opaque white acrylic powder perfect for French designs and nail art.',
+      images: ['/snow-white-acrylic-white.webp', '/snow-white-acrylic-colorful.webp'],
+      categories: ['acrylic-system'],
+      rating: 4.8,
+      reviews: 89,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '12',
+      name: 'Colour Acrylics',
+      slug: 'colour-acrylics',
+      price: 180,
+      compareAtPrice: undefined,
+      short_description: 'High-pigment powders for creative nail art.',
+      shortDescription: 'High-pigment powders for creative nail art.',
+      description: 'High-pigment acrylic powders in vibrant colors for creative nail art.',
+      images: ['/colour-acrylics-white.webp', '/colour-acrylics-colorful.webp'],
+      categories: ['acrylic-system'],
+      rating: 4.7,
+      reviews: 73,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
+    {
+      id: '13',
+      name: 'Glitter Acrylics',
+      slug: 'glitter-acrylics',
+      price: 180,
+      compareAtPrice: undefined,
+      short_description: 'Sparkle acrylics for encapsulated effects.',
+      shortDescription: 'Sparkle acrylics for encapsulated effects.',
+      description: 'Sparkle acrylic powders for creating encapsulated glitter effects.',
+      images: ['/glitter-acrylics-white.webp', '/glitter-acrylics-colorful.webp'],
+      categories: ['acrylic-system'],
+      rating: 4.6,
+      reviews: 45,
+      badges: [],
+      inStock: true,
+      variants: []
+    },
     {
       id: '15',
       name: 'Crystal Kolinsky Sculpting Brush',
@@ -821,15 +821,15 @@ export const ShopPage: React.FC = () => {
           });
         };
 
-        // Apply categories to all products
-        const combinedProductsWithCategories = ensureCategories([...uniqueStaticProducts, ...mappedProducts, ...mappedBundles]);
-
         // Merge DB products with static products
         // We prioritize DB products if they exist, checking by slug
         const dbProductSlugs = new Set([...mappedProducts, ...mappedBundles].map(p => p.slug));
         
         // Only add static products that are NOT in the DB results
         const uniqueStaticProducts = staticProducts.filter(p => !dbProductSlugs.has(p.slug));
+
+        // Apply categories to all products
+        const combinedProductsWithCategories = ensureCategories([...uniqueStaticProducts, ...mappedProducts, ...mappedBundles]);
 
         // Combine everything
         const combinedProducts = [...uniqueStaticProducts, ...mappedProducts, ...mappedBundles];
@@ -1135,22 +1135,10 @@ export const ShopPage: React.FC = () => {
                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none text-lg"
                />
              </div>
-             <div className="flex items-center justify-between mt-2">
-               <div className="flex items-center gap-2">
-                 <button
-                   onClick={() => setShowFilters(!showFilters)}
-                   className="flex items-center gap-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:border-black transition-colors text-sm font-medium"
-                 >
-                   <Filter className="h-4 w-4" />
-                   <span>Filters</span>
-                 </button>
-               </div>
-               <div className="flex items-center gap-2">
-                 <span className="text-xs text-gray-500 hidden lg:block">
-                   {sortedProducts.length} of {allProducts.length}
-                 </span>
-                 {/* Desktop view mode controls removed - only 3x3 grid available */}
-               </div>
+             <div className="flex items-center justify-end mt-2">
+               <span className="text-xs text-gray-500">
+                 {sortedProducts.length} of {allProducts.length}
+               </span>
              </div>
            </div>
            
@@ -1158,40 +1146,31 @@ export const ShopPage: React.FC = () => {
            <div className="sticky top-0 z-40 bg-white border-b border-gray-100 mb-6 -mx-4 px-4 py-3 lg:hidden">
              <div className="flex items-center justify-between gap-2">
                <span className="text-sm text-gray-600">{sortedProducts.length} Results</span>
-               <div className="flex items-center gap-2">
+               <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                  <button
-                   onClick={() => setShowFilters(true)}
-                   className="flex items-center gap-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm"
+                   onClick={() => setViewMode('list')}
+                   className={`p-1.5 rounded-md transition-colors ${
+                     viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                   }`}
                  >
-                   <Filter className="w-4 h-4" />
-                   Filters
+                   <List className="h-3 w-3" />
                  </button>
-                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-                   <button
-                     onClick={() => setViewMode('list')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                   >
-                     <List className="h-3 w-3" />
-                   </button>
-                   <button
-                     onClick={() => setViewMode('grid')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'grid' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                   >
-                     <Grid2X2 className="h-3 w-3" />
-                   </button>
-                   <button
-                     onClick={() => setViewMode('compact')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'compact' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                   >
-                     <Grid3X3 className="h-3 w-3" />
-                   </button>
-                 </div>
+                 <button
+                   onClick={() => setViewMode('grid')}
+                   className={`p-1.5 rounded-md transition-colors ${
+                     viewMode === 'grid' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                   }`}
+                 >
+                   <Grid2X2 className="h-3 w-3" />
+                 </button>
+                 <button
+                   onClick={() => setViewMode('single')}
+                   className={`p-1.5 rounded-md transition-colors ${
+                     viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                   }`}
+                 >
+                   <List className="h-3 w-3" />
+                 </button>
                </div>
              </div>
            </div>
@@ -1337,9 +1316,7 @@ export const ShopPage: React.FC = () => {
             <div className="w-64 flex-shrink-0 pr-8 hidden lg:block">
               {/* Desktop Sidebar Filters */}
               <div className="mb-8">
-                <h3 className="font-bold text-xl mb-4">Filters</h3>
                 <div className="space-y-6">
-                  {/* Sort By - Moved to sidebar */}
                   <div className="mb-6">
                     <h4 className="font-semibold text-gray-900 mb-3">Sort By</h4>
                     <select
