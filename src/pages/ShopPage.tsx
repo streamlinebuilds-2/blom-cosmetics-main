@@ -1066,8 +1066,7 @@ export const ShopPage: React.FC = () => {
             </p>
           </div>
 
-           {/* Professional Autocomplete Search */}
-           {/* Simplified Search Bar */}
+           {/* Search and Filters Bar */}
            <div className="mb-6 mx-auto max-w-2xl">
              <div className="relative">
                <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -1078,6 +1077,48 @@ export const ShopPage: React.FC = () => {
                  placeholder="Search products..."
                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none text-lg"
                />
+             </div>
+             <div className="flex items-center justify-between mt-2">
+               <div className="flex items-center gap-2">
+                 <button
+                   onClick={() => setShowFilters(!showFilters)}
+                   className="flex items-center gap-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:border-black transition-colors text-sm font-medium"
+                 >
+                   <Filter className="h-4 w-4" />
+                   <span>Filters</span>
+                 </button>
+               </div>
+               <div className="flex items-center gap-2">
+                 <span className="text-xs text-gray-500 hidden lg:block">
+                   {sortedProducts.length} of {allProducts.length}
+                 </span>
+                 <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                   <button
+                     onClick={() => setViewMode('grid-3')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                   >
+                     <Grid3X3 className="h-3 w-3" />
+                   </button>
+                   <button
+                     onClick={() => setViewMode('grid-2')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                   >
+                     <Grid2X2 className="h-3 w-3" />
+                   </button>
+                   <button
+                     onClick={() => setViewMode('list')}
+                     className={`p-1.5 rounded-md transition-colors ${
+                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                     }`}
+                   >
+                     <List className="h-3 w-3" />
+                   </button>
+                 </div>
+               </div>
              </div>
            </div>
            
@@ -1185,7 +1226,7 @@ export const ShopPage: React.FC = () => {
                             key={cat.slug}
                             className={`flex items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
                               selectedCategory === cat.slug
-                                ? 'bg-gray-100'
+                                ? 'bg-pink-100 border-l-4 border-pink-500'
                                 : 'hover:bg-gray-50'
                             }`}
                             onClick={() => {
@@ -1218,7 +1259,7 @@ export const ShopPage: React.FC = () => {
                             key={range.label}
                             className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
                               selectedPriceRange?.label === range.label
-                                ? 'bg-gray-100'
+                                ? 'bg-pink-100 border-l-4 border-pink-500'
                                 : 'hover:bg-gray-50'
                             }`}
                             onClick={() => setSelectedPriceRange(range)}
@@ -1298,81 +1339,77 @@ export const ShopPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Sidebar - Filters */}
             <div className="w-64 flex-shrink-0 pr-8 hidden lg:block">
-              {/* Sort By - Added as requested */}
+              {/* Filters - Updated with bigger, bolder heading and consistent styling */}
               <div className="mb-8">
-                <h3 className="font-bold text-xl mb-4">Sort By</h3>
-                <div className="space-y-2">
-                  {sortOptions.map((option) => (
-                    <div
-                      key={option.value}
-                      className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
-                        sortBy === option.value
-                          ? 'bg-pink-100 border-l-4 border-pink-500'
-                          : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => setSortBy(option.value)}
-                    >
-                      <div className="mr-3">
-                        <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${sortBy === option.value ? 'border-black bg-black' : 'border-gray-300'}`}>
-                          {sortBy === option.value && <div className="w-2.5 h-2.5 bg-white rounded-full" />}
+                <h3 className="font-bold text-xl mb-4">Filters</h3>
+                <div className="space-y-6">
+                  {/* Categories */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3">Categories</h4>
+                    <div className="max-h-60 overflow-y-auto">
+                      {productCategories.map(cat => (
+                        <div
+                          key={cat.slug}
+                          className={`flex justify-between items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
+                            selectedCategory === cat.slug
+                              ? 'bg-pink-100 border-l-4 border-pink-500'
+                              : 'hover:bg-gray-50'
+                          }`}
+                          onClick={() => setSelectedCategory(cat.slug)}
+                        >
+                          <span className={`${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-700'}`}>
+                            {cat.name}
+                          </span>
+                          <span className="bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">
+                            {cat.count}
+                          </span>
                         </div>
-                      </div>
-                      <span className={`${sortBy === option.value ? 'font-bold text-black' : 'text-gray-700'}`}>
-                        {option.label}
-                      </span>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Categories - Updated with bigger, bolder heading and scrollable */}
-              <div className="mb-8">
-                <h3 className="font-bold text-xl mb-4">Categories</h3>
-                <div className="max-h-60 overflow-y-auto">
-                  {productCategories.map(cat => (
-                    <div
-                      key={cat.slug}
-                      className={`flex justify-between items-center py-2 px-3 rounded-lg cursor-pointer mb-2 ${
-                        selectedCategory === cat.slug
-                          ? 'bg-gray-100'
-                          : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => setSelectedCategory(cat.slug)}
-                    >
-                      <span className={`${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-700'}`}>
-                        {cat.name}
-                      </span>
-                      <span className="bg-gray-100 text-xs px-2 py-1 rounded-full text-gray-500">
-                        {cat.count}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Price Ranges - Updated with bigger, bolder heading and fixed selection */}
-              <div>
-                <h3 className="font-bold text-xl mb-4">Price</h3>
-                <div className="space-y-3">
-                  {priceRanges.map(range => (
-                    <div
-                      key={range.label}
-                      className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
-                        selectedPriceRange?.label === range.label
-                          ? 'bg-gray-100'
-                          : 'hover:bg-gray-50'
-                      }`}
-                      onClick={() => setSelectedPriceRange(range)}
-                    >
-                      <div className="mr-3">
-                        <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
-                          {selectedPriceRange?.label === range.label && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                  {/* Price Ranges */}
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-3">Price</h4>
+                    <div className="space-y-3">
+                      {priceRanges.map(range => (
+                        <div
+                          key={range.label}
+                          className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
+                            selectedPriceRange?.label === range.label
+                              ? 'bg-pink-100 border-l-4 border-pink-500'
+                              : 'hover:bg-gray-50'
+                          }`}
+                          onClick={() => setSelectedPriceRange(range)}
+                        >
+                          <div className="mr-3">
+                            <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
+                              {selectedPriceRange?.label === range.label && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                            </div>
+                          </div>
+                          <span className="text-gray-600 flex-1">{range.label}</span>
+                          <span className="text-xs text-gray-400">({getPriceRangeCount(range)})</span>
                         </div>
-                      </div>
-                      <span className="text-gray-600 flex-1">{range.label}</span>
-                      <span className="text-xs text-gray-400">({getPriceRangeCount(range)})</span>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+
+                  {/* In Stock Only */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div>
+                      <h4 className="font-medium text-gray-900 text-sm">Availability</h4>
+                      <p className="text-xs text-gray-500">Show only in-stock items</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={showInStockOnly}
+                        onChange={(e) => setShowInStockOnly(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>
