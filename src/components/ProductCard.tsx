@@ -17,7 +17,8 @@ interface ProductCardProps {
   badges?: string[]; 
   className?: string; 
   isListView?: boolean; 
-  hoverShine?: boolean; 
+  hoverShine?: boolean;
+  hideDescription?: boolean; 
   variants?: Array<{ 
     name: string; 
     price?: number; 
@@ -38,13 +39,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   badges = [], 
   className = '', 
   isListView = false, 
-  hoverShine = false, 
+  hoverShine = false,
+  hideDescription = false,
   variants = [] 
 }) => { 
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const [showVariantModal, setShowVariantModal] = React.useState(false);
 
-  // Ensure we have safe data
+  // Safe Fallbacks
   const safeName = name || 'Product Name';
   const safeShortDescription = shortDescription || 'Professional quality nail care product';
   const safeImages = Array.isArray(images) && images.length > 0 ? images : ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'];
@@ -81,16 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const wishlistItem = {
-      id: slug,
-      productId: slug,
-      name: safeName,
-      price,
-      image: safeImages[0],
-      slug
-    };
-    wishlistStore.toggleItem(wishlistItem);
+    wishlistStore.toggleItem({ id: slug, productId: slug, name: safeName, price, image: safeImages[0], slug });
   };
 
   const handleCardClick = () => {
@@ -99,7 +92,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const formatPrice = (p: number) => `R${p.toFixed(2)}`;
 
-  // --- LIST VIEW ---
+  // --- LIST VIEW STYLING ---
   if (isListView) {
     return (
       <>
@@ -110,7 +103,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           `}
           onClick={handleCardClick}
         >
-          {/* Image */}
           <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
             <OptimizedImage
               src={safeImages[0]}
@@ -121,7 +113,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             />
           </div>
 
-          {/* Content */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-gray-900 truncate group-hover:text-pink-500 transition-colors">
               {safeName}
@@ -141,7 +132,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </div>
           </div>
 
-          {/* Actions */}
           <div className="flex flex-col gap-2">
             <button
               onClick={handleWishlistToggle}
@@ -154,7 +144,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               disabled={!inStock || price === -1}
               className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {inStock ? (hasVariants ? 'Select' : 'Add') : 'Out of Stock'}
+              {inStock ? (hasVariants ? 'Select' : 'Add') : 'Out'}
             </button>
           </div>
         </article>
@@ -169,12 +159,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     );
   }
 
-  // --- GRID VIEW ---
+  // --- GRID VIEW STYLING (The look you want) ---
   return (
     <>
       <article 
         className={`
-          group relative bg-off-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1
+          group relative bg-white rounded-2xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 
           ${className}
         `}
         onClick={handleCardClick}
@@ -186,7 +176,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             alt={safeName}
             width={400}
             height={500}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           />
           
           {/* Badges */}
@@ -198,7 +188,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             ))}
           </div>
           
-          {/* Wishlist Fab */}
+          {/* Wishlist Button */}
           <button
             onClick={handleWishlistToggle}
             className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white transition-all transform hover:scale-110"
@@ -206,12 +196,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-pink-500 text-pink-500' : 'text-gray-600'}`} />
           </button>
           
-          {/* Quick Add Button (Desktop Hover) */}
+          {/* Quick Add Button (Slide Up Effect) */}
           <div className="absolute bottom-4 left-4 right-4 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 hidden md:block">
             <button
               onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
-              className="w-full bg-white text-black font-semibold py-3 rounded-xl shadow-lg hover:bg-black hover:text-white transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-pink-500 text-white font-semibold py-3 rounded-xl shadow-lg hover:bg-pink-600 transition-colors flex items-center justify-center gap-2"
             >
               <ShoppingCart className="w-4 h-4" />
               {inStock ? (hasVariants ? 'Select Options' : 'Add to Cart') : 'Out of Stock'}
@@ -224,9 +214,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <h3 className="font-semibold text-gray-900 mb-1 truncate group-hover:text-pink-500 transition-colors">
             {safeName}
           </h3>
-          <p className="text-sm text-gray-500 line-clamp-2 mb-3 h-10">
-            {safeShortDescription}
-          </p>
+          
+          {!hideDescription && (
+            <p className="text-sm text-gray-500 line-clamp-2 mb-3 h-10">
+              {safeShortDescription}
+            </p>
+          )}
           
           <div className="flex items-center justify-between">
             <div className="flex flex-col">
@@ -240,10 +233,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               )}
             </div>
             
-            {/* Mobile Add Button */}
+            {/* Mobile Add Button (Always Visible) */}
             <button 
               onClick={hasVariants ? handleCardClick : handleAddToCart}
-              className="md:hidden bg-black text-white p-2 rounded-lg"
+              className="md:hidden bg-pink-500 text-white p-2 rounded-lg"
               disabled={!inStock}
             >
               <ShoppingCart className="w-4 h-4" />
