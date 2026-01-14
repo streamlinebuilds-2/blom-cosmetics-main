@@ -13,12 +13,19 @@ export const ShopPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list'>(() => {
+  const [viewMode, setViewMode] = useState<'grid-3' | 'grid-2' | 'list' | 'grid-3x3'>(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth < 768 ? 'list' : 'grid-3';
     }
     return 'grid-3';
   });
+
+  // Remove old view options and add 3x3 grid view
+  const viewOptions = [
+    { value: 'grid-3', label: '3x3 Grid', icon: Grid3X3 },
+    { value: 'grid-2', label: '2x2 Grid', icon: Grid2X2 },
+    { value: 'list', label: 'List', icon: List }
+  ];
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
   const [showInStockOnly, setShowInStockOnly] = useState(false);
@@ -1022,6 +1029,9 @@ export const ShopPage: React.FC = () => {
         return 'grid-cols-2 sm:grid-cols-2';
       case 'list':
         return 'grid-cols-1';
+      case 'grid-3x3':
+        // On mobile show 2 columns, tablet 2, desktop 3
+        return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
       default:
         return 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3';
     }
@@ -1094,28 +1104,12 @@ export const ShopPage: React.FC = () => {
                  </span>
                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                    <button
-                     onClick={() => setViewMode('grid-3')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'grid-3' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                   >
-                     <Grid3X3 className="h-3 w-3" />
-                   </button>
-                   <button
                      onClick={() => setViewMode('grid-2')}
                      className={`p-1.5 rounded-md transition-colors ${
                        viewMode === 'grid-2' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                      }`}
                    >
                      <Grid2X2 className="h-3 w-3" />
-                   </button>
-                   <button
-                     onClick={() => setViewMode('list')}
-                     className={`p-1.5 rounded-md transition-colors ${
-                       viewMode === 'list' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                     }`}
-                   >
-                     <List className="h-3 w-3" />
                    </button>
                  </div>
                </div>
@@ -1355,7 +1349,11 @@ export const ShopPage: React.FC = () => {
                               ? 'bg-pink-100 border-l-4 border-pink-500'
                               : 'hover:bg-gray-50'
                           }`}
-                          onClick={() => setSelectedCategory(cat.slug)}
+                          onClick={() => {
+                            setSelectedCategory(cat.slug);
+                            // Update URL hash to reflect category change
+                            window.location.hash = cat.slug;
+                          }}
                         >
                           <span className={`${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-700'}`}>
                             {cat.name}
@@ -1380,7 +1378,11 @@ export const ShopPage: React.FC = () => {
                               ? 'bg-pink-100 border-l-4 border-pink-500'
                               : 'hover:bg-gray-50'
                           }`}
-                          onClick={() => setSelectedPriceRange(range)}
+                          onClick={() => {
+                            setSelectedPriceRange(range);
+                            // Update URL hash to reflect price range change
+                            window.location.hash = `price-${range.label}`;
+                          }}
                         >
                           <div className="mr-3">
                             <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${selectedPriceRange?.label === range.label ? 'border-black bg-black' : 'border-gray-300'}`}>
@@ -1410,6 +1412,21 @@ export const ShopPage: React.FC = () => {
                       <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-pink-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-400"></div>
                     </label>
                   </div>
+
+                  {/* Apply All Filters Button */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <button
+                      onClick={() => {
+                        // Apply all current filters
+                        // This will trigger re-render with updated filters
+                        // No need to do anything as filters are already reactive
+                        console.log('Applying all filters');
+                      }}
+                      className="w-full px-4 py-3 bg-pink-400 text-white rounded-xl hover:bg-pink-500 transition-colors font-medium"
+                    >
+                      Apply All Filters
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1431,37 +1448,56 @@ export const ShopPage: React.FC = () => {
                 return Object.entries(groupedProducts).map(([subcategory, products]) => (
                   <div key={subcategory} className="mb-10">
                     <h2 className="text-xl font-bold text-gray-900 mb-4">{subcategory.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
-                    <div className={`grid ${getGridClasses()} gap-6`}>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 sm:gap-x-6 sm:gap-y-12">
                       {products.map((product) => (
-                        <div key={product.id} className="group">
-                          <div className="relative overflow-hidden rounded-2xl bg-white shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-                            <div className="aspect-square bg-gray-50">
-                              <img
-                                src={product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'}
-                                alt={product.name}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <div className="p-4 flex flex-col h-56 text-center">
-                              <h3 className="font-semibold text-lg mb-1 group-hover:text-pink-400 transition-colors line-clamp-2">{product.name}</h3>
-                              <p className="text-gray-600 text-sm mb-3 line-clamp-3">{product.shortDescription}</p>
-                              <div className="flex justify-center items-center mt-2">
-                                <span className="text-xl font-bold text-gray-900">R{product.price.toFixed(2)}</span>
+                        <div key={product.id} className="group flex flex-col">
+                          <a href={`/products/${product.slug}`} className="block relative aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden mb-3">
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                            {!product.inStock && (
+                              <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
+                                <span className="bg-black text-white text-[10px] font-bold px-2 py-1 rounded">SOLD OUT</span>
                               </div>
-                              <div className="flex justify-center items-center mt-3">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    // Add to cart logic would go here
-                                    console.log('Add to cart:', product.name);
-                                  }}
-                                  className="bg-pink-400 text-white px-6 py-3 rounded-full hover:bg-pink-500 transition-colors flex items-center min-w-[120px]"
-                                  title="Add to Cart"
-                                >
-                                  <ShoppingCart className="h-5 w-5 mr-1" />
-                                  <span className="text-sm font-medium">Add</span>
-                                </button>
-                              </div>
+                            )}
+                          </a>
+
+                          {/* Content - Removed Description as requested */}
+                          <div className="flex flex-col flex-1">
+                            <a href={`/products/${product.slug}`} className="block">
+                              <h3 className="text-sm font-bold text-gray-900 leading-tight mb-1 line-clamp-2 min-h-[2.5em]">
+                                {product.name}
+                              </h3>
+                            </a>
+                            
+                            <div className="mt-auto pt-2 flex items-center justify-between gap-2">
+                              <span className="text-sm font-bold text-gray-900 whitespace-nowrap">
+                                R{product.price.toFixed(2)}
+                              </span>
+                              
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  if (!product.inStock) return;
+                                  
+                                  cartStore.addItem({
+                                    id: product.id,
+                                    productId: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    image: product.images[0],
+                                    quantity: 1
+                                  });
+                                }}
+                                disabled={!product.inStock}
+                                className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:scale-110 transition-transform active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                              >
+                                <ShoppingCart className="w-4 h-4" />
+                              </button>
                             </div>
                           </div>
                         </div>
