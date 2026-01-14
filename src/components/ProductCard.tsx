@@ -92,57 +92,48 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const formatPrice = (p: number) => `R${p.toFixed(2)}`;
 
-  // --- LIST VIEW STYLING ---
+  // --- LIST VIEW (Kept simple for consistency) ---
   if (isListView) {
     return (
       <>
         <article 
           className={`
-            group cursor-pointer bg-white rounded-xl border border-gray-100 overflow-hidden relative transition-all duration-300 hover:shadow-lg flex flex-row items-center gap-4 p-4 
+            group cursor-pointer bg-white rounded-2xl border border-gray-100 overflow-hidden relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-row items-center gap-4 p-4 
             ${className}
           `}
           onClick={handleCardClick}
         >
-          <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+          <div className="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50">
             <OptimizedImage
               src={safeImages[0]}
               alt={safeName}
-              width={80}
-              height={80}
+              width={96}
+              height={96}
               className="w-full h-full object-cover"
             />
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 truncate group-hover:text-pink-500 transition-colors">
-              {safeName}
-            </h3>
-            <p className="text-sm text-gray-500 line-clamp-1 mb-2">
-              {safeShortDescription}
-            </p>
+            <h3 className="font-bold text-gray-900 truncate mb-1 text-lg">{safeName}</h3>
+             <p className="text-sm text-gray-500 line-clamp-1 mb-2">{safeShortDescription}</p>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-gray-900">
+              <span className="font-bold text-gray-900 text-lg">
                 {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
               </span>
-              {compareAtPrice && price !== -1 && (
-                <span className="text-xs text-gray-400 line-through">
-                  {formatPrice(compareAtPrice)}
-                </span>
-              )}
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <button
               onClick={handleWishlistToggle}
-              className={`p-2 rounded-full transition-colors ${isWishlisted ? 'text-pink-500 bg-pink-50' : 'text-gray-400 hover:bg-gray-100'}`}
+              className={`p-2 rounded-full transition-colors self-end ${isWishlisted ? 'text-pink-500 bg-pink-50' : 'text-gray-400 hover:bg-gray-100'}`}
             >
               <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
             <button
               onClick={hasVariants ? handleCardClick : handleAddToCart}
               disabled={!inStock || price === -1}
-              className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors whitespace-nowrap shadow-md"
             >
               {inStock ? (hasVariants ? 'Select' : 'Add') : 'Out'}
             </button>
@@ -244,6 +235,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
         </div>
       </article>
+
       {showVariantModal && (
         <ProductVariantModal
           isOpen={showVariantModal}
