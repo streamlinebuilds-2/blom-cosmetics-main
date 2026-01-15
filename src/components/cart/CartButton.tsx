@@ -48,15 +48,6 @@ export const CartButton: React.FC<CartButtonProps> = ({ onClick, className = '' 
         }`}
         strokeWidth={2}
       />
-      {itemCount > 0 && (
-        <span
-          className={`absolute -top-0.5 -right-0.5 bg-pink-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold transition-all duration-200 ${
-            isAnimating ? 'scale-110' : ''
-          }`}
-        >
-          {itemCount > 99 ? '99+' : itemCount}
-        </span>
-      )}
     </button>
   );
 };
