@@ -183,28 +183,51 @@ export const ProductDetailPage: React.FC = () => {
             console.log('Set initial variant:', variants[0].name);
           }
 
-          // Fetch related products (same category)
+          // Fetch related products (same category, or fallback to any active products)
+          let related: any[] = [];
+          
+          // First try to get products from same category
           if (productData.category) {
-            const { data: related } = await supabase
+            const { data: categoryRelated } = await supabase
               .from('products')
               .select('*')
               .eq('category', productData.category)
               .neq('id', productData.id)
               .eq('status', 'active')
               .limit(4);
-              
-            if (related) {
-              setRelatedProducts(related.map(p => ({
-                id: p.id,
-                name: p.name,
-                slug: p.slug,
-                price: p.price,
-                images: [p.image_url || p.thumbnail_url],
-                category: p.category,
-                inStock: (p.stock_quantity || 0) > 0
-              })));
+            
+            if (categoryRelated && categoryRelated.length > 0) {
+              related = categoryRelated;
             }
           }
+          
+          // If we don't have enough products from same category, fill with other active products
+          if (related.length < 4) {
+            const { data: otherProducts } = await supabase
+              .from('products')
+              .select('*')
+              .neq('id', productData.id)
+              .eq('status', 'active')
+              .limit(4 - related.length);
+            
+            if (otherProducts) {
+              // Filter out products we already have
+              const existingIds = new Set(related.map(p => p.id));
+              const additional = otherProducts.filter(p => !existingIds.has(p.id));
+              related = [...related, ...additional].slice(0, 4);
+            }
+          }
+          
+          // Always set related products, even if empty (will show section with message)
+          setRelatedProducts(related.map(p => ({
+            id: p.id,
+            name: p.name,
+            slug: p.slug,
+            price: p.price,
+            images: [p.image_url || p.thumbnail_url],
+            category: p.category,
+            inStock: (p.stock_quantity || 0) > 0
+          })));
 
           // Fetch approved reviews
           const { data: reviewsData, error: reviewsError } = await supabase
@@ -791,16 +814,20 @@ export const ProductDetailPage: React.FC = () => {
           </div>
 
           {/* You Might Also Like */}
-          {relatedProducts.length > 0 && (
-            <div className="mb-16">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">You Might Also Like</h2>
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">You Might Also Like</h2>
+            {relatedProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
                 {relatedProducts.map((related) => (
                   <ProductCard key={related.id} {...related} />
                 ))}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-500">More products coming soon!</p>
+              </div>
+            )}
+          </div>
         </Container>
       </main>
 
