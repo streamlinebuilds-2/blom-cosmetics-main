@@ -25,6 +25,7 @@ interface ProductCardProps {
     inStock?: boolean; 
     image?: string; 
   }>; 
+  onCardClickOverride?: () => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ 
@@ -41,7 +42,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isListView = false, 
   hoverShine = false,
   hideDescription = false,
-  variants = [] 
+  variants = [],
+  onCardClickOverride 
 }) => { 
   const [isWishlisted, setIsWishlisted] = React.useState(false);
   const [showVariantModal, setShowVariantModal] = React.useState(false);
@@ -89,7 +91,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const handleCardClick = () => {
-    window.location.href = `/products/${slug}`;
+    if (onCardClickOverride) {
+      onCardClickOverride();
+    } else {
+      window.location.href = `/products/${slug}`;
+    }
   };
 
   const formatPrice = (p: number) => `R${p.toFixed(2)}`;
@@ -137,7 +143,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 e.preventDefault();
                 e.stopPropagation();
                 if (hasVariants) {
-                  handleCardClick();
+                  setShowVariantModal(true);
                 } else {
                   handleAddToCart(e);
                 }
@@ -233,7 +239,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 e.preventDefault();
                 e.stopPropagation();
                 if (hasVariants) {
-                  handleCardClick();
+                  setShowVariantModal(true);
                 } else {
                   handleAddToCart(e);
                 }

@@ -70,7 +70,30 @@ export const FeaturedProducts = () => {
             };
           }).filter(Boolean); // Remove empty slots
 
-          setFeatured(items);
+          // Transform Colour Acrylics products
+          const transformedItems = items.map((item: any) => {
+            // Check if this is a Colour Acrylics product (case-insensitive)
+            const isColourAcrylics = item.name && item.name.toLowerCase().includes('colour acrylics');
+            
+            if (isColourAcrylics) {
+              // Remove variant suffix (e.g., "Colour Acrylics - Raspberry Santa" → "Colour Acrylics")
+              const baseName = item.name.split(' - ')[0];
+              
+              return {
+                ...item,
+                name: baseName,
+                shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
+                // Add custom navigation override to go to shop page with acrylic-system filter
+                onCardClickOverride: () => {
+                  window.location.href = '/shop#acrylic-system';
+                }
+              };
+            }
+            
+            return item;
+          });
+
+          setFeatured(transformedItems);
         }
       } catch (err) {
         console.error('Error loading featured items:', err);
@@ -108,6 +131,7 @@ export const FeaturedProducts = () => {
               inStock={item.inStock}
               hoverShine={true}
               variants={item.variants} // <--- Ensure variants are passed to the card
+              onCardClickOverride={item.onCardClickOverride} // <--- Pass custom navigation if provided
             />
           ))}
         </div>

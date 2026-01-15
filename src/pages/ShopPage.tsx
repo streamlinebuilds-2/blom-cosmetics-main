@@ -1051,6 +1051,53 @@ export const ShopPage: React.FC = () => {
     return `${baseClasses} sm:${viewMode === 'single' || viewMode === 'list' ? 'grid-cols-1' : 'grid-cols-2'} lg:grid-cols-3`;
   };
 
+  const renderProductGrid = () => {
+    // Group products by main category - handle both array and string categories
+    const groupedProducts: Record<string, any[]> = {};
+    sortedProducts.forEach(product => {
+      // Get the primary category (first from array or single category)
+      const primaryCategory = product.categories ? product.categories[0] : (product.category || 'uncategorized');
+      if (!groupedProducts[primaryCategory]) {
+        groupedProducts[primaryCategory] = [];
+      }
+      groupedProducts[primaryCategory].push(product);
+    });
+
+    // If a specific category is selected, show flat grid
+    if (selectedCategory !== 'all') {
+      const productsInCategory = groupedProducts[selectedCategory] || [];
+      return (
+        <div key={selectedCategory} className="mb-10">
+          <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
+            {productsInCategory.map((product) => (
+              <ProductCard
+                key={product.id}
+                {...product}
+                isListView={viewMode === 'list'}
+              />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // If "All Products" is selected, group by main category
+    return Object.entries(groupedProducts).map(([category, products]) => (
+      <div key={category} className="mb-10">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">{category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
+        <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              {...product}
+              isListView={viewMode === 'list'}
+            />
+          ))}
+        </div>
+      </div>
+    ));
+  };
+
   const clearFilters = () => {
     setSearchTerm('');
     setSortBy('featured');
@@ -1424,52 +1471,7 @@ export const ShopPage: React.FC = () => {
             {/* Right Content - Products */}
             <div className="flex-1">
               {/* Products Grid with Subcategory Grouping */}
-              {(() => {
-                // Group products by main category - handle both array and string categories
-                const groupedProducts: Record<string, any[]> = {};
-                sortedProducts.forEach(product => {
-                  // Get the primary category (first from array or single category)
-                  const primaryCategory = product.categories ? product.categories[0] : (product.category || 'uncategorized');
-                  if (!groupedProducts[primaryCategory]) {
-                    groupedProducts[primaryCategory] = [];
-                  }
-                  groupedProducts[primaryCategory].push(product);
-                });
-
-                // If a specific category is selected, show flat grid
-                if (selectedCategory !== 'all') {
-                  const productsInCategory = groupedProducts[selectedCategory] || [];
-                  return (
-                    <div key={selectedCategory} className="mb-10">
-                      <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
-                        {productsInCategory.map((product) => (
-                          <ProductCard
-                            key={product.id}
-                            {...product}
-                            isListView={viewMode === 'list'}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                }
-
-                // If "All Products" is selected, group by main category
-                return Object.entries(groupedProducts).map(([category, products]) => (
-                  <div key={category} className="mb-10">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">{category.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</h2>
-                    <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
-                      {products.map((product) => (
-                        <ProductCard
-                          key={product.id}
-                          {...product}
-                          isListView={viewMode === 'list'}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ));
-              })()}
+              {renderProductGrid()}
             </div>
           </div>
 
