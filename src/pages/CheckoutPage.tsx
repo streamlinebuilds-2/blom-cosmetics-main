@@ -84,10 +84,10 @@ const clearSimpleCouponData = () => {
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
-  const [step, setStep] = useState<'shipping' | 'payment' | 'review'>(() => {
+  const [step, setStep] = useState<'shipping' | 'review'>(() => {
     const params = new URLSearchParams(window.location.search);
     const s = params.get('step');
-    return s === 'payment' ? 'payment' : 'shipping';
+    return s === 'review' ? 'review' : 'shipping';
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState<{[key: string]: boolean}>({});
@@ -364,13 +364,9 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
-    setStep('payment');
-    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
-  };
-
-  const handlePaymentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    // Skip payment step, go directly to review
     setStep('review');
+    try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
   };
 
   const handleApplyCoupon = async () => {
@@ -780,16 +776,9 @@ export const CheckoutPage: React.FC = () => {
                 <span>Shipping</span>
               </div>
               <div className="w-8 h-px bg-gray-300"></div>
-              <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'payment' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
-                  2
-                </div>
-                <span>Payment</span>
-              </div>
-              <div className="w-8 h-px bg-gray-300"></div>
               <div className={`flex items-center gap-2 ${step === 'review' ? 'text-gray-900' : 'text-gray-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
-                  3
+                  2
                 </div>
                 <span>Review</span>
               </div>
@@ -1111,7 +1100,7 @@ export const CheckoutPage: React.FC = () => {
 
                       <div className="flex flex-col sm:flex-row justify-between gap-3">
                         <Button type="submit" size="lg" className="w-full sm:w-auto">
-                          <span className="text-xs sm:text-sm">Continue to Payment</span>
+                          <span className="text-xs sm:text-sm">Continue to Review</span>
                         </Button>
                         <Button
                           type="button"
@@ -1127,132 +1116,65 @@ export const CheckoutPage: React.FC = () => {
                 </Card>
               )}
 
-              {/* Payment Information */}
-              {step === 'payment' && (
-                <Card>
-                  <CardHeader>
-                    <h2 className="text-2xl font-bold">Payment Method</h2>
-                  </CardHeader>
-                  <CardContent>
-                    <form onSubmit={handlePaymentSubmit} className="space-y-6">
-                      {/* Payment Methods */}
-                      <div className="space-y-4">
-                        {paymentMethods.map((method) => (
-                          <div
-                            key={method.id}
-                            className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                              paymentInfo.method === method.id
-                                ? 'border-gray-400 bg-gray-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                            onClick={() => setPaymentInfo({...paymentInfo, method: method.id})}
-                          >
-                            <div className="flex items-center gap-3">
-                              <input
-                                type="radio"
-                                name="paymentMethod"
-                                value={method.id}
-                                checked={paymentInfo.method === method.id}
-                                onChange={(e) => setPaymentInfo({...paymentInfo, method: e.target.value})}
-                                className="text-gray-400"
-                              />
-                              <method.icon className="h-5 w-5 text-gray-600" />
-                              <div>
-                                <h3 className="font-medium">{method.name}</h3>
-                                <p className="text-sm text-gray-600">{method.description}</p>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Security Notice */}
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Shield className="h-5 w-5 text-gray-500" />
-                          <h3 className="font-medium text-gray-900">Secure Payment</h3>
-                        </div>
-                        <p className="text-sm text-gray-700">
-                          Your payment information is encrypted and secure. We use industry-standard 
-                          SSL encryption to protect your data.
-                        </p>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => setStep('shipping')}
-                        >
-                          <ArrowLeft className="h-4 w-4 mr-2" />
-                          Back to Shipping
-                        </Button>
-                        <Button type="submit" size="lg">
-                          Review Order
-                        </Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Order Review */}
               {step === 'review' && (
                 <Card>
-                  <CardHeader>
-                    <h2 className="text-2xl font-bold">Review Your Order</h2>
+                  <CardHeader className="pb-3 sm:pb-6">
+                    <h2 className="text-xl sm:text-2xl font-bold">Review Your Order</h2>
                   </CardHeader>
-                  <CardContent className="space-y-6">
+                  <CardContent className="space-y-3 sm:space-y-4">
                     {/* Fulfillment summary */}
                     {shippingMethod === 'store-pickup' ? (
                       <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-medium">Collection</h3>
+                        <div className="flex items-center justify-between mb-2 sm:mb-3">
+                          <h3 className="font-medium text-sm sm:text-base">Collection</h3>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setStep('shipping')}
+                            className="text-xs sm:text-sm"
                           >
-                            <Edit className="h-4 w-4 mr-1" />
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                             Edit
                           </Button>
                         </div>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="font-medium">Collect from BLOM HQ, Randfontein</p>
-                          <p className="mt-2 text-sm text-gray-600">
-                            <Mail className="h-4 w-4 inline mr-1" />
+                        <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                          <p className="font-medium text-sm sm:text-base">Collect from BLOM HQ, Randfontein</p>
+                          <p className="mt-2 text-xs sm:text-sm text-gray-600">
+                            <Mail className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
                             {shippingInfo.email}
                           </p>
-                          <p className="text-sm text-gray-600">
-                            <Phone className="h-4 w-4 inline mr-1" />
+                          <p className="text-xs sm:text-sm text-gray-600">
+                            <Phone className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
                             {shippingInfo.phone}
                           </p>
                         </div>
                       </div>
                     ) : (
                       <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="font-medium">Shipping Address</h3>
+                        <div className="flex items-center justify-between mb-2 sm:mb-3">
+                          <h3 className="font-medium text-sm sm:text-base">Shipping Address</h3>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setStep('shipping')}
+                            className="text-xs sm:text-sm"
                           >
-                            <Edit className="h-4 w-4 mr-1" />
+                            <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
                             Edit
                           </Button>
                         </div>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="font-medium">{shippingInfo.firstName} {shippingInfo.lastName}</p>
-                          <p>{deliveryAddress.street_address}</p>
-                          <p>{deliveryAddress.city}, {deliveryAddress.zone} {deliveryAddress.code}</p>
-                          <p>{deliveryAddress.country}</p>
-                          <p className="mt-2 text-sm text-gray-600">
-                            <Mail className="h-4 w-4 inline mr-1" />
+                        <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                          <p className="font-medium text-sm sm:text-base">{shippingInfo.firstName} {shippingInfo.lastName}</p>
+                          <p className="text-xs sm:text-sm">{deliveryAddress.street_address}</p>
+                          <p className="text-xs sm:text-sm">{deliveryAddress.city}, {deliveryAddress.zone} {deliveryAddress.code}</p>
+                          <p className="text-xs sm:text-sm">{deliveryAddress.country}</p>
+                          <p className="mt-2 text-xs sm:text-sm text-gray-600">
+                            <Mail className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
                             {shippingInfo.email}
                           </p>
-                          <p className="text-sm text-gray-600">
-                            <Phone className="h-4 w-4 inline mr-1" />
+                          <p className="text-xs sm:text-sm text-gray-600">
+                            <Phone className="h-3 w-3 sm:h-4 sm:w-4 inline mr-1" />
                             {shippingInfo.phone}
                           </p>
                         </div>
@@ -1261,22 +1183,12 @@ export const CheckoutPage: React.FC = () => {
 
                     {/* Payment Method */}
                     <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-medium">Payment Method</h3>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => { setStep('payment'); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); } }}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                      </div>
-                      <div className="bg-gray-50 rounded-lg p-4">
-                        <p className="font-medium">
+                      <h3 className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">Payment Method</h3>
+                      <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                        <p className="font-medium text-sm sm:text-base">
                           {paymentMethods.find(m => m.id === paymentInfo.method)?.name}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-xs sm:text-sm text-gray-600">
                           {paymentMethods.find(m => m.id === paymentInfo.method)?.description}
                         </p>
                       </div>
@@ -1284,43 +1196,43 @@ export const CheckoutPage: React.FC = () => {
 
                     {/* Order Items */}
                     <div>
-                      <h3 className="font-medium mb-3">Order Items</h3>
-                      <div className="space-y-3">
+                      <h3 className="font-medium mb-3 text-base sm:text-lg">Order Items</h3>
+                      <div className="space-y-2 sm:space-y-3">
                         {cartState.items.map((item) => (
-                          <div key={item.id} className="flex gap-4 p-4 border rounded-lg">
+                          <div key={item.id} className="flex gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg">
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="w-16 h-16 object-cover rounded"
+                              className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0"
                             />
-                            <div className="flex-1">
-                              <h4 className="font-medium">{item.name}</h4>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-sm sm:text-base truncate">{item.name}</h4>
                               {item.variant && (
-                                <p className="text-sm text-gray-500">{item.variant.title}</p>
+                                <p className="text-xs sm:text-sm text-gray-500">{item.variant.title}</p>
                               )}
-                              <p className="text-gray-900 font-bold">{formatPrice(item.price)}</p>
+                              <p className="text-gray-900 font-bold text-sm sm:text-base">{formatPrice(item.price)}</p>
                             </div>
-                            <div className="text-right">
-                              <div className="inline-flex items-center gap-2 mb-1">
+                            <div className="text-right flex-shrink-0">
+                              <div className="inline-flex items-center gap-1.5 sm:gap-2 mb-1">
                                 <button
                                   type="button"
                                   aria-label="Decrease quantity"
                                   onClick={() => handleQuantityChange(item.id, Math.max(1, item.quantity - 1))}
-                                  className="p-1.5 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                                  className="p-1 sm:p-1.5 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
                                 >
-                                  <Minus className="h-4 w-4" />
+                                  <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                 </button>
-                                <span className="w-8 text-center font-medium">{item.quantity}</span>
+                                <span className="w-6 sm:w-8 text-center font-medium text-sm sm:text-base">{item.quantity}</span>
                                 <button
                                   type="button"
                                   aria-label="Increase quantity"
                                   onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                  className="p-1.5 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
+                                  className="p-1 sm:p-1.5 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
                                 >
-                                  <Plus className="h-4 w-4" />
+                                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                                 </button>
                               </div>
-                              <p className="text-gray-900 font-bold">
+                              <p className="text-gray-900 font-bold text-sm sm:text-base">
                                 {formatPrice(item.price * item.quantity)}
                               </p>
                             </div>
@@ -1329,19 +1241,21 @@ export const CheckoutPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex flex-col sm:flex-row justify-between gap-4">
                       <Button
                         type="button"
                         variant="outline"
-                        onClick={() => { setStep('payment'); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); } }}
+                        onClick={() => { setStep('shipping'); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); } }}
+                        className="w-full sm:w-auto"
                       >
                         <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Payment
+                        Back to Shipping
                       </Button>
                       <Button
                         size="lg"
                         onClick={handlePlaceOrder}
                         loading={isProcessing}
+                        className="w-full sm:w-auto"
                       >
                         <Lock className="h-4 w-4 mr-2" />
                         {isProcessing ? 'Processing...' : `Place Order - ${formatPrice(orderTotal)}`}
@@ -1359,59 +1273,6 @@ export const CheckoutPage: React.FC = () => {
                   <h3 className="text-xl font-bold">Order Summary</h3>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Cart Items */}
-                  <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {cartState.items.map((item) => (
-                      <div key={item.id} className="flex gap-3">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-12 h-12 object-cover rounded"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate">{item.name}</h4>
-                          {item.variant && (
-                            <p className="text-xs text-gray-500">{item.variant.title}</p>
-                          )}
-                          <div className="flex items-center justify-between mt-1">
-                            <div className="inline-flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                aria-label="Decrease quantity"
-                                onClick={() => handleQuantityChange(item.id, Math.max(1, item.quantity - 1))}
-                                className="p-1 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
-                              >
-                                <Minus className="h-3.5 w-3.5" />
-                              </button>
-                              <span className="w-7 text-center text-sm font-medium">{item.quantity}</span>
-                              <button
-                                type="button"
-                                aria-label="Increase quantity"
-                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                className="p-1 rounded-full border border-gray-200 hover:bg-gray-100 active:scale-95 transition"
-                              >
-                                <Plus className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-900 font-bold text-sm">
-                                {formatPrice(item.price * item.quantity)}
-                              </span>
-                              <button
-                                type="button"
-                                aria-label="Remove item"
-                                onClick={() => handleRemoveItem(item.id)}
-                                className="p-1 rounded-full hover:bg-red-50 text-red-500 hover:text-red-700 transition-colors"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
                   {/* Coupon Code */}
                   <div className="border-t pt-4">
                     <div className="space-y-3">
@@ -1588,7 +1449,7 @@ export const CheckoutPage: React.FC = () => {
                       { name: '5-Pack Bundle', price: 160, image: '/nail-file-white.webp' }
                     ]
                   })}
-                  className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                  className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
                 >
                   Add to Cart
                 </button>
@@ -1636,7 +1497,7 @@ export const CheckoutPage: React.FC = () => {
                       { name: 'Watermelon', image: '/cuticle-oil-watermelon.webp' }
                     ]
                   })}
-                  className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                  className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
                 >
                   Add to Cart
                 </button>
@@ -1678,7 +1539,7 @@ export const CheckoutPage: React.FC = () => {
                     image: '/top-coat-white.webp',
                     variants: []
                   })}
-                  className="w-full bg-pink-400 hover:bg-pink-500 text-white px-6 py-2 rounded-md font-medium transition-colors"
+                  className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
                 >
                   Add to Cart
                 </button>
