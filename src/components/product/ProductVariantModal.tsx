@@ -109,46 +109,46 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         onClick={onClose}
       />
       
-      {/* Modal - Simple design */}
-      <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-hidden sm:mx-4 flex flex-col">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-pink-400 to-blue-400 text-white p-4 sm:p-6">
+      {/* Modal - Optimized for mobile */}
+      <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md max-h-[75vh] sm:max-h-[90vh] overflow-hidden sm:mx-4 flex flex-col">
+        {/* Header - Smaller on mobile */}
+        <div className="bg-gradient-to-r from-pink-400 to-blue-400 text-white p-3 sm:p-6 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg sm:text-xl font-bold">{product.name}</h2>
-              <p className="text-pink-100 text-sm mt-1">Choose a variant</p>
+            <div className="flex-1 min-w-0 pr-2">
+              <h2 className="text-base sm:text-xl font-bold truncate">{product.name}</h2>
+              <p className="text-pink-100 text-xs sm:text-sm mt-0.5">Choose a variant</p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-colors flex-shrink-0"
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {/* Selected Variant Image */}
-          <div className="mb-4">
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6">
+          {/* Selected Variant Image - Smaller on mobile */}
+          <div className="mb-3 sm:mb-4">
             <img
               src={(() => {
                 const selectedVariantData = product.variants.find(v => v.name === selectedVariant);
                 return selectedVariantData?.image || product.images[0] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop';
               })()}
               alt={selectedVariant || product.name}
-              className="w-full h-40 object-cover rounded-lg"
+              className="w-full h-32 sm:h-40 object-cover rounded-lg"
             />
           </div>
 
-          {/* Variant List */}
-          <div className="space-y-3">
+          {/* Variant List - Compact on mobile */}
+          <div className="space-y-2 sm:space-y-3">
             {product.variants.map((variant) => (
               <button
                 key={variant.name}
                 onClick={() => handleVariantSelect(variant.name)}
                 disabled={!isVariantInStock(variant)}
-                className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
+                className={`w-full p-3 sm:p-4 rounded-lg border-2 text-left transition-all ${
                   isVariantSelected(variant.name)
                     ? 'border-pink-400 bg-pink-50 text-pink-700'
                     : isVariantInStock(variant)
@@ -157,16 +157,16 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{variant.name}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm sm:text-base truncate">{variant.name}</div>
                     {variant.price && variant.price !== product.price && (
-                      <div className="text-sm text-gray-600">
+                      <div className="text-xs sm:text-sm text-gray-600">
                         {variant.price > product.price ? '+' : ''}R{(variant.price - product.price).toFixed(2)}
                       </div>
                     )}
                   </div>
                   {isVariantSelected(variant.name) && (
-                    <Check className="h-5 w-5 text-pink-600" />
+                    <Check className="h-4 w-4 sm:h-5 sm:w-5 text-pink-600 flex-shrink-0 ml-2" />
                   )}
                 </div>
                 {!isVariantInStock(variant) && (
@@ -177,8 +177,8 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t border-gray-200 p-4 sm:p-6 bg-white">
+        {/* Footer - Compact on mobile */}
+        <div className="border-t border-gray-200 p-3 sm:p-6 bg-white flex-shrink-0">
           <button
             onClick={handleAddToCart}
             disabled={!selectedVariant || loading}

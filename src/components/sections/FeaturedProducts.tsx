@@ -70,8 +70,8 @@ export const FeaturedProducts = () => {
             };
           }).filter(Boolean); // Remove empty slots
 
-          // Transform Colour Acrylics products
-          const transformedItems = items.map((item: any) => {
+          // Transform Colour Acrylics products - fetch all variants
+          const transformedItems = await Promise.all(items.map(async (item: any) => {
             // Check if this is a Colour Acrylics product (case-insensitive)
             const isColourAcrylics = item.name && item.name.toLowerCase().includes('colour acrylics');
             
@@ -79,19 +79,73 @@ export const FeaturedProducts = () => {
               // Remove variant suffix (e.g., "Colour Acrylics - Raspberry Santa" → "Colour Acrylics")
               const baseName = item.name.split(' - ')[0];
               
+              // Fetch all Colour Acrylics products from database to create variants
+              try {
+                const { data: allColourAcrylics, error } = await supabase
+                  .from('products')
+                  .select('id, name, price, thumbnail_url, stock, product_variants(id, title, price, inventory_quantity)')
+                  .ilike('name', 'Colour Acrylics%')
+                  .eq('status', 'active');
+                
+                if (!error && allColourAcrylics) {
+                  // Collect all variants - either from product_variants or create from product names
+                  const allVariants: any[] = [];
+                  
+                  allColourAcrylics.forEach((product: any) => {
+                    // If product has variants, use them
+                    if (Array.isArray(product.product_variants) && product.product_variants.length > 0) {
+                      product.product_variants.forEach((variant: any) => {
+                        if (!allVariants.find(v => v.name === (variant.title || variant.name))) {
+                          allVariants.push({
+                            name: variant.title || variant.name || '',
+                            price: variant.price || product.price || item.price,
+                            inStock: (variant.inventory_quantity || product.stock || 0) > 0,
+                            image: variant.image || product.thumbnail_url || item.image
+                          });
+                        }
+                      });
+                    } else {
+                      // If no variants, create variant from product name (extract variant name)
+                      const variantName = product.name.includes(' - ') 
+                        ? product.name.split(' - ').slice(1).join(' - ')
+                        : product.name.replace(/^Colour Acrylics\s*/i, '').trim() || 'Default';
+                      
+                      if (!allVariants.find(v => v.name === variantName)) {
+                        allVariants.push({
+                          name: variantName,
+                          price: product.price || item.price,
+                          inStock: (product.stock || 0) > 0,
+                          image: product.thumbnail_url || item.image
+                        });
+                      }
+                    }
+                  });
+                  
+                  // Return with all variants
+                  return {
+                    ...item,
+                    name: baseName,
+                    shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
+                    variants: allVariants.length > 0 ? allVariants : item.variants
+                    // No onCardClickOverride - let it work like normal product with variants
+                  };
+                }
+              } catch (err) {
+                console.error('Error fetching Colour Acrylics variants:', err);
+              }
+              
+              // Fallback if fetch fails - keep original variants if any
               return {
                 ...item,
                 name: baseName,
                 shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
-                // Add custom navigation override to go to shop page with acrylic-system filter
-                onCardClickOverride: () => {
-                  window.location.href = '/shop#acrylic-system';
-                }
+                variants: item.variants || []
+                // No onCardClickOverride - let it work like normal product with variants
               };
             }
             
             return item;
-          });
+          }));
 
           setFeatured(transformedItems);
         }
