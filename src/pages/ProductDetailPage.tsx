@@ -555,7 +555,7 @@ export const ProductDetailPage: React.FC = () => {
                 
                 <div className="flex flex-col sm:flex-row gap-4">
                   {/* Quantity Selector */}
-                  <div className="flex items-center border border-gray-200 rounded-xl h-14 sm:h-12 w-fit">
+                  <div className="flex items-center border border-gray-200 rounded-xl h-16 sm:h-12 w-fit">
                     <button 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="w-12 sm:w-12 h-full flex items-center justify-center text-gray-500 hover:text-pink-500 transition-colors"
@@ -572,10 +572,10 @@ export const ProductDetailPage: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* Add to Cart Button - Larger on mobile */}
+                  {/* Add to Cart Button - Larger on mobile, match Buy Now size */}
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 h-16 sm:h-12 bg-pink-500 text-white font-bold rounded-full uppercase transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base sm:text-sm px-6"
+                    className="w-full sm:flex-1 h-16 sm:h-12 bg-pink-500 text-white font-bold rounded-full uppercase transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base sm:text-sm px-6"
                   >
                     <ShoppingCart className="w-6 h-6 sm:w-5 sm:h-5" />
                     Add to Cart
@@ -600,7 +600,7 @@ export const ProductDetailPage: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-sm text-gray-900">Free Shipping</h4>
-                    <p className="text-xs text-gray-500 mt-1">On orders over R1000</p>
+                    <p className="text-xs text-gray-500 mt-1">On orders over R2000</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">
