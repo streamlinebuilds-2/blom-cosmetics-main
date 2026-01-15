@@ -89,11 +89,11 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
                   ))}
                 </div>
                 <span className="text-base md:text-lg font-semibold text-gray-900">
-                  {averageRating.toFixed(1)} out of 5
+                  {(averageRating || 0).toFixed(1)} out of 5
                 </span>
               </div>
               <span className="text-gray-500 text-sm md:text-lg">
-                Based on {reviewCount} review{reviewCount !== 1 ? 's' : ''}
+                Based on {reviewCount || 0} review{(reviewCount || 0) !== 1 ? 's' : ''}
               </span>
             </div>
           </div>
@@ -112,21 +112,21 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {/* Overall Rating */}
             <div className="text-center">
-              <div className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6">{averageRating.toFixed(1)}</div>
+              <div className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6">{(averageRating || 0).toFixed(1)}</div>
               <div className="flex items-center justify-center gap-1 py-2 md:py-3">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     className={`h-6 w-6 md:h-8 md:w-8 ${
-                      i < Math.floor(averageRating)
+                      i < Math.floor(averageRating || 0)
                         ? 'fill-current'
                         : 'text-gray-300'
                     }`}
-                    style={{ color: i < Math.floor(averageRating) ? '#F59E0B' : undefined }}
+                    style={{ color: i < Math.floor(averageRating || 0) ? '#F59E0B' : undefined }}
                   />
                 ))}
               </div>
-              <p className="text-gray-600 mt-3 md:mt-4 text-sm md:text-base">Based on {reviewCount} review{reviewCount !== 1 ? 's' : ''}</p>
+              <p className="text-gray-600 mt-3 md:mt-4 text-sm md:text-base">Based on {reviewCount || 0} review{(reviewCount || 0) !== 1 ? 's' : ''}</p>
             </div>
 
             {/* Star Rating Breakdown */}
