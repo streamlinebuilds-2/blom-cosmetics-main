@@ -19,20 +19,20 @@ interface ReviewSectionProps {
   productName: string;
   productImage: string;
   productSlug: string;
-  averageRating: number;
-  reviewCount: number;
-  reviews: Review[];
-  onReviewSubmit: (review: any) => void;
+  averageRating?: number;
+  reviewCount?: number;
+  reviews?: Review[];
+  onReviewSubmit?: (review: any) => void;
 }
 
 export const ReviewSection: React.FC<ReviewSectionProps> = ({
   productName,
   productImage = '/assets/blom_logo.webp',
   productSlug,
-  averageRating,
-  reviewCount,
-  reviews,
-  onReviewSubmit
+  averageRating = 0,
+  reviewCount = 0,
+  reviews = [],
+  onReviewSubmit = () => {}
 }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
@@ -40,11 +40,13 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
 
   // Filter and sort reviews
+  const safeReviews = Array.isArray(reviews) ? reviews : [];
+  
   const filteredReviews = selectedRating 
-    ? reviews.filter(review => review.rating === selectedRating)
-    : reviews;
+    ? safeReviews.filter(review => review.rating === selectedRating)
+    : safeReviews;
 
-  const sortedReviews = [...(Array.isArray(filteredReviews) ? filteredReviews : [])].sort((a, b) => {
+  const sortedReviews = [...filteredReviews].sort((a, b) => {
     switch (sortBy) {
       case 'newest':
         return new Date(b.date).getTime() - new Date(a.date).getTime();

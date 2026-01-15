@@ -456,6 +456,9 @@ export const ProductDetailPage: React.FC = () => {
               productName={product.name}
               productImage={product.images[0]}
               productSlug={product.slug}
+              averageRating={0} // TODO: Fetch from DB
+              reviewCount={product.product_reviews?.[0]?.count || 0}
+              reviews={[]} // TODO: Fetch reviews
             />
           </div>
 
