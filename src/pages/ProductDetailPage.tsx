@@ -57,10 +57,9 @@ export const ProductDetailPage: React.FC = () => {
           // Process product data
           const processedProduct = {
             ...productData,
-            images: [
-              productData.image_url || productData.thumbnail_url,
-              ...(productData.gallery_urls || [])
-            ].filter(Boolean),
+            images: Array.isArray(productData.gallery_urls) 
+              ? [productData.image_url || productData.thumbnail_url, ...productData.gallery_urls].filter(Boolean)
+              : [productData.image_url || productData.thumbnail_url].filter(Boolean),
             features: Array.isArray(productData.features) ? productData.features : [],
             howToUse: Array.isArray(productData.how_to_use) ? productData.how_to_use : [],
             ingredients: {
