@@ -258,7 +258,7 @@ export const ProductDetailPage: React.FC = () => {
       if (currentImage) {
         const matchingVariant = product.variants.find((v: any) => {
           if (!v.image) return false;
-          return currentImage === v.image || currentImage.includes(v.name.toLowerCase().replace(/\s+/g, '-')));
+          return currentImage === v.image || currentImage.includes(v.name.toLowerCase().replace(/\s+/g, '-'));
         });
         if (matchingVariant) {
           setSelectedVariant(matchingVariant.name);
