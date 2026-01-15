@@ -245,7 +245,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 }
               }}
               disabled={!inStock || price === -1}
-              className="w-full bg-pink-500 text-white font-bold py-2 md:py-3 px-4 rounded-full shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
+              className="w-full bg-pink-500 text-white font-bold py-3.5 md:py-3 px-4 rounded-full shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
             >
               {inStock ? (
                 <>

@@ -47,18 +47,12 @@ export const ProductDetailPage: React.FC = () => {
         setLoading(true);
         console.log('Loading product for slug:', slug);
 
-        // Fetch main product with variants
+        // Fetch main product with variants (use variants JSON column like ShopPage)
         const { data: productData, error } = await supabase
           .from('products')
           .select(`
             *, 
-            product_reviews(count),
-            product_variants (
-              id,
-              title,
-              price,
-              inventory_quantity
-            )
+            product_reviews(count)
           `)
           .eq('slug', slug)
           .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 errors on 0 rows
@@ -75,33 +69,43 @@ export const ProductDetailPage: React.FC = () => {
           
           console.log('Product data:', {
             name: productData.name,
-            product_variants: productData.product_variants,
+            variants: productData.variants,
             baseImages: baseImages
           });
           
-          // Process variants and match with images
-          const variants = Array.isArray(productData.product_variants)
-            ? productData.product_variants.map((v: any) => {
-                const variantTitle = v.title || v.name || '';
-                const variantNameSlug = variantTitle.toLowerCase().replace(/\s+/g, '-');
-                const variantNameWords = variantTitle.toLowerCase().split(/\s+/);
+          // Process variants from JSON column (same as ShopPage)
+          const variants = Array.isArray(productData.variants)
+            ? productData.variants.map((v: any) => {
+                // Handle both object and string variants
+                if (typeof v === 'string') {
+                  return { 
+                    id: v, 
+                    name: v, 
+                    inStock: true,
+                    image: null
+                  };
+                }
+                
+                const variantName = v.name || v.label || v.title || '';
+                const variantNameSlug = variantName.toLowerCase().replace(/\s+/g, '-');
+                const variantNameWords = variantName.toLowerCase().split(/\s+/);
                 const productSlug = (productData.slug || '').toLowerCase();
                 
                 // Try to find matching image in gallery by checking if image path contains variant name
-                let variantImage: string | null = null;
-                if (baseImages.length > 0) {
-                  // Check each image to see if it matches the variant
+                let variantImage: string | null = v.image || v.image_url || null;
+                
+                // If no direct image, try to match from gallery
+                if (!variantImage && baseImages.length > 0) {
                   for (const img of baseImages) {
                     const imgLower = img.toLowerCase();
                     // Match patterns like: 
                     // - cuticle-oil-vanilla.webp
                     // - cuticle-oil-cotton-candy.webp
                     // - /cuticle-oil-vanilla.webp
-                    // Try multiple matching strategies
                     const matches = 
                       imgLower.includes(variantNameSlug) || 
-                      imgLower.includes(variantTitle.toLowerCase().replace(/\s+/g, '-')) ||
-                      imgLower.includes(variantTitle.toLowerCase().replace(/\s+/g, '')) ||
+                      imgLower.includes(variantName.toLowerCase().replace(/\s+/g, '-')) ||
+                      imgLower.includes(variantName.toLowerCase().replace(/\s+/g, '')) ||
                       // Match individual words (e.g., "cotton" and "candy" in "cotton-candy")
                       (variantNameWords.length > 1 && variantNameWords.every(word => imgLower.includes(word))) ||
                       // Match with product slug prefix (e.g., "cuticle-oil-vanilla")
@@ -116,10 +120,10 @@ export const ProductDetailPage: React.FC = () => {
                 }
                 
                 return {
-                  id: v.id,
-                  name: variantTitle,
+                  id: v.id || variantName,
+                  name: variantName,
                   price: v.price || productData.price,
-                  inStock: (v.inventory_quantity || 0) > 0,
+                  inStock: v.inStock ?? v.in_stock ?? true,
                   image: variantImage
                 };
               })
@@ -571,7 +575,7 @@ export const ProductDetailPage: React.FC = () => {
                   {/* Add to Cart Button - Larger on mobile */}
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 h-14 sm:h-12 bg-pink-500 text-white font-bold rounded-full uppercase transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base sm:text-sm"
+                    className="flex-1 h-16 sm:h-12 bg-pink-500 text-white font-bold rounded-full uppercase transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base sm:text-sm px-6"
                   >
                     <ShoppingCart className="w-6 h-6 sm:w-5 sm:h-5" />
                     Add to Cart
@@ -581,7 +585,7 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Buy Now Button - Larger on mobile */}
                 <button
                   onClick={handleBuyNow}
-                  className="w-full h-14 sm:h-12 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-full uppercase hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 text-base sm:text-sm"
+                  className="w-full h-16 sm:h-12 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-full uppercase hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 text-base sm:text-sm px-6"
                 >
                   <CreditCard className="w-6 h-6 sm:w-5 sm:h-5" />
                   Buy Now
