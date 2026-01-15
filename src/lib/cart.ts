@@ -238,7 +238,28 @@ class CartStore {
   }
 }
 
+import { useState, useEffect } from 'react';
+
+// ... (existing code)
+
 export const cartStore = CartStore.getInstance();
+
+export function useCart() {
+  const [state, setState] = useState(cartStore.getState());
+
+  useEffect(() => {
+    return cartStore.subscribe(setState);
+  }, []);
+
+  return {
+    ...state,
+    addItem: cartStore.addItem.bind(cartStore),
+    removeItem: cartStore.removeItem.bind(cartStore),
+    updateQuantity: cartStore.updateQuantity.bind(cartStore),
+    clearCart: cartStore.clearCart.bind(cartStore),
+    getItemCount: cartStore.getItemCount.bind(cartStore)
+  };
+}
 
 // Utility functions
 export const formatPrice = (price: number): string => {
