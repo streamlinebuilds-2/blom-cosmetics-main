@@ -82,26 +82,63 @@ export const handler: Handler = async (e) => {
 
     console.log("Review created successfully:", data.id);
 
-    // Optional: notify n8n
-    if (process.env.REVIEWS_INTAKE_WEBHOOK) {
-      fetch(process.env.REVIEWS_INTAKE_WEBHOOK, {
+    // Send webhook to external service
+    const WEBHOOK_URL = process.env.REVIEWS_INTAKE_WEBHOOK || 'https://dockerfile-1n82.onrender.com/webhook/reviews-intake';
+    
+    const webhookPayload = {
+      review_id: data.id,
+      product_id,
+      product_slug,
+      reviewer_name,
+      reviewer_email,
+      title,
+      body,
+      rating,
+      images,
+      is_verified_buyer,
+      order_id,
+      status: "pending",
+      timestamp: new Date().toISOString(),
+      source: 'website'
+    };
+
+    console.log('🔔 SENDING REVIEW WEBHOOK:', {
+      url: WEBHOOK_URL,
+      payload: webhookPayload
+    });
+
+    // Send webhook with timeout to prevent function timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    try {
+      const webhookResponse = await fetch(WEBHOOK_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          review_id: data.id,
-          product_id,
-          product_slug,
-          reviewer_name,
-          reviewer_email,
-          title,
-          body,
-          rating,
-          images,
-          is_verified_buyer,
-          order_id,
-          status: "pending",
-        }),
-      }).catch(() => {});
+        headers: {
+          "Content-Type": "application/json",
+          "User-Agent": "BLOM-Cosmetics-Reviews/1.0"
+        },
+        body: JSON.stringify(webhookPayload),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
+      const webhookResponseText = await webhookResponse.text();
+      console.log('📥 WEBHOOK RESPONSE:', {
+        status: webhookResponse.status,
+        statusText: webhookResponse.statusText,
+        body: webhookResponseText
+      });
+
+      if (!webhookResponse.ok) {
+        console.warn(`❌ Webhook responded with status ${webhookResponse.status}: ${webhookResponseText}`);
+      } else {
+        console.log('✅ WEBHOOK SUCCESS: Review payload sent successfully');
+      }
+    } catch (webhookError: any) {
+      console.error('❌ Webhook failed (timeout or network error):', webhookError);
+      // Don't fail the review submission if webhook fails, but log it clearly
     }
 
     return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, id: data.id }) };
