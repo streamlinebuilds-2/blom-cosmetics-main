@@ -80,17 +80,45 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
     setIsSubmitting(true);
 
     try {
+      // Send review to backend endpoint
+      const response = await fetch('/.netlify/functions/reviews-intake', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          product_slug: productSlug,
+          reviewer_name: name.trim(),
+          reviewer_email: email.trim(),
+          rating: Number(rating),
+          title: title.trim() || null,
+          body: comment.trim(),
+          images: [], // Can be extended later for image uploads
+          is_verified_buyer: false
+        }),
+      });
+
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = { ok: false, error: responseText };
+      }
+
+      if (!response.ok) {
+        throw new Error(result.error || result.body || 'Failed to submit review');
+      }
+
+      // Call the onSubmit callback for UI updates
       const reviewData: ReviewData = {
         rating,
         title: title.trim(),
         comment: comment.trim(),
         name: name.trim(),
         email: email.trim(),
-        verified: false // In a real app, this would be determined by purchase verification
+        verified: false
       };
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
       onSubmit(reviewData);
       
@@ -102,8 +130,11 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
       setEmail('');
       setErrors({});
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting review:', error);
+      setErrors({ 
+        comment: error.message || 'Failed to submit review. Please try again.' 
+      });
     } finally {
       setIsSubmitting(false);
     }

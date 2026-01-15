@@ -32,6 +32,7 @@ export const ProductDetailPage: React.FC = () => {
   
   const [product, setProduct] = useState<any>(null);
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
@@ -203,6 +204,36 @@ export const ProductDetailPage: React.FC = () => {
                 inStock: (p.stock_quantity || 0) > 0
               })));
             }
+          }
+
+          // Fetch approved reviews
+          const { data: reviewsData, error: reviewsError } = await supabase
+            .from('product_reviews')
+            .select('id, reviewer_name, title, body, rating, images, created_at, is_verified_buyer')
+            .eq('product_slug', productData.slug)
+            .eq('status', 'approved')
+            .order('created_at', { ascending: false });
+
+          if (!reviewsError && reviewsData) {
+            // Transform reviews to match ReviewSection format
+            const transformedReviews = reviewsData.map((r: any) => ({
+              id: r.id,
+              name: r.reviewer_name,
+              rating: r.rating,
+              title: r.title || '',
+              comment: r.body,
+              date: r.created_at,
+              verified: r.is_verified_buyer || false,
+              helpful: 0,
+              images: r.images || []
+            }));
+            setReviews(transformedReviews);
+            
+            // Calculate average rating
+            const avgRating = transformedReviews.length > 0
+              ? transformedReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / transformedReviews.length
+              : 0;
+            setProduct((prev: any) => ({ ...prev, averageRating: avgRating }));
           }
         }
       } catch (err) {
@@ -717,9 +748,45 @@ export const ProductDetailPage: React.FC = () => {
               productName={product.name}
               productImage={product.images[0]}
               productSlug={product.slug}
-              averageRating={0} // TODO: Fetch from DB
-              reviewCount={product.product_reviews?.[0]?.count || 0}
-              reviews={[]} // TODO: Fetch reviews
+              averageRating={product.averageRating || 0}
+              reviewCount={reviews.length}
+              reviews={reviews}
+              onReviewSubmit={async () => {
+                // Reload reviews after submission
+                if (product?.slug) {
+                  const { data: reviewsData } = await supabase
+                    .from('product_reviews')
+                    .select('id, reviewer_name, title, body, rating, images, created_at, is_verified_buyer')
+                    .eq('product_slug', product.slug)
+                    .eq('status', 'approved')
+                    .order('created_at', { ascending: false });
+
+                  if (reviewsData) {
+                    const transformedReviews = reviewsData.map((r: any) => ({
+                      id: r.id,
+                      name: r.reviewer_name,
+                      rating: r.rating,
+                      title: r.title || '',
+                      comment: r.body,
+                      date: r.created_at,
+                      verified: r.is_verified_buyer || false,
+                      helpful: 0,
+                      images: r.images || []
+                    }));
+                    setReviews(transformedReviews);
+                    
+                    const avgRating = transformedReviews.length > 0
+                      ? transformedReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / transformedReviews.length
+                      : 0;
+                    setProduct((prev: any) => ({ ...prev, averageRating: avgRating }));
+                  }
+                }
+                
+                toast({
+                  title: "Review Submitted",
+                  description: "Thank you for your review! It will be published after moderation."
+                });
+              }}
             />
           </div>
 
