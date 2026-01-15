@@ -88,7 +88,7 @@ function App() {
           <Route path="/courses/:slug" element={<PageWithCart><CourseDetailPage /></PageWithCart>} />
           
           {/* Products */}
-          <Route path="/products/:slug" element={<ProductDetailPage />} />
+          <Route path="/products/:slug" element={<PageWithCart><ProductDetailPage /></PageWithCart>} />
           {/* Product Category Pages */}
           <Route path="/products/acrylic-system" element={<PageWithCart><ShopPage /></PageWithCart>} />
           
