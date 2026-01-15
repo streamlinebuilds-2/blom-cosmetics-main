@@ -44,6 +44,8 @@ export const ProductDetailPage: React.FC = () => {
       
       try {
         setLoading(true);
+        console.log('Loading product for slug:', slug);
+
         // Fetch main product
         const { data: productData, error } = await supabase
           .from('products')
@@ -51,15 +53,19 @@ export const ProductDetailPage: React.FC = () => {
           .eq('slug', slug)
           .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 errors on 0 rows
 
+        console.log('Supabase response:', { productData, error });
+
         if (error) throw error;
         
         if (productData) {
           // Process product data
+          const images = Array.isArray(productData.gallery_urls) 
+            ? [productData.image_url || productData.thumbnail_url, ...productData.gallery_urls].filter(Boolean)
+            : [productData.image_url || productData.thumbnail_url].filter(Boolean);
+            
           const processedProduct = {
             ...productData,
-            images: Array.isArray(productData.gallery_urls) 
-              ? [productData.image_url || productData.thumbnail_url, ...productData.gallery_urls].filter(Boolean)
-              : [productData.image_url || productData.thumbnail_url].filter(Boolean),
+            images: images.length > 0 ? images : ['/assets/blom_logo.webp'], // Fallback image
             features: Array.isArray(productData.features) ? productData.features : [],
             howToUse: Array.isArray(productData.how_to_use) ? productData.how_to_use : [],
             ingredients: {
@@ -264,11 +270,11 @@ export const ProductDetailPage: React.FC = () => {
               {/* Price */}
               <div className="flex items-end gap-3 mb-6">
                 <span className="text-3xl font-bold text-gray-900">
-                  R{product.price.toFixed(2)}
+                  R{(product.price || 0).toFixed(2)}
                 </span>
                 {product.compare_at_price && (
                   <span className="text-xl text-gray-400 line-through mb-1">
-                    R{product.compare_at_price.toFixed(2)}
+                    R{(product.compare_at_price || 0).toFixed(2)}
                   </span>
                 )}
               </div>

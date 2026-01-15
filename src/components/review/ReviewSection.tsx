@@ -27,7 +27,7 @@ interface ReviewSectionProps {
 
 export const ReviewSection: React.FC<ReviewSectionProps> = ({
   productName,
-  productImage,
+  productImage = '/assets/blom_logo.webp',
   productSlug,
   averageRating,
   reviewCount,

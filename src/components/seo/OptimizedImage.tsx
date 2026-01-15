@@ -50,7 +50,14 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     typeof window !== 'undefined'
       ? window.location.origin
       : 'https://cute-stroopwafel-203cac.netlify.app';
-  const imageUrl = src.startsWith('http') ? src : `${site}${src}`;
+  
+  // Handle missing src
+  const safeSrc = src || '/assets/blom_logo.webp'; // Fallback to logo or placeholder
+  const imageUrl = safeSrc.startsWith('http') ? safeSrc : `${site}${safeSrc}`;
+
+  if (!src) {
+    console.warn('OptimizedImage: src is missing for', alt);
+  }
 
   return (
     <>
