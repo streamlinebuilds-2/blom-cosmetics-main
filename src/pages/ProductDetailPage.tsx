@@ -57,8 +57,7 @@ export const ProductDetailPage: React.FC = () => {
               id,
               title,
               price,
-              inventory_quantity,
-              image_url
+              inventory_quantity
             )
           `)
           .eq('slug', slug)
@@ -81,7 +80,7 @@ export const ProductDetailPage: React.FC = () => {
                 name: v.title || v.name || '',
                 price: v.price || productData.price,
                 inStock: (v.inventory_quantity || 0) > 0,
-                image: v.image_url || null
+                image: null // Variant images not stored in product_variants table
               }))
             : [];
           
