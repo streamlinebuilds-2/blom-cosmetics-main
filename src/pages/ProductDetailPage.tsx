@@ -73,29 +73,68 @@ export const ProductDetailPage: React.FC = () => {
             ? [productData.image_url || productData.thumbnail_url, ...productData.gallery_urls].filter(Boolean)
             : [productData.image_url || productData.thumbnail_url].filter(Boolean);
           
-          // Process variants
+          // Process variants and match with images
           const variants = Array.isArray(productData.product_variants)
-            ? productData.product_variants.map((v: any) => ({
-                id: v.id,
-                name: v.title || v.name || '',
-                price: v.price || productData.price,
-                inStock: (v.inventory_quantity || 0) > 0,
-                image: null // Variant images not stored in product_variants table
-              }))
+            ? productData.product_variants.map((v: any) => {
+                const variantTitle = v.title || v.name || '';
+                const variantNameSlug = variantTitle.toLowerCase().replace(/\s+/g, '-');
+                const variantNameWords = variantTitle.toLowerCase().split(/\s+/);
+                const productSlug = (productData.slug || '').toLowerCase();
+                
+                // Try to find matching image in gallery by checking if image path contains variant name
+                let variantImage: string | null = null;
+                if (baseImages.length > 0) {
+                  // Check each image to see if it matches the variant
+                  for (const img of baseImages) {
+                    const imgLower = img.toLowerCase();
+                    // Match patterns like: 
+                    // - cuticle-oil-vanilla.webp
+                    // - cuticle-oil-cotton-candy.webp
+                    // - /cuticle-oil-vanilla.webp
+                    // Try multiple matching strategies
+                    const matches = 
+                      imgLower.includes(variantNameSlug) || 
+                      imgLower.includes(variantTitle.toLowerCase().replace(/\s+/g, '-')) ||
+                      imgLower.includes(variantTitle.toLowerCase().replace(/\s+/g, '')) ||
+                      // Match individual words (e.g., "cotton" and "candy" in "cotton-candy")
+                      (variantNameWords.length > 1 && variantNameWords.every(word => imgLower.includes(word))) ||
+                      // Match with product slug prefix (e.g., "cuticle-oil-vanilla")
+                      (productSlug && imgLower.includes(`${productSlug}-${variantNameSlug}`)) ||
+                      (productSlug && imgLower.includes(`${productSlug}_${variantNameSlug}`));
+                    
+                    if (matches) {
+                      variantImage = img;
+                      break;
+                    }
+                  }
+                }
+                
+                return {
+                  id: v.id,
+                  name: variantTitle,
+                  price: v.price || productData.price,
+                  inStock: (v.inventory_quantity || 0) > 0,
+                  image: variantImage
+                };
+              })
             : [];
           
           // Build images array including variant images
           const allImages: Array<{ url: string; variantName: string | null }> = [];
+          const variantImagesUsed = new Set<string>();
           
-          // Add base product images
-          baseImages.forEach((img: string) => {
-            allImages.push({ url: img, variantName: null });
+          // First, add variant images (prioritize them)
+          variants.forEach((variant: any) => {
+            if (variant.image && !variantImagesUsed.has(variant.image)) {
+              allImages.push({ url: variant.image, variantName: variant.name });
+              variantImagesUsed.add(variant.image);
+            }
           });
           
-          // Add variant images
-          variants.forEach((variant: any) => {
-            if (variant.image && !allImages.find(img => img.url === variant.image)) {
-              allImages.push({ url: variant.image, variantName: variant.name });
+          // Then add base product images that aren't variant images
+          baseImages.forEach((img: string) => {
+            if (!variantImagesUsed.has(img)) {
+              allImages.push({ url: img, variantName: null });
             }
           });
           
@@ -195,6 +234,16 @@ export const ProductDetailPage: React.FC = () => {
       if (imageIndex !== -1) {
         setSelectedImageIndex(imageIndex);
       }
+    } else {
+      // If variant doesn't have specific image, try to find it in imageVariants
+      if (product.imageVariants) {
+        const matchingImageIndex = product.imageVariants.findIndex(
+          (img: any) => img.variantName === variantName
+        );
+        if (matchingImageIndex !== -1) {
+          setSelectedImageIndex(matchingImageIndex);
+        }
+      }
     }
   };
   
@@ -203,14 +252,28 @@ export const ProductDetailPage: React.FC = () => {
     setSelectedImageIndex(index);
     if (product.imageVariants && product.imageVariants[index]?.variantName) {
       setSelectedVariant(product.imageVariants[index].variantName);
+    } else if (product.variants && product.variants.length > 0) {
+      // Try to match image to variant by checking if image path contains variant name
+      const currentImage = product.images[index];
+      if (currentImage) {
+        const matchingVariant = product.variants.find((v: any) => {
+          if (!v.image) return false;
+          return currentImage === v.image || currentImage.includes(v.name.toLowerCase().replace(/\s+/g, '-')));
+        });
+        if (matchingVariant) {
+          setSelectedVariant(matchingVariant.name);
+        }
+      }
     }
   };
   
   // Get current variant name for label
   const getCurrentVariantName = () => {
+    // First check if current image is linked to a variant
     if (product.imageVariants && product.imageVariants[selectedImageIndex]?.variantName) {
       return product.imageVariants[selectedImageIndex].variantName;
     }
+    // Fallback to selected variant
     return selectedVariant;
   };
 
@@ -298,9 +361,9 @@ export const ProductDetailPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Variant Name Label - Bottom Corner */}
+                {/* Variant Name Label - Bottom Left Corner */}
                 {getCurrentVariantName() && (
-                  <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                  <div className="absolute bottom-4 left-4 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded-full">
                     {getCurrentVariantName()}
                   </div>
                 )}
@@ -387,14 +450,11 @@ export const ProductDetailPage: React.FC = () => {
               {product.variants && product.variants.length > 0 && (
                 <div className="mb-8">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="text-sm font-semibold text-gray-900">Select Variant:</span>
-                    {selectedVariant && (
-                      <span className="text-sm text-gray-500">({selectedVariant})</span>
-                    )}
+                    <span className="text-sm font-semibold text-gray-900">Scent:</span>
                   </div>
                   
-                  {/* Variant Options */}
-                  <div className="flex flex-wrap gap-3">
+                  {/* Variant Options - Pill buttons */}
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {product.variants.map((variant: any) => {
                       const isSelected = selectedVariant === variant.name;
                       const isOutOfStock = !variant.inStock;
@@ -407,7 +467,7 @@ export const ProductDetailPage: React.FC = () => {
                           className={`
                             px-4 py-2 rounded-full text-sm font-medium transition-all
                             ${isSelected
-                              ? 'bg-pink-500 text-white shadow-lg shadow-pink-200 ring-2 ring-pink-300'
+                              ? 'bg-pink-500 text-white shadow-lg shadow-pink-200'
                               : isOutOfStock
                               ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
                               : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50'
@@ -425,7 +485,7 @@ export const ProductDetailPage: React.FC = () => {
                     })}
                   </div>
                   
-                  {/* Variant Images Grid */}
+                  {/* Variant Images Grid - Show if variants have images */}
                   {product.variants.some((v: any) => v.image) && (
                     <div className="mt-4">
                       <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -468,40 +528,40 @@ export const ProductDetailPage: React.FC = () => {
                 
                 <div className="flex flex-col sm:flex-row gap-4">
                   {/* Quantity Selector */}
-                  <div className="flex items-center border border-gray-200 rounded-xl h-12 w-fit">
+                  <div className="flex items-center border border-gray-200 rounded-xl h-14 sm:h-12 w-fit">
                     <button 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-pink-500 transition-colors"
+                      className="w-12 sm:w-12 h-full flex items-center justify-center text-gray-500 hover:text-pink-500 transition-colors"
                       disabled={quantity <= 1}
                     >
-                      <Minus className="w-4 h-4" />
+                      <Minus className="w-5 h-5 sm:w-4 sm:h-4" />
                     </button>
-                    <span className="w-8 text-center font-medium text-gray-900">{quantity}</span>
+                    <span className="w-12 sm:w-8 text-center font-medium text-gray-900 text-base sm:text-sm">{quantity}</span>
                     <button 
                       onClick={() => setQuantity(quantity + 1)}
-                      className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-pink-500 transition-colors"
+                      className="w-12 sm:w-12 h-full flex items-center justify-center text-gray-500 hover:text-pink-500 transition-colors"
                     >
-                      <Plus className="w-4 h-4" />
+                      <Plus className="w-5 h-5 sm:w-4 sm:h-4" />
                     </button>
                   </div>
 
-                  {/* Add to Cart Button */}
+                  {/* Add to Cart Button - Larger on mobile */}
                   <button
                     onClick={handleAddToCart}
-                    className="flex-1 h-12 bg-pink-500 text-white font-bold rounded-full transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                    className="flex-1 h-14 sm:h-12 bg-pink-500 text-white font-bold rounded-full transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base sm:text-sm"
                   >
-                    <ShoppingCart className="w-5 h-5" />
-                    Add to Cart
+                    <ShoppingCart className="w-6 h-6 sm:w-5 sm:h-5" />
+                    ADD TO CART
                   </button>
                 </div>
 
-                {/* Buy Now Button */}
+                {/* Buy Now Button - Larger on mobile */}
                 <button
                   onClick={handleBuyNow}
-                  className="w-full h-12 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-full hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                  className="w-full h-14 sm:h-12 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-full hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 text-base sm:text-sm"
                 >
-                  <CreditCard className="w-5 h-5" />
-                  Buy Now
+                  <CreditCard className="w-6 h-6 sm:w-5 sm:h-5" />
+                  BUY NOW
                 </button>
               </div>
 
