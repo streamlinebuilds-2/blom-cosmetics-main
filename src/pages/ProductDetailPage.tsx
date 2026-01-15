@@ -61,16 +61,16 @@ export const ProductDetailPage: React.FC = () => {
               productData.image_url || productData.thumbnail_url,
               ...(productData.gallery_urls || [])
             ].filter(Boolean),
-            features: productData.features || [],
-            howToUse: productData.how_to_use || [],
+            features: Array.isArray(productData.features) ? productData.features : [],
+            howToUse: Array.isArray(productData.how_to_use) ? productData.how_to_use : [],
             ingredients: {
-              inci: productData.inci_ingredients || [],
-              key: productData.key_ingredients || []
+              inci: Array.isArray(productData.inci_ingredients) ? productData.inci_ingredients : [],
+              key: Array.isArray(productData.key_ingredients) ? productData.key_ingredients : []
             },
             details: {
               size: productData.size,
               shelfLife: productData.shelf_life,
-              claims: productData.claims || []
+              claims: Array.isArray(productData.claims) ? productData.claims : []
             }
           };
           
