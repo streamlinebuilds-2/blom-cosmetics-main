@@ -1,4 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
+
+// Manually load .env
+try {
+  const envPath = path.resolve(process.cwd(), '.env');
+  if (fs.existsSync(envPath)) {
+    const envConfig = fs.readFileSync(envPath, 'utf8');
+    envConfig.split('\n').forEach(line => {
+      const match = line.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        const key = match[1].trim();
+        const value = match[2].trim().replace(/^['"](.*)['"]$/, '$1');
+        process.env[key] = value;
+      }
+    });
+    console.log('.env file loaded successfully');
+  }
+} catch (e) {
+  console.error('Error loading .env file:', e);
+}
 
 const supabaseUrl = 'https://yvmnedjybrpvlupygusf.supabase.co';
 

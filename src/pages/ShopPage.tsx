@@ -4,7 +4,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { ProductCard } from '../components/ProductCard';
-import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download, ShoppingCart, X } from 'lucide-react';
+import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, BookOpen, Download, ShoppingCart, X, Square } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
 import { PageLoadingSpinner, ProductGridSkeleton } from '../components/ui/LoadingSpinner';
 import { supabase } from '../lib/supabase';
@@ -28,11 +28,12 @@ export const ShopPage: React.FC = () => {
     const handleResize = () => {
       const width = window.innerWidth;
       if (width >= 1024) {
-        // Desktop: Force 3x3 grid, no options to change
-        setViewMode('compact');
+        // Desktop: Force 3x3 grid if not already compact
+        setViewMode(prev => prev !== 'compact' ? 'compact' : prev);
       } else {
-        // Mobile: Default to 1x1 grid
-        setViewMode('single');
+        // Mobile: Only switch to single if currently in desktop mode (compact)
+        // This prevents resetting user's choice (grid/list) on mobile resize events (scrolling)
+        setViewMode(prev => prev === 'compact' ? 'single' : prev);
       }
     };
 
@@ -1138,13 +1139,13 @@ export const ShopPage: React.FC = () => {
                    <Grid2X2 className="h-3 w-3" />
                  </button>
                  <button
-                   onClick={() => setViewMode('single')}
-                   className={`p-1.5 rounded-md transition-colors ${
-                     viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
-                   }`}
-                 >
-                   <List className="h-3 w-3" />
-                 </button>
+                  onClick={() => setViewMode('single')}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    viewMode === 'single' ? 'bg-white text-pink-400 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Square className="h-3 w-3" />
+                </button>
                </div>
               </div>
             </div>
@@ -1168,6 +1169,31 @@ export const ShopPage: React.FC = () => {
                   </div>
                   
                   <div className="space-y-6">
+                    {/* Sort By - Mobile Version */}
+                    <div>
+                      <h3 className="font-bold text-xl mb-4">Sort By</h3>
+                      <div className="space-y-3">
+                        {sortOptions.map(option => (
+                          <div
+                            key={option.value}
+                            className={`flex items-center py-2 px-3 rounded-lg cursor-pointer ${
+                              sortBy === option.value
+                                ? 'bg-pink-100 border-l-4 border-pink-500'
+                                : 'hover:bg-gray-50'
+                            }`}
+                            onClick={() => setSortBy(option.value)}
+                          >
+                            <div className="mr-3">
+                              <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${sortBy === option.value ? 'border-black bg-black' : 'border-gray-300'}`}>
+                                {sortBy === option.value && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                              </div>
+                            </div>
+                            <span className="text-gray-600 flex-1">{option.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Categories - Mobile Version - Updated with bigger, bolder heading */}
                     <div>
                       <h3 className="font-bold text-xl mb-4">Categories</h3>
