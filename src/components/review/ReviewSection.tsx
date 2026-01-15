@@ -44,7 +44,7 @@ export const ReviewSection: React.FC<ReviewSectionProps> = ({
     ? reviews.filter(review => review.rating === selectedRating)
     : reviews;
 
-  const sortedReviews = [...filteredReviews].sort((a, b) => {
+  const sortedReviews = [...(Array.isArray(filteredReviews) ? filteredReviews : [])].sort((a, b) => {
     switch (sortBy) {
       case 'newest':
         return new Date(b.date).getTime() - new Date(a.date).getTime();

@@ -49,7 +49,7 @@ export const ProductDetailPage: React.FC = () => {
           .from('products')
           .select('*, product_reviews(count)')
           .eq('slug', slug)
-          .single();
+          .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 errors on 0 rows
 
         if (error) throw error;
         
