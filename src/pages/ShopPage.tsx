@@ -501,6 +501,8 @@ export const ShopPage: React.FC = () => {
   const normalizeCategoryToSlug = (category: string): string => {
     const categoryMap: Record<string, string> = {
       'Bundle Deals': 'bundle-deals',
+      'Collection': 'collections',
+      'Collections': 'collections',
       'Acrylic System': 'acrylic-system',
       'Prep & Finish': 'prep-finishing',
       'Prep & Finishing': 'prep-finishing',
@@ -551,9 +553,81 @@ export const ShopPage: React.FC = () => {
 
         // Map products from products table
         const mappedProducts = (products || []).map((p: any) => {
-          // Check if this is actually a bundle stored in products table
+          // Check if this is a Collection (product_type, category, or name)
+          const isCollectionFromProductsTable =
+            (p.product_type || '').toString().toLowerCase() === 'collection' ||
+            ((p.category || '').toString().toLowerCase().includes('collection'));
+          // Check if this is a bundle stored in products table
           const isBundleFromProductsTable = p.product_type === 'bundle' || p.category === 'Bundle Deals';
-          
+
+          if (isCollectionFromProductsTable) {
+            return {
+              id: `bundle-${p.id}`,
+              name: p.name,
+              slug: p.slug,
+              category: 'collections',
+
+              // Price - check all variations
+              price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
+              compareAtPrice: p.compare_at_price || p.compare_at || null,
+
+              // Stock - check ALL possible columns (using ?? to properly handle 0 values)
+              stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
+              inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
+
+              // Descriptions - check variations
+              shortDescription: p.short_description || p.short_desc || p.description_short || '',
+              short_description: p.short_description || p.short_desc || p.description_short || '',
+              description: p.short_description || p.short_desc || p.description_short || '',
+              overview: p.overview || p.long_description || p.description_full || p.description || '',
+
+              // Images - check variations (including gallery fallback)
+              // We insert hover_image at index 1 for the card flip effect
+              images: [
+                p.thumbnail_url || p.image_main || p.image_url,
+                p.hover_image || p.hover_url, 
+                ...(p.gallery_urls || p.image_gallery || p.gallery || [])
+              ].filter(Boolean),
+
+              // Arrays (use modern names, fallback to empty)
+              features: p.features || [],
+              howToUse: p.how_to_use || [],
+              ingredients: {
+                inci: p.inci_ingredients || [],
+                key: p.key_ingredients || []
+              },
+              // Variants - ensure proper mapping with name/label fallback
+              variants: Array.isArray(p.variants)
+                ? p.variants.map((v: any) => {
+                    // Handle both object and string variants
+                    if (typeof v === 'string') {
+                      return { name: v, inStock: true };
+                    }
+                    return {
+                      name: v.name || v.label || v.title || '',
+                      label: v.label || v.name || v.title || '',
+                      inStock: v.inStock ?? v.in_stock ?? true,
+                      image: v.image || v.image_url || null,
+                      price: v.price || null
+                    };
+                  })
+                : [],
+
+              // Meta
+              rating: 0,
+              reviews: 0,
+              badges: [...(p.badges || []), 'Bundle'],
+              seo: {
+                title: p.meta_title || p.name,
+                description: p.meta_description || p.short_description || p.short_desc
+              },
+              
+              // Bundle-specific fields
+              isBundle: true,
+              bundleProducts: p.bundle_products || [] // Will be populated if needed
+            };
+          }
+
           if (isBundleFromProductsTable) {
             return {
               id: `bundle-${p.id}`,
@@ -713,12 +787,17 @@ export const ShopPage: React.FC = () => {
           };
         });
 
-        // Map bundles to product format
-        const mappedBundles = (bundles || []).map((bundle: any) => ({
+        // Map bundles to product format: Collections vs Bundle Deals
+        const mappedBundles = (bundles || []).map((bundle: any) => {
+          const isCollection =
+            ((bundle.product_type || bundle.bundle_type || bundle.category || '').toString().toLowerCase().includes('collection')) ||
+            ((bundle.name || '').toLowerCase().includes('collection'));
+          const category = isCollection ? 'collections' : 'bundle-deals';
+          return {
           id: `bundle-${bundle.id}`,
           name: bundle.name,
           slug: bundle.slug,
-          category: 'bundle-deals', // Always use bundle-deals category
+          category,
 
           // Price - check all variations
           price: bundle.price_cents ? bundle.price_cents / 100 : (bundle.price || 0),
@@ -775,7 +854,8 @@ export const ShopPage: React.FC = () => {
           // Bundle-specific fields
           isBundle: true,
           bundleProducts: bundle.bundle_products || [] // Will be populated if needed
-        }));
+        };
+        });
 
         // Ensure all products have categories arrays (for static products that might not have been updated)
         const ensureCategories = (products: any[]) => {
@@ -858,6 +938,7 @@ export const ShopPage: React.FC = () => {
       'prep-finishing',    // Prep Solution & Primer - SECOND PRIORITY
       'gel-system',        // Gel products
       'tools-essentials',  // Tools and essentials
+      'collections',       // Collections (e.g. Petal Collection, Red Collection)
       'bundle-deals',      // Bundle deals
       'furniture'          // Furniture - BOTTOM PRIORITY
     ];
@@ -878,12 +959,12 @@ export const ShopPage: React.FC = () => {
       }
     });
 
-    // 4. Add any remaining categories that aren't in our priority list
+    // 4. Add any remaining categories that aren't in our priority list (exclude archived)
     allProducts.forEach((product: any) => {
       // Get category from either categories array or single category
       const productCategories = product.categories || (product.category ? [product.category] : []);
       productCategories.forEach((slug: string) => {
-        if (!slug || slug === 'all' || foundCategories.has(slug)) return;
+        if (!slug || slug === 'all' || slug === 'archived' || foundCategories.has(slug)) return;
 
         if (!cats.has(slug)) {
           const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
