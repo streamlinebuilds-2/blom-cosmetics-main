@@ -433,12 +433,12 @@ export const CourseDetailPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto-select package and date if there's only one option
+  // Auto-select package and date
   useEffect(() => {
-    if (course.packages.length === 1 && !selectedPackage) {
+    if (course.packages.length > 0 && !selectedPackage) {
       setSelectedPackage(course.packages[0].name);
     }
-    if (course.availableDates.length === 1 && !selectedDate) {
+    if (course.availableDates.length > 0 && !selectedDate) {
       setSelectedDate(course.availableDates[0]);
     }
   }, [course, selectedPackage, selectedDate]);
@@ -524,9 +524,14 @@ export const CourseDetailPage: React.FC = () => {
         return;
       }
 
-      // Extract numeric price from package (e.g., "R450" -> 450)
       const priceMatch = selectedPkg.price.match(/[\d,]+/);
       const coursePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
+      const depositAmount = 2000;
+      const amountToCharge = course.isOnline ? coursePrice : depositAmount;
+      const amountToChargeCents = Math.round(amountToCharge * 100);
+      const itemLabel = course.isOnline
+        ? `${course.title} - ${selectedPackage} Package (${selectedDate})`
+        : `${course.title} - ${selectedPackage} Deposit (${selectedDate})`;
 
       // Create order with course as product
       const orderRes = await fetch('/.netlify/functions/create-order', {
@@ -540,17 +545,18 @@ export const CourseDetailPage: React.FC = () => {
           },
           items: [{
             product_id: course.id,
-            product_name: `${course.title} - ${selectedPackage} Package`,
-            unit_price: coursePrice,
+            product_name: itemLabel,
+            sku: `COURSE:${courseSlug}`,
+            unit_price: amountToChargeCents,
             quantity: 1
           }],
           totals: {
-            subtotal_cents: Math.round(coursePrice * 100),
+            subtotal_cents: amountToChargeCents,
             shipping_cents: 0,
             tax_cents: 0
           },
           shipping: {
-            method: 'digital' // No shipping needed for online courses
+            method: course.isOnline ? 'digital' : 'collection'
           }
         })
       });
@@ -566,8 +572,8 @@ export const CourseDetailPage: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: coursePrice,
-          item_name: `${course.title} - ${selectedPackage} Package`,
+          amount: amountToCharge,
+          item_name: itemLabel,
           m_payment_id: orderData.m_payment_id,
           email_address: formData.email,
           name_first: formData.name.split(' ')[0],

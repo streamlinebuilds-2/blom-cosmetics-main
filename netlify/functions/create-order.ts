@@ -76,7 +76,10 @@ export const handler: Handler = async (event) => {
     
     // Select the correct address object
     // If delivery, use shipping address. If collection, it is null.
-    const deliveryAddress = fulfillmentMethod === 'delivery' ? (body.shipping?.address || body.fulfillment?.address || body.delivery_address) : null;
+    const deliveryAddress =
+      fulfillmentMethod === 'delivery'
+        ? (body.shipping?.address ?? body.fulfillment?.address ?? body.delivery_address ?? null)
+        : null;
     const collectionLocation = fulfillmentMethod === 'collection' ? 'BLOM HQ' : null;
 
     // 3. Create Order via RPC
