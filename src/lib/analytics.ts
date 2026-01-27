@@ -98,8 +98,8 @@ class AdvancedAnalytics {
 
   constructor(config: AnalyticsConfig = {}) {
     this.config = {
-      googleAnalyticsId: config.googleAnalyticsId || 'G-XXXXXXXXXX', // Placeholder - remove analytics for now
-      facebookPixelId: config.facebookPixelId || 'YOUR_FACEBOOK_PIXEL_ID',
+      googleAnalyticsId: config.googleAnalyticsId,
+      facebookPixelId: config.facebookPixelId,
       hotjarId: config.hotjarId || undefined,
       enableDebug: config.enableDebug || false,
       enableConversionOptimization: config.enableConversionOptimization || true,
@@ -604,7 +604,7 @@ class AdvancedAnalytics {
 
   // User Properties
   setUserProperties(properties: Record<string, any>) {
-    if (typeof window !== 'undefined' && (window as any).gtag) {
+    if (typeof window !== 'undefined' && (window as any).gtag && this.config.googleAnalyticsId) {
       (window as any).gtag('config', this.config.googleAnalyticsId, {
         user_properties: properties
       });
@@ -669,7 +669,13 @@ let analyticsInstance: AdvancedAnalytics | null = null;
 
 export const getAnalytics = (config?: AnalyticsConfig): AdvancedAnalytics => {
   if (!analyticsInstance) {
-    analyticsInstance = new AdvancedAnalytics(config);
+    const gaId = (import.meta as any).env?.VITE_GA_ID as string | undefined;
+    const fbId = (import.meta as any).env?.VITE_FB_PIXEL_ID as string | undefined;
+    analyticsInstance = new AdvancedAnalytics({
+      googleAnalyticsId: gaId && !gaId.includes('XXXX') ? gaId : undefined,
+      facebookPixelId: fbId && fbId !== 'YOUR_FACEBOOK_PIXEL_ID' ? fbId : undefined,
+      ...config
+    });
   }
   return analyticsInstance;
 };

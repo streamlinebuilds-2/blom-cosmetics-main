@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
 import { ClickableContact } from '../components/ui/ClickableContact';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { supabase } from '../lib/supabase';
 import { 
   Clock, 
   MapPin, 
@@ -21,8 +23,27 @@ import {
 export const CourseDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const courseSlug = slug || 'professional-acrylic-training';
+  type CourseRow = {
+    id: string;
+    title: string;
+    slug: string;
+    description: string | null;
+    price: number | string | null;
+    image_url: string | null;
+    duration: string | null;
+    level: string | null;
+    course_type?: string | null;
+    template_key?: string | null;
+    is_active: boolean;
+    created_at: string | null;
+  };
+
+  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
+  const [courseError, setCourseError] = useState<string | null>(null);
+  const [courseRow, setCourseRow] = useState<CourseRow | null>(null);
+
   // Course data
-  const courses = {
+  const courseTemplates = {
     'professional-acrylic-training': {
       id: 'a603be5f-2c56-4e95-9423-8229c8991b40',
       title: 'Professional Acrylic Training',
@@ -265,7 +286,140 @@ export const CourseDetailPage: React.FC = () => {
     }
   };
 
-  const course = courses[courseSlug as keyof typeof courses] || courses['professional-acrylic-training'];
+  const currencyFormatter = useMemo(() => {
+    return new Intl.NumberFormat('en-ZA', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    });
+  }, []);
+
+  const isOnlineFromRow = (row: CourseRow | null) => {
+    if (!row) return null;
+    const normalizedType = ((row as any).course_type || '').toLowerCase();
+    if (normalizedType === 'online') return true;
+    if (normalizedType === 'in-person') return false;
+    const duration = (row.duration || '').toLowerCase();
+    return row.slug.toLowerCase().startsWith('online-') || duration.includes('self-paced');
+  };
+
+  const getNumericPrice = (value: CourseRow['price']) => {
+    if (value === null || value === undefined || value === '') return null;
+    const numeric = typeof value === 'number' ? value : Number(value);
+    if (!Number.isFinite(numeric)) return null;
+    return numeric;
+  };
+
+  const formatPriceLabel = (value: CourseRow['price']) => {
+    const numeric = getNumericPrice(value);
+    if (numeric === null) return '';
+    return `R${currencyFormatter.format(numeric)}`;
+  };
+
+  const templateKey = ((courseRow as any)?.template_key as string | null | undefined) || courseSlug;
+  const template = courseTemplates[templateKey as keyof typeof courseTemplates] || null;
+
+  const course = useMemo(() => {
+    const onlineFromRow = isOnlineFromRow(courseRow);
+    const isOnline = onlineFromRow ?? template?.isOnline ?? true;
+
+    const base = template || {
+      id: courseRow?.id || '',
+      title: courseRow?.title || '',
+      description: courseRow?.description || '',
+      heroImage: courseRow?.image_url || '/assets/blom_logo.webp',
+      duration: courseRow?.duration || '',
+      price: formatPriceLabel(courseRow?.price ?? null),
+      numericPrice: getNumericPrice(courseRow?.price ?? null) || 0,
+      isOnline,
+      location: isOnline ? 'Online' : 'In-Person',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience.'
+      },
+      about: [(courseRow?.description || '').trim()].filter(Boolean),
+      packages: [
+        {
+          name: 'Standard',
+          price: formatPriceLabel(courseRow?.price ?? null) || 'R0',
+          kitValue: 'Included',
+          features: [
+            'Certificate after you\'ve completed your exam'
+          ]
+        }
+      ],
+      availableDates: ['Available Now'],
+      accordionData: []
+    };
+
+    const numericPrice = getNumericPrice(courseRow?.price ?? null);
+    const priceLabel = formatPriceLabel(courseRow?.price ?? null);
+
+    const merged = {
+      ...base,
+      id: courseRow?.id || base.id,
+      title: courseRow?.title || base.title,
+      description: (courseRow?.description ?? base.description) || '',
+      heroImage: courseRow?.image_url || base.heroImage,
+      duration: courseRow?.duration || base.duration,
+      numericPrice: numericPrice ?? base.numericPrice,
+      price: priceLabel || base.price,
+      isOnline,
+      location: isOnline ? 'Online' : base.location
+    };
+
+    if (template && template.packages?.length) {
+      const nextPackages = [...template.packages];
+      if (priceLabel) {
+        nextPackages[0] = {
+          ...nextPackages[0],
+          price: nextPackages[0].price ? priceLabel : priceLabel
+        };
+      }
+      return {
+        ...merged,
+        packages: nextPackages
+      };
+    }
+
+    return merged;
+  }, [courseRow, courseSlug, currencyFormatter, template]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      setIsLoadingCourse(true);
+      setCourseError(null);
+
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('slug', courseSlug)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (error) {
+        console.error('Failed to load course by slug:', error.message);
+        setCourseError('Unable to load this course right now. Please try again.');
+        setCourseRow(null);
+        setIsLoadingCourse(false);
+        return;
+      }
+
+      setCourseRow((data ?? null) as CourseRow | null);
+      setIsLoadingCourse(false);
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [courseSlug]);
+
+  const isNotFound = !isLoadingCourse && !courseError && !courseRow && !template;
+
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(0);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -474,8 +628,36 @@ export const CourseDetailPage: React.FC = () => {
       <Header showMobileMenu={true} />
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
+        {isLoadingCourse ? (
+          <div className="py-24">
+            <LoadingSpinner size="lg" text="Loading course..." />
+          </div>
+        ) : courseError ? (
+          <div className="py-24">
+            <Container>
+              <div className="flex flex-col items-center justify-center text-center">
+                <p className="text-neutral-700 mb-4">{courseError}</p>
+                <Button onClick={() => window.location.reload()} variant="primary">
+                  Retry
+                </Button>
+              </div>
+            </Container>
+          </div>
+        ) : isNotFound ? (
+          <div className="py-24">
+            <Container>
+              <div className="flex flex-col items-center justify-center text-center">
+                <p className="text-neutral-700 mb-4">Course not found.</p>
+                <Button onClick={() => (window.location.href = '/courses')} variant="primary">
+                  Back to Courses
+                </Button>
+              </div>
+            </Container>
+          </div>
+        ) : (
+          <>
+            {/* Hero Section */}
+            <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
           <img
             src={course.heroImage}
             alt={course.title}
@@ -965,6 +1147,8 @@ export const CourseDetailPage: React.FC = () => {
             </div>
           </Container>
         </section>
+          </>
+        )}
       </main>
 
       <Footer />
