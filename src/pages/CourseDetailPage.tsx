@@ -12,6 +12,8 @@ import {
   ChevronUp,
   CheckCircle,
   Calendar,
+  Package,
+  Ticket,
   Phone,
   Mail,
   Shield,
@@ -101,6 +103,38 @@ export const CourseDetailPage: React.FC = () => {
         'March 2026 (19-23 Mar)',
         'May/June 2026 (29 May-2 Jun)'
       ],
+      thingsToBring: [
+        'Your own refreshments and lunch (coffee and tea will be provided daily)',
+        'A practice hand (preferably a Habbil Hand – this is essential)',
+        'An electric file (e-file) and a safety bit',
+        'Two hand models: Day 4 model required for practical work; Day 5 model required for assessment'
+      ],
+      trainingSchedule: [
+        {
+          title: 'March 2026',
+          items: [
+            '19 March 2026 (08:30-16:00)',
+            '20 March 2026 (08:30-16:00)',
+            '21 March 2026 (09:00-15:00)',
+            '22 March 2026 (08:30-15:00)',
+            '23 March 2026 (08:30-16:00)'
+          ]
+        },
+        {
+          title: 'May/June 2026',
+          items: [
+            '29 May 2026 (08:30-16:00)',
+            '30 May 2026 (08:30-16:00)',
+            '31 May 2026 (09:00-15:00)',
+            '1 June 2026 (08:30-15:00)',
+            '2 June 2026 (08:30-16:00)'
+          ]
+        }
+      ],
+      studentDiscount: [
+        'We have a shop inside the training studio',
+        '10% discount on all product purchases during your training'
+      ],
       accordionData: [
         {
           title: 'DAY 1: FOUNDATION & PREPARATION',
@@ -177,6 +211,9 @@ export const CourseDetailPage: React.FC = () => {
         }
       ],
       availableDates: ['Available Now'],
+      thingsToBring: [],
+      trainingSchedule: [],
+      studentDiscount: [],
       accordionData: [
         {
           title: 'MODULE 1: INTRODUCTION TO WATERCOLOR',
@@ -254,6 +291,9 @@ export const CourseDetailPage: React.FC = () => {
         }
       ],
       availableDates: ['Available Now'],
+      thingsToBring: [],
+      trainingSchedule: [],
+      studentDiscount: [],
       accordionData: [
         {
           title: 'MODULE 1: CHRISTMAS BASICS',
@@ -751,12 +791,12 @@ export const CourseDetailPage: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Available Dates */}
+                {/* Course Dates */}
                 <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Calendar className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Available Dates'}</h3>
+                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Course Dates'}</h3>
                   <div className="space-y-2">
                     {course.availableDates.map((date, index) => (
                       <button
@@ -788,6 +828,61 @@ export const CourseDetailPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+                {!course.isOnline && course.thingsToBring.length > 0 && (
+                  <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                    <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                      <Package className="h-8 w-8 text-pink-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Things to Bring</h3>
+                    <ul className="text-gray-600 text-sm space-y-2 text-left">
+                      {course.thingsToBring.map((item, index) => (
+                        <li key={index} className="flex gap-2">
+                          <span className="text-pink-400 mt-0.5">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {!course.isOnline && course.trainingSchedule.length > 0 && (
+                  <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                    <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                      <Clock className="h-8 w-8 text-pink-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Training Dates & Times</h3>
+                    <div className="text-left space-y-4">
+                      {course.trainingSchedule.map((block, index) => (
+                        <div key={index}>
+                          <div className="text-sm font-bold text-gray-900 mb-2">{block.title}</div>
+                          <ul className="text-gray-600 text-sm space-y-1">
+                            {block.items.map((t: string, tIndex: number) => (
+                              <li key={tIndex}>{t}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {!course.isOnline && course.studentDiscount.length > 0 && (
+                  <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                    <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                      <Ticket className="h-8 w-8 text-pink-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Exclusive Student Discount</h3>
+                    <ul className="text-gray-600 text-sm space-y-2 text-left">
+                      {course.studentDiscount.map((item, index) => (
+                        <li key={index} className="flex gap-2">
+                          <span className="text-pink-400 mt-0.5">•</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {/* Contact */}
                 <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
