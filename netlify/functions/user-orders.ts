@@ -40,8 +40,29 @@ export const handler: Handler = async (event) => {
 
     const orders = await response.json();
 
+    const orderIds = orders.map((o: any) => o.id).filter(Boolean)
+    let courseOrderIdSet = new Set<string>()
+    if (orderIds.length > 0) {
+      const inFilter = `(${orderIds.map((id: string) => `"${id}"`).join(',')})`
+      const cpRes = await fetch(
+        `${process.env.SUPABASE_URL}/rest/v1/course_purchases?select=order_id&order_id=in.${encodeURIComponent(inFilter)}`,
+        {
+          headers: {
+            apikey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY!}`
+          }
+        }
+      )
+      if (cpRes.ok) {
+        const cps = await cpRes.json()
+        courseOrderIdSet = new Set<string>((cps || []).map((c: any) => String(c.order_id)))
+      }
+    }
+
+    const filteredOrders = orders.filter((o: any) => !courseOrderIdSet.has(String(o.id)))
+
     // Format orders for frontend
-  const formattedOrders = orders.map((order: any) => {
+  const formattedOrders = filteredOrders.map((order: any) => {
     const addr = order.delivery_address || null;
     const shippingAddress = addr && addr.street_address ? `${addr.street_address}, ${addr.local_area || ''}, ${addr.city || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '') : null;
 

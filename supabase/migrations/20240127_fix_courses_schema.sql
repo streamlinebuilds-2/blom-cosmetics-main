@@ -26,7 +26,7 @@ INSERT INTO public.courses (
   'Professional Acrylic Training',
   'professional-acrylic-training',
   'Master the art of acrylic nail application with hands-on training in Randfontein.',
-  7200,
+  7600,
   '/professional-acrylic-training-hero.webp',
   '5 Days',
   'Beginner to Intermediate',

@@ -6,6 +6,7 @@ export const handler: Handler = async (event) => {
 
     const body = JSON.parse(event.body || '{}')
     const items = body.items || []
+    const orderKind = body.order_kind === 'course' ? 'course' : 'product'
     const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 
     const SUPABASE_URL = process.env.SUPABASE_URL
@@ -119,22 +120,87 @@ export const handler: Handler = async (event) => {
       p_fulfillment_method: fulfillmentMethod,
       p_delivery_address: deliveryAddress,
       p_collection_location: collectionLocation,
-      p_coupon_code: body.coupon?.code || null
+      p_coupon_code: body.coupon?.code || null,
+      p_order_kind: orderKind
     };
 
-    const rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
+    let rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
       method: 'POST',
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(rpcPayload)
     });
 
-    if (!rpcRes.ok) throw new Error(`Database Error: ${await rpcRes.text()}`);
+    if (!rpcRes.ok) {
+      const errText = await rpcRes.text();
+      if (errText.includes('p_order_kind') || errText.includes('api_create_order')) {
+        const { p_order_kind, ...fallbackPayload } = rpcPayload;
+        rpcRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/api_create_order`, {
+          method: 'POST',
+          headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(fallbackPayload)
+        });
+        if (!rpcRes.ok) throw new Error(`Database Error: ${await rpcRes.text()}`);
+      } else {
+        throw new Error(`Database Error: ${errText}`);
+      }
+    }
 
     const orderData = await rpcRes.json();
+    const order = Array.isArray(orderData) ? orderData[0] : orderData;
+
+    if (orderKind === 'course' && body.course_booking?.course_slug) {
+      const booking = body.course_booking;
+      const basePayload: any = {
+        order_id: String(order.order_id),
+        course_slug: String(booking.course_slug),
+        buyer_email: String(booking.buyer_email || body.buyer?.email || ''),
+        buyer_name: booking.buyer_name || body.buyer?.name || null,
+        buyer_phone: booking.buyer_phone || body.buyer?.phone || null,
+        course_title: booking.course_title || null,
+        course_type: booking.course_type || null,
+        selected_package: booking.selected_package || null,
+        selected_date: booking.selected_date || null,
+        amount_paid_cents: typeof booking.amount_paid_cents === 'number' ? booking.amount_paid_cents : null,
+        payment_kind: booking.payment_kind || null,
+        details: booking.details || null
+      };
+
+      const bookingPayload: any = {
+        ...basePayload,
+        amount_owed_cents: typeof booking.amount_owed_cents === 'number' ? booking.amount_owed_cents : null,
+        balance_order_id: booking.balance_order_id || null
+      };
+
+      const insertBooking = async (payload: any) => {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/course_purchases?on_conflict=order_id,course_slug`, {
+          method: 'POST',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'resolution=merge-duplicates'
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!r.ok) throw new Error(await r.text());
+      };
+
+      try {
+        await insertBooking(bookingPayload);
+      } catch (e: any) {
+        const msg = String(e?.message || e);
+        if (msg.includes('amount_owed_cents') || msg.includes('balance_order_id')) {
+          await insertBooking(basePayload);
+        } else {
+          throw e;
+        }
+      }
+    }
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Array.isArray(orderData) ? orderData[0] : orderData)
+      body: JSON.stringify(order)
     };
 
   } catch (e: any) {

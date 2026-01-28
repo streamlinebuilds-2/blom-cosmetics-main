@@ -92,6 +92,34 @@ export const handler: Handler = async (event) => {
         else console.error('❌ Invoice generation failed:', await invRes.text())
       } catch (e) { console.error('Invoice trigger error:', e) }
 
+      try {
+        const amountCents = Math.round(Number(data.amount || 0) * 100);
+        let isCourse = order.order_kind === 'course';
+
+        if (!isCourse) {
+          const cpRes = await fetch(
+            `${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}&select=id&limit=1`,
+            { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+          );
+          if (cpRes.ok) {
+            const cps = await cpRes.json();
+            isCourse = Array.isArray(cps) && cps.length > 0;
+          }
+        }
+
+        if (isCourse && Number.isFinite(amountCents) && amountCents > 0) {
+          await fetch(`${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}`, {
+            method: 'PATCH',
+            headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount_paid_cents: amountCents
+            })
+          });
+        }
+      } catch (e) {
+        console.error('Course purchase update error:', e)
+      }
+
       // D) Trigger Stock Deduction
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/rpc/process_order_stock_deduction`, {

@@ -64,6 +64,27 @@ export const handler: Handler = async (event) => {
       await supabase.rpc('process_order_stock_deduction', { p_order_id: order.id });
     }
 
+    try {
+      const amountCents = typeof order.total_cents === 'number'
+        ? order.total_cents
+        : Math.round(Number(order.total || 0) * 100);
+
+      const { data: cps } = await supabase
+        .from('course_purchases')
+        .select('id')
+        .eq('order_id', order.id)
+        .limit(1);
+
+      if (cps && cps.length > 0 && Number.isFinite(amountCents) && amountCents > 0) {
+        await supabase
+          .from('course_purchases')
+          .update({ amount_paid_cents: amountCents })
+          .eq('order_id', order.id);
+      }
+    } catch (e) {
+      console.error('Course purchase update error:', e)
+    }
+
     // 4. TRIGGER N8N WORKFLOW
     // Constructing the specific payload you asked for: Amount, Name, Email, Phone, Order ID
     const n8nPayload = {

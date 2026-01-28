@@ -16,7 +16,7 @@ const CoursesPage: React.FC = () => {
       image: '/professional-acrylic-training-hero.webp',
       duration: '5 Days',
       location: 'Randfontein',
-      priceLabel: 'From R7,200'
+      priceLabel: 'From R7,600'
     }
   ];
 

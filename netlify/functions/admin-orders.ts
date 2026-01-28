@@ -139,9 +139,30 @@ export const handler: Handler = async (event) => {
 
       const orders = await ordersRes.json()
 
+      const orderIds = orders.map((o: any) => o.id).filter(Boolean)
+      let courseOrderIdSet = new Set<string>()
+      if (orderIds.length > 0) {
+        const inFilter = `(${orderIds.map((id: string) => `"${id}"`).join(',')})`
+        const cpRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/course_purchases?select=order_id&order_id=in.${encodeURIComponent(inFilter)}`,
+          {
+            headers: {
+              apikey: SERVICE_KEY,
+              Authorization: `Bearer ${SERVICE_KEY}`
+            }
+          }
+        )
+        if (cpRes.ok) {
+          const cps = await cpRes.json()
+          courseOrderIdSet = new Set<string>((cps || []).map((c: any) => String(c.order_id)))
+        }
+      }
+
+      const filteredOrders = orders.filter((o: any) => !courseOrderIdSet.has(String(o.id)))
+
       // For each order, fetch items with invoice_url status
       const ordersWithItems = await Promise.all(
-        orders.map(async (order: any) => {
+        filteredOrders.map(async (order: any) => {
           // Fetch order items
           const itemsRes = await fetch(
             `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=id,product_name,quantity,unit_price,total_price,variant_title`,

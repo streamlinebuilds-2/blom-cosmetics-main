@@ -447,16 +447,34 @@ export const CourseDetailPage: React.FC = () => {
       const paymentAmount = course.isOnline ? coursePrice : depositAmount;
       const paymentAmountCents = Math.round(paymentAmount * 100);
       const paymentLabel = course.isOnline ? 'Purchase' : 'Deposit';
+      const paymentKind = course.isOnline ? 'full' : 'deposit';
+      const amountOwedCents = course.isOnline ? 0 : Math.max(0, Math.round((coursePrice - depositAmount) * 100));
 
       // Create order with course as product
       const orderRes = await fetch('/.netlify/functions/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          order_kind: 'course',
           buyer: {
             name: formData.name,
             email: formData.email,
             phone: `${formData.countryCode}${formData.phone}`
+          },
+          course_booking: {
+            course_slug: courseSlug,
+            course_title: course.title,
+            course_type: course.isOnline ? 'online' : 'in-person',
+            selected_package: selectedPackage,
+            selected_date: selectedDate,
+            amount_paid_cents: paymentAmountCents,
+            amount_owed_cents: amountOwedCents,
+            payment_kind: paymentKind,
+            details: {
+              course_id: course.id,
+              course_price_cents: Math.round(coursePrice * 100),
+              deposit_cents: Math.round(depositAmount * 100)
+            }
           },
           items: [{
             product_id: course.id,
@@ -481,7 +499,7 @@ export const CourseDetailPage: React.FC = () => {
 
       const orderData = await orderRes.json();
       const orderId = orderData.order_id;
-      const merchantPaymentId = orderData.merchant_payment_id;
+      const merchantPaymentId = orderData.m_payment_id || orderData.merchant_payment_id;
 
       // Redirect to PayFast
       const paymentRes = await fetch('/.netlify/functions/payfast-redirect', {
@@ -834,7 +852,7 @@ export const CourseDetailPage: React.FC = () => {
                     <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                       <Package className="h-8 w-8 text-pink-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Things to Bring</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">What You Need to Bring</h3>
                     <ul className="text-gray-600 text-sm space-y-2 text-left">
                       {course.thingsToBring.map((item, index) => (
                         <li key={index} className="flex gap-2">
@@ -846,26 +864,22 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                 )}
 
-                {!course.isOnline && course.trainingSchedule.length > 0 && (
-                  <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                {!course.isOnline && course.trainingSchedule.length > 0 && course.trainingSchedule.map((block: any) => (
+                  <div key={block.title} className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                     <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                       <Clock className="h-8 w-8 text-pink-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Training Dates & Times</h3>
-                    <div className="text-left space-y-4">
-                      {course.trainingSchedule.map((block, index) => (
-                        <div key={index}>
-                          <div className="text-sm font-bold text-gray-900 mb-2">{block.title}</div>
-                          <ul className="text-gray-600 text-sm space-y-1">
-                            {block.items.map((t: string, tIndex: number) => (
-                              <li key={tIndex}>{t}</li>
-                            ))}
-                          </ul>
-                        </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide">{`Training Times - ${block.title}`}</h3>
+                    <ul className="text-gray-600 text-sm space-y-2 text-left mt-4">
+                      {block.items.map((t: string, index: number) => (
+                        <li key={index} className="flex gap-2">
+                          <span className="text-pink-400 mt-0.5">•</span>
+                          <span>{t}</span>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
-                )}
+                ))}
 
                 {!course.isOnline && course.studentDiscount.length > 0 && (
                   <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
