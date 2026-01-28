@@ -87,7 +87,6 @@ export default function CheckoutSuccess() {
   }, [checkStatus]);
 
   const formatCurrency = (cents: number) => `R${((cents || 0) / 100).toFixed(2)}`;
-  const isCourseOrder = Boolean(orderDetails?.items?.some((item: any) => typeof item?.sku === 'string' && item.sku.startsWith('COURSE:')));
 
   const downloadReceipt = async () => {
     if (!orderDetails) return;
@@ -136,14 +135,14 @@ export default function CheckoutSuccess() {
                     <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                       <CheckCircle className="h-10 w-10 text-green-600" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{isCourseOrder ? 'Booking Confirmed!' : 'Order Confirmed!'}</h1>
-                    <p className="text-gray-600">{isCourseOrder ? 'Your payment was successful. Please keep your receipt as proof of booking.' : 'Your payment was successful.'}</p>
+                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
+                    <p className="text-gray-600">Your payment was successful.</p>
                     <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
                       <Button onClick={downloadReceipt} disabled={loading} variant="outline" className="gap-2">
-                          <Download className="h-4 w-4" /> {loading ? 'Generating...' : isCourseOrder ? 'Download Course Receipt' : 'Download Receipt'}
+                          <Download className="h-4 w-4" /> {loading ? 'Generating...' : 'Download Receipt'}
                       </Button>
-                      <Button onClick={() => window.location.href = isCourseOrder ? '/courses' : '/shop'} className="bg-pink-500 hover:bg-pink-600 text-white">
-                          {isCourseOrder ? 'Back to Courses' : 'Continue Shopping'}
+                      <Button onClick={() => window.location.href = '/shop'} className="bg-pink-500 hover:bg-pink-600 text-white">
+                          Continue Shopping
                       </Button>
                     </div>
                   </>
@@ -183,7 +182,7 @@ export default function CheckoutSuccess() {
             {status === 'paid' && orderDetails && (
               <Card>
                 <CardHeader>
-                  <h3 className="text-xl font-semibold">{isCourseOrder ? 'Booking Details' : 'Order Details'} #{orderDetails.order_number}</h3>
+                  <h3 className="text-xl font-semibold">Order Details #{orderDetails.order_number}</h3>
                 </CardHeader>
                 <CardContent>
                   {/* Items Table */}

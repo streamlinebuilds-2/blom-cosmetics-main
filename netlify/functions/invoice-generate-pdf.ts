@@ -23,8 +23,6 @@ export const handler = async (event: any) => {
 
     const iRes = await sb(`/rest/v1/order_items?order_id=eq.${order.id}&select=*`)
     const items = (await iRes.json()) as any[]
-    const courseItems = items.filter((it: any) => typeof it?.sku === 'string' && it.sku.startsWith('COURSE:'))
-    const hasCourseItems = courseItems.length > 0
 
     // 2. Setup PDF
     const pdf = await PDFDocument.create()
@@ -56,10 +54,7 @@ export const handler = async (event: any) => {
     } catch {}
 
     // Header
-    const headerTitle = order.payment_status === 'paid'
-      ? (hasCourseItems ? 'COURSE RECEIPT' : 'RECEIPT')
-      : 'INVOICE'
-    rightText(headerTitle, right, y + 10, 16, true)
+    rightText("INVOICE / RECEIPT", right, y + 10, 16, true)
     rightText(`Order #: ${order.order_number}`, right, y - 10, 10)
     rightText(`Date: ${new Date(order.created_at).toLocaleDateString()}`, right, y - 22, 10)
 
@@ -82,9 +77,6 @@ export const handler = async (event: any) => {
        text(addr.street_address || "", left + 200, y - 15)
        text(`${addr.city || ''} ${addr.code || ''}`, left + 200, y - 27)
        text(addr.country || "", left + 200, y - 39)
-    } else if (order.fulfillment_method === 'digital') {
-       text("Delivery:", left + 200, y, 10, true)
-       text("Digital / Online course", left + 200, y - 15)
     } else {
        text("Collection From:", left + 200, y, 10, true)
        text("BLOM Cosmetics HQ", left + 200, y - 15)
@@ -114,40 +106,6 @@ export const handler = async (event: any) => {
       rightText(money(price), right - 80, y)
       rightText(money(total), right, y)
       y -= 20
-    }
-
-    if (hasCourseItems) {
-      y -= 5
-      line(y + 12)
-      text("Course Booking Details", left, y, 10, true)
-      y -= 18
-
-      for (const it of courseItems) {
-        const sku = String(it.sku || '')
-        const courseSlug = sku.replace(/^COURSE:/, '').trim()
-        const productName = String(it.product_name || '')
-        const dateMatch = productName.match(/\(([^)]+)\)\s*$/)
-        const selectedDate = dateMatch ? dateMatch[1].trim() : ''
-        const withoutDate = selectedDate ? productName.replace(/\s*\([^)]+\)\s*$/, '').trim() : productName.trim()
-        const isDeposit = /\bdeposit\b/i.test(withoutDate)
-        const dashIdx = withoutDate.indexOf(' - ')
-        const selectedPackage = dashIdx >= 0
-          ? withoutDate.slice(dashIdx + 3).replace(/\bdeposit\b/i, '').replace(/\bpackage\b/i, '').trim()
-          : ''
-
-        text(`Course: ${courseSlug}`, left, y, 10, true)
-        y -= 14
-        if (selectedPackage) {
-          text(`Package: ${selectedPackage}`, left, y)
-          y -= 12
-        }
-        if (selectedDate) {
-          text(`Date/Access: ${selectedDate}`, left, y)
-          y -= 12
-        }
-        text(`Payment: ${isDeposit ? 'Deposit (partial payment)' : 'Full payment'}`, left, y)
-        y -= 16
-      }
     }
 
     // Add shipping as a line item if shipping cost exists

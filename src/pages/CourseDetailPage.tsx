@@ -1,12 +1,10 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
 import { ClickableContact } from '../components/ui/ClickableContact';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { supabase } from '../lib/supabase';
 import { 
   Clock, 
   MapPin, 
@@ -23,42 +21,19 @@ import {
 export const CourseDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const courseSlug = slug || 'professional-acrylic-training';
-  type CourseRow = {
-    id: string;
-    title: string;
-    slug: string;
-    description: string | null;
-    price: number | string | null;
-    image_url: string | null;
-    duration: string | null;
-    level: string | null;
-    course_type?: string | null;
-    template_key?: string | null;
-    deposit_amount?: number | string | null;
-    available_dates?: any[] | null;
-    packages?: any[] | null;
-    key_details?: any[] | null;
-    is_active: boolean;
-    created_at: string | null;
-  };
-
-  const [isLoadingCourse, setIsLoadingCourse] = useState(true);
-  const [courseError, setCourseError] = useState<string | null>(null);
-  const [courseRow, setCourseRow] = useState<CourseRow | null>(null);
-
   // Course data
-  const courseTemplates = {
+  const courses = {
     'professional-acrylic-training': {
       id: 'a603be5f-2c56-4e95-9423-8229c8991b40',
       title: 'Professional Acrylic Training',
-      description: 'Master the art of acrylic nail application with hands-on training. Choose your kit, book your dates, and secure your spot with a deposit.',
+      description: 'Master the art of acrylic nail application with hands-on training in Randfontein.',
       heroImage: '/professional-acrylic-training-hero.webp',
-      duration: '5 Full Days (Intensive Training)',
-      price: 'From R7,600',
-      numericPrice: 7600,
+      duration: '5 Days',
+      price: 'From R7,200',
+      numericPrice: 7200,
+      depositAmount: 2000,
       isOnline: false,
-      location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
-      depositAmount: 1800,
+      location: 'Randfontein',
       instructor: {
         name: 'Avané Crous',
         image: '/avane-crous-headshot.webp',
@@ -71,25 +46,13 @@ export const CourseDetailPage: React.FC = () => {
       packages: [
         {
           name: 'Standard',
-          price: 'R7,600',
+          price: 'R7,200',
           kitValue: 'R3,200',
           features: [
-            'Prep & Primer',
-            'Sculpting Forms (x300)',
-            'Top Coat',
-            'Colour Acrylic 15g',
-            'Nude Acrylic 56g',
-            'White Acrylic 56g',
-            'Crystal Clear Acrylic 56g',
-            '250ml Nail Liquid',
-            '100% Kolinsky Brush',
-            'Dappen Dish',
-            'Training Manual',
-            'Lint-Free Wipes',
-            'Nail Cleanser 30ml',
-            'Hand File & Buffer',
-            'Cuticle Pusher',
-            'Lifelong mentorship and modern techniques'
+          '5-day comprehensive training',
+          'Basic starter kit included',
+          'Certificate after you\'ve completed your exam',
+          'Course materials and handouts'
           ]
         },
         {
@@ -97,78 +60,19 @@ export const CourseDetailPage: React.FC = () => {
           price: 'R9,900',
           kitValue: 'R5,100',
           features: [
-            'Prep & Primer',
-            'Sculpting Forms (x300)',
-            'Top Coat',
-            'Colour Acrylic 15g',
-            'Nude Acrylic 56g',
-            'White Acrylic 56g',
-            'Crystal Clear Acrylic 56g',
-            '500ml Nail Liquid',
-            '100% Kolinsky Brush',
-            'Dappen Dish',
-            'Training Manual',
-            'Lint-Free Wipes',
-            'Nail Cleanser 200ml',
-            'Hand File & Buffer',
-            'Unicorn Cuticle Pusher',
-            'LED Lamp (x1)',
-            'Electric File (x1)',
-            'Safety Bit',
-            'Box of Nail Tips',
-            'Nail Glue',
-            'Lifelong mentorship and modern techniques'
+            '5-day comprehensive training',
+            'Premium professional kit included',
+            'Certificate after you\'ve completed your exam',
+            'Course materials and handouts',
+            'Bigger kit — electric e-file & LED lamp included'
           ],
           popular: true
         }
       ],
       availableDates: [
-        'March 2026 (19-23 Mar)',
-        'May/June 2026 (29 May-2 Jun)'
-      ],
-      keyDetails: [
-        {
-          title: 'What You Need to Bring',
-          items: [
-            'Your own refreshments and lunch (coffee and tea will be provided daily)',
-            'A practice hand (preferably a Habbil Hand - this is essential)',
-            'An electric file (e-file) and a safety bit',
-            'Two hand models: Day 4 model required for practical work; Day 5 model required for assessment'
-          ]
-        },
-        {
-          title: 'Exclusive Student Discount',
-          items: [
-            'We have a shop inside the training studio',
-            '10% discount on all product purchases during your training'
-          ]
-        },
-        {
-          title: 'Training Times - March 2026',
-          items: [
-            '19 March 2026 (08:30-16:00)',
-            '20 March 2026 (08:30-16:00)',
-            '21 March 2026 (09:00-15:00)',
-            '22 March 2026 (08:30-15:00)',
-            '23 March 2026 (08:30-16:00)'
-          ]
-        },
-        {
-          title: 'Training Times - May/June 2026',
-          items: [
-            '29 May 2026 (08:30-16:00)',
-            '30 May 2026 (08:30-16:00)',
-            '31 May 2026 (09:00-15:00)',
-            '1 June 2026 (08:30-15:00)',
-            '2 June 2026 (08:30-16:00)'
-          ]
-        },
-        {
-          title: 'Deposit',
-          items: [
-            'R1800 non-refundable deposit required to book your spot'
-          ]
-        }
+        'March 15-19, 2025',
+        'April 12-16, 2025',
+        'May 10-14, 2025'
       ],
       accordionData: [
         {
@@ -219,6 +123,7 @@ export const CourseDetailPage: React.FC = () => {
       duration: 'Self-Paced',
       price: 'R480',
       numericPrice: 480,
+      depositAmount: 0,
       isOnline: true,
       location: 'Online',
       instructor: {
@@ -293,6 +198,7 @@ export const CourseDetailPage: React.FC = () => {
       price: 'R450',
       originalPrice: 'R650',
       numericPrice: 450,
+      depositAmount: 0,
       isOnline: true,
       location: 'Online',
       instructor: {
@@ -362,171 +268,8 @@ export const CourseDetailPage: React.FC = () => {
     }
   };
 
-  const currencyFormatter = useMemo(() => {
-    return new Intl.NumberFormat('en-ZA', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    });
-  }, []);
-
-  const isOnlineFromRow = (row: CourseRow | null) => {
-    if (!row) return null;
-    const normalizedType = ((row as any).course_type || '').toLowerCase();
-    if (normalizedType === 'online') return true;
-    if (normalizedType === 'in-person') return false;
-    const duration = (row.duration || '').toLowerCase();
-    return row.slug.toLowerCase().startsWith('online-') || duration.includes('self-paced');
-  };
-
-  const getNumericPrice = (value: CourseRow['price']) => {
-    if (value === null || value === undefined || value === '') return null;
-    const numeric = typeof value === 'number' ? value : Number(value);
-    if (!Number.isFinite(numeric)) return null;
-    return numeric;
-  };
-
-  const formatPriceLabel = (value: CourseRow['price']) => {
-    const numeric = getNumericPrice(value);
-    if (numeric === null) return '';
-    return `R${currencyFormatter.format(numeric)}`;
-  };
-
-  const templateKey = ((courseRow as any)?.template_key as string | null | undefined) || courseSlug;
-  const template = courseTemplates[templateKey as keyof typeof courseTemplates] || null;
-
-  const course = useMemo(() => {
-    const onlineFromRow = isOnlineFromRow(courseRow);
-    const isOnline = onlineFromRow ?? template?.isOnline ?? true;
-
-    const dbDeposit = (() => {
-      const raw = (courseRow as any)?.deposit_amount;
-      if (raw === null || raw === undefined || raw === '') return null;
-      const numeric = typeof raw === 'number' ? raw : Number(raw);
-      return Number.isFinite(numeric) ? numeric : null;
-    })();
-
-    const dbDates = Array.isArray((courseRow as any)?.available_dates) ? (courseRow as any).available_dates : null;
-    const dbPackages = Array.isArray((courseRow as any)?.packages) ? (courseRow as any).packages : null;
-    const dbKeyDetails = Array.isArray((courseRow as any)?.key_details) ? (courseRow as any).key_details : null;
-
-    const base = template || {
-      id: courseRow?.id || '',
-      title: courseRow?.title || '',
-      description: courseRow?.description || '',
-      heroImage: courseRow?.image_url || '/assets/blom_logo.webp',
-      duration: courseRow?.duration || '',
-      price: formatPriceLabel(courseRow?.price ?? null),
-      numericPrice: getNumericPrice(courseRow?.price ?? null) || 0,
-      isOnline,
-      location: isOnline ? 'Online' : 'In-Person',
-      depositAmount: dbDeposit ?? 2000,
-      instructor: {
-        name: 'Avané Crous',
-        image: '/avane-crous-headshot.webp',
-        bio: 'Professional nail artist and educator with over 8 years of experience.'
-      },
-      about: [(courseRow?.description || '').trim()].filter(Boolean),
-      packages: [
-        {
-          name: 'Standard',
-          price: formatPriceLabel(courseRow?.price ?? null) || 'R0',
-          kitValue: 'Included',
-          features: [
-            'Certificate after you\'ve completed your exam'
-          ]
-        }
-      ],
-      availableDates: dbDates && dbDates.length ? dbDates : ['Available Now'],
-      keyDetails: dbKeyDetails,
-      accordionData: []
-    };
-
-    const numericPrice = getNumericPrice(courseRow?.price ?? null);
-    const priceLabel = formatPriceLabel(courseRow?.price ?? null);
-
-    const merged = {
-      ...base,
-      id: courseRow?.id || base.id,
-      title: courseRow?.title || base.title,
-      description: (courseRow?.description ?? base.description) || '',
-      heroImage: courseRow?.image_url || base.heroImage,
-      duration: courseRow?.duration || base.duration,
-      numericPrice: numericPrice ?? base.numericPrice,
-      price: priceLabel || base.price,
-      isOnline,
-      location: isOnline ? 'Online' : base.location,
-      depositAmount: dbDeposit ?? (base as any).depositAmount ?? 2000
-    };
-
-    if (dbPackages && dbPackages.length) {
-      const normalized = dbPackages.map((p: any) => ({
-        name: String(p?.name || 'Standard'),
-        price: `R${currencyFormatter.format(Number(p?.price ?? 0) || 0)}`,
-        kitValue: p?.kit_value !== undefined && p?.kit_value !== null && p?.kit_value !== ''
-          ? `R${currencyFormatter.format(Number(p?.kit_value ?? 0) || 0)}`
-          : 'Included',
-        features: Array.isArray(p?.features) ? p.features.map((f: any) => String(f)) : [],
-        popular: Boolean(p?.popular)
-      }));
-
-      return {
-        ...merged,
-        packages: normalized
-      };
-    }
-
-    if (template && template.packages?.length) {
-      const nextPackages = [...template.packages];
-      if (priceLabel) {
-        nextPackages[0] = {
-          ...nextPackages[0],
-          price: nextPackages[0].price ? priceLabel : priceLabel
-        };
-      }
-      return {
-        ...merged,
-        packages: nextPackages
-      };
-    }
-
-    return merged;
-  }, [courseRow, courseSlug, currencyFormatter, template]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const load = async () => {
-      setIsLoadingCourse(true);
-      setCourseError(null);
-
-      const { data, error } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('slug', courseSlug)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (cancelled) return;
-
-      if (error) {
-        console.error('Failed to load course by slug:', error.message);
-        setCourseError('Unable to load this course right now. Please try again.');
-        setCourseRow(null);
-        setIsLoadingCourse(false);
-        return;
-      }
-
-      setCourseRow((data ?? null) as CourseRow | null);
-      setIsLoadingCourse(false);
-    };
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [courseSlug]);
-
-  const isNotFound = !isLoadingCourse && !courseError && !courseRow && !template;
-
+  const course = courses[courseSlug as keyof typeof courses] || courses['professional-acrylic-training'];
+  const depositAmount = !course.isOnline ? (course.depositAmount ?? 2000) : 0;
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(0);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -540,12 +283,12 @@ export const CourseDetailPage: React.FC = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto-select package and date
+  // Auto-select package and date if there's only one option
   useEffect(() => {
-    if (course.packages.length > 0 && !selectedPackage) {
+    if (course.packages.length === 1 && !selectedPackage) {
       setSelectedPackage(course.packages[0].name);
     }
-    if (course.availableDates.length > 0 && !selectedDate) {
+    if (course.availableDates.length === 1 && !selectedDate) {
       setSelectedDate(course.availableDates[0]);
     }
   }, [course, selectedPackage, selectedDate]);
@@ -631,14 +374,12 @@ export const CourseDetailPage: React.FC = () => {
         return;
       }
 
+      // Extract numeric price from package (e.g., "R450" -> 450)
       const priceMatch = selectedPkg.price.match(/[\d,]+/);
       const coursePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
-      const depositAmount = (course as any).depositAmount || 2000;
-      const amountToCharge = course.isOnline ? coursePrice : depositAmount;
-      const amountToChargeCents = Math.round(amountToCharge * 100);
-      const itemLabel = course.isOnline
-        ? `${course.title} - ${selectedPackage} Package (${selectedDate})`
-        : `${course.title} - ${selectedPackage} Deposit (${selectedDate})`;
+      const paymentAmount = course.isOnline ? coursePrice : depositAmount;
+      const paymentAmountCents = Math.round(paymentAmount * 100);
+      const paymentLabel = course.isOnline ? 'Purchase' : 'Deposit';
 
       // Create order with course as product
       const orderRes = await fetch('/.netlify/functions/create-order', {
@@ -652,18 +393,17 @@ export const CourseDetailPage: React.FC = () => {
           },
           items: [{
             product_id: course.id,
-            product_name: itemLabel,
-            sku: `COURSE:${courseSlug}`,
-            unit_price: amountToChargeCents,
+            product_name: `${course.title} - ${selectedPackage} ${paymentLabel}`,
+            unit_price: paymentAmountCents,
             quantity: 1
           }],
           totals: {
-            subtotal_cents: amountToChargeCents,
+            subtotal_cents: paymentAmountCents,
             shipping_cents: 0,
             tax_cents: 0
           },
           shipping: {
-            method: course.isOnline ? 'digital' : 'collection'
+            method: 'collection'
           }
         })
       });
@@ -673,15 +413,18 @@ export const CourseDetailPage: React.FC = () => {
       }
 
       const orderData = await orderRes.json();
+      const orderId = orderData.order_id;
+      const merchantPaymentId = orderData.merchant_payment_id;
 
       // Redirect to PayFast
       const paymentRes = await fetch('/.netlify/functions/payfast-redirect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: amountToCharge,
-          item_name: itemLabel,
-          m_payment_id: orderData.m_payment_id,
+          order_id: orderId,
+          amount: paymentAmount,
+          item_name: `${course.title} - ${selectedPackage} ${paymentLabel}`,
+          m_payment_id: merchantPaymentId,
           email_address: formData.email,
           name_first: formData.name.split(' ')[0],
           name_last: formData.name.split(' ').slice(1).join(' ') || formData.name.split(' ')[0],
@@ -694,9 +437,22 @@ export const CourseDetailPage: React.FC = () => {
         throw new Error('Failed to initialize payment');
       }
 
-      // Auto-submit PayFast form
-      const html = await paymentRes.text();
-      document.body.innerHTML = html;
+      const contentType = paymentRes.headers.get('content-type') || '';
+
+      if (contentType.includes('text/html')) {
+        const html = await paymentRes.text();
+        document.open();
+        document.write(html);
+        document.close();
+      } else {
+        const pfData = await paymentRes.json();
+        const redirectUrl = pfData.redirect || pfData.url;
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        } else {
+          throw new Error('No redirect URL received from PayFast');
+        }
+      }
 
     } catch (error) {
       console.error('Enrollment error:', error);
@@ -736,58 +492,13 @@ export const CourseDetailPage: React.FC = () => {
     { code: '+971', country: '🇦🇪 AE' }
   ];
 
-  const trainingAddress = useMemo(() => {
-    if (course.isOnline) return null;
-    const keyDetails = (course as any).keyDetails;
-    if (!Array.isArray(keyDetails)) return null;
-    for (const entry of keyDetails) {
-      if (!entry || typeof entry !== 'object') continue;
-      const title = String((entry as any).title || '').toLowerCase();
-      if (title.includes('location')) {
-        const items = (entry as any).items;
-        if (Array.isArray(items) && typeof items[0] === 'string' && items[0].trim()) {
-          return items[0].trim();
-        }
-      }
-    }
-    return null;
-  }, [course]);
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <Header showMobileMenu={true} />
 
       <main className="flex-1">
-        {isLoadingCourse ? (
-          <div className="py-24">
-            <LoadingSpinner size="lg" text="Loading course..." />
-          </div>
-        ) : courseError ? (
-          <div className="py-24">
-            <Container>
-              <div className="flex flex-col items-center justify-center text-center">
-                <p className="text-neutral-700 mb-4">{courseError}</p>
-                <Button onClick={() => window.location.reload()} variant="primary">
-                  Retry
-                </Button>
-              </div>
-            </Container>
-          </div>
-        ) : isNotFound ? (
-          <div className="py-24">
-            <Container>
-              <div className="flex flex-col items-center justify-center text-center">
-                <p className="text-neutral-700 mb-4">Course not found.</p>
-                <Button onClick={() => (window.location.href = '/courses')} variant="primary">
-                  Back to Courses
-                </Button>
-              </div>
-            </Container>
-          </div>
-        ) : (
-          <>
-            {/* Hero Section */}
-            <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
+        {/* Hero Section */}
+        <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
           <img
             src={course.heroImage}
             alt={course.title}
@@ -891,7 +602,7 @@ export const CourseDetailPage: React.FC = () => {
               <h2 className="heading-with-stripe">What You'll Learn</h2>
               
               <div className="space-y-4">
-                {course.accordionData.map((item: any, index: number) => (
+                {course.accordionData.map((item, index) => (
                   <div key={index} className="bg-white border-2 border-gray-200 rounded-xl shadow-sm hover:border-blue-200 hover:shadow-md transition-all duration-300">
                     <button
                       onClick={() => toggleAccordion(index)}
@@ -917,9 +628,9 @@ export const CourseDetailPage: React.FC = () => {
                             </li>
                           ))}
                         </ul>
-                        {Boolean((item as any).note) && (
+                        {item.note && (
                           <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#CEE5FF' }}>
-                            <p className="text-sm font-medium" style={{ color: '#1a5a9a' }}>{String((item as any).note)}</p>
+                            <p className="text-sm font-medium" style={{ color: '#1a5a9a' }}>{item.note}</p>
                       </div>
                     )}
                       </div>
@@ -938,7 +649,7 @@ export const CourseDetailPage: React.FC = () => {
               <h2 className="heading-with-stripe">Choose Your Package</h2>
               
               <div className={`grid gap-8 ${course.packages.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-2'}`}>
-                {course.packages.map((pkg: any, index: number) => (
+                {course.packages.map((pkg, index) => (
                   <div key={index} className={`bg-white border-2 ${pkg.popular ? 'border-pink-400' : 'border-gray-200'} rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full ${pkg.popular ? 'shadow-xl' : ''}`} style={pkg.popular ? { boxShadow: '0 8px 30px rgba(255,116,164,0.2)' } : {}}>
                     {pkg.popular && (
                       <div className="absolute -top-1 left-1/2 -translate-x-1/2">
@@ -958,10 +669,10 @@ export const CourseDetailPage: React.FC = () => {
                     </div>
                     
                     <ul className="space-y-4 mb-8 flex-grow">
-                      {pkg.features.map((feature: any, featureIndex: number) => (
+                      {pkg.features.map((feature, featureIndex) => (
                         <li key={featureIndex} className="flex items-center gap-3 transition-all duration-300 hover:bg-pink-50 hover:translate-x-2 rounded-lg py-2 px-3 -mx-3 cursor-pointer">
                           <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#CEE5FF', stroke: '#4A9FFF' }} />
-                          <span className="text-gray-700">{String(feature)}</span>
+                          <span className="text-gray-700">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -994,19 +705,8 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Location</h3>
                   <p className="text-gray-600">
-                    {course.isOnline ? (
-                      <>
-                        Online<br />
-                        <span className="text-sm text-gray-500">Access from anywhere</span>
-                      </>
-                    ) : (
-                      <>
-                        {trainingAddress || 'In-Person'}<br />
-                        <span className="text-sm text-gray-500">
-                          {trainingAddress ? 'Randfontein, Gauteng' : 'Detailed address provided upon booking'}
-                        </span>
-                      </>
-                    )}
+                    {course.location}<br />
+                    <span className="text-sm text-gray-500">{course.isOnline ? 'Access from anywhere' : 'Detailed address provided upon booking'}</span>
                   </p>
                 </div>
 
@@ -1017,9 +717,7 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Deposit Required'}</h3>
                   <p className="text-gray-600">
-                    {course.isOnline
-                      ? 'Full payment required'
-                      : `R${currencyFormatter.format((course as any).depositAmount || 2000)} non-refundable deposit to secure your spot`}<br />
+                    {course.isOnline ? 'Full payment required' : `R${depositAmount.toLocaleString('en-ZA')} to secure your spot`}<br />
                     <span className="text-sm text-gray-500">{course.isOnline ? 'Instant access after payment' : 'Balance due on course start date'}</span>
                   </p>
                 </div>
@@ -1086,69 +784,6 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              {Array.isArray((course as any).keyDetails) && (course as any).keyDetails.length > 0 && (
-                <div className="mt-10 grid md:grid-cols-2 gap-8">
-                  {(() => {
-                    const raw = (course as any).keyDetails as any[];
-                    const hasSections = raw.some((item) => item && typeof item === 'object' && 'title' in item);
-                    if (!hasSections) {
-                      const bullets = raw.map((item) => String(item)).filter(Boolean);
-                      return [
-                        <div
-                          key="key-details"
-                          className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                          style={{ backgroundColor: '#CEE5FF' }}
-                        >
-                          <h3 className="text-lg font-bold text-gray-900 mb-4 uppercase tracking-wide text-center">Key Details</h3>
-                          <ul className="space-y-2 text-gray-700">
-                            {bullets.map((item, idx) => (
-                              <li key={idx} className="flex gap-3">
-                                <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#FF74A4' }} />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ];
-                    }
-
-                    const sections = raw
-                      .filter((item) => item && typeof item === 'object')
-                      .map((item, idx) => {
-                        const title = String((item as any).title || '').trim();
-                        const items = Array.isArray((item as any).items)
-                          ? (item as any).items.map((v: any) => String(v)).filter(Boolean)
-                          : [];
-                        if (!title && items.length === 0) return null;
-                        return (
-                          <div
-                            key={`${title || 'section'}-${idx}`}
-                            className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                            style={{ backgroundColor: '#CEE5FF' }}
-                          >
-                            {title && (
-                              <h3 className="text-lg font-bold text-gray-900 mb-4 uppercase tracking-wide text-center">{title}</h3>
-                            )}
-                            {items.length > 0 && (
-                              <ul className="space-y-2 text-gray-700">
-                                {items.map((entry: string, itemIdx: number) => (
-                                  <li key={itemIdx} className="flex gap-3">
-                                    <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#FF74A4' }} />
-                                    <span>{entry}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        );
-                      })
-                      .filter(Boolean);
-
-                    return sections;
-                  })()}
-                </div>
-              )}
             </div>
           </Container>
         </section>
@@ -1314,11 +949,7 @@ export const CourseDetailPage: React.FC = () => {
                         className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                         style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                       >
-                        {isSubmitting
-                          ? 'Processing...'
-                          : course.isOnline
-                            ? 'Complete Purchase'
-                            : `Pay Deposit & Secure Spot (R${currencyFormatter.format((course as any).depositAmount || 2000)})`}
+                        {isSubmitting ? 'Processing...' : course.isOnline ? 'Complete Purchase' : `Pay Deposit & Secure Spot (R${depositAmount.toLocaleString('en-ZA')})`}
                       </button>
 
                       {/* Help text when button is disabled */}
@@ -1357,8 +988,6 @@ export const CourseDetailPage: React.FC = () => {
             </div>
           </Container>
         </section>
-          </>
-        )}
       </main>
 
       <Footer />

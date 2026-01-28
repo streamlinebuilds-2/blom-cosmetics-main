@@ -58,9 +58,6 @@ export const handler = async (event: any) => {
       `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${order.id}&select=product_name,sku,quantity,unit_price,line_total,variant_title`
     ) as any[]
 
-    const courseItems = items.filter((it: any) => typeof it?.sku === 'string' && it.sku.startsWith('COURSE:'))
-    const hasCourseItems = courseItems.length > 0
-
     // --- Detect Furniture ---
     const furnitureKeywords = ['table', 'station', 'desk', 'dresser', 'bed', 'chair', 'rack'];
     const hasFurniture = items.some((it: any) => {
@@ -109,10 +106,7 @@ export const handler = async (event: any) => {
     } catch (e) {}
 
     // Header Details
-    const headerTitle = order.status === 'paid'
-      ? (hasCourseItems ? 'COURSE RECEIPT' : 'RECEIPT')
-      : 'INVOICE'
-    drawText(headerTitle, left, y, 24, true)
+    drawText("RECEIPT", left, y, 24, true)
     y -= 10
     drawText(`Receipt #: ${m_payment_id}`, left, (y -= 16), 10, false, rgb(0.35, 0.38, 0.45))
     drawText(`Date: ${new Date(order.created_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}`, left, (y -= 14), 10, false, rgb(0.35, 0.38, 0.45))
@@ -127,18 +121,10 @@ export const handler = async (event: any) => {
     drawText("Fulfillment", right - 200, y, 12, true)
     y -= 16
     drawText(order.buyer_name || "-", left, y, 11)
-    const fulfillmentLabel = order.fulfillment_method === 'digital'
-      ? 'DIGITAL'
-      : String(order.fulfillment_method || '-').toUpperCase()
-    drawText(fulfillmentLabel, right - 200, y, 11)
+    drawText(String(order.fulfillment_method || '-').toUpperCase(), right - 200, y, 11)
     y -= 14
     drawText(order.buyer_email || "-", left, y, 10, false, rgb(0.4, 0.45, 0.52))
-    if (order.fulfillment_method === 'collection' && order.collection_location) {
-      drawText(String(order.collection_location), right - 200, y, 10, false, rgb(0.4, 0.45, 0.52))
-    }
-    if (order.fulfillment_method === 'digital') {
-      drawText("Online course access / digital delivery", right - 200, y, 10, false, rgb(0.4, 0.45, 0.52))
-    }
+    if (order.collection_location) drawText(String(order.collection_location), right - 200, y, 10, false, rgb(0.4, 0.45, 0.52))
     y -= 14
     drawText(order.buyer_phone || "", left, y, 10, false, rgb(0.4, 0.45, 0.52))
     
@@ -179,77 +165,6 @@ export const handler = async (event: any) => {
       y -= 16
     })
 
-    if (hasCourseItems) {
-      y -= 6
-      drawLine(left, y, right, y)
-      y -= 18
-      drawText("Course Booking Details", left, y, 11, true)
-      y -= 14
-
-      const flattenKeyDetails = (raw: any): string[] => {
-        if (!raw) return []
-        if (Array.isArray(raw) && raw.length > 0 && typeof raw[0] === 'string') {
-          return raw.map((v: any) => String(v)).filter(Boolean)
-        }
-        if (Array.isArray(raw) && raw.length > 0 && raw.some((v: any) => v && typeof v === 'object')) {
-          const out: string[] = []
-          for (const section of raw) {
-            const title = String(section?.title || '').trim()
-            const items = Array.isArray(section?.items) ? section.items.map((v: any) => String(v)).filter(Boolean) : []
-            for (const entry of items) {
-              out.push(title ? `${title}: ${entry}` : entry)
-            }
-          }
-          return out
-        }
-        return []
-      }
-
-      for (const it of courseItems) {
-        const sku = String(it.sku || '')
-        const courseSlug = sku.replace(/^COURSE:/, '').trim()
-        const productName = String(it.product_name || '')
-        const dateMatch = productName.match(/\(([^)]+)\)\s*$/)
-        const selectedDate = dateMatch ? dateMatch[1].trim() : ''
-        const withoutDate = selectedDate ? productName.replace(/\s*\([^)]+\)\s*$/, '').trim() : productName.trim()
-        const isDeposit = /\bdeposit\b/i.test(withoutDate)
-        const dashIdx = withoutDate.indexOf(' - ')
-        const selectedPackage = dashIdx >= 0
-          ? withoutDate.slice(dashIdx + 3).replace(/\bdeposit\b/i, '').replace(/\bpackage\b/i, '').trim()
-          : ''
-
-        let courseTitle = courseSlug
-        let keyLines: string[] = []
-        try {
-          const rows: any[] = await fetchJson(
-            `${SUPABASE_URL}/rest/v1/courses?slug=eq.${encodeURIComponent(courseSlug)}&select=title,key_details`
-          )
-          if (rows?.[0]?.title) courseTitle = String(rows[0].title)
-          keyLines = flattenKeyDetails(rows?.[0]?.key_details).slice(0, 4)
-        } catch (e) {}
-
-        drawText(`Course: ${courseTitle}`, left, y, 10, true)
-        y -= 12
-        if (selectedPackage) {
-          drawText(`Package: ${selectedPackage}`, left, y, 10)
-          y -= 12
-        }
-        if (selectedDate) {
-          drawText(`Date/Access: ${selectedDate}`, left, y, 10)
-          y -= 12
-        }
-        drawText(`Payment: ${isDeposit ? 'Deposit (partial payment)' : 'Full payment'}`, left, y, 10)
-        y -= 12
-
-        for (const lineText of keyLines) {
-          drawText(`• ${lineText}`, left, y, 9, false, rgb(0.35, 0.38, 0.45))
-          y -= 11
-        }
-
-        y -= 6
-      }
-    }
-
     // --- FINANCIALS SECTION ---
     const shippingAmount = order.shipping_cents ? order.shipping_cents / 100 : 0
     const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : itemsSum
@@ -267,11 +182,7 @@ export const handler = async (event: any) => {
       drawRightText("R 0.00", right - 20, y, 10)
       y -= 16
     } else if (shippingAmount > 0) {
-      const label = order.fulfillment_method === 'collection'
-        ? 'Collection Fee'
-        : order.fulfillment_method === 'digital'
-          ? 'Digital Delivery'
-          : 'Shipping & Handling';
+      const label = order.fulfillment_method === 'collection' ? 'Collection Fee' : 'Shipping & Handling';
       drawText(label, left, y, 10)
       drawRightText("1", right - 150, y, 10)
       drawRightText(money(shippingAmount), right - 90, y, 10)

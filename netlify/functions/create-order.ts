@@ -68,22 +68,15 @@ export const handler: Handler = async (event) => {
       });
     }
 
-    // --- Normalize Fulfillment Method ---
-    // The checkout sends 'shipping.method' as 'store-pickup' | 'door-to-door' | 'digital'
-    // Map this to a DB-safe fulfillment method
+    // --- FIX 1 & 2: Normalize Fulfillment Method ---
+    // The checkout sends 'shipping.method' as 'store-pickup' or 'door-to-door'
+    // We need to map this to 'collection' or 'delivery' for the DB
     const rawMethod = body.shipping?.method || body.fulfillment?.method || 'delivery';
-    const fulfillmentMethod = rawMethod === 'digital'
-      ? 'digital'
-      : (rawMethod === 'store-pickup' || rawMethod === 'collection')
-        ? 'collection'
-        : 'delivery';
+    const fulfillmentMethod = (rawMethod === 'store-pickup' || rawMethod === 'collection') ? 'collection' : 'delivery';
     
     // Select the correct address object
-    // If delivery, use shipping address. If collection/digital, it is null.
-    const deliveryAddress =
-      fulfillmentMethod === 'delivery'
-        ? (body.shipping?.address ?? body.fulfillment?.address ?? body.delivery_address ?? null)
-        : null;
+    // If delivery, use shipping address. If collection, it is null.
+    const deliveryAddress = fulfillmentMethod === 'delivery' ? (body.shipping?.address || body.fulfillment?.address || body.delivery_address) : null;
     const collectionLocation = fulfillmentMethod === 'collection' ? 'BLOM HQ' : null;
 
     // 3. Create Order via RPC
