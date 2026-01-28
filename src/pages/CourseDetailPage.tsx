@@ -17,7 +17,8 @@ import {
   Phone,
   Mail,
   Shield,
-  CreditCard
+  CreditCard,
+  X
 } from 'lucide-react';
 
 export const CourseDetailPage: React.FC = () => {
@@ -340,6 +341,7 @@ export const CourseDetailPage: React.FC = () => {
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(0);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [showComparePackages, setShowComparePackages] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -370,17 +372,25 @@ export const CourseDetailPage: React.FC = () => {
 
   const selectPackage = (packageName: string) => {
     setSelectedPackage(packageName);
-    setTimeout(() => {
-      document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
 
   const selectDate = (date: string) => {
     setSelectedDate(date);
-    setTimeout(() => {
-      document.getElementById('booking-form')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
+
+  const compareFeatures = (() => {
+    const seen = new Set<string>();
+    const ordered: string[] = [];
+    for (const pkg of course.packages) {
+      for (const f of pkg.features) {
+        if (!seen.has(f)) {
+          seen.add(f);
+          ordered.push(f);
+        }
+      }
+    }
+    return ordered;
+  })();
 
   const validateField = (name: string, value: string | boolean) => {
     const errors: Record<string, string> = {};
@@ -731,7 +741,99 @@ export const CourseDetailPage: React.FC = () => {
         <section className="py-20 bg-white">
           <Container>
             <div className="max-w-5xl mx-auto">
-              <h2 className="heading-with-stripe">Choose Your Package</h2>
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="heading-with-stripe">Choose Your Package</h2>
+                {course.packages.length > 1 && (
+                  <button
+                    onClick={() => setShowComparePackages(true)}
+                    className="bg-transparent hover:bg-pink-50 text-gray-900 font-semibold py-2 px-4 rounded-full transition-all duration-200 border border-gray-300"
+                  >
+                    Compare Packages
+                  </button>
+                )}
+              </div>
+
+              {showComparePackages && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div
+                    className="absolute inset-0 bg-black/40"
+                    onClick={() => setShowComparePackages(false)}
+                  />
+                  <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="flex items-center justify-between p-6 border-b">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Compare</div>
+                        <div className="text-2xl font-bold text-gray-900">Packages</div>
+                      </div>
+                      <button
+                        onClick={() => setShowComparePackages(false)}
+                        className="h-10 w-10 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                        aria-label="Close"
+                      >
+                        <X className="h-5 w-5 text-gray-700" />
+                      </button>
+                    </div>
+
+                    <div className="p-6 overflow-auto max-h-[70vh]">
+                      <table className="w-full text-left border-collapse">
+                        <thead className="sticky top-0 bg-white">
+                          <tr className="border-b">
+                            <th className="py-3 pr-4 text-sm font-bold text-gray-900">What’s Included</th>
+                            {course.packages.map((pkg) => (
+                              <th key={pkg.name} className="py-3 px-4 text-sm font-bold text-gray-900 whitespace-nowrap">
+                                <div className="flex flex-col gap-1">
+                                  <span>{pkg.name}</span>
+                                  <span className="text-xs font-semibold text-gray-500">{pkg.price}</span>
+                                  <span className="text-xs font-semibold text-gray-500">Kit: {pkg.kitValue}</span>
+                                </div>
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {compareFeatures.map((feature) => (
+                            <tr key={feature} className="border-b last:border-b-0">
+                              <td className="py-3 pr-4 text-sm text-gray-700">{feature}</td>
+                              {course.packages.map((pkg) => {
+                                const has = pkg.features.includes(feature);
+                                return (
+                                  <td key={pkg.name} className="py-3 px-4">
+                                    {has ? (
+                                      <div className="inline-flex items-center justify-center h-7 w-7 rounded-full" style={{ backgroundColor: '#CEE5FF' }}>
+                                        <CheckCircle className="h-4 w-4" style={{ color: '#1a5a9a' }} />
+                                      </div>
+                                    ) : (
+                                      <span className="text-gray-300">—</span>
+                                    )}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <div className="p-6 border-t flex justify-end gap-3">
+                      <button
+                        onClick={() => setShowComparePackages(false)}
+                        className="bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-3 px-6 rounded-full transition-colors"
+                      >
+                        Close
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowComparePackages(false);
+                          scrollToBooking();
+                        }}
+                        className="bg-pink-400 hover:bg-pink-500 text-white font-semibold py-3 px-6 rounded-full transition-colors"
+                      >
+                        Book Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className={`grid gap-8 ${course.packages.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-2'}`}>
                 {course.packages.map((pkg, index) => (
