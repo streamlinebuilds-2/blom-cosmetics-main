@@ -886,43 +886,43 @@ export const CourseDetailPage: React.FC = () => {
               
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Location */}
-                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <MapPin className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Location</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">Location</h3>
+                  <p className="text-gray-800 text-base md:text-lg leading-relaxed">
                     {course.location}<br />
                     {course.isOnline && (
-                      <span className="text-sm text-gray-500">Access from anywhere</span>
+                      <span className="text-base text-gray-700">Access from anywhere</span>
                     )}
                   </p>
                 </div>
 
                 {/* Payment Info */}
-                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <CreditCard className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Deposit Required'}</h3>
-                  <p className="text-gray-600">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Deposit Required'}</h3>
+                  <p className="text-gray-800 text-base md:text-lg leading-relaxed">
                     {course.isOnline ? 'Full payment required' : `R${depositAmount.toLocaleString('en-ZA')} to secure your spot`}<br />
-                    <span className="text-sm text-gray-500">{course.isOnline ? 'Instant access after payment' : 'Balance due on course start date'}</span>
+                    <span className="text-base text-gray-700">{course.isOnline ? 'Instant access after payment' : 'Balance due on course start date'}</span>
                   </p>
                 </div>
 
                 {/* Course Dates */}
-                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Calendar className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Course Dates'}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Course Dates'}</h3>
                   <div className="space-y-2">
                     {course.availableDates.map((date, index) => (
                       <button
                         key={index}
                         onClick={() => selectDate(date)}
-                        className={`block w-full px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:-translate-y-1`}
+                        className={`block w-full px-5 py-3 rounded-full text-base font-semibold transition-all duration-300 hover:-translate-y-1`}
                         style={selectedDate === date ? {
                           backgroundColor: '#FF74A4',
                           color: 'white'
@@ -950,12 +950,12 @@ export const CourseDetailPage: React.FC = () => {
                 </div>
 
                 {!course.isOnline && course.thingsToBring.length > 0 && (
-                  <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                  <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                     <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                       <Package className="h-8 w-8 text-pink-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">What You Need to Bring</h3>
-                    <ul className="text-gray-600 text-sm space-y-2 text-left">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">What You Need to Bring</h3>
+                    <ul className="text-gray-800 text-base md:text-lg leading-relaxed space-y-3 text-left">
                       {course.thingsToBring.map((item, index) => (
                         <li key={index} className="flex gap-2">
                           <span className="text-pink-400 mt-0.5">•</span>
@@ -967,12 +967,12 @@ export const CourseDetailPage: React.FC = () => {
                 )}
 
                 {!course.isOnline && course.trainingSchedule.length > 0 && course.trainingSchedule.map((block: any) => (
-                  <div key={block.title} className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                  <div key={block.title} className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                     <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                       <Clock className="h-8 w-8 text-pink-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 uppercase tracking-wide">{`Training Times - ${block.title}`}</h3>
-                    <ul className="text-gray-600 text-sm space-y-2 text-left mt-4">
+                    <h3 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide">{`Training Times - ${block.title}`}</h3>
+                    <ul className="text-gray-800 text-base md:text-lg leading-relaxed space-y-3 text-left mt-4">
                       {block.items.map((t: string, index: number) => (
                         <li key={index} className="flex gap-2">
                           <span className="text-pink-400 mt-0.5">•</span>
@@ -984,12 +984,12 @@ export const CourseDetailPage: React.FC = () => {
                 ))}
 
                 {!course.isOnline && course.studentDiscount.length > 0 && (
-                  <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                  <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                     <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                       <Ticket className="h-8 w-8 text-pink-400" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Exclusive Student Discount</h3>
-                    <ul className="text-gray-600 text-sm space-y-2 text-left">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">Exclusive Student Discount</h3>
+                    <ul className="text-gray-800 text-base md:text-lg leading-relaxed space-y-3 text-left">
                       {course.studentDiscount.map((item, index) => (
                         <li key={index} className="flex gap-2">
                           <span className="text-pink-400 mt-0.5">•</span>
@@ -1001,23 +1001,23 @@ export const CourseDetailPage: React.FC = () => {
                 )}
 
                 {/* Contact */}
-                <div className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <Phone className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Contact</h3>
-                  <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">Contact</h3>
+                  <div className="space-y-3">
                     <ClickableContact 
                       type="phone" 
                       value="+27 79 548 3317" 
-                      className="text-gray-600"
+                      className="text-gray-800 text-base md:text-lg"
                     >
                       WhatsApp: +27 79 548 3317
                     </ClickableContact>
                     <ClickableContact 
                       type="email" 
                       value="shopblomcosmetics@gmail.com" 
-                      className="text-sm text-gray-500"
+                      className="text-gray-800 text-base md:text-lg"
                     >
                       Email: shopblomcosmetics@gmail.com
                     </ClickableContact>
