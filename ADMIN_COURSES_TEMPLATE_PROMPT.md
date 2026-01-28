@@ -16,12 +16,13 @@ You are working in the BLOM admin repo (blom-admin). This is an update to existi
 ## Goal
 1) Add a **Course Type** field (Online / In-Person) when creating/editing courses in the admin app.
 2) Add a **Start from Template** dropdown on the create form so new courses can be created using the 3 existing customer course pages as defaults.
-3) Ensure the admin app handles the required fields correctly (especially `instructor_name` which is NOT NULL).
+3) Add full edit control for in-person course details: dates, packages, deposit amount, key details.
+4) **Note:** Instructor information is managed outside this tool or defaults to static values. Do NOT add UI controls for `instructor_name` or `instructor_bio`.
 
 ---
 
 ## Database / Supabase (SQL only; run in Supabase)
-The `courses` table schema has been updated to include `image_url`, `duration`, `level`, `template_key`, and requires `instructor_name`.
+The `courses` table schema has been updated to include `image_url`, `duration`, `level`, `template_key`.
 
 If you haven't run the migration yet, ensure these columns exist:
 
@@ -31,7 +32,9 @@ ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS image_url text;
 ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS duration text;
 ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS level text;
 ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS template_key text;
-ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS instructor_name text; -- Should be NOT NULL in production
+
+-- Instructor fields exist in DB but are NOT managed by Admin UI
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS instructor_name text;
 ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS instructor_bio text;
 
 -- Add course_type if missing
@@ -40,11 +43,38 @@ ALTER TABLE public.courses DROP CONSTRAINT IF EXISTS courses_course_type_check;
 ALTER TABLE public.courses ADD CONSTRAINT courses_course_type_check CHECK (course_type IN ('online', 'in-person'));
 ```
 
+### In-person editable content fields (required for full control)
+Add these columns to `public.courses`:
+- `deposit_amount numeric(10,2)` (used for in-person checkout deposit)
+- `available_dates jsonb` (array of date strings)
+- `packages jsonb` (array of package objects)
+- `key_details jsonb` (optional: array of bullet strings)
+
+```sql
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS deposit_amount numeric(10,2);
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS available_dates jsonb;
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS packages jsonb;
+ALTER TABLE public.courses ADD COLUMN IF NOT EXISTS key_details jsonb;
+```
+
+Packages JSON shape (admin must store exactly this):
+```json
+[
+  {
+    "name": "Standard",
+    "price": 7200,
+    "kit_value": 3200,
+    "features": ["5-day training", "Starter kit", "Certificate", "Handouts"],
+    "popular": false
+  }
+]
+```
+
 ---
 
 ## Netlify Functions (Writes)
 ### save-course.ts
-Extend the payload and DB upsert to include all display fields and the required `instructor_name`.
+Extend the payload and DB upsert to include all display fields EXCEPT instructor info.
 
 Example payload shape:
 ```ts
@@ -60,10 +90,20 @@ Example payload shape:
   is_active?,
   course_type,     // 'online' | 'in-person'
   template_key?,   // string | null
-  instructor_name, // REQUIRED (string)
-  instructor_bio?  // string | null
+  deposit_amount?,  // number | null
+  available_dates?, // string[] | null
+  packages?,        // Package[] | null (see JSON shape)
+  key_details?      // string[] | null
 }
 ```
+
+Validation rules:
+- If `course_type === 'in-person'`:
+  - `deposit_amount` required (number > 0)
+  - `available_dates` required (non-empty array)
+  - `packages` required (non-empty array, each with name/price/features)
+- If `course_type === 'online'`:
+  - these can be null/empty
 
 ---
 
@@ -77,9 +117,16 @@ Add these UI controls:
   - Online (`online`)
   - In-Person (`in-person`)
 
-#### B) Instructor Fields (Required)
-- **Instructor Name** (required): `instructor_name`
-- **Instructor Bio** (optional): `instructor_bio`
+#### B) In-person details (only show when course_type === 'in-person')
+- Deposit Amount (required): `deposit_amount`
+- Available Dates editor (required):
+  - “Add date” button
+  - list of date text inputs (strings) with remove
+- Packages editor (required):
+  - “Add package” button
+  - per package fields: name, price (number), kit value (number), popular (boolean)
+  - features editor: add/remove feature strings
+- Key details editor (optional): add/remove bullet strings
 
 #### C) Start from Template dropdown (create-only)
 Show only when `id === 'new'`.
@@ -96,7 +143,7 @@ When a template is selected, auto-fill these fields:
 - duration, level
 - is_active, course_type
 - template_key
-- instructor_name, instructor_bio
+- For in-person template: also auto-fill deposit_amount / available_dates / packages.
 
 **Template defaults:**
 
@@ -110,9 +157,41 @@ When a template is selected, auto-fill these fields:
 - duration: `5 Days`
 - level: `Beginner to Intermediate`
 - course_type: `in-person`
-- instructor_name: `Avané Crous`
-- instructor_bio: `Professional nail artist and educator with over 8 years of experience in acrylic nail application.`
+- deposit_amount: `2000.00`
+- available_dates: `["March 15-19, 2026", "April 12-16, 2026", "May 10-14, 2026"]`
+- packages: see below
 - is_active: true
+
+packages example:
+```json
+[
+  {
+    "name": "Standard",
+    "price": 7200,
+    "kit_value": 3200,
+    "features": [
+      "5-day comprehensive training",
+      "Basic starter kit included",
+      "Certificate after you've completed your exam",
+      "Course materials and handouts"
+    ],
+    "popular": false
+  },
+  {
+    "name": "Deluxe",
+    "price": 9900,
+    "kit_value": 5100,
+    "features": [
+      "5-day comprehensive training",
+      "Premium professional kit included",
+      "Certificate after you've completed your exam",
+      "Course materials and handouts",
+      "Bigger kit — electric e-file & LED lamp included"
+    ],
+    "popular": true
+  }
+]
+```
 
 2) Online Watercolour Workshop
 - template_key: `online-watercolour-workshop`
@@ -124,8 +203,6 @@ When a template is selected, auto-fill these fields:
 - duration: `Self-Paced`
 - level: `All Levels`
 - course_type: `online`
-- instructor_name: `Avané Crous`
-- instructor_bio: `Professional nail artist and educator with over 8 years of experience.`
 - is_active: true
 
 3) Christmas Watercolor Workshop
@@ -138,8 +215,6 @@ When a template is selected, auto-fill these fields:
 - duration: `Self-Paced`
 - level: `All Levels`
 - course_type: `online`
-- instructor_name: `Avané Crous`
-- instructor_bio: `Professional nail artist and educator with over 8 years of experience.`
 - is_active: true
 
 ### 2) Courses.jsx (list page)
@@ -148,11 +223,13 @@ When a template is selected, auto-fill these fields:
 ---
 
 ## Data Adapter (Admin)
-Update `supabaseAdapter.jsx` to include `image_url`, `duration`, `level`, `template_key`, `instructor_name`, `instructor_bio` in read and write flows.
+Update `supabaseAdapter.jsx` to include `image_url`, `duration`, `level`, `template_key`.
+Also include: `deposit_amount`, `available_dates`, `packages`, `key_details`.
+(Note: Do NOT include instructor fields).
 
 ---
 
 ## Verification Checklist
 - Create a new course from each template and verify fields auto-fill.
-- Save and confirm the row has the correct `course_type` and `instructor_name`.
+- Save and confirm the row has the correct `course_type`.
 - Customer frontend shows the course under the correct section (Online vs In-Person).

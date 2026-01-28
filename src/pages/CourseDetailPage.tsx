@@ -34,6 +34,10 @@ export const CourseDetailPage: React.FC = () => {
     level: string | null;
     course_type?: string | null;
     template_key?: string | null;
+    deposit_amount?: number | string | null;
+    available_dates?: any[] | null;
+    packages?: any[] | null;
+    key_details?: any[] | null;
     is_active: boolean;
     created_at: string | null;
   };
@@ -47,13 +51,14 @@ export const CourseDetailPage: React.FC = () => {
     'professional-acrylic-training': {
       id: 'a603be5f-2c56-4e95-9423-8229c8991b40',
       title: 'Professional Acrylic Training',
-      description: 'Master the art of acrylic nail application with hands-on training in Randfontein.',
+      description: 'Master the art of acrylic nail application with hands-on training. Choose your kit, book your dates, and secure your spot with a deposit.',
       heroImage: '/professional-acrylic-training-hero.webp',
-      duration: '5 Days',
-      price: 'From R7,200',
-      numericPrice: 7200,
+      duration: '5 Full Days (Intensive Training)',
+      price: 'From R7,600',
+      numericPrice: 7600,
       isOnline: false,
-      location: 'Randfontein',
+      location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
+      depositAmount: 1800,
       instructor: {
         name: 'Avané Crous',
         image: '/avane-crous-headshot.webp',
@@ -66,13 +71,25 @@ export const CourseDetailPage: React.FC = () => {
       packages: [
         {
           name: 'Standard',
-          price: 'R7,200',
+          price: 'R7,600',
           kitValue: 'R3,200',
           features: [
-          '5-day comprehensive training',
-          'Basic starter kit included',
-          'Certificate after you\'ve completed your exam',
-          'Course materials and handouts'
+            'Prep & Primer',
+            'Sculpting Forms (x300)',
+            'Top Coat',
+            'Colour Acrylic 15g',
+            'Nude Acrylic 56g',
+            'White Acrylic 56g',
+            'Crystal Clear Acrylic 56g',
+            '250ml Nail Liquid',
+            '100% Kolinsky Brush',
+            'Dappen Dish',
+            'Training Manual',
+            'Lint-Free Wipes',
+            'Nail Cleanser 30ml',
+            'Hand File & Buffer',
+            'Cuticle Pusher',
+            'Lifelong mentorship and modern techniques'
           ]
         },
         {
@@ -80,19 +97,91 @@ export const CourseDetailPage: React.FC = () => {
           price: 'R9,900',
           kitValue: 'R5,100',
           features: [
-            '5-day comprehensive training',
-            'Premium professional kit included',
-            'Certificate after you\'ve completed your exam',
-            'Course materials and handouts',
-            'Bigger kit — electric e-file & LED lamp included'
+            'Prep & Primer',
+            'Sculpting Forms (x300)',
+            'Top Coat',
+            'Colour Acrylic 15g',
+            'Nude Acrylic 56g',
+            'White Acrylic 56g',
+            'Crystal Clear Acrylic 56g',
+            '500ml Nail Liquid',
+            '100% Kolinsky Brush',
+            'Dappen Dish',
+            'Training Manual',
+            'Lint-Free Wipes',
+            'Nail Cleanser 200ml',
+            'Hand File & Buffer',
+            'Unicorn Cuticle Pusher',
+            'LED Lamp (x1)',
+            'Electric File (x1)',
+            'Safety Bit',
+            'Box of Nail Tips',
+            'Nail Glue',
+            'Lifelong mentorship and modern techniques'
           ],
           popular: true
         }
       ],
       availableDates: [
-        'March 15-19, 2025',
-        'April 12-16, 2025',
-        'May 10-14, 2025'
+        'March 2026 (19-23 Mar)',
+        'May/June 2026 (29 May-2 Jun)'
+      ],
+      keyDetails: [
+        {
+          title: 'Course Overview',
+          items: [
+            'Duration: 5 Full Days (Intensive Training)',
+            'Goal: To empower, uplift, and equip you with the skills to succeed in the nail industry'
+          ]
+        },
+        {
+          title: 'Training Location',
+          items: [
+            '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng'
+          ]
+        },
+        {
+          title: 'What You Need to Bring',
+          items: [
+            'Your own refreshments and lunch (coffee and tea will be provided daily)',
+            'A practice hand (preferably a Habbil Hand - this is essential)',
+            'An electric file (e-file) and a safety bit',
+            'Two hand models: Day 4 model required for practical work; Day 5 model required for assessment'
+          ]
+        },
+        {
+          title: 'Exclusive Student Discount',
+          items: [
+            'We have a shop inside the training studio',
+            '10% discount on all product purchases during your training'
+          ]
+        },
+        {
+          title: 'Training Times - March 2026',
+          items: [
+            '19 March 2026 (08:30-16:00)',
+            '20 March 2026 (08:30-16:00)',
+            '21 March 2026 (09:00-15:00)',
+            '22 March 2026 (08:30-15:00)',
+            '23 March 2026 (08:30-16:00)'
+          ]
+        },
+        {
+          title: 'Training Times - May/June 2026',
+          items: [
+            '29 May 2026 (08:30-16:00)',
+            '30 May 2026 (08:30-16:00)',
+            '31 May 2026 (09:00-15:00)',
+            '1 June 2026 (08:30-15:00)',
+            '2 June 2026 (08:30-16:00)'
+          ]
+        },
+        {
+          title: 'Deposit',
+          items: [
+            'R1800 non-refundable deposit required to book your spot'
+          ]
+        }
       ],
       accordionData: [
         {
@@ -322,6 +411,17 @@ export const CourseDetailPage: React.FC = () => {
     const onlineFromRow = isOnlineFromRow(courseRow);
     const isOnline = onlineFromRow ?? template?.isOnline ?? true;
 
+    const dbDeposit = (() => {
+      const raw = (courseRow as any)?.deposit_amount;
+      if (raw === null || raw === undefined || raw === '') return null;
+      const numeric = typeof raw === 'number' ? raw : Number(raw);
+      return Number.isFinite(numeric) ? numeric : null;
+    })();
+
+    const dbDates = Array.isArray((courseRow as any)?.available_dates) ? (courseRow as any).available_dates : null;
+    const dbPackages = Array.isArray((courseRow as any)?.packages) ? (courseRow as any).packages : null;
+    const dbKeyDetails = Array.isArray((courseRow as any)?.key_details) ? (courseRow as any).key_details : null;
+
     const base = template || {
       id: courseRow?.id || '',
       title: courseRow?.title || '',
@@ -332,6 +432,7 @@ export const CourseDetailPage: React.FC = () => {
       numericPrice: getNumericPrice(courseRow?.price ?? null) || 0,
       isOnline,
       location: isOnline ? 'Online' : 'In-Person',
+      depositAmount: dbDeposit ?? 2000,
       instructor: {
         name: 'Avané Crous',
         image: '/avane-crous-headshot.webp',
@@ -348,7 +449,8 @@ export const CourseDetailPage: React.FC = () => {
           ]
         }
       ],
-      availableDates: ['Available Now'],
+      availableDates: dbDates && dbDates.length ? dbDates : ['Available Now'],
+      keyDetails: dbKeyDetails,
       accordionData: []
     };
 
@@ -365,8 +467,26 @@ export const CourseDetailPage: React.FC = () => {
       numericPrice: numericPrice ?? base.numericPrice,
       price: priceLabel || base.price,
       isOnline,
-      location: isOnline ? 'Online' : base.location
+      location: isOnline ? 'Online' : base.location,
+      depositAmount: dbDeposit ?? (base as any).depositAmount ?? 2000
     };
+
+    if (dbPackages && dbPackages.length) {
+      const normalized = dbPackages.map((p: any) => ({
+        name: String(p?.name || 'Standard'),
+        price: `R${currencyFormatter.format(Number(p?.price ?? 0) || 0)}`,
+        kitValue: p?.kit_value !== undefined && p?.kit_value !== null && p?.kit_value !== ''
+          ? `R${currencyFormatter.format(Number(p?.kit_value ?? 0) || 0)}`
+          : 'Included',
+        features: Array.isArray(p?.features) ? p.features.map((f: any) => String(f)) : [],
+        popular: Boolean(p?.popular)
+      }));
+
+      return {
+        ...merged,
+        packages: normalized
+      };
+    }
 
     if (template && template.packages?.length) {
       const nextPackages = [...template.packages];
@@ -526,7 +646,7 @@ export const CourseDetailPage: React.FC = () => {
 
       const priceMatch = selectedPkg.price.match(/[\d,]+/);
       const coursePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
-      const depositAmount = 2000;
+      const depositAmount = (course as any).depositAmount || 2000;
       const amountToCharge = course.isOnline ? coursePrice : depositAmount;
       const amountToChargeCents = Math.round(amountToCharge * 100);
       const itemLabel = course.isOnline
@@ -628,6 +748,23 @@ export const CourseDetailPage: React.FC = () => {
     { code: '+1', country: '🇺🇸 US' },
     { code: '+971', country: '🇦🇪 AE' }
   ];
+
+  const trainingAddress = useMemo(() => {
+    if (course.isOnline) return null;
+    const keyDetails = (course as any).keyDetails;
+    if (!Array.isArray(keyDetails)) return null;
+    for (const entry of keyDetails) {
+      if (!entry || typeof entry !== 'object') continue;
+      const title = String((entry as any).title || '').toLowerCase();
+      if (title.includes('location')) {
+        const items = (entry as any).items;
+        if (Array.isArray(items) && typeof items[0] === 'string' && items[0].trim()) {
+          return items[0].trim();
+        }
+      }
+    }
+    return null;
+  }, [course]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -767,7 +904,7 @@ export const CourseDetailPage: React.FC = () => {
               <h2 className="heading-with-stripe">What You'll Learn</h2>
               
               <div className="space-y-4">
-                {course.accordionData.map((item, index) => (
+                {course.accordionData.map((item: any, index: number) => (
                   <div key={index} className="bg-white border-2 border-gray-200 rounded-xl shadow-sm hover:border-blue-200 hover:shadow-md transition-all duration-300">
                     <button
                       onClick={() => toggleAccordion(index)}
@@ -793,9 +930,9 @@ export const CourseDetailPage: React.FC = () => {
                             </li>
                           ))}
                         </ul>
-                        {item.note && (
+                        {Boolean((item as any).note) && (
                           <div className="mt-4 p-4 rounded-lg" style={{ backgroundColor: '#CEE5FF' }}>
-                            <p className="text-sm font-medium" style={{ color: '#1a5a9a' }}>{item.note}</p>
+                            <p className="text-sm font-medium" style={{ color: '#1a5a9a' }}>{String((item as any).note)}</p>
                       </div>
                     )}
                       </div>
@@ -814,7 +951,7 @@ export const CourseDetailPage: React.FC = () => {
               <h2 className="heading-with-stripe">Choose Your Package</h2>
               
               <div className={`grid gap-8 ${course.packages.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-2'}`}>
-                {course.packages.map((pkg, index) => (
+                {course.packages.map((pkg: any, index: number) => (
                   <div key={index} className={`bg-white border-2 ${pkg.popular ? 'border-pink-400' : 'border-gray-200'} rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative flex flex-col h-full ${pkg.popular ? 'shadow-xl' : ''}`} style={pkg.popular ? { boxShadow: '0 8px 30px rgba(255,116,164,0.2)' } : {}}>
                     {pkg.popular && (
                       <div className="absolute -top-1 left-1/2 -translate-x-1/2">
@@ -834,10 +971,10 @@ export const CourseDetailPage: React.FC = () => {
                     </div>
                     
                     <ul className="space-y-4 mb-8 flex-grow">
-                      {pkg.features.map((feature, featureIndex) => (
+                      {pkg.features.map((feature: any, featureIndex: number) => (
                         <li key={featureIndex} className="flex items-center gap-3 transition-all duration-300 hover:bg-pink-50 hover:translate-x-2 rounded-lg py-2 px-3 -mx-3 cursor-pointer">
                           <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#CEE5FF', stroke: '#4A9FFF' }} />
-                          <span className="text-gray-700">{feature}</span>
+                          <span className="text-gray-700">{String(feature)}</span>
                         </li>
                       ))}
                     </ul>
@@ -870,8 +1007,19 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Location</h3>
                   <p className="text-gray-600">
-                    {course.location}<br />
-                    <span className="text-sm text-gray-500">{course.isOnline ? 'Access from anywhere' : 'Detailed address provided upon booking'}</span>
+                    {course.isOnline ? (
+                      <>
+                        Online<br />
+                        <span className="text-sm text-gray-500">Access from anywhere</span>
+                      </>
+                    ) : (
+                      <>
+                        {trainingAddress || 'In-Person'}<br />
+                        <span className="text-sm text-gray-500">
+                          {trainingAddress ? 'Randfontein, Gauteng' : 'Detailed address provided upon booking'}
+                        </span>
+                      </>
+                    )}
                   </p>
                 </div>
 
@@ -882,7 +1030,9 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Deposit Required'}</h3>
                   <p className="text-gray-600">
-                    {course.isOnline ? 'Full payment required' : 'R2,000 to secure your spot'}<br />
+                    {course.isOnline
+                      ? 'Full payment required'
+                      : `R${currencyFormatter.format((course as any).depositAmount || 2000)} non-refundable deposit to secure your spot`}<br />
                     <span className="text-sm text-gray-500">{course.isOnline ? 'Instant access after payment' : 'Balance due on course start date'}</span>
                   </p>
                 </div>
@@ -949,6 +1099,69 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {Array.isArray((course as any).keyDetails) && (course as any).keyDetails.length > 0 && (
+                <div className="mt-10 grid md:grid-cols-2 gap-8">
+                  {(() => {
+                    const raw = (course as any).keyDetails as any[];
+                    const hasSections = raw.some((item) => item && typeof item === 'object' && 'title' in item);
+                    if (!hasSections) {
+                      const bullets = raw.map((item) => String(item)).filter(Boolean);
+                      return [
+                        <div
+                          key="key-details"
+                          className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                          style={{ backgroundColor: '#CEE5FF' }}
+                        >
+                          <h3 className="text-lg font-bold text-gray-900 mb-4 uppercase tracking-wide text-center">Key Details</h3>
+                          <ul className="space-y-2 text-gray-700">
+                            {bullets.map((item, idx) => (
+                              <li key={idx} className="flex gap-3">
+                                <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#FF74A4' }} />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ];
+                    }
+
+                    const sections = raw
+                      .filter((item) => item && typeof item === 'object')
+                      .map((item, idx) => {
+                        const title = String((item as any).title || '').trim();
+                        const items = Array.isArray((item as any).items)
+                          ? (item as any).items.map((v: any) => String(v)).filter(Boolean)
+                          : [];
+                        if (!title && items.length === 0) return null;
+                        return (
+                          <div
+                            key={`${title || 'section'}-${idx}`}
+                            className="p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                            style={{ backgroundColor: '#CEE5FF' }}
+                          >
+                            {title && (
+                              <h3 className="text-lg font-bold text-gray-900 mb-4 uppercase tracking-wide text-center">{title}</h3>
+                            )}
+                            {items.length > 0 && (
+                              <ul className="space-y-2 text-gray-700">
+                                {items.map((entry: string, itemIdx: number) => (
+                                  <li key={itemIdx} className="flex gap-3">
+                                    <CheckCircle className="h-5 w-5 flex-shrink-0" style={{ color: '#FF74A4' }} />
+                                    <span>{entry}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        );
+                      })
+                      .filter(Boolean);
+
+                    return sections;
+                  })()}
+                </div>
+              )}
             </div>
           </Container>
         </section>
@@ -1114,7 +1327,11 @@ export const CourseDetailPage: React.FC = () => {
                         className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                         style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                       >
-                        {isSubmitting ? 'Processing...' : course.isOnline ? 'Complete Purchase' : 'Pay Deposit & Secure Spot (R2,000)'}
+                        {isSubmitting
+                          ? 'Processing...'
+                          : course.isOnline
+                            ? 'Complete Purchase'
+                            : `Pay Deposit & Secure Spot (R${currencyFormatter.format((course as any).depositAmount || 2000)})`}
                       </button>
 
                       {/* Help text when button is disabled */}

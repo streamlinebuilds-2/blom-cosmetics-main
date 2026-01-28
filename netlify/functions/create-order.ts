@@ -72,7 +72,10 @@ export const handler: Handler = async (event) => {
     // The checkout sends 'shipping.method' as 'store-pickup' or 'door-to-door'
     // We need to map this to 'collection' or 'delivery' for the DB
     const rawMethod = body.shipping?.method || body.fulfillment?.method || 'delivery';
-    const fulfillmentMethod = (rawMethod === 'store-pickup' || rawMethod === 'collection') ? 'collection' : 'delivery';
+    const fulfillmentMethod =
+      rawMethod === 'store-pickup' || rawMethod === 'collection' || rawMethod === 'digital'
+        ? 'collection'
+        : 'delivery';
     
     // Select the correct address object
     // If delivery, use shipping address. If collection, it is null.
