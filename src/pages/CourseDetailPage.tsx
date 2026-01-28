@@ -128,19 +128,6 @@ export const CourseDetailPage: React.FC = () => {
       ],
       keyDetails: [
         {
-          title: 'Course Overview',
-          items: [
-            'Duration: 5 Full Days (Intensive Training)',
-            'Goal: To empower, uplift, and equip you with the skills to succeed in the nail industry'
-          ]
-        },
-        {
-          title: 'Training Location',
-          items: [
-            '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng'
-          ]
-        },
-        {
           title: 'What You Need to Bring',
           items: [
             'Your own refreshments and lunch (coffee and tea will be provided daily)',

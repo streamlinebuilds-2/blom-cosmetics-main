@@ -52,8 +52,6 @@ INSERT INTO public.courses (
     {"name":"Deluxe","price":9900,"kit_value":5100,"features":["Prep & Primer","Sculpting Forms (x300)","Top Coat","Colour Acrylic 15g","Nude Acrylic 56g","White Acrylic 56g","Crystal Clear Acrylic 56g","500ml Nail Liquid","100% Kolinsky Brush","Dappen Dish","Training Manual","Lint-Free Wipes","Nail Cleanser 200ml","Hand File & Buffer","Unicorn Cuticle Pusher","LED Lamp (x1)","Electric File (x1)","Safety Bit","Box of Nail Tips","Nail Glue","Lifelong mentorship and modern techniques"],"popular":true}
   ]'::jsonb,
   '[
-    {"title":"Course Overview","items":["Duration: 5 Full Days (Intensive Training)","Goal: To empower, uplift, and equip you with the skills to succeed in the nail industry"]},
-    {"title":"Training Location","items":["34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng"]},
     {"title":"What You Need to Bring","items":["Your own refreshments and lunch (coffee and tea will be provided daily)","A practice hand (preferably a Habbil Hand - this is essential)","An electric file (e-file) and a safety bit","Two hand models: Day 4 model required for practical work; Day 5 model required for assessment"]},
     {"title":"Exclusive Student Discount","items":["We have a shop inside the training studio","10% discount on all product purchases during your training"]},
     {"title":"Training Times - March 2026","items":["19 March 2026 (08:30-16:00)","20 March 2026 (08:30-16:00)","21 March 2026 (09:00-15:00)","22 March 2026 (08:30-15:00)","23 March 2026 (08:30-16:00)"]},

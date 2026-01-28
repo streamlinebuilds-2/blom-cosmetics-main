@@ -68,17 +68,18 @@ export const handler: Handler = async (event) => {
       });
     }
 
-    // --- FIX 1 & 2: Normalize Fulfillment Method ---
-    // The checkout sends 'shipping.method' as 'store-pickup' or 'door-to-door'
-    // We need to map this to 'collection' or 'delivery' for the DB
+    // --- Normalize Fulfillment Method ---
+    // The checkout sends 'shipping.method' as 'store-pickup' | 'door-to-door' | 'digital'
+    // Map this to a DB-safe fulfillment method
     const rawMethod = body.shipping?.method || body.fulfillment?.method || 'delivery';
-    const fulfillmentMethod =
-      rawMethod === 'store-pickup' || rawMethod === 'collection' || rawMethod === 'digital'
+    const fulfillmentMethod = rawMethod === 'digital'
+      ? 'digital'
+      : (rawMethod === 'store-pickup' || rawMethod === 'collection')
         ? 'collection'
         : 'delivery';
     
     // Select the correct address object
-    // If delivery, use shipping address. If collection, it is null.
+    // If delivery, use shipping address. If collection/digital, it is null.
     const deliveryAddress =
       fulfillmentMethod === 'delivery'
         ? (body.shipping?.address ?? body.fulfillment?.address ?? body.delivery_address ?? null)
