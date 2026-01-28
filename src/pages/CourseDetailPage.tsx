@@ -26,14 +26,14 @@ export const CourseDetailPage: React.FC = () => {
     'professional-acrylic-training': {
       id: 'a603be5f-2c56-4e95-9423-8229c8991b40',
       title: 'Professional Acrylic Training',
-      description: 'Master the art of acrylic nail application with hands-on training in Randfontein.',
+      description: 'Master the art of acrylic nail application with hands-on training. Choose your kit, book your dates, and secure your spot with a deposit.',
       heroImage: '/professional-acrylic-training-hero.webp',
-      duration: '5 Days',
-      price: 'From R7,200',
-      numericPrice: 7200,
-      depositAmount: 2000,
+      duration: '5 Full Days (Intensive Training)',
+      price: 'From R7,600',
+      numericPrice: 7600,
+      depositAmount: 1800,
       isOnline: false,
-      location: 'Randfontein',
+      location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
       instructor: {
         name: 'Avané Crous',
         image: '/avane-crous-headshot.webp',
@@ -46,13 +46,25 @@ export const CourseDetailPage: React.FC = () => {
       packages: [
         {
           name: 'Standard',
-          price: 'R7,200',
+          price: 'R7,600',
           kitValue: 'R3,200',
           features: [
-          '5-day comprehensive training',
-          'Basic starter kit included',
-          'Certificate after you\'ve completed your exam',
-          'Course materials and handouts'
+            'Prep & Primer',
+            'Sculpting Forms (x300)',
+            'Top Coat',
+            'Colour Acrylic 15g',
+            'Nude Acrylic 56g',
+            'White Acrylic 56g',
+            'Crystal Clear Acrylic 56g',
+            '250ml Nail Liquid',
+            '100% Kolinsky Brush',
+            'Dappen Dish',
+            'Training Manual',
+            'Lint-Free Wipes',
+            'Nail Cleanser 30ml',
+            'Hand File & Buffer',
+            'Cuticle Pusher',
+            'Lifelong mentorship and modern techniques'
           ]
         },
         {
@@ -60,19 +72,34 @@ export const CourseDetailPage: React.FC = () => {
           price: 'R9,900',
           kitValue: 'R5,100',
           features: [
-            '5-day comprehensive training',
-            'Premium professional kit included',
-            'Certificate after you\'ve completed your exam',
-            'Course materials and handouts',
-            'Bigger kit — electric e-file & LED lamp included'
+            'Prep & Primer',
+            'Sculpting Forms (x300)',
+            'Top Coat',
+            'Colour Acrylic 15g',
+            'Nude Acrylic 56g',
+            'White Acrylic 56g',
+            'Crystal Clear Acrylic 56g',
+            '500ml Nail Liquid',
+            '100% Kolinsky Brush',
+            'Dappen Dish',
+            'Training Manual',
+            'Lint-Free Wipes',
+            'Nail Cleanser 200ml',
+            'Hand File & Buffer',
+            'Unicorn Cuticle Pusher',
+            'LED Lamp (x1)',
+            'Electric File (x1)',
+            'Safety Bit',
+            'Box of Nail Tips',
+            'Nail Glue',
+            'Lifelong mentorship and modern techniques'
           ],
           popular: true
         }
       ],
       availableDates: [
-        'March 15-19, 2025',
-        'April 12-16, 2025',
-        'May 10-14, 2025'
+        'March 2026 (19-23 Mar)',
+        'May/June 2026 (29 May-2 Jun)'
       ],
       accordionData: [
         {
@@ -269,7 +296,7 @@ export const CourseDetailPage: React.FC = () => {
   };
 
   const course = courses[courseSlug as keyof typeof courses] || courses['professional-acrylic-training'];
-  const depositAmount = !course.isOnline ? (course.depositAmount ?? 2000) : 0;
+  const depositAmount = !course.isOnline ? (course.depositAmount ?? 1800) : 0;
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(0);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
@@ -706,7 +733,9 @@ export const CourseDetailPage: React.FC = () => {
                   <h3 className="text-lg font-bold text-gray-900 mb-3 uppercase tracking-wide">Location</h3>
                   <p className="text-gray-600">
                     {course.location}<br />
-                    <span className="text-sm text-gray-500">{course.isOnline ? 'Access from anywhere' : 'Detailed address provided upon booking'}</span>
+                    {course.isOnline && (
+                      <span className="text-sm text-gray-500">Access from anywhere</span>
+                    )}
                   </p>
                 </div>
 
