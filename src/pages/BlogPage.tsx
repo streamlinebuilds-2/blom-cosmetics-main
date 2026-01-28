@@ -6,6 +6,7 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { queries, BlogPost } from '../lib/supabase';
 import { ShareButton } from '../components/ui/ShareButton';
+import { pageSEO, trackPageView, updateSEO } from '../lib/seo';
 import { 
   Calendar, 
   Clock, 
@@ -24,6 +25,15 @@ export const BlogPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState<string>('all');
+
+  useEffect(() => {
+    updateSEO(pageSEO(
+      'Blog',
+      'Read BLOM Cosmetics blog posts for nail tips, product guides, and training insights.',
+      '/blog'
+    ));
+    trackPageView('Blog | BLOM Cosmetics', 'https://blom-cosmetics.co.za/blog');
+  }, []);
 
   // Fallback blog posts data
   const fallbackPosts = [

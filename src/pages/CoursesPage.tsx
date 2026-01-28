@@ -5,6 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Clock, MapPin, DollarSign, Star, Activity, Users } from 'lucide-react';
+import { pageSEO, trackPageView, updateSEO } from '../lib/seo';
 
 const CoursesPage: React.FC = () => {
   const inPersonCourses = [
@@ -48,6 +49,15 @@ const CoursesPage: React.FC = () => {
   ];
 
   // Intersection Observer for mobile shimmer effect
+  useEffect(() => {
+    updateSEO(pageSEO(
+      'Courses',
+      'Explore BLOM Cosmetics training courses and workshops. Book in-person training or learn online at your own pace.',
+      '/courses'
+    ));
+    trackPageView('Courses | BLOM Cosmetics', 'https://blom-cosmetics.co.za/courses');
+  }, []);
+
   useEffect(() => {
     const observerOptions = {
       threshold: 0.5,

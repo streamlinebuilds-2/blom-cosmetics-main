@@ -1054,13 +1054,13 @@ export const CourseDetailPage: React.FC = () => {
                           {!selectedPackage && (
                             <li className="flex items-center gap-2">
                               <span className="text-yellow-600">●</span>
-                              <span>Choose a package above</span>
+                              <span>Choose a package</span>
                             </li>
                           )}
                           {!selectedDate && (
                             <li className="flex items-center gap-2">
                               <span className="text-yellow-600">●</span>
-                              <span>Select a date above</span>
+                              <span>Select a date</span>
                             </li>
                           )}
                         </ul>
@@ -1086,6 +1086,49 @@ export const CourseDetailPage: React.FC = () => {
                         </div>
                       </div>
                     )}
+
+                    {/* Package & Date Dropdowns */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
+                          Package <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={selectedPackage}
+                          onChange={(e) => setSelectedPackage(e.target.value)}
+                          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base bg-white"
+                        >
+                          <option value="" disabled>
+                            Select a package
+                          </option>
+                          {course.packages.map((pkg) => (
+                            <option key={pkg.name} value={pkg.name}>
+                              {pkg.name} ({pkg.price})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
+                          Date <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base bg-white"
+                        >
+                          <option value="" disabled>
+                            Select a date
+                          </option>
+                          {course.availableDates.map((date) => (
+                            <option key={date} value={date}>
+                              {date}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
                     {/* Row 2: Name & Email */}
                     <div className="grid md:grid-cols-2 gap-6">
