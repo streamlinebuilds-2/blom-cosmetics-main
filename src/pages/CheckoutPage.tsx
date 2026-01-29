@@ -767,20 +767,20 @@ export const CheckoutPage: React.FC = () => {
         <Container>
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold mb-4">Checkout</h1>
-            <div className="flex items-center justify-center gap-4">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4">Checkout</h1>
+            <div className="flex items-center justify-center gap-3 sm:gap-4">
               <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'shipping' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm sm:text-base ${step === 'shipping' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
                   1
                 </div>
-                <span>Shipping</span>
+                <span className="text-sm sm:text-base">Shipping</span>
               </div>
-              <div className="w-8 h-px bg-gray-300"></div>
+              <div className="w-6 sm:w-8 h-px bg-gray-300"></div>
               <div className={`flex items-center gap-2 ${step === 'review' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step === 'review' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
+                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm sm:text-base ${step === 'review' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
                   2
                 </div>
-                <span>Review</span>
+                <span className="text-sm sm:text-base">Review</span>
               </div>
             </div>
           </div>
@@ -791,10 +791,10 @@ export const CheckoutPage: React.FC = () => {
               {/* Shipping Information */}
               {step === 'shipping' && (
                 <Card>
-                  <CardHeader>
-                    <h2 className="text-2xl font-bold">Shipping Information</h2>
+                  <CardHeader className="p-4 sm:p-6 pb-4 sm:pb-4">
+                    <h2 className="text-xl sm:text-2xl font-bold">Shipping Information</h2>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="p-4 sm:p-6 pt-0">
                     <form onSubmit={handleShippingSubmit} className="space-y-6">
                       
                       {/* Shipping Method Selection */}
@@ -1119,10 +1119,10 @@ export const CheckoutPage: React.FC = () => {
               {/* Order Review */}
               {step === 'review' && (
                 <Card>
-                  <CardHeader className="pb-3 sm:pb-6">
+                  <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-6">
                     <h2 className="text-xl sm:text-2xl font-bold">Review Your Order</h2>
                   </CardHeader>
-                  <CardContent className="space-y-3 sm:space-y-4">
+                  <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
                     {/* Fulfillment summary */}
                     {shippingMethod === 'store-pickup' ? (
                       <div>
@@ -1199,11 +1199,11 @@ export const CheckoutPage: React.FC = () => {
                       <h3 className="font-medium mb-3 text-base sm:text-lg">Order Items</h3>
                       <div className="space-y-2 sm:space-y-3">
                         {cartState.items.map((item) => (
-                          <div key={item.id} className="flex gap-3 sm:gap-4 p-3 sm:p-4 border rounded-lg">
+                          <div key={item.id} className="flex gap-3 sm:gap-4 p-2.5 sm:p-4 border rounded-lg">
                             <img
                               src={item.image}
                               alt={item.name}
-                              className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0"
+                              className="w-10 h-10 sm:w-16 sm:h-16 object-cover rounded flex-shrink-0"
                             />
                             <div className="flex-1 min-w-0">
                               <h4 className="font-medium text-sm sm:text-base truncate">{item.name}</h4>

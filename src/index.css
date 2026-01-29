@@ -1172,9 +1172,9 @@ html, body {
 
 @media (max-width: 640px) {
   .btn.checkout-review-action {
-    padding: 0.75rem 1.1rem;
-    font-size: 0.95rem;
-    min-height: 44px;
+    padding: 0.65rem 1rem;
+    font-size: 0.9rem;
+    min-height: 42px;
     max-width: 100%;
     white-space: normal;
     text-align: center;

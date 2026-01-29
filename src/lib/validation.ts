@@ -82,10 +82,6 @@ export const validateAddress = (address: {
     errors.push('Street address is required');
   }
   
-  if (!address.local_area.trim()) {
-    errors.push('Suburb is required');
-  }
-  
   if (!address.city.trim()) {
     errors.push('City is required');
   }
