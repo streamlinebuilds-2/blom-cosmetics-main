@@ -1246,7 +1246,7 @@ export const CheckoutPage: React.FC = () => {
                         type="button"
                         variant="outline"
                         onClick={() => { setStep('shipping'); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); } }}
-                        className="w-full sm:w-auto"
+                        className="w-full sm:w-auto checkout-review-action"
                       >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         Back to Shipping
@@ -1255,7 +1255,7 @@ export const CheckoutPage: React.FC = () => {
                         size="lg"
                         onClick={handlePlaceOrder}
                         loading={isProcessing}
-                        className="w-full sm:w-auto"
+                        className="w-full sm:w-auto checkout-review-action"
                       >
                         <Lock className="h-4 w-4 mr-2" />
                         {isProcessing ? 'Processing...' : `Place Order - ${formatPrice(orderTotal)}`}
