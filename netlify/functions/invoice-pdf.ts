@@ -3,7 +3,7 @@ import fetch from "node-fetch"
 
 const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const SITE = process.env.SITE_BASE_URL || process.env.SITE_URL || "https://blom-cosmetics.co.za"
+const SITE_URL = (process.env.SITE_URL || "https://blom-cosmetics.co.za/").replace(/\/+$/, "")
 const BUCKET = "invoices" 
 const LOGO_URL = "https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png"
 
@@ -38,8 +38,10 @@ export const handler = async (event: any) => {
 
     if (!m_payment_id && order_id) {
       try {
-        const orderResponse: any = await fetchJson(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id`);
-        if (orderResponse && orderResponse.length > 0) m_payment_id = orderResponse[0].m_payment_id;
+        const orderResponse: any = await fetchJson(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order_id}&select=m_payment_id,merchant_payment_id`);
+        if (orderResponse && orderResponse.length > 0) {
+          m_payment_id = orderResponse[0].m_payment_id || orderResponse[0].merchant_payment_id;
+        }
       } catch (error) { console.error('ID Lookup Error', error); }
     }
 
@@ -48,8 +50,9 @@ export const handler = async (event: any) => {
     }
 
     // 1) Load Order Data
+    const orParam = encodeURIComponent(`(m_payment_id.eq.${m_payment_id},merchant_payment_id.eq.${m_payment_id})`)
     const orderResponse: any = await fetchJson(
-      `${SUPABASE_URL}/rest/v1/orders?m_payment_id=eq.${encodeURIComponent(m_payment_id)}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,subtotal_cents,shipping_cents,discount_cents,status,created_at`
+      `${SUPABASE_URL}/rest/v1/orders?or=${orParam}&select=id,buyer_name,buyer_email,buyer_phone,fulfillment_method,delivery_address,collection_location,total,subtotal_cents,shipping_cents,discount_cents,status,created_at`
     )
     const order = Array.isArray(orderResponse) ? orderResponse[0] : orderResponse
     if (!order) return { statusCode: 404, body: "ORDER_NOT_FOUND" }
@@ -166,12 +169,13 @@ export const handler = async (event: any) => {
     })
 
     // --- FINANCIALS SECTION ---
-    const shippingAmount = order.shipping_cents ? order.shipping_cents / 100 : 0
-    const subtotalAmount = order.subtotal_cents ? order.subtotal_cents / 100 : itemsSum
-    let discountAmount = order.discount_cents ? order.discount_cents / 100 : 0
+    const subtotalAmount = order.subtotal_cents != null ? order.subtotal_cents / 100 : itemsSum
+    const shippingAmount = (order.shipping_cents || 0) / 100
+    const discountCents = order.discount_cents || 0
+    const discountAmount = discountCents / 100
 
     // Shipping
-    const isFreeShipping = !hasFurniture && subtotalAmount >= 2000 && shippingAmount === 0;
+    const isFreeShipping = subtotalAmount >= 2000 && shippingAmount === 0;
     
     if (hasFurniture && shippingAmount === 0) {
       drawText("Shipping (Furniture)", left, y, 10)
@@ -191,7 +195,7 @@ export const handler = async (event: any) => {
     }
 
     // Discount
-    if (discountAmount > 0) {
+    if (discountCents > 0) {
       drawText("Coupon Discount", left, y, 10, false, rgb(0, 0.5, 0.2))
       drawRightText("-" + money(discountAmount), right - 20, y, 10, false, rgb(0, 0.5, 0.2))
       y -= 16
@@ -216,7 +220,7 @@ export const handler = async (event: any) => {
     drawText("Thank you for your purchase!", left, y, 10, false, rgb(0.35, 0.38, 0.45))
     y -= 12
     drawText("Questions? Contact us: shopblomcosmetics@gmail.com | +27 79 548 3317", left, y, 9, false, rgb(0.4, 0.45, 0.52))
-    drawRightText(SITE.replace(/^https?:\/\//, ""), right, y, 9, false, rgb(0.4, 0.45, 0.52))
+    drawRightText(SITE_URL.replace(/^https?:\/\//, ""), right, y, 9, false, rgb(0.4, 0.45, 0.52))
 
     const pdfBytes = await pdf.save()
     const version = q.v || Date.now().toString()
@@ -230,11 +234,12 @@ export const handler = async (event: any) => {
 
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(filename)}`
     
-    await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
+    const upd = await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
       method: "PATCH",
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ invoice_url: publicUrl })
     })
+    if (!upd.ok) throw new Error(await upd.text())
 
     const disposition = (q.download === '1' || body.download === true) ? 'attachment' : 'inline'
     return {

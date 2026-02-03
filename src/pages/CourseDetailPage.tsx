@@ -443,6 +443,13 @@ export const CourseDetailPage: React.FC = () => {
     }
 
     try {
+      const nowBase36 = Date.now().toString(36).toUpperCase();
+      const bytes = globalThis.crypto?.getRandomValues?.(new Uint8Array(3));
+      const rand = bytes
+        ? Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+        : Math.random().toString(16).slice(2, 8).toUpperCase();
+      const clientPaymentId = `BL-${nowBase36}-${rand}`;
+
       // Get the selected package price
       const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
       if (!selectedPkg) {
@@ -466,6 +473,7 @@ export const CourseDetailPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           order_kind: 'course',
+          m_payment_id: clientPaymentId,
           buyer: {
             name: formData.name,
             email: formData.email,
@@ -509,7 +517,7 @@ export const CourseDetailPage: React.FC = () => {
 
       const orderData = await orderRes.json();
       const orderId = orderData.order_id;
-      const merchantPaymentId = orderData.m_payment_id || orderData.merchant_payment_id;
+      const merchantPaymentId = orderData.m_payment_id || orderData.merchant_payment_id || clientPaymentId;
 
       // Redirect to PayFast
       const paymentRes = await fetch('/.netlify/functions/payfast-redirect', {

@@ -582,11 +582,19 @@ export const CheckoutPage: React.FC = () => {
     setIsProcessing(true);
     
     try {
+      const nowBase36 = Date.now().toString(36).toUpperCase();
+      const bytes = globalThis.crypto?.getRandomValues?.(new Uint8Array(3));
+      const rand = bytes
+        ? Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
+        : Math.random().toString(16).slice(2, 8).toUpperCase();
+      const clientPaymentId = `BL-${nowBase36}-${rand}`;
+
       // Step 1: Create order in Supabase (new payload)
       const createOrderRes = await fetch('/.netlify/functions/create-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          m_payment_id: clientPaymentId,
           buyer: {
             email: shippingInfo.email,
             name: `${shippingInfo.firstName} ${shippingInfo.lastName}`.trim(),
@@ -607,7 +615,9 @@ export const CheckoutPage: React.FC = () => {
             subtotal_cents: Math.round(cartState.subtotal * 100),
             shipping_cents: Math.round(shippingCost * 100),
             discount_cents: Math.round(discount * 100),
-            tax_cents: 0
+            tax_cents: 0,
+            total_cents: Math.round(orderTotal * 100),
+            total: orderTotal
           },
           coupon: appliedCoupon ? { code: appliedCoupon.code } : null
         })
@@ -629,7 +639,8 @@ export const CheckoutPage: React.FC = () => {
 
       const orderData = await createOrderRes.json();
       const orderId = orderData.order_id;
-      const totalCents = orderData.total_cents;
+      const paymentId = orderData.m_payment_id || orderData.merchant_payment_id || clientPaymentId;
+      const totalCents = Number(orderData.total_cents ?? Math.round(orderTotal * 100));
 
       // Save address to user_addresses if requested and user is logged in
       if (saveThisAddress && userSession?.user && shippingMethod === 'door-to-door') {
@@ -655,6 +666,7 @@ export const CheckoutPage: React.FC = () => {
       // Store order locally before redirecting
       localStorage.setItem('blom_pending_order', JSON.stringify({
         orderId,
+        m_payment_id: paymentId,
         cartItems: cartState.items,
         total: totalCents / 100,
         shipping: shippingCost,
@@ -669,9 +681,9 @@ export const CheckoutPage: React.FC = () => {
       // All customer/delivery data already saved to Supabase via create-order above
       const pfRequestBody = {
         order_id: orderData.order_id, // Pass the actual order ID for proper redirect
-        m_payment_id: orderData.merchant_payment_id,
+        m_payment_id: paymentId,
         amount: (totalCents / 100).toFixed(2),
-        item_name: `BLOM Order ${orderData.merchant_payment_id}`
+        item_name: `BLOM Order ${paymentId}`
       };
 
       console.log('🔍 PayFast request:', pfRequestBody);

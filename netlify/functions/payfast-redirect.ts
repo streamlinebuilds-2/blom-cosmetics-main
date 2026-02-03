@@ -42,8 +42,7 @@ async function upsertOrder({
     return;
   }
 
-  const orderData = {
-    merchant_payment_id,
+  const baseData = {
     status: 'pending',
     total_amount: Number(amount).toFixed(2),
     currency,
@@ -65,22 +64,31 @@ async function upsertOrder({
     updated_at: new Date().toISOString()
   } as Record<string, any>;
 
-  const r = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=merchant_payment_id`, {
-    method: 'POST',
-    headers: {
-      apikey: serviceKey,
-      Authorization: `Bearer ${serviceKey}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
-    },
-    body: JSON.stringify(orderData)
-  });
+  const tryUpsert = async (idField: 'm_payment_id' | 'merchant_payment_id') => {
+    const r = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=${idField}`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ ...baseData, [idField]: merchant_payment_id })
+    });
+    return r;
+  };
 
-  if (!r.ok) {
-    const txt = await r.text();
-    console.error(`Supabase upsert order failed: ${r.status} ${txt}`);
-    throw new Error(`Failed to create order: ${r.status}`);
-  }
+  const first = await tryUpsert('m_payment_id');
+  if (first.ok) return;
+  const firstTxt = await first.text();
+
+  const second = await tryUpsert('merchant_payment_id');
+  if (second.ok) return;
+  const secondTxt = await second.text();
+
+  console.error(`Supabase upsert order failed: ${first.status} ${firstTxt}`);
+  console.error(`Supabase upsert order failed: ${second.status} ${secondTxt}`);
+  throw new Error(`Failed to create order: ${second.status}`);
 }
 
 export const handler: Handler = async (event) => {
@@ -136,9 +144,7 @@ export const handler: Handler = async (event) => {
       // Continue anyway - we can create order via ITN webhook
     }
 
-    // 2) Build PayFast redirect with CORRECT signature order
-    // CRITICAL: PayFast validates signature in THIS EXACT ORDER
-    // Use order_id from payload if available, otherwise use m_payment_id
+    // 2) Build PayFast redirect
     const orderId = payload.order_id || m_payment_id;
     const RETURN_URL = `${SITE_BASE_URL}/checkout/status?order=${orderId}`;
     
@@ -150,31 +156,29 @@ export const handler: Handler = async (event) => {
       notify_url: NOTIFY_URL,
       m_payment_id,
       amount: amountStr,
-      item_name
+      item_name,
+      custom_str1: m_payment_id
     };
 
-    // PayFast signature order - MUST be in this exact sequence
-    const signatureOrder = [
-      'merchant_id',
-      'merchant_key',
-      'return_url',
-      'cancel_url',
-      'notify_url',
-      'm_payment_id',
-      'amount',
-      'item_name'
-    ];
+    const passthroughKeys = [
+      'email_address',
+      'name_first',
+      'name_last',
+      'custom_str2',
+      'custom_str3',
+      'custom_str4'
+    ] as const;
 
-    // Build signature string
-    const parts: string[] = [];
-    for (const key of signatureOrder) {
-      const val = fields[key];
-      if (val !== undefined && val !== null && String(val) !== '') {
-        parts.push(`${key}=${encPF(val)}`);
+    for (const k of passthroughKeys) {
+      if (payload?.[k] !== undefined && payload?.[k] !== null && String(payload[k]) !== '') {
+        fields[k] = String(payload[k]);
       }
     }
     
-    let baseString = parts.join('&');
+    const signatureKeys = Object.keys(fields).filter((k) => fields[k] !== undefined && fields[k] !== null && String(fields[k]) !== '');
+    signatureKeys.sort();
+    const baseStringParts = signatureKeys.map((k) => `${k}=${encPF(fields[k])}`);
+    let baseString = baseStringParts.join('&');
     
     // Add passphrase if configured
     if (process.env.PAYFAST_PASSPHRASE) {
@@ -183,14 +187,6 @@ export const handler: Handler = async (event) => {
     
     // Generate MD5 signature
     const signature = crypto.createHash('md5').update(baseString).digest('hex');
-
-    // Debug logging (remove in production)
-    console.log('PayFast Signature Debug:');
-    console.log('- Merchant ID:', process.env.PAYFAST_MERCHANT_ID);
-    console.log('- Amount:', amountStr);
-    console.log('- m_payment_id:', m_payment_id);
-    console.log('- Signature length:', signature.length);
-    console.log('- Base string:', baseString.substring(0, 200) + '...');
 
     // Add signature to fields
     fields.signature = signature;

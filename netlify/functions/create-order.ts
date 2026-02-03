@@ -1,4 +1,5 @@
 import type { Handler } from '@netlify/functions'
+import crypto from 'crypto'
 
 export const handler: Handler = async (event) => {
   try {
@@ -80,10 +81,37 @@ export const handler: Handler = async (event) => {
     const deliveryAddress = fulfillmentMethod === 'delivery' ? (body.shipping?.address || body.fulfillment?.address || body.delivery_address) : null;
     const collectionLocation = fulfillmentMethod === 'collection' ? 'BLOM HQ' : null;
 
+    const hasFurniture = validItems.some((it) => {
+      const name = String(it.resolved_product?.name || it.base_name || '').toLowerCase()
+      return ['table', 'station', 'desk', 'dresser', 'bed', 'chair', 'rack'].some((k) => name.includes(k))
+    })
+
+    const nowBase36 = Date.now().toString(36).toUpperCase()
+    const entropy = crypto.randomBytes(3).toString('hex').toUpperCase()
+    const canonicalPaymentId = String(body.m_payment_id || body.merchant_payment_id || body.payment_id || `BL-${nowBase36}-${entropy}`)
+
+    const subtotalCents = validItems.reduce((sum: number, it: any) => {
+      const qty = Number(it.quantity || 0)
+      const unitPriceCents = Math.round(Number(it.unit_price || 0))
+      return sum + Math.max(0, qty) * Math.max(0, unitPriceCents)
+    }, 0)
+
+    let shippingCents = 0
+    if (fulfillmentMethod === 'collection') {
+      shippingCents = hasFurniture ? 500 * 100 : 0
+    } else if (hasFurniture) {
+      shippingCents = 0
+    } else {
+      shippingCents = subtotalCents >= 2000 * 100 ? 0 : 120 * 100
+    }
+
+    const rawDiscountCents = Math.round(Number(body.totals?.discount_cents ?? body.discount_cents ?? 0))
+    const discountCents = Math.max(0, Math.min(rawDiscountCents, subtotalCents + shippingCents))
+
     // 3. Create Order via RPC
     const rpcPayload = {
-      p_order_number: `BL-${Date.now().toString(36).toUpperCase()}`,
-      p_m_payment_id: `BL-${Date.now().toString(16).toUpperCase()}`, // Unique ID for PayFast
+      p_order_number: `BL-${nowBase36}-${entropy}`,
+      p_m_payment_id: canonicalPaymentId,
       p_buyer_email: body.shippingInfo?.email || body.buyer?.email,
       p_buyer_name: body.shippingInfo ? `${body.shippingInfo.firstName} ${body.shippingInfo.lastName}` : body.buyer?.name,
       p_buyer_phone: body.shippingInfo?.phone || body.buyer?.phone,
@@ -113,9 +141,9 @@ export const handler: Handler = async (event) => {
         };
       }),
       
-      p_subtotal_cents: Number(body.totals?.subtotal_cents || 0),
-      p_shipping_cents: Number(body.totals?.shipping_cents || 0),
-      p_discount_cents: Number(body.totals?.discount_cents || 0),
+      p_subtotal_cents: subtotalCents,
+      p_shipping_cents: shippingCents,
+      p_discount_cents: discountCents,
       p_tax_cents: 0,
       p_fulfillment_method: fulfillmentMethod,
       p_delivery_address: deliveryAddress,
@@ -200,7 +228,11 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(order)
+      body: JSON.stringify({
+        ...order,
+        m_payment_id: order?.m_payment_id ?? order?.merchant_payment_id ?? canonicalPaymentId,
+        merchant_payment_id: order?.merchant_payment_id ?? order?.m_payment_id ?? canonicalPaymentId
+      })
     };
 
   } catch (e: any) {
