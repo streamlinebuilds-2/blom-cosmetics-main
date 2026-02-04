@@ -88,6 +88,29 @@ export default function CheckoutSuccess() {
 
   const formatCurrency = (cents: number) => `R${((cents || 0) / 100).toFixed(2)}`;
 
+  const getLineTotalRaw = (item: any) => {
+    const qty = Number(item?.quantity || 0);
+    const unit = Number(item?.unit_price || 0);
+    const line = Number(item?.line_total);
+    if (Number.isFinite(line)) return line;
+    if (Number.isFinite(qty) && Number.isFinite(unit)) return qty * unit;
+    return 0;
+  };
+
+  const getItemMoneyMultiplier = (order: any) => {
+    const expectedSubtotal = Number(order?.subtotal_cents || 0) / 100;
+    const items = Array.isArray(order?.items) ? order.items : [];
+    const rawSum = items.reduce((sum: number, it: any) => sum + getLineTotalRaw(it), 0);
+
+    if (expectedSubtotal > 0) {
+      const tol = Math.max(0.05, expectedSubtotal * 0.005);
+      if (Math.abs(rawSum - expectedSubtotal) <= tol) return 1;
+      if (Math.abs(rawSum / 100 - expectedSubtotal) <= tol) return 0.01;
+    }
+
+    return 1;
+  };
+
   const downloadReceipt = async () => {
     if (!orderDetails) return;
     setLoading(true);
@@ -201,7 +224,7 @@ export default function CheckoutSuccess() {
                             <td className="px-4 py-3">{item.product_name}</td>
                             <td className="px-4 py-3 text-center">{item.quantity}</td>
                             <td className="px-4 py-3 text-right font-medium">
-                              R {((item.line_total || (item.quantity * item.unit_price) || 0) / 100).toFixed(2)}
+                              R {(getLineTotalRaw(item) * getItemMoneyMultiplier(orderDetails)).toFixed(2)}
                             </td>
                           </tr>
                         ))}
