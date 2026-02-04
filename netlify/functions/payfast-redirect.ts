@@ -12,9 +12,57 @@ const NOTIFY_URL = `${SITE_BASE_URL}/.netlify/functions/payfast-itn`;
 
 // PHP-style urlencode for PayFast: spaces -> +, and encode ! ' ( ) *
 function encPF(v: unknown) {
-  return encodeURIComponent(String(v ?? ''))
+  return encodeURIComponent(String(v ?? '').trim())
     .replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())
-    .replace(/%20/g, '+');
+    .replace(/%20/g, '+')
+    .replace(/%[0-9a-f]{2}/g, m => m.toUpperCase());
+}
+
+const CHECKOUT_SIGNATURE_FIELD_ORDER = [
+  'merchant_id',
+  'merchant_key',
+  'return_url',
+  'cancel_url',
+  'notify_url',
+  'name_first',
+  'name_last',
+  'email_address',
+  'cell_number',
+  'm_payment_id',
+  'amount',
+  'item_name',
+  'item_description',
+  'custom_int1',
+  'custom_int2',
+  'custom_int3',
+  'custom_int4',
+  'custom_int5',
+  'custom_str1',
+  'custom_str2',
+  'custom_str3',
+  'custom_str4',
+  'custom_str5',
+  'email_confirmation',
+  'confirmation_address',
+  'payment_method',
+  'subscription_type',
+  'billing_date',
+  'recurring_amount',
+  'frequency',
+  'cycles'
+] as const;
+
+function sortKeysForPayFast(keys: string[]) {
+  const priority = new Map<string, number>();
+  for (let i = 0; i < CHECKOUT_SIGNATURE_FIELD_ORDER.length; i += 1) priority.set(CHECKOUT_SIGNATURE_FIELD_ORDER[i], i);
+  return [...keys].sort((a, b) => {
+    const pa = priority.get(a);
+    const pb = priority.get(b);
+    if (pa === undefined && pb === undefined) return a.localeCompare(b);
+    if (pa === undefined) return 1;
+    if (pb === undefined) return -1;
+    return pa - pb;
+  });
 }
 
 async function upsertOrder({ 
@@ -148,9 +196,17 @@ export const handler: Handler = async (event) => {
     const orderId = payload.order_id || m_payment_id;
     const RETURN_URL = `${SITE_BASE_URL}/checkout/status?order=${orderId}`;
     
+    if (!process.env.PAYFAST_MERCHANT_ID || !process.env.PAYFAST_MERCHANT_KEY) {
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'PayFast merchant credentials not configured' })
+      };
+    }
+
     const fields: Record<string, string> = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID || '',
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY || '',
+      merchant_id: process.env.PAYFAST_MERCHANT_ID,
+      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
       return_url: RETURN_URL,
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
@@ -175,9 +231,12 @@ export const handler: Handler = async (event) => {
       }
     }
     
-    const signatureKeys = Object.keys(fields).filter((k) => fields[k] !== undefined && fields[k] !== null && String(fields[k]) !== '');
-    signatureKeys.sort();
-    const baseStringParts = signatureKeys.map((k) => `${k}=${encPF(fields[k])}`);
+    const signatureKeys = Object.keys(fields).filter((k) => {
+      const val = fields[k];
+      return val !== undefined && val !== null && String(val).trim() !== '' && k !== 'signature';
+    });
+    const orderedKeys = sortKeysForPayFast(signatureKeys);
+    const baseStringParts = orderedKeys.map((k) => `${k}=${encPF(fields[k])}`);
     let baseString = baseStringParts.join('&');
     
     // Add passphrase if configured
