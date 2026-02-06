@@ -5,8 +5,55 @@ const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 // UPDATED URL: Using the notify-order endpoint you requested
 const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
+const N8N_COURSE_PURCHASE_WEBHOOK_URL = process.env.N8N_COURSE_PURCHASE_WEBHOOK_URL || 'https://dockerfile-1n82.onrender.com/webhook/purchase-success'
+const N8N_COURSE_PURCHASE_WEBHOOK_TOKEN = process.env.N8N_COURSE_PURCHASE_WEBHOOK_TOKEN || ''
+const N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET = process.env.N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET || ''
 
 const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!)
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+function splitName(fullName: string) {
+  const parts = String(fullName || '').trim().split(/\s+/).filter(Boolean)
+  const first = parts[0] || ''
+  const last = parts.slice(1).join(' ')
+  return { first_name: first, last_name: last }
+}
+
+async function postJsonWithRetry(url: string, payload: unknown) {
+  const body = JSON.stringify(payload)
+  const signatureSecret = N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET.trim()
+  const signature = signatureSecret
+    ? await import('crypto').then((m) => m.createHmac('sha256', signatureSecret).update(body).digest('hex'))
+    : ''
+
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (N8N_COURSE_PURCHASE_WEBHOOK_TOKEN.trim()) {
+    headers.Authorization = `Bearer ${N8N_COURSE_PURCHASE_WEBHOOK_TOKEN.trim()}`
+  }
+  if (signature) {
+    headers['X-Webhook-Signature'] = signature
+  }
+
+  const delaysMs = [0, 500, 1500, 3500, 7000]
+  let lastStatus: number | null = null
+  let lastBody = ''
+
+  for (let attempt = 0; attempt < delaysMs.length; attempt++) {
+    if (delaysMs[attempt] > 0) await sleep(delaysMs[attempt])
+    try {
+      const res = await fetch(url, { method: 'POST', headers, body })
+      lastStatus = res.status
+      lastBody = await res.text()
+      if (res.status === 200 || res.status === 202) return { ok: true as const, status: res.status, body: lastBody }
+    } catch (e: any) {
+      lastStatus = null
+      lastBody = String(e?.message || e)
+    }
+  }
+
+  return { ok: false as const, status: lastStatus, body: lastBody }
+}
 
 export const handler: Handler = async (event) => {
   // 1. CORS Headers (Allow your site to call this)
@@ -42,26 +89,16 @@ export const handler: Handler = async (event) => {
     }
 
     // 3. If already paid, just return success (idempotent)
-    if (order.status === 'paid') {
-      console.log('✅ Order already paid. Skipping DB update.')
-    } else {
-      // 4. FORCE MARK AS PAID (Since user reached success page)
-      // In a high-security system, we would verify with PayFast API here.
-      // For your needs, we accept the success page presence as proof.
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({
-          status: 'paid',
-          payment_status: 'paid',
-          paid_at: new Date().toISOString()
-        })
-        .eq('id', order.id)
+    const currentStatus = String(order.status || '').toLowerCase()
+    const currentPaymentStatus = String(order.payment_status || '').toLowerCase()
+    const isPaid = currentStatus === 'paid' || currentPaymentStatus === 'paid' || currentPaymentStatus === 'complete'
 
-      if (updateError) throw updateError
-      console.log('💰 Order forcibly marked as PAID by Success Page trigger')
-      
-      // 5. Trigger Stock Deduction (The "Unknown Product" fix logic)
-      await supabase.rpc('process_order_stock_deduction', { p_order_id: order.id });
+    if (!isPaid) {
+      return {
+        statusCode: 202,
+        headers,
+        body: JSON.stringify({ success: false, message: 'Order not confirmed paid yet' })
+      }
     }
 
     try {
@@ -109,6 +146,90 @@ export const handler: Handler = async (event) => {
       console.error('N8N Error:', await n8nRes.text())
     } else {
       console.log('✅ N8N Alert Sent!')
+    }
+
+    try {
+      const { data: cps } = await supabase
+        .from('course_purchases')
+        .select('course_slug,invitation_status,buyer_email,buyer_name,buyer_phone')
+        .eq('order_id', order.id)
+
+      const coursePurchases = Array.isArray(cps) ? cps : []
+      const isCourse = order.order_kind === 'course' || coursePurchases.length > 0
+
+      if (isCourse) {
+        const alreadySent = coursePurchases.some((cp: any) => String(cp?.invitation_status || '').toLowerCase() === 'sent')
+
+        if (!alreadySent) {
+          const { data: items } = await supabase
+            .from('order_items')
+            .select('sku,quantity,unit_price')
+            .eq('order_id', order.id)
+
+          const line_items = (Array.isArray(items) ? items : [])
+            .map((it: any) => ({
+              sku: String(it?.sku || ''),
+              quantity: Number(it?.quantity || 0),
+              unit_price: Number(it?.unit_price || 0),
+              currency: 'ZAR'
+            }))
+            .filter((it: any) => it.sku && Number.isFinite(it.quantity) && it.quantity > 0 && Number.isFinite(it.unit_price) && it.unit_price > 0)
+
+          const buyerEmail = String(order.buyer_email || coursePurchases?.[0]?.buyer_email || '').trim()
+          const buyerName = String(order.buyer_name || coursePurchases?.[0]?.buyer_name || '').trim()
+          const buyerPhone = String(order.buyer_phone || coursePurchases?.[0]?.buyer_phone || '').trim()
+          const { first_name, last_name } = splitName(buyerName)
+
+          if (buyerEmail && line_items.length > 0 && !line_items.some((it: any) => !it.sku)) {
+            const env = process.env.CONTEXT === 'production' ? 'production' : 'staging'
+            const paidAt = String(order.paid_at || new Date().toISOString())
+
+            const payload = {
+              event: 'course_purchase_paid',
+              order_id: String(order.id),
+              provider: 'payfast',
+              paid_at: paidAt,
+              email: buyerEmail,
+              customer: {
+                first_name,
+                last_name,
+                phone: buyerPhone
+              },
+              line_items,
+              total: {
+                amount: Number(order.total || 0),
+                currency: 'ZAR'
+              },
+              meta: {
+                site: 'blom-academy',
+                env
+              }
+            }
+
+            const courseRes = await postJsonWithRetry(N8N_COURSE_PURCHASE_WEBHOOK_URL, payload)
+
+            if (courseRes.ok) {
+              await supabase
+                .from('course_purchases')
+                .update({ invitation_status: 'sent', invited_at: paidAt })
+                .eq('order_id', order.id)
+            } else {
+              await supabase
+                .from('course_purchases')
+                .update({ invitation_status: 'failed' })
+                .eq('order_id', order.id)
+              console.error('Course purchase webhook failed', { status: courseRes.status, body: courseRes.body })
+            }
+          } else if (coursePurchases.length > 0) {
+            await supabase
+              .from('course_purchases')
+              .update({ invitation_status: 'failed' })
+              .eq('order_id', order.id)
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Course webhook fallback error:', e)
     }
 
     return {

@@ -137,7 +137,7 @@ export const handler: Handler = async (event) => {
           product_name: finalDisplayName,
           quantity: it.quantity,
           unit_price: unitPriceRands, // Store as Rands (e.g. 590.00)
-          sku: it.original_sku
+          sku: it.original_sku || it.resolved_product?.sku || null
         };
       }),
       

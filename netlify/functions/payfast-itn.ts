@@ -6,6 +6,9 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const PF_PASSPHRASE = process.env.PAYFAST_PASSPHRASE || process.env.PF_PASSPHRASE || ''
 const SITE = process.env.SITE_URL || process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za'
 const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
+const N8N_COURSE_PURCHASE_WEBHOOK_URL = process.env.N8N_COURSE_PURCHASE_WEBHOOK_URL || 'https://dockerfile-1n82.onrender.com/webhook/purchase-success'
+const N8N_COURSE_PURCHASE_WEBHOOK_TOKEN = process.env.N8N_COURSE_PURCHASE_WEBHOOK_TOKEN || ''
+const N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET = process.env.N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET || ''
 
 const encodeVal = (v: any) => encodeURIComponent(String(v)).replace(/%20/g, '+')
 
@@ -15,6 +18,69 @@ function signITN(fields: Record<string, any>, passphrase?: string): string {
   const base = keys.map((k) => `${k}=${encodeVal(fields[k])}`).join('&')
   const withPP = passphrase ? `${base}&passphrase=${encodeVal(passphrase)}` : base
   return crypto.createHash('md5').update(withPP).digest('hex')
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+async function postJsonWithRetry(url: string, payload: unknown, extraHeaders: Record<string, string> = {}) {
+  const body = JSON.stringify(payload)
+  const signatureSecret = N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET.trim()
+  const signature = signatureSecret
+    ? crypto.createHmac('sha256', signatureSecret).update(body).digest('hex')
+    : ''
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...extraHeaders
+  }
+
+  if (N8N_COURSE_PURCHASE_WEBHOOK_TOKEN.trim()) {
+    headers.Authorization = `Bearer ${N8N_COURSE_PURCHASE_WEBHOOK_TOKEN.trim()}`
+  }
+
+  if (signature) {
+    headers['X-Webhook-Signature'] = signature
+  }
+
+  const delaysMs = [0, 500, 1500, 3500, 7000]
+  let lastStatus: number | null = null
+  let lastBody = ''
+
+  for (let attempt = 0; attempt < delaysMs.length; attempt++) {
+    if (delaysMs[attempt] > 0) await sleep(delaysMs[attempt])
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10_000)
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers,
+        body,
+        signal: controller.signal
+      })
+      lastStatus = res.status
+      lastBody = await res.text()
+
+      if (res.status === 200 || res.status === 202) {
+        return { ok: true as const, status: res.status, body: lastBody }
+      }
+    } catch (e: any) {
+      lastStatus = null
+      lastBody = String(e?.message || e)
+    } finally {
+      clearTimeout(timeout)
+    }
+  }
+
+  return { ok: false as const, status: lastStatus, body: lastBody }
+}
+
+function splitName(fullName: string) {
+  const parts = String(fullName || '').trim().split(/\s+/).filter(Boolean)
+  const first = parts[0] || ''
+  const last = parts.slice(1).join(' ')
+  return { first_name: first, last_name: last }
 }
 
 export const handler: Handler = async (event) => {
@@ -81,7 +147,15 @@ export const handler: Handler = async (event) => {
       return { statusCode: 404, body: 'Order not found' }
     }
 
+    const coursePurchasesRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}&select=course_slug,invitation_status,buyer_email,buyer_name,buyer_phone`,
+      { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+    )
+    const coursePurchases = coursePurchasesRes.ok ? await coursePurchasesRes.json() : []
+    const isCourse = order.order_kind === 'course' || (Array.isArray(coursePurchases) && coursePurchases.length > 0)
+
     // 4. Update Status to PAID (if not already)
+    const paidAt = order.paid_at || new Date().toISOString()
     if (order.status !== 'paid') {
       console.log(`Processing Payment for ${order.id}...`)
 
@@ -92,7 +166,7 @@ export const handler: Handler = async (event) => {
         body: JSON.stringify({
           status: 'paid',
           payment_status: 'paid',
-          paid_at: new Date().toISOString()
+          paid_at: paidAt
         })
       })
 
@@ -178,6 +252,90 @@ export const handler: Handler = async (event) => {
         });
         console.log('✅ Notification sent')
       } catch (e) { console.error('Notification error:', e) }
+    }
+
+    if (isCourse) {
+      const hasSent = Array.isArray(coursePurchases) && coursePurchases.some((cp: any) => String(cp?.invitation_status || '').toLowerCase() === 'sent')
+
+      if (!hasSent) {
+        const itemsRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/order_items?order_id=eq.${encodeURIComponent(order.id)}&select=sku,quantity,unit_price`,
+          { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+        )
+        const orderItems = itemsRes.ok ? await itemsRes.json() : []
+
+        const line_items = (Array.isArray(orderItems) ? orderItems : [])
+          .map((it: any) => ({
+            sku: String(it?.sku || ''),
+            quantity: Number(it?.quantity || 0),
+            unit_price: Number(it?.unit_price || 0),
+            currency: 'ZAR'
+          }))
+          .filter((it: any) => it.sku && Number.isFinite(it.quantity) && it.quantity > 0 && Number.isFinite(it.unit_price) && it.unit_price > 0)
+
+        const buyerEmail = String(order.buyer_email || coursePurchases?.[0]?.buyer_email || data.email_address || '').trim()
+        const buyerName = String(order.buyer_name || coursePurchases?.[0]?.buyer_name || `${data.name_first || ''} ${data.name_last || ''}`.trim()).trim()
+        const buyerPhone = String(order.buyer_phone || coursePurchases?.[0]?.buyer_phone || '').trim()
+        const { first_name, last_name } = splitName(buyerName)
+
+        const totalAmount = Number(data.amount || order.total || 0)
+
+        if (!buyerEmail || line_items.length === 0 || line_items.some((it: any) => !it.sku)) {
+          if (Array.isArray(coursePurchases) && coursePurchases.length > 0) {
+            await fetch(`${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}`, {
+              method: 'PATCH',
+              headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ invitation_status: 'failed' })
+            })
+          }
+          return { statusCode: 500, body: 'COURSE_WEBHOOK_PAYLOAD_INVALID' }
+        }
+
+        const env = process.env.CONTEXT === 'production' ? 'production' : 'staging'
+        const payload = {
+          event: 'course_purchase_paid',
+          order_id: String(order.id),
+          provider: 'payfast',
+          paid_at: String(paidAt),
+          email: buyerEmail,
+          customer: {
+            first_name,
+            last_name,
+            phone: buyerPhone
+          },
+          line_items,
+          total: {
+            amount: totalAmount,
+            currency: 'ZAR'
+          },
+          meta: {
+            site: 'blom-academy',
+            env
+          }
+        }
+
+        const n8nRes = await postJsonWithRetry(N8N_COURSE_PURCHASE_WEBHOOK_URL, payload)
+
+        if (!n8nRes.ok) {
+          if (Array.isArray(coursePurchases) && coursePurchases.length > 0) {
+            await fetch(`${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}`, {
+              method: 'PATCH',
+              headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ invitation_status: 'failed' })
+            })
+          }
+          console.error('Course purchase webhook failed', { status: n8nRes.status, body: n8nRes.body })
+          return { statusCode: 500, body: 'COURSE_WEBHOOK_FAILED' }
+        }
+
+        if (Array.isArray(coursePurchases) && coursePurchases.length > 0) {
+          await fetch(`${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}`, {
+            method: 'PATCH',
+            headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ invitation_status: 'sent', invited_at: paidAt })
+          })
+        }
+      }
     }
 
     return { statusCode: 200, body: 'Success' }

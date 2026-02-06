@@ -179,6 +179,7 @@ export const CourseDetailPage: React.FC = () => {
     },
     'online-watercolour-workshop': {
       id: '7c5276c1-9207-4653-89c3-bb4c675db5e2', // Matches Academy "Blom Flower Workshop"
+      sku: 'SKU_FLOWER_WORKSHOP',
       title: 'Online Watercolour Workshop',
       description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance.',
       heroImage: '/online-watercolor-card.webp',
@@ -256,6 +257,7 @@ export const CourseDetailPage: React.FC = () => {
     },
     'christmas-watercolor-workshop': {
       id: 'efe16488-1de6-4522-aeb3-b08cfae3a640', // Matches Academy "Christmas Workshop"
+      sku: 'SKU_XMAS_WATERCOLOR',
       title: 'Christmas Watercolor Workshop',
       description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
       heroImage: '/christmas-watercolor-card.webp',
@@ -496,6 +498,7 @@ export const CourseDetailPage: React.FC = () => {
           },
           items: [{
             product_id: course.id,
+            sku: (course as any).sku,
             product_name: `${course.title} - ${selectedPackage} ${paymentLabel}`,
             unit_price: paymentAmountCents,
             quantity: 1
