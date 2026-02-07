@@ -1,7 +1,7 @@
 # Course Page Updates
 
 ## Overview
-All three course pages (Professional Acrylic Training, Online Watercolour Workshop, and Christmas Watercolour Workshop) have been updated with a modern, professional design matching the reference image.
+All three course pages (Professional Acrylic Training, Flower Nail Art Workshop, and Christmas Watercolor Workshop) have been updated with a modern, professional design matching the reference image.
 
 ## Key Improvements
 
@@ -120,7 +120,7 @@ All updates use standard CSS properties and work across modern browsers.
 
 ## Applies To
 ✅ Professional Acrylic Training course page
-✅ Online Watercolour Workshop course page
-✅ Christmas Watercolour Workshop course page
+✅ Flower Nail Art Workshop course page
+✅ Christmas Watercolor Workshop course page
 
 All three courses now have the exact same professional styling for instructor and about sections!

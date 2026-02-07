@@ -24,9 +24,9 @@ const CoursesPage: React.FC = () => {
   const onlineCourses = [
     {
       id: 2,
-      slug: 'online-watercolour-workshop',
-      title: 'Online Watercolour Workshop',
-      description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance. Let your creativity bloom with BLOM.',
+      slug: 'blom-flower-workshop',
+      title: 'Flower Nail Art Workshop',
+      description: 'Learn how to create soft, dreamy flower nail art designs from the comfort of your home with step-by-step videos and detailed guidance. Let your creativity bloom with BLOM.',
       image: '/online-watercolor-card.webp',
       duration: 'Self-Paced',
       location: 'Online',

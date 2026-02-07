@@ -87,7 +87,7 @@ Show only when `id === 'new'`.
 - Options:
   - None
   - Professional Acrylic Training
-  - Online Watercolour Workshop
+  - Flower Nail Art Workshop
   - Christmas Watercolor Workshop
 
 When a template is selected, auto-fill these fields:
@@ -114,11 +114,11 @@ When a template is selected, auto-fill these fields:
 - instructor_bio: `Professional nail artist and educator with over 8 years of experience in acrylic nail application.`
 - is_active: true
 
-2) Online Watercolour Workshop
-- template_key: `online-watercolour-workshop`
-- title: `Online Watercolour Workshop`
-- slug: `online-watercolour-workshop`
-- description: `Learn how to create soft, dreamy watercolour designs from the comfort of your home.`
+2) Flower Nail Art Workshop
+- template_key: `blom-flower-workshop`
+- title: `Flower Nail Art Workshop`
+- slug: `blom-flower-workshop`
+- description: `Learn how to create soft, dreamy flower nail art designs from the comfort of your home with step-by-step videos and detailed guidance.`
 - price: `480.00`
 - image_url: `/online-watercolor-card.webp`
 - duration: `Self-Paced`

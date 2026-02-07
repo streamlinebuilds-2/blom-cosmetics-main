@@ -177,11 +177,89 @@ export const CourseDetailPage: React.FC = () => {
         }
       ]
     },
+    'blom-flower-workshop': {
+      id: '7c5276c1-9207-4653-89c3-bb4c675db5e2', // Matches Academy "Blom Flower Workshop"
+      sku: 'SKU_FLOWER_WORKSHOP',
+      title: 'Flower Nail Art Workshop',
+      description: 'Learn how to create soft, dreamy flower nail art designs from the comfort of your home with step-by-step videos and detailed guidance.',
+      heroImage: '/online-watercolor-card.webp',
+      duration: 'Self-Paced',
+      price: 'R480',
+      numericPrice: 480,
+      depositAmount: 0,
+      isOnline: true,
+      location: 'Online',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.'
+      },
+      about: [
+        'This comprehensive online workshop teaches you the fundamentals of watercolor nail art. You\'ll learn how to create soft, dreamy designs that are perfect for any occasion.',
+        'Through step-by-step video tutorials and detailed guidance, you\'ll master blending techniques, color theory, and how to create stunning watercolor effects on nails.'
+      ],
+      packages: [
+        {
+          name: 'Complete Workshop',
+          price: 'R480',
+          kitValue: 'Included',
+          features: [
+            'Lifetime access to video tutorials',
+            'Step-by-step guides',
+            'Color theory basics',
+            'Blending techniques',
+            'Certificate after you\'ve completed your exam'
+          ]
+        }
+      ],
+      availableDates: ['Available Now'],
+      thingsToBring: [],
+      trainingSchedule: [],
+      studentDiscount: [],
+      accordionData: [
+        {
+          title: 'MODULE 1: INTRODUCTION TO WATERCOLOR',
+          content: [
+            'Understanding watercolor nail art',
+            'Essential tools and materials',
+            'Color theory and mixing',
+            'Basic techniques overview'
+          ]
+        },
+        {
+          title: 'MODULE 2: BLENDING TECHNIQUES',
+          content: [
+            'Wet-on-wet blending',
+            'Gradient creation',
+            'Color transitions',
+            'Troubleshooting common issues'
+          ]
+        },
+        {
+          title: 'MODULE 3: DESIGN CREATION',
+          content: [
+            'Floral watercolor designs',
+            'Abstract patterns',
+            'Seasonal themes',
+            'Personal style development'
+          ]
+        },
+        {
+          title: 'MODULE 4: FINISHING & MAINTENANCE',
+          content: [
+            'Top coat application',
+            'Longevity tips',
+            'Touch-up techniques',
+            'Client consultation skills'
+          ]
+        }
+      ]
+    },
     'online-watercolour-workshop': {
       id: '7c5276c1-9207-4653-89c3-bb4c675db5e2', // Matches Academy "Blom Flower Workshop"
       sku: 'SKU_FLOWER_WORKSHOP',
-      title: 'Online Watercolour Workshop',
-      description: 'Learn how to create soft, dreamy watercolour designs from the comfort of your home with step-by-step videos and detailed guidance.',
+      title: 'Flower Nail Art Workshop',
+      description: 'Learn how to create soft, dreamy flower nail art designs from the comfort of your home with step-by-step videos and detailed guidance.',
       heroImage: '/online-watercolor-card.webp',
       duration: 'Self-Paced',
       price: 'R480',
