@@ -8,6 +8,16 @@ import { Clock, MapPin, DollarSign, Star, Activity, Users } from 'lucide-react';
 import { pageSEO, trackPageView, updateSEO } from '../lib/seo';
 
 const CoursesPage: React.FC = () => {
+  const academyCourseSlugs = new Set([
+    'holiday-watercolor-workshop',
+    'blom-flower-watercolor-workshop'
+  ]);
+
+  const getAcademyCourseUrl = (slug: string) => {
+    if (!academyCourseSlugs.has(slug)) return null;
+    return `https://blom-academy.vercel.app/course/${slug}`;
+  };
+
   const inPersonCourses = [
     {
       id: 1,
@@ -24,7 +34,7 @@ const CoursesPage: React.FC = () => {
   const onlineCourses = [
     {
       id: 2,
-      slug: 'blom-flower-workshop',
+      slug: 'blom-flower-watercolor-workshop',
       title: 'Flower Nail Art Workshop',
       description: 'Learn how to create soft, dreamy flower nail art designs from the comfort of your home with step-by-step videos and detailed guidance. Let your creativity bloom with BLOM.',
       image: '/online-watercolor-card.webp',
@@ -35,8 +45,8 @@ const CoursesPage: React.FC = () => {
     },
     {
       id: 3,
-      slug: 'christmas-watercolor-workshop',
-      title: 'Christmas Watercolor Workshop',
+      slug: 'holiday-watercolor-workshop',
+      title: 'Christmas Watercolor Nail Art Workshop',
       description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques in this special seasonal workshop.',
       image: '/christmas-watercolor-card.webp',
       duration: 'Self-Paced',
@@ -224,12 +234,18 @@ const CoursesPage: React.FC = () => {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => window.location.href = `/courses/${course.slug}`}
-                      className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
-                    >
-                      SEE MORE DETAILS
-                    </button>
+                    {(() => {
+                      const academyUrl = getAcademyCourseUrl(course.slug);
+                      if (!academyUrl) return null;
+                      return (
+                        <button
+                          onClick={() => window.location.href = academyUrl}
+                          className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+                        >
+                          VIEW ON BLOM ACADEMY
+                        </button>
+                      );
+                    })()}
                   </CardContent>
                 </Card>
               ))}

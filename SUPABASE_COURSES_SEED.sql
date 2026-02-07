@@ -40,7 +40,7 @@ INSERT INTO public.courses (
 (
   '7c5276c1-9207-4653-89c3-bb4c675db5e2',
   'Flower Nail Art Workshop',
-  'blom-flower-workshop',
+  'blom-flower-watercolor-workshop',
   'Learn how to create soft, dreamy flower nail art designs from the comfort of your home.',
   480,
   '/online-watercolor-card.webp',
@@ -48,15 +48,15 @@ INSERT INTO public.courses (
   'All Levels',
   true,
   'online',
-  'blom-flower-workshop',
+  'blom-flower-watercolor-workshop',
   'Avané Crous',
   'Professional nail artist and educator with over 8 years of experience.',
   now() - interval '1 day'
 ),
 (
   'efe16488-1de6-4522-aeb3-b08cfae3a640',
-  'Christmas Watercolor Workshop',
-  'christmas-watercolor-workshop',
+  'Christmas Watercolor Nail Art Workshop',
+  'holiday-watercolor-workshop',
   'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
   450,
   '/christmas-watercolor-card.webp',
@@ -64,7 +64,7 @@ INSERT INTO public.courses (
   'All Levels',
   true,
   'online',
-  'christmas-watercolor-workshop',
+  'holiday-watercolor-workshop',
   'Avané Crous',
   'Professional nail artist and educator with over 8 years of experience.',
   now() - interval '2 days'

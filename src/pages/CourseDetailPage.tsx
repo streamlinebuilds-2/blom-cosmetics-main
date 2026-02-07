@@ -24,6 +24,9 @@ import {
 export const CourseDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const courseSlug = slug || 'professional-acrylic-training';
+  const academyCourseSlug = courseSlug === 'online-watercolour-workshop'
+    ? 'blom-flower-watercolor-workshop'
+    : courseSlug;
   // Course data
   const courses = {
     'professional-acrylic-training': {
@@ -177,7 +180,7 @@ export const CourseDetailPage: React.FC = () => {
         }
       ]
     },
-    'blom-flower-workshop': {
+    'blom-flower-watercolor-workshop': {
       id: '7c5276c1-9207-4653-89c3-bb4c675db5e2', // Matches Academy "Blom Flower Workshop"
       sku: 'SKU_FLOWER_WORKSHOP',
       title: 'Flower Nail Art Workshop',
@@ -333,10 +336,10 @@ export const CourseDetailPage: React.FC = () => {
         }
       ]
     },
-    'christmas-watercolor-workshop': {
-      id: 'efe16488-1de6-4522-aeb3-b08cfae3a640', // Matches Academy "Christmas Workshop"
+    'holiday-watercolor-workshop': {
+      id: 'efe16488-1de6-4522-aeb3-b08cfae3a640',
       sku: 'SKU_XMAS_WATERCOLOR',
-      title: 'Christmas Watercolor Workshop',
+      title: 'Christmas Watercolor Nail Art Workshop',
       description: 'Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.',
       heroImage: '/christmas-watercolor-card.webp',
       duration: 'Self-Paced',
@@ -560,7 +563,7 @@ export const CourseDetailPage: React.FC = () => {
             phone: `${formData.countryCode}${formData.phone}`
           },
           course_booking: {
-            course_slug: courseSlug,
+            course_slug: academyCourseSlug,
             course_title: course.title,
             course_type: course.isOnline ? 'online' : 'in-person',
             selected_package: selectedPackage,
@@ -613,7 +616,7 @@ export const CourseDetailPage: React.FC = () => {
           name_first: formData.name.split(' ')[0],
           name_last: formData.name.split(' ').slice(1).join(' ') || formData.name.split(' ')[0],
           custom_str1: course.id, // Pass course ID
-          custom_str2: courseSlug // Pass course slug
+              custom_str2: academyCourseSlug // Pass course slug
         })
       });
 

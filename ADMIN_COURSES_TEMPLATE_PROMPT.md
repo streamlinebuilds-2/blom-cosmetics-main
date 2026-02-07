@@ -115,9 +115,9 @@ When a template is selected, auto-fill these fields:
 - is_active: true
 
 2) Flower Nail Art Workshop
-- template_key: `blom-flower-workshop`
+- template_key: `blom-flower-watercolor-workshop`
 - title: `Flower Nail Art Workshop`
-- slug: `blom-flower-workshop`
+- slug: `blom-flower-watercolor-workshop`
 - description: `Learn how to create soft, dreamy flower nail art designs from the comfort of your home with step-by-step videos and detailed guidance.`
 - price: `480.00`
 - image_url: `/online-watercolor-card.webp`
@@ -128,10 +128,10 @@ When a template is selected, auto-fill these fields:
 - instructor_bio: `Professional nail artist and educator with over 8 years of experience.`
 - is_active: true
 
-3) Christmas Watercolor Workshop
-- template_key: `christmas-watercolor-workshop`
-- title: `Christmas Watercolor Workshop`
-- slug: `christmas-watercolor-workshop`
+3) Christmas Watercolor Nail Art Workshop
+- template_key: `holiday-watercolor-workshop`
+- title: `Christmas Watercolor Nail Art Workshop`
+- slug: `holiday-watercolor-workshop`
 - description: `Paint festive watercolor nail art for the holidays! Learn Christmas tree designs, snowflakes, and winter wonderland techniques.`
 - price: `450.00`
 - image_url: `/christmas-watercolor-card.webp`
