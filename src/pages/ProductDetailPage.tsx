@@ -48,7 +48,6 @@ export const ProductDetailPage: React.FC = () => {
         setLoading(true);
         console.log('Loading product for slug:', slug);
 
-        // Fetch main product with variants (use variants JSON column like ShopPage)
         const { data: productData, error } = await supabase
           .from('products')
           .select(`
@@ -61,22 +60,59 @@ export const ProductDetailPage: React.FC = () => {
         console.log('Supabase response:', { productData, error });
 
         if (error) throw error;
-        
-        if (productData) {
+
+        let productSource: 'products' | 'bundles' = 'products';
+        let resolvedProductData: any = productData;
+
+        if (!resolvedProductData) {
+          const { data: bundleData, error: bundleError } = await supabase
+            .from('bundles')
+            .select('*')
+            .eq('slug', slug)
+            .maybeSingle();
+
+          console.log('Bundle lookup response:', { bundleData, bundleError });
+
+          if (bundleError) throw bundleError;
+
+          if (bundleData) {
+            productSource = 'bundles';
+
+            const bundleImages = Array.isArray(bundleData.images)
+              ? bundleData.images
+              : [bundleData.image_url || bundleData.thumbnail_url].filter(Boolean);
+
+            resolvedProductData = {
+              ...bundleData,
+              id: `bundle-${bundleData.id}`,
+              slug: bundleData.slug,
+              name: bundleData.name,
+              price: bundleData.price || (bundleData.price_cents ? bundleData.price_cents / 100 : 0),
+              compare_at_price: bundleData.compare_at_price || (bundleData.compare_at_price_cents ? bundleData.compare_at_price_cents / 100 : null),
+              image_url: bundleData.image_url || bundleData.thumbnail_url || bundleImages[0] || null,
+              thumbnail_url: bundleData.thumbnail_url || bundleData.image_url || bundleImages[0] || null,
+              gallery_urls: bundleImages.slice(1),
+              stock_quantity: 1,
+              product_reviews: [{ count: 0 }]
+            };
+          }
+        }
+
+        if (resolvedProductData) {
           // Process product data
-          const baseImages = Array.isArray(productData.gallery_urls) 
-            ? [productData.image_url || productData.thumbnail_url, ...productData.gallery_urls].filter(Boolean)
-            : [productData.image_url || productData.thumbnail_url].filter(Boolean);
+          const baseImages = Array.isArray(resolvedProductData.gallery_urls) 
+            ? [resolvedProductData.image_url || resolvedProductData.thumbnail_url, ...resolvedProductData.gallery_urls].filter(Boolean)
+            : [resolvedProductData.image_url || resolvedProductData.thumbnail_url].filter(Boolean);
           
           console.log('Product data:', {
-            name: productData.name,
-            variants: productData.variants,
+            name: resolvedProductData.name,
+            variants: resolvedProductData.variants,
             baseImages: baseImages
           });
           
           // Process variants from JSON column (same as ShopPage)
-          const variants = Array.isArray(productData.variants)
-            ? productData.variants.map((v: any) => {
+          const variants = Array.isArray(resolvedProductData.variants)
+            ? resolvedProductData.variants.map((v: any) => {
                 // Handle both object and string variants
                 if (typeof v === 'string') {
                   return { 
@@ -90,7 +126,7 @@ export const ProductDetailPage: React.FC = () => {
                 const variantName = v.name || v.label || v.title || '';
                 const variantNameSlug = variantName.toLowerCase().replace(/\s+/g, '-');
                 const variantNameWords = variantName.toLowerCase().split(/\s+/);
-                const productSlug = (productData.slug || '').toLowerCase();
+                const productSlug = (resolvedProductData.slug || '').toLowerCase();
                 
                 // Try to find matching image in gallery by checking if image path contains variant name
                 let variantImage: string | null = v.image || v.image_url || null;
@@ -123,7 +159,7 @@ export const ProductDetailPage: React.FC = () => {
                 return {
                   id: v.id || variantName,
                   name: variantName,
-                  price: v.price || productData.price,
+                  price: v.price || resolvedProductData.price,
                   inStock: v.inStock ?? v.in_stock ?? true,
                   image: variantImage
                 };
@@ -150,21 +186,22 @@ export const ProductDetailPage: React.FC = () => {
           });
           
           const processedProduct = {
-            ...productData,
+            ...resolvedProductData,
             images: allImages.length > 0 ? allImages.map(img => img.url) : ['/assets/blom_logo.webp'],
             imageVariants: allImages, // Store variant mapping
             variants: variants,
-            features: Array.isArray(productData.features) ? productData.features : [],
-            howToUse: Array.isArray(productData.how_to_use) ? productData.how_to_use : [],
+            features: Array.isArray(resolvedProductData.features) ? resolvedProductData.features : [],
+            howToUse: Array.isArray(resolvedProductData.how_to_use) ? resolvedProductData.how_to_use : [],
             ingredients: {
-              inci: Array.isArray(productData.inci_ingredients) ? productData.inci_ingredients : [],
-              key: Array.isArray(productData.key_ingredients) ? productData.key_ingredients : []
+              inci: Array.isArray(resolvedProductData.inci_ingredients) ? resolvedProductData.inci_ingredients : [],
+              key: Array.isArray(resolvedProductData.key_ingredients) ? resolvedProductData.key_ingredients : []
             },
             details: {
-              size: productData.size,
-              shelfLife: productData.shelf_life,
-              claims: Array.isArray(productData.claims) ? productData.claims : []
-            }
+              size: resolvedProductData.size,
+              shelfLife: resolvedProductData.shelf_life,
+              claims: Array.isArray(resolvedProductData.claims) ? resolvedProductData.claims : []
+            },
+            isBundle: productSource === 'bundles'
           };
           
           console.log('Processed product:', {
@@ -187,12 +224,12 @@ export const ProductDetailPage: React.FC = () => {
           let related: any[] = [];
           
           // First try to get products from same category
-          if (productData.category) {
+          if (productSource === 'products' && resolvedProductData.category) {
             const { data: categoryRelated } = await supabase
               .from('products')
               .select('*')
-              .eq('category', productData.category)
-              .neq('id', productData.id)
+              .eq('category', resolvedProductData.category)
+              .neq('id', resolvedProductData.id)
               .eq('status', 'active')
               .limit(4);
             
@@ -203,12 +240,15 @@ export const ProductDetailPage: React.FC = () => {
           
           // If we don't have enough products from same category, fill with other active products
           if (related.length < 4) {
-            const { data: otherProducts } = await supabase
+            const otherProductsQuery = supabase
               .from('products')
               .select('*')
-              .neq('id', productData.id)
               .eq('status', 'active')
               .limit(4 - related.length);
+
+            const { data: otherProducts } = productSource === 'products'
+              ? await otherProductsQuery.neq('id', resolvedProductData.id)
+              : await otherProductsQuery;
             
             if (otherProducts) {
               // Filter out products we already have
@@ -233,7 +273,7 @@ export const ProductDetailPage: React.FC = () => {
           const { data: reviewsData, error: reviewsError } = await supabase
             .from('product_reviews')
             .select('id, reviewer_name, title, body, rating, images, created_at, is_verified_buyer')
-            .eq('product_slug', productData.slug)
+            .eq('product_slug', resolvedProductData.slug)
             .eq('status', 'approved')
             .order('created_at', { ascending: false });
 
