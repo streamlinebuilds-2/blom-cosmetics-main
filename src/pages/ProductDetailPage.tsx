@@ -82,6 +82,9 @@ export const ProductDetailPage: React.FC = () => {
               ? bundleData.images
               : [bundleData.image_url || bundleData.thumbnail_url].filter(Boolean);
 
+            const bundleShortDescription = bundleData.short_desc || bundleData.description_short || bundleData.short_description || '';
+            const bundleOverview = bundleData.long_desc || bundleData.description_full || bundleData.description || bundleShortDescription || '';
+
             resolvedProductData = {
               ...bundleData,
               id: `bundle-${bundleData.id}`,
@@ -89,6 +92,10 @@ export const ProductDetailPage: React.FC = () => {
               name: bundleData.name,
               price: bundleData.price || (bundleData.price_cents ? bundleData.price_cents / 100 : 0),
               compare_at_price: bundleData.compare_at_price || (bundleData.compare_at_price_cents ? bundleData.compare_at_price_cents / 100 : null),
+              short_description: bundleShortDescription,
+              shortDescription: bundleShortDescription,
+              description: bundleShortDescription,
+              overview: bundleOverview,
               image_url: bundleData.image_url || bundleData.thumbnail_url || bundleImages[0] || null,
               thumbnail_url: bundleData.thumbnail_url || bundleData.image_url || bundleImages[0] || null,
               gallery_urls: bundleImages.slice(1),
@@ -432,6 +439,8 @@ export const ProductDetailPage: React.FC = () => {
     ? Math.round(((product.compare_at_price - product.price) / product.compare_at_price) * 100)
     : 0;
 
+  const shortDescriptionText = product.short_description || product.shortDescription;
+
   return (
     <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
@@ -553,9 +562,9 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Short Description */}
-              {product.short_description && (
+              {shortDescriptionText && (
                 <p className="text-gray-600 leading-relaxed mb-8 text-lg">
-                  {product.short_description}
+                  {shortDescriptionText}
                 </p>
               )}
 
