@@ -1,11 +1,15 @@
 import type { Handler } from '@netlify/functions'
 import crypto from 'crypto'
 
+const PF_ENV = String(process.env.PAYFAST_ENV || 'live').toLowerCase()
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const PF_PASSPHRASE = process.env.PAYFAST_PASSPHRASE || process.env.PF_PASSPHRASE || ''
+const PF_PASSPHRASE =
+  (PF_ENV === 'sandbox' ? process.env.PAYFAST_SANDBOX_PASSPHRASE : process.env.PAYFAST_PASSPHRASE) ||
+  process.env.PF_PASSPHRASE ||
+  ''
 const SITE = process.env.SITE_URL || process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za'
-const PF_BASE = 'https://www.payfast.co.za'
+const PF_BASE = PF_ENV === 'sandbox' ? 'https://sandbox.payfast.co.za' : 'https://www.payfast.co.za'
 const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
 const N8N_COURSE_PURCHASE_WEBHOOK_URL = process.env.N8N_COURSE_PURCHASE_WEBHOOK_URL || 'https://dockerfile-1n82.onrender.com/webhook/purchase-success'
 const N8N_COURSE_PURCHASE_WEBHOOK_TOKEN = process.env.N8N_COURSE_PURCHASE_WEBHOOK_TOKEN || ''

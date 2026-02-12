@@ -3,8 +3,8 @@ import crypto from 'crypto';
 
 // FIXED VERSION - Correct signature order for PayFast
 
-// Always use live endpoint
-const PF_BASE = 'https://www.payfast.co.za';
+const PF_ENV = String(process.env.PAYFAST_ENV || 'live').toLowerCase();
+const PF_BASE = PF_ENV === 'sandbox' ? 'https://sandbox.payfast.co.za' : 'https://www.payfast.co.za';
 const SITE_BASE_URL = (process.env.SITE_BASE_URL || process.env.URL || 'https://blom-cosmetics.co.za').replace(/\/+$/, '');
 const CANCEL_URL = `${SITE_BASE_URL}/checkout/cancel`;
 // CRITICAL: This must match what PayFast is configured to send to
@@ -196,7 +196,11 @@ export const handler: Handler = async (event) => {
     const orderId = payload.order_id || m_payment_id;
     const RETURN_URL = `${SITE_BASE_URL}/checkout/status?order=${orderId}`;
     
-    if (!process.env.PAYFAST_MERCHANT_ID || !process.env.PAYFAST_MERCHANT_KEY) {
+    const merchantId = PF_ENV === 'sandbox' ? process.env.PAYFAST_SANDBOX_MERCHANT_ID : process.env.PAYFAST_MERCHANT_ID;
+    const merchantKey = PF_ENV === 'sandbox' ? process.env.PAYFAST_SANDBOX_MERCHANT_KEY : process.env.PAYFAST_MERCHANT_KEY;
+    const passphrase = PF_ENV === 'sandbox' ? process.env.PAYFAST_SANDBOX_PASSPHRASE : process.env.PAYFAST_PASSPHRASE;
+
+    if (!merchantId || !merchantKey) {
       return {
         statusCode: 500,
         headers,
@@ -205,8 +209,8 @@ export const handler: Handler = async (event) => {
     }
 
     const fields: Record<string, string> = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
+      merchant_id: merchantId,
+      merchant_key: merchantKey,
       return_url: RETURN_URL,
       cancel_url: CANCEL_URL,
       notify_url: NOTIFY_URL,
@@ -240,8 +244,8 @@ export const handler: Handler = async (event) => {
     let baseString = baseStringParts.join('&');
     
     // Add passphrase if configured
-    if (process.env.PAYFAST_PASSPHRASE) {
-      baseString += `&passphrase=${encPF(process.env.PAYFAST_PASSPHRASE)}`;
+    if (passphrase) {
+      baseString += `&passphrase=${encPF(passphrase)}`;
     }
     
     // Generate MD5 signature
