@@ -5,22 +5,47 @@ const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const PF_PASSPHRASE = process.env.PAYFAST_PASSPHRASE || process.env.PF_PASSPHRASE || ''
 const SITE = process.env.SITE_URL || process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za'
+const PF_BASE = 'https://www.payfast.co.za'
 const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
 const N8N_COURSE_PURCHASE_WEBHOOK_URL = process.env.N8N_COURSE_PURCHASE_WEBHOOK_URL || 'https://dockerfile-1n82.onrender.com/webhook/purchase-success'
 const N8N_COURSE_PURCHASE_WEBHOOK_TOKEN = process.env.N8N_COURSE_PURCHASE_WEBHOOK_TOKEN || ''
 const N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET = process.env.N8N_COURSE_PURCHASE_WEBHOOK_SIGNING_SECRET || ''
 
-const encodeVal = (v: any) => encodeURIComponent(String(v)).replace(/%20/g, '+')
+function encPF(v: unknown) {
+  return encodeURIComponent(String(v ?? '').trim())
+    .replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())
+    .replace(/%20/g, '+')
+    .replace(/%[0-9a-f]{2}/g, m => m.toUpperCase())
+}
 
 function signITN(fields: Record<string, any>, passphrase?: string): string {
   const keys = Object.keys(fields).filter((k) => fields[k] !== undefined && fields[k] !== null && fields[k] !== '')
   keys.sort()
-  const base = keys.map((k) => `${k}=${encodeVal(fields[k])}`).join('&')
-  const withPP = passphrase ? `${base}&passphrase=${encodeVal(passphrase)}` : base
+  const base = keys.map((k) => `${k}=${encPF(fields[k])}`).join('&')
+  const withPP = passphrase ? `${base}&passphrase=${encPF(passphrase)}` : base
   return crypto.createHash('md5').update(withPP).digest('hex')
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+async function validateWithPayFast(rawBody: string) {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 10_000)
+  try {
+    const res = await fetch(`${PF_BASE}/eng/query/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: rawBody,
+      signal: controller.signal
+    })
+    const text = (await res.text()).trim()
+    return { ok: res.ok && text === 'VALID', status: res.status, text }
+  } catch (e: any) {
+    return { ok: false, status: null as number | null, text: String(e?.message || e) }
+  } finally {
+    clearTimeout(timeout)
+  }
+}
 
 async function postJsonWithRetry(url: string, payload: unknown, extraHeaders: Record<string, string> = {}) {
   const body = JSON.stringify(payload)
@@ -103,18 +128,29 @@ export const handler: Handler = async (event) => {
     }
 
     const passphrase = PF_PASSPHRASE.trim()
-    if (!passphrase) {
-      console.error('PAYFAST_PASSPHRASE missing; refusing ITN')
-      return { statusCode: 500, body: 'PAYFAST_PASSPHRASE_MISSING' }
-    }
-
     const receivedSignature = String(data.signature || '').trim().toLowerCase()
     const { signature: _sig, ...fieldsToVerify } = data
-    const expectedSignature = signITN(fieldsToVerify, passphrase).toLowerCase()
+    const expectedWithPassphrase = passphrase ? signITN(fieldsToVerify, passphrase).toLowerCase() : ''
+    const expectedWithoutPassphrase = signITN(fieldsToVerify).toLowerCase()
 
-    if (!receivedSignature || receivedSignature !== expectedSignature) {
-      console.error('Invalid PayFast ITN signature', { receivedSignature, expectedSignature })
-      return { statusCode: 400, body: 'INVALID_SIGNATURE' }
+    const signatureOk =
+      !!receivedSignature &&
+      (receivedSignature === expectedWithoutPassphrase || (expectedWithPassphrase && receivedSignature === expectedWithPassphrase))
+
+    if (!signatureOk) {
+      const rawBody = event.body || ''
+      const pfValidate = rawBody ? await validateWithPayFast(rawBody) : { ok: false, status: null, text: 'EMPTY_BODY' }
+
+      if (!pfValidate.ok) {
+        console.error('Invalid PayFast ITN signature', {
+          receivedSignature,
+          expectedWithPassphrase,
+          expectedWithoutPassphrase,
+          payfastValidateStatus: pfValidate.status,
+          payfastValidateText: pfValidate.text
+        })
+        return { statusCode: 400, body: 'INVALID_SIGNATURE' }
+      }
     }
 
     // 2. Handle Failed Payments
