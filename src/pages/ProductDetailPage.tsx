@@ -273,7 +273,7 @@ export const ProductDetailPage: React.FC = () => {
             price: p.price,
             images: [p.image_url || p.thumbnail_url],
             category: p.category,
-            inStock: (p.stock_quantity || 0) > 0
+            inStock: true // Always in stock per request
           })));
 
           // Fetch approved reviews
@@ -476,11 +476,7 @@ export const ProductDetailPage: React.FC = () => {
                       -{discountPercentage}%
                     </span>
                   )}
-                  {(product.stock_quantity || 0) < 1 && (
-                    <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full">
-                      Out of Stock
-                    </span>
-                  )}
+                  {/* Out of Stock badge removed per request - always show available */}
                 </div>
 
                 {/* Variant Name Label - Bottom Left Corner */}
@@ -583,7 +579,7 @@ export const ProductDetailPage: React.FC = () => {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {product.variants.map((variant: any) => {
                       const isSelected = selectedVariant === variant.name;
-                      const isOutOfStock = !variant.inStock;
+                      const isOutOfStock = false; // Always show as in stock per request
                       
                       return (
                         <button

@@ -573,7 +573,7 @@ export const ShopPage: React.FC = () => {
 
               // Stock - check ALL possible columns (using ?? to properly handle 0 values)
               stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
-              inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
+              inStock: true, // Force in stock per request
 
               // Descriptions - check variations
               shortDescription: p.short_description || p.short_desc || p.description_short || '',
@@ -606,7 +606,7 @@ export const ShopPage: React.FC = () => {
                     return {
                       name: v.name || v.label || v.title || '',
                       label: v.label || v.name || v.title || '',
-                      inStock: v.inStock ?? v.in_stock ?? true,
+                      inStock: true, // Force in stock per request
                       image: v.image || v.image_url || null,
                       price: v.price || null
                     };
@@ -736,7 +736,7 @@ export const ShopPage: React.FC = () => {
 
             // Stock - check ALL possible columns (using ?? to properly handle 0 values)
             stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
-            inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
+            inStock: true, // Force in stock per request
 
             // Descriptions - check variations
             shortDescription: p.short_description || p.short_desc || p.description_short || '',
@@ -769,7 +769,7 @@ export const ShopPage: React.FC = () => {
                   return {
                     name: v.name || v.label || v.title || '',
                     label: v.label || v.name || v.title || '',
-                    inStock: v.inStock ?? v.in_stock ?? true,
+                    inStock: true, // Force in stock per request
                     image: v.image || v.image_url || null,
                     price: v.price || null
                   };

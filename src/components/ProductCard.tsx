@@ -68,7 +68,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    if (!inStock || price === -1) return;
+    // Allow add to cart even if out of stock (per request)
+    if (price === -1) return;
     if (hasVariants) {
       setShowVariantModal(true);
     } else {
@@ -139,20 +140,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
             </button>
             <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (hasVariants) {
-                  setShowVariantModal(true);
-                } else {
-                  handleAddToCart(e);
-                }
-              }}
-              disabled={!inStock || price === -1}
-              className="bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors whitespace-nowrap shadow-md"
-            >
-              {inStock ? (hasVariants ? 'Select' : 'Add') : 'Out'}
-            </button>
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (hasVariants) {
+                    setShowVariantModal(true);
+                  } else {
+                    handleAddToCart(e);
+                  }
+                }}
+                disabled={price === -1}
+                className="bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors whitespace-nowrap shadow-md"
+              >
+                {hasVariants ? 'Select' : 'Add'}
+              </button>
           </div>
         </article>
         {showVariantModal && (
@@ -244,17 +245,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   handleAddToCart(e);
                 }
               }}
-              disabled={!inStock || price === -1}
+              disabled={price === -1}
               className="w-full bg-pink-500 text-white font-bold py-3.5 md:py-3 px-4 rounded-full shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
             >
-              {inStock ? (
-                <>
-                  <Plus className="w-5 h-5" />
-                  <span>{hasVariants ? 'Select Options' : 'Add to Cart'}</span>
-                </>
-              ) : (
-                'Out of Stock'
-              )}
+              <Plus className="w-5 h-5" />
+              <span>{hasVariants ? 'Select Options' : 'Add to Cart'}</span>
             </button>
           </div>
         </div>

@@ -96,7 +96,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
   };
 
   const isVariantInStock = (variant: ProductVariant) => {
-    return variant.inStock !== false; // Default to true if not specified
+    return true; // Always return true per request
   };
 
   if (!isOpen) return null;
@@ -169,9 +169,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-pink-600 flex-shrink-0 ml-2" />
                   )}
                 </div>
-                {!isVariantInStock(variant) && (
-                  <div className="text-xs text-red-500 mt-1">Out of Stock</div>
-                )}
+                {/* Out of stock message removed per request */}
               </button>
             ))}
           </div>
