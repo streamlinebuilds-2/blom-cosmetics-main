@@ -974,6 +974,17 @@ export const ShopPage: React.FC = () => {
       });
     });
 
+    // 5. Update counts for priority categories to include all matching products
+    priorityOrder.forEach(slug => {
+      if (cats.has(slug)) {
+        const count = allProducts.filter((product: any) =>
+          (product.category === slug) ||
+          (product.categories && product.categories.includes(slug))
+        ).length;
+        cats.get(slug).count = count;
+      }
+    });
+
     return Array.from(cats.values());
   }, [allProducts]);
 
@@ -1146,7 +1157,12 @@ export const ShopPage: React.FC = () => {
 
     // If a specific category is selected, show flat grid
     if (selectedCategory !== 'all') {
-      const productsInCategory = groupedProducts[selectedCategory] || [];
+      // Filter products that belong to the selected category (handling array or string)
+      const productsInCategory = sortedProducts.filter(p => 
+        (p.category === selectedCategory) ||
+        (p.categories && p.categories.includes(selectedCategory))
+      );
+      
       return (
         <div key={selectedCategory} className="mb-10">
           <div className={`grid ${getResponsiveGridClasses()} gap-6 sm:gap-8`}>
