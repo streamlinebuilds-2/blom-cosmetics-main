@@ -214,7 +214,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               {safeName}
             </h3>
             {!hideDescription && (
-              <p className="hidden md:block text-sm text-gray-500 mt-1 line-clamp-2 leading-relaxed">
+              <p className="hidden md:line-clamp-3 text-sm text-gray-500 mt-1 leading-relaxed">
                 {safeShortDescription}
               </p>
             )}
