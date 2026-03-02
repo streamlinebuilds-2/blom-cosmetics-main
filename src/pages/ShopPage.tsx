@@ -938,8 +938,8 @@ export const ShopPage: React.FC = () => {
       'prep-finishing',    // Prep Solution & Primer - SECOND PRIORITY
       'gel-system',        // Gel products
       'tools-essentials',  // Tools and essentials
-      'collections',       // Collections (e.g. Petal Collection, Red Collection)
       'bundle-deals',      // Bundle deals
+      'collections',       // Collections (MOVED DOWN)
       'furniture'          // Furniture - BOTTOM PRIORITY
     ];
 
