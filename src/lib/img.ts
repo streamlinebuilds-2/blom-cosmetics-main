@@ -1,16 +1,20 @@
 export const transformImg = (url: string, t: string) => {
   if (!url) return url;
   
-  // Safe Optimization Only: Add transformation if it's a Cloudinary URL
-  // We do NOT change the domain (cloud name) here to avoid breaking images.
-  if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
-    // Avoid double-transforming if 't' is already present
-    if (!url.includes(t)) {
-      return url.replace('/upload/', `/upload/${t}/`);
+  // 1. Automatic Domain Migration (Fix Broken Links)
+  // Replace old 'blom-cosmetics' AND incorrect 'dd89enrjz' with the CORRECT 'drsrbzm2t'
+  let newUrl = url
+    .replace('res.cloudinary.com/blom-cosmetics', 'res.cloudinary.com/drsrbzm2t')
+    .replace('res.cloudinary.com/dd89enrjz', 'res.cloudinary.com/drsrbzm2t');
+
+  // 2. Safe Optimization (fixes slow loading)
+  if (newUrl.includes('res.cloudinary.com') && newUrl.includes('/upload/')) {
+    if (!newUrl.includes(t)) {
+      return newUrl.replace('/upload/', `/upload/${t}/`);
     }
   }
-  
-  return url;
+
+  return newUrl;
 };
 
 export const cardImg = (u: string) => transformImg(u, "f_auto,q_auto,w_400,h_400,c_fill,g_auto");
