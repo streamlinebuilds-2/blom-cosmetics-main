@@ -17,8 +17,8 @@ export function ReviewForm({ productSlug, product }: ReviewFormProps) {
   const [photoPreviews, setPhotoPreviews] = React.useState<string[]>([]);
   const [errors, setErrors] = React.useState<{ body?: string; rating?: string }>(()=>({}));
 
-  const CLOUD_NAME = 'dd89enrjz';
-  const UPLOAD_PRESET = 'blom_unsigned';
+  const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dd89enrjz';
+  const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'blom_unsigned';
 
   function onPhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files || []).slice(0, 3);
