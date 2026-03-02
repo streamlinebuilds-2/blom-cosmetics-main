@@ -1,4 +1,5 @@
 import React from 'react';
+import { transformImg } from '../../lib/img';
 
 interface OptimizedImageProps {
   src: string;
@@ -53,7 +54,11 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   
   // Handle missing src
   const safeSrc = src || '/assets/blom_logo.webp'; // Fallback to logo or placeholder
-  const imageUrl = safeSrc.startsWith('http') ? safeSrc : `${site}${safeSrc}`;
+  
+  // Apply optimizations (fixes broken links and slow loading)
+  const optimizedSrc = transformImg(safeSrc, 'f_auto,q_auto');
+  
+  const imageUrl = optimizedSrc.startsWith('http') ? optimizedSrc : `${site}${optimizedSrc}`;
 
   if (!src) {
     console.warn('OptimizedImage: src is missing for', alt);
