@@ -8,16 +8,6 @@ import { Clock, MapPin, DollarSign, Star, Activity, Users } from 'lucide-react';
 import { pageSEO, trackPageView, updateSEO } from '../lib/seo';
 
 const CoursesPage: React.FC = () => {
-  const academyCourseSlugs = new Set([
-    'holiday-watercolor-workshop',
-    'blom-flower-watercolor-workshop'
-  ]);
-
-  const getAcademyCourseUrl = (slug: string) => {
-    if (!academyCourseSlugs.has(slug)) return null;
-    return `https://blom-academy.vercel.app/course/${slug}`;
-  };
-
   const inPersonCourses = [
     {
       id: 1,
@@ -234,18 +224,12 @@ const CoursesPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {(() => {
-                      const academyUrl = getAcademyCourseUrl(course.slug);
-                      if (!academyUrl) return null;
-                      return (
-                        <button
-                          onClick={() => window.location.href = academyUrl}
-                          className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
-                        >
-                          VIEW ON BLOM ACADEMY
-                        </button>
-                      );
-                    })()}
+                    <button
+                      onClick={() => window.location.href = `/courses/${course.slug}`}
+                      className="w-full bg-pink-400 hover:bg-pink-400 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+                    >
+                      SEE MORE DETAILS
+                    </button>
                   </CardContent>
                 </Card>
               ))}
