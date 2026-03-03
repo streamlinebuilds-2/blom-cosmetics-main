@@ -936,10 +936,10 @@ export const ShopPage: React.FC = () => {
     const priorityOrder = [
       'acrylic-system',    // Core Acrylics, Colour Acrylics, Glitter Acrylics - TOP PRIORITY
       'prep-finishing',    // Prep Solution & Primer - SECOND PRIORITY
+      'collections',       // Collections (MOVED UP TO 3RD POSITION)
       'gel-system',        // Gel products
       'tools-essentials',  // Tools and essentials
       'bundle-deals',      // Bundle deals
-      'collections',       // Collections (MOVED DOWN)
       'furniture'          // Furniture - BOTTOM PRIORITY
     ];
 
@@ -1038,16 +1038,34 @@ export const ShopPage: React.FC = () => {
     if (metaDescription) {
       metaDescription.setAttribute('content', 'Shop professional nail care products, acrylic systems, and tools. High-quality products trusted by nail artists and beauty professionals.');
     }
-    window.scrollTo({ top: 0 });
+
+    // Scroll Restoration Logic
+    const savedScroll = sessionStorage.getItem('shopScrollY');
+    if (savedScroll) {
+      // Restore scroll position if returning from a product page
+      // Use a slight delay to ensure content is rendered
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(savedScroll));
+        sessionStorage.removeItem('shopScrollY');
+      }, 100);
+    } else {
+      // Otherwise scroll to top
+      window.scrollTo({ top: 0 });
+    }
 
     // If navigated with hash to a category (e.g., #acrylic-system), preselect it
     const hash = window.location.hash.replace('#', '');
-    if (hash) {
+    if (hash && !savedScroll) {
       setSelectedCategory(hash);
       // Scroll to filter bar smoothly
       try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
     }
   }, []);
+
+  const handleProductClick = (slug: string) => {
+    sessionStorage.setItem('shopScrollY', window.scrollY.toString());
+    window.location.href = `/products/${slug}`;
+  };
 
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -1171,6 +1189,7 @@ export const ShopPage: React.FC = () => {
                 key={product.id}
                 {...product}
                 isListView={viewMode === 'list'}
+                onCardClickOverride={() => handleProductClick(product.slug)}
               />
             ))}
           </div>
@@ -1188,6 +1207,7 @@ export const ShopPage: React.FC = () => {
               key={product.id}
               {...product}
               isListView={viewMode === 'list'}
+              onCardClickOverride={() => handleProductClick(product.slug)}
             />
           ))}
         </div>
