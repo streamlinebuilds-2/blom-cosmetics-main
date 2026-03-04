@@ -186,9 +186,13 @@ export const ProductDetailPage: React.FC = () => {
           });
           
           // Then add base product images that aren't variant images
+          // Use a Set to strictly deduplicate based on URL string
+          const seenUrls = new Set(Array.from(variantImagesUsed));
+          
           baseImages.forEach((img: string) => {
-            if (!variantImagesUsed.has(img)) {
+            if (img && !seenUrls.has(img)) {
               allImages.push({ url: img, variantName: null });
+              seenUrls.add(img);
             }
           });
           
@@ -716,13 +720,11 @@ export const ProductDetailPage: React.FC = () => {
               {/* Accordion Sections - Smart Content Hiding */}
               <div className="border-t border-gray-100">
                 {/* Overview */}
-                {(product.description || product.overview) && (
-                  <AccordionItem title="Overview" defaultOpen={true}>
-                    <div className="prose prose-pink max-w-none text-gray-600">
-                      <p>{product.overview || product.description}</p>
-                    </div>
-                  </AccordionItem>
-                )}
+                <AccordionItem title="Overview" defaultOpen={true}>
+                  <div className="prose prose-pink max-w-none text-gray-600">
+                    <p>{product.overview || product.description || product.shortDescription || 'No description available for this product.'}</p>
+                  </div>
+                </AccordionItem>
 
                 {/* Features & Benefits */}
                 {product.features && product.features.length > 0 && (
