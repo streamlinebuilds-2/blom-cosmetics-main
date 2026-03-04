@@ -555,21 +555,28 @@ export const ShopPage: React.FC = () => {
         const mappedProducts = (products || []).map((p: any) => {
           // Check if explicit bundle deal (override collection detection)
           const categoryLower = (p.category || '').toString().toLowerCase();
-          const explicitBundleDeal = categoryLower === 'bundle-deals' || categoryLower === 'bundle deals';
+          const explicitBundleDeal = categoryLower === 'bundle-deals' || categoryLower === 'bundle deals' || 
+                                     categoryLower === 'bundles' || categoryLower === 'bundle'; // Added bundle variations
 
           // Check if this is a Collection or Bundle (product_type, category, or name)
-          // We now treat all Collections as Bundle Deals
+          // We now treat all Collections and Bundles as Bundle Deals
           const isBundleOrCollection = explicitBundleDeal || 
             (p.product_type || '').toString().toLowerCase() === 'collection' ||
             (p.product_type || '').toString().toLowerCase() === 'bundle' ||
             categoryLower.includes('collection') ||
+            categoryLower.includes('bundle') || // Added generic bundle check
             p.category === 'Bundle Deals';
 
           if (isBundleOrCollection) {
             // Determine badge based on original type
             const isCollection = (p.product_type || '').toString().toLowerCase() === 'collection' || 
                                  categoryLower.includes('collection');
-            const typeBadge = isCollection ? 'Collection' : 'Bundle';
+            
+            // Logic to determine if it is a Bundle
+            const isBundle = (p.product_type || '').toString().toLowerCase() === 'bundle' || 
+                             categoryLower.includes('bundle');
+
+            const typeBadge = isCollection ? 'Collection' : (isBundle ? 'Bundle' : 'Bundle Deal');
 
             return {
               id: `bundle-${p.id}`,
