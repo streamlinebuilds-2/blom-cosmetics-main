@@ -722,8 +722,8 @@ export const ProductDetailPage: React.FC = () => {
                 {/* Overview */}
                 <AccordionItem title="Overview" defaultOpen={true}>
                   <div className="prose prose-pink max-w-none text-gray-600">
-                    <p>{product.overview || product.description || product.shortDescription || 'No description available for this product.'}</p>
-                  </div>
+                  <p>{product.overview || product.short_description || product.shortDescription || product.description || 'No description available for this product.'}</p>
+                </div>
                 </AccordionItem>
 
                 {/* Features & Benefits */}

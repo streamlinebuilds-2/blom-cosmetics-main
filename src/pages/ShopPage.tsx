@@ -501,8 +501,8 @@ export const ShopPage: React.FC = () => {
   const normalizeCategoryToSlug = (category: string): string => {
     const categoryMap: Record<string, string> = {
       'Bundle Deals': 'bundle-deals',
-      'Collection': 'collections',
-      'Collections': 'collections',
+      'Collection': 'bundle-deals', // Consolidated into Bundle Deals
+      'Collections': 'bundle-deals', // Consolidated into Bundle Deals
       'Acrylic System': 'acrylic-system',
       'Prep & Finish': 'prep-finishing',
       'Prep & Finishing': 'prep-finishing',
@@ -554,22 +554,28 @@ export const ShopPage: React.FC = () => {
         // Map products from products table
         const mappedProducts = (products || []).map((p: any) => {
           // Check if explicit bundle deal (override collection detection)
-          const explicitBundleDeal = (p.category || '').toString().toLowerCase() === 'bundle-deals';
+          const categoryLower = (p.category || '').toString().toLowerCase();
+          const explicitBundleDeal = categoryLower === 'bundle-deals' || categoryLower === 'bundle deals';
 
-          // Check if this is a Collection (product_type, category, or name)
-          const isCollectionFromProductsTable = !explicitBundleDeal && (
+          // Check if this is a Collection or Bundle (product_type, category, or name)
+          // We now treat all Collections as Bundle Deals
+          const isBundleOrCollection = explicitBundleDeal || 
             (p.product_type || '').toString().toLowerCase() === 'collection' ||
-            ((p.category || '').toString().toLowerCase().includes('collection'))
-          );
-          // Check if this is a bundle stored in products table
-          const isBundleFromProductsTable = p.product_type === 'bundle' || p.category === 'Bundle Deals';
+            (p.product_type || '').toString().toLowerCase() === 'bundle' ||
+            categoryLower.includes('collection') ||
+            p.category === 'Bundle Deals';
 
-          if (isCollectionFromProductsTable) {
+          if (isBundleOrCollection) {
+            // Determine badge based on original type
+            const isCollection = (p.product_type || '').toString().toLowerCase() === 'collection' || 
+                                 categoryLower.includes('collection');
+            const typeBadge = isCollection ? 'Collection' : 'Bundle';
+
             return {
               id: `bundle-${p.id}`,
               name: p.name,
               slug: p.slug,
-              category: 'collections',
+              category: 'bundle-deals', // Consolidated category
 
               // Price - check all variations
               price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
@@ -620,75 +626,7 @@ export const ShopPage: React.FC = () => {
               // Meta
               rating: 0,
               reviews: 0,
-              badges: [...(p.badges || []), 'Bundle'],
-              seo: {
-                title: p.meta_title || p.name,
-                description: p.meta_description || p.short_description || p.short_desc
-              },
-              
-              // Bundle-specific fields
-              isBundle: true,
-              bundleProducts: p.bundle_products || [] // Will be populated if needed
-            };
-          }
-
-          if (isBundleFromProductsTable) {
-            return {
-              id: `bundle-${p.id}`,
-              name: p.name,
-              slug: p.slug,
-              category: 'bundle-deals', // Force bundle category
-
-              // Price - check all variations
-              price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
-              compareAtPrice: p.compare_at_price || p.compare_at || null,
-
-              // Stock - check ALL possible columns (using ?? to properly handle 0 values)
-              stock: p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0,
-              inStock: (p.stock ?? p.stock_quantity ?? p.stock_qty ?? p.stock_on_hand ?? p.stock_available ?? p.inventory_quantity ?? 0) > 0,
-
-              // Descriptions - check variations
-              shortDescription: p.short_description || p.short_desc || p.description_short || '',
-              short_description: p.short_description || p.short_desc || p.description_short || '',
-              description: p.short_description || p.short_desc || p.description_short || '',
-              overview: p.overview || p.long_description || p.description_full || p.description || '',
-
-              // Images - check variations (including gallery fallback)
-              // We insert hover_image at index 1 for the card flip effect
-              images: [
-                p.thumbnail_url || p.image_main || p.image_url,
-                p.hover_image || p.hover_url, 
-                ...(p.gallery_urls || p.image_gallery || p.gallery || [])
-              ].filter(Boolean),
-
-              // Arrays (use modern names, fallback to empty)
-              features: p.features || [],
-              howToUse: p.how_to_use || [],
-              ingredients: {
-                inci: p.inci_ingredients || [],
-                key: p.key_ingredients || []
-              },
-              // Variants - ensure proper mapping with name/label fallback
-              variants: Array.isArray(p.variants)
-                ? p.variants.map((v: any) => {
-                    // Handle both object and string variants
-                    if (typeof v === 'string') {
-                      return { name: v, inStock: true };
-                    }
-                    return {
-                      name: v.name || v.label || v.title || '',
-                      label: v.label || v.name || v.title || '',
-                      inStock: v.inStock ?? v.in_stock ?? true,
-                      image: v.image || v.image_url || null,
-                      price: v.price || null
-                    };
-                  })
-                : [],
-
-              // Meta
-              rating: 0,
-              reviews: 0,
-              badges: [...(p.badges || []), 'Bundle'],
+              badges: [...(p.badges || []), typeBadge],
               seo: {
                 title: p.meta_title || p.name,
                 description: p.meta_description || p.short_description || p.short_desc
@@ -791,16 +729,16 @@ export const ShopPage: React.FC = () => {
           };
         });
 
-        // Map bundles to product format: Collections vs Bundle Deals
+        // Map bundles to product format: All are Bundle Deals
         const mappedBundles = (bundles || []).map((bundle: any) => {
-          // Logic update: Allow explicit 'bundle-deals' category to override name-based detection
-          const explicitBundleDeal = (bundle.category || '').toString().toLowerCase() === 'bundle-deals';
+          // Force all bundles to be in 'bundle-deals' category as per requirement
+          const category = 'bundle-deals';
+          
+          // Determine badge based on original type
+          const isCollection = ((bundle.product_type || bundle.bundle_type || bundle.category || '').toString().toLowerCase().includes('collection')) ||
+            ((bundle.name || '').toLowerCase().includes('collection'));
+          const typeBadge = isCollection ? 'Collection' : 'Bundle';
 
-          const isCollection = !explicitBundleDeal && (
-            ((bundle.product_type || bundle.bundle_type || bundle.category || '').toString().toLowerCase().includes('collection')) ||
-            ((bundle.name || '').toLowerCase().includes('collection'))
-          );
-          const category = isCollection ? 'collections' : 'bundle-deals';
           return {
           id: `bundle-${bundle.id}`,
           name: bundle.name,
@@ -853,7 +791,7 @@ export const ShopPage: React.FC = () => {
           // Meta
           rating: 0,
           reviews: 0,
-          badges: bundle.badges || ['Bundle'],
+          badges: bundle.badges || [typeBadge],
           seo: {
             title: bundle.meta_title || bundle.name,
             description: bundle.meta_description || bundle.short_desc || ''
@@ -944,10 +882,9 @@ export const ShopPage: React.FC = () => {
     const priorityOrder = [
       'acrylic-system',    // Core Acrylics, Colour Acrylics, Glitter Acrylics - TOP PRIORITY
       'prep-finishing',    // Prep Solution & Primer - SECOND PRIORITY
-      'collections',       // Collections (MOVED UP TO 3RD POSITION)
+      'bundle-deals',      // Bundle Deals (Consolidated Collections & Bundles) - 3RD PRIORITY
       'gel-system',        // Gel products
       'tools-essentials',  // Tools and essentials
-      'bundle-deals',      // Bundle deals
       'furniture'          // Furniture - BOTTOM PRIORITY
     ];
 
