@@ -553,10 +553,14 @@ export const ShopPage: React.FC = () => {
 
         // Map products from products table
         const mappedProducts = (products || []).map((p: any) => {
+          // Check if explicit bundle deal (override collection detection)
+          const explicitBundleDeal = (p.category || '').toString().toLowerCase() === 'bundle-deals';
+
           // Check if this is a Collection (product_type, category, or name)
-          const isCollectionFromProductsTable =
+          const isCollectionFromProductsTable = !explicitBundleDeal && (
             (p.product_type || '').toString().toLowerCase() === 'collection' ||
-            ((p.category || '').toString().toLowerCase().includes('collection'));
+            ((p.category || '').toString().toLowerCase().includes('collection'))
+          );
           // Check if this is a bundle stored in products table
           const isBundleFromProductsTable = p.product_type === 'bundle' || p.category === 'Bundle Deals';
 
@@ -789,9 +793,13 @@ export const ShopPage: React.FC = () => {
 
         // Map bundles to product format: Collections vs Bundle Deals
         const mappedBundles = (bundles || []).map((bundle: any) => {
-          const isCollection =
+          // Logic update: Allow explicit 'bundle-deals' category to override name-based detection
+          const explicitBundleDeal = (bundle.category || '').toString().toLowerCase() === 'bundle-deals';
+
+          const isCollection = !explicitBundleDeal && (
             ((bundle.product_type || bundle.bundle_type || bundle.category || '').toString().toLowerCase().includes('collection')) ||
-            ((bundle.name || '').toLowerCase().includes('collection'));
+            ((bundle.name || '').toLowerCase().includes('collection'))
+          );
           const category = isCollection ? 'collections' : 'bundle-deals';
           return {
           id: `bundle-${bundle.id}`,
