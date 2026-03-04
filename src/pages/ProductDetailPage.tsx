@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../lib/cart';
@@ -445,6 +445,51 @@ export const ProductDetailPage: React.FC = () => {
 
   const shortDescriptionText = product.short_description || product.shortDescription;
 
+  const categoryDetails = useMemo(() => {
+    if (!product) return { name: 'Shop', slug: 'all' };
+    
+    // Check for Bundle Deals first (highest priority for these items)
+    const isBundle = product.isBundle || 
+                     (product.category && (
+                       product.category === 'bundle-deals' || 
+                       product.category === 'Bundle Deals' ||
+                       product.category.toLowerCase().includes('collection') ||
+                       product.category.toLowerCase().includes('bundle')
+                     ));
+
+    if (isBundle) {
+      return { name: 'Bundle Deals', slug: 'bundle-deals' };
+    }
+
+    // Default category handling
+    let slug = product.category || 'all';
+    
+    // Normalize if needed
+    const map: Record<string, string> = {
+      'Acrylic System': 'acrylic-system',
+      'Prep & Finish': 'prep-finishing',
+      'Prep & Finishing': 'prep-finishing',
+      'Gel System': 'gel-system',
+      'Tools & Essentials': 'tools-essentials',
+      'Furniture': 'furniture',
+      'Coming Soon': 'coming-soon'
+    };
+    
+    if (map[slug]) slug = map[slug];
+    else slug = slug.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
+    
+    // Explicit name overrides
+    const nameOverrides: Record<string, string> = {
+      'prep-finishing': 'Prep & Finishing',
+      'tools-essentials': 'Tools & Essentials'
+    };
+
+    // Generate display name
+    const name = nameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    
+    return { name, slug };
+  }, [product]);
+
   return (
     <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
@@ -456,6 +501,21 @@ export const ProductDetailPage: React.FC = () => {
             <Link to="/" className="hover:text-pink-500 transition-colors">Home</Link>
             <span className="mx-2">/</span>
             <Link to="/shop" className="hover:text-pink-500 transition-colors">Shop</Link>
+            
+            {/* Dynamic Category Breadcrumb */}
+            {categoryDetails.slug !== 'all' && (
+              <>
+                <span className="mx-2">/</span>
+                <Link 
+                  to={`/shop#${categoryDetails.slug}`} 
+                  className="hover:text-pink-500 transition-colors"
+                  onClick={() => sessionStorage.removeItem('shopScrollY')} // Reset scroll when explicitly navigating to category
+                >
+                  {categoryDetails.name}
+                </Link>
+              </>
+            )}
+            
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium truncate max-w-[200px]">{product.name}</span>
           </nav>

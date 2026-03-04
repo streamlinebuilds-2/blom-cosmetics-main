@@ -898,6 +898,12 @@ export const ShopPage: React.FC = () => {
     // 3. Scan products for unique categories and organize by priority
     const foundCategories = new Set();
     
+    // Explicit name overrides
+    const categoryNameOverrides: Record<string, string> = {
+      'prep-finishing': 'Prep & Finishing',
+      'tools-essentials': 'Tools & Essentials'
+    };
+    
     // Process products in priority order to maintain desired sequence
     priorityOrder.forEach(slug => {
       const productsInCategory = allProducts.filter((product: any) =>
@@ -905,7 +911,7 @@ export const ShopPage: React.FC = () => {
         (product.categories && product.categories.includes(slug))
       );
       if (productsInCategory.length > 0) {
-        const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        const name = categoryNameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         cats.set(slug, { name, slug, count: productsInCategory.length });
         foundCategories.add(slug);
       }
@@ -919,7 +925,7 @@ export const ShopPage: React.FC = () => {
         if (!slug || slug === 'all' || slug === 'archived' || foundCategories.has(slug)) return;
 
         if (!cats.has(slug)) {
-          const name = slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+          const name = categoryNameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
           cats.set(slug, { name, slug, count: 0 });
         }
         cats.get(slug).count++;
@@ -1007,10 +1013,12 @@ export const ShopPage: React.FC = () => {
 
     // If navigated with hash to a category (e.g., #acrylic-system), preselect it
     const hash = window.location.hash.replace('#', '');
-    if (hash && !savedScroll) {
+    if (hash) {
       setSelectedCategory(hash);
-      // Scroll to filter bar smoothly
-      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
+      // Scroll to filter bar smoothly only if we aren't restoring scroll
+      if (!savedScroll) {
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
+      }
     }
   }, []);
 
@@ -1408,7 +1416,7 @@ export const ShopPage: React.FC = () => {
           
           {selectedCategory === 'prep-finishing' && (
             <div id="prep-finishing" className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Prep & Finish</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Prep & Finishing</h2>
               <p className="text-gray-600 mb-6">Essential prep solutions, primers, and finishing products for professional nail care.</p>
             </div>
           )}
