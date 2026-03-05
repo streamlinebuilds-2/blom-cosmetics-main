@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Container } from './Container';
 import { User, Menu, X, Minus, Plus } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
@@ -11,6 +12,8 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -37,23 +40,18 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    // Allow default behavior for external links or if we want standard navigation
-    // But for SPA feel and smooth scroll reset:
-    
-    const isSamePage = window.location.pathname === href.split('?')[0] && href.split('?')[0] === '/shop';
-
-    if (isSamePage && href.includes('?category=')) {
-       // We are on shop page and clicking a category filter
-       // Let the browser handle the history push, but we might want to close menu
-       setIsMobileMenuOpen(false);
-       window.scrollTo({ top: 0, behavior: 'smooth' });
-       return; // Let default anchor click happen so URL updates
-    }
-
-    // For other navigations
+  const handleNavClick = (e: React.MouseEvent, href: string) => {
+    if (href.startsWith('http')) return;
+    e.preventDefault();
     setIsMobileMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(href);
+    requestAnimationFrame(() => {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+    });
   };
 
   const navigationItems = [
@@ -75,15 +73,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     { name: 'Furniture', href: '/shop?category=furniture' }
   ];
 
-  // Get current page for active highlighting
-  const getCurrentPath = () => {
-    if (typeof window !== 'undefined') {
-      return window.location.pathname.replace(/\/$/, '') || '/';
-    }
-    return '/';
-  };
-
-  const currentPath = getCurrentPath();
+  const currentPath = location.pathname.replace(/\/$/, '') || '/';
+  const currentCategory = new URLSearchParams(location.search).get('category') || 'all';
 
   return (
     <>
@@ -181,29 +172,50 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             <div className="bg-white h-full pb-20">
               <div className="py-2">
                 {navigationItems.map((item) => {
+                  const isActive = currentPath === item.href;
+
                   if (item.name === 'Shop') {
                     return (
                       <div key={item.name} className="py-2 border-b border-gray-50">
-                        <button 
+                        <button
                           onClick={() => setIsShopExpanded(!isShopExpanded)}
-                          className="flex items-center justify-between w-full px-6 py-3 text-left hover:bg-gray-50"
+                          className={`flex items-center justify-between w-full px-6 py-3 text-left rounded-xl mx-2 transition-colors ${
+                            isActive ? 'bg-blue-50 text-gray-900' : 'hover:bg-pink-50 text-gray-900'
+                          }`}
                         >
-                          <span className="text-black text-base font-medium">{item.name}</span>
-                          {isShopExpanded ? <Minus className="w-4 h-4 text-gray-900" /> : <Plus className="w-4 h-4 text-gray-900" />}
+                          <span className="text-base font-medium">{item.name}</span>
+                          {isShopExpanded ? (
+                            <Minus className="w-4 h-4 text-gray-700" />
+                          ) : (
+                            <Plus className="w-4 h-4 text-gray-700" />
+                          )}
                         </button>
-                        
-                        <div className={`overflow-hidden transition-all duration-300 ${isShopExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                          <div className="bg-gray-50 py-2">
-                            {shopCategories.map((subItem, subIndex) => (
-                              <a
-                                key={subIndex}
-                                href={subItem.href}
-                                className="block py-2.5 px-10 text-gray-600 text-sm hover:text-black transition-colors border-l-2 border-transparent hover:border-black"
-                                onClick={(e) => handleNavClick(e, subItem.href)}
-                              >
-                                {subItem.name}
-                              </a>
-                            ))}
+
+                        <div
+                          className={`overflow-hidden transition-all duration-300 ${
+                            isShopExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                          }`}
+                        >
+                          <div className="py-2">
+                            {shopCategories.map((subItem, subIndex) => {
+                              const subCategory = new URLSearchParams(subItem.href.split('?')[1] || '').get('category') || 'all';
+                              const subActive = currentPath === '/shop' && currentCategory === subCategory;
+
+                              return (
+                                <a
+                                  key={subIndex}
+                                  href={subItem.href}
+                                  className={`block py-2.5 px-10 text-sm rounded-lg mx-4 transition-colors ${
+                                    subActive
+                                      ? 'bg-pink-50 text-pink-700'
+                                      : 'text-gray-600 hover:bg-pink-50 hover:text-gray-900'
+                                  }`}
+                                  onClick={(e) => handleNavClick(e, subItem.href)}
+                                >
+                                  {subItem.name}
+                                </a>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -214,7 +226,9 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block py-4 px-6 text-black text-base font-medium hover:bg-gray-50 transition-colors border-b border-gray-50"
+                      className={`block py-4 px-6 text-base font-medium rounded-xl mx-2 transition-colors ${
+                        isActive ? 'bg-blue-50 text-gray-900' : 'text-gray-900 hover:bg-pink-50'
+                      }`}
                       onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
@@ -222,7 +236,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                   );
                 })}
               </div>
-              
+
               {/* Footer Links in Menu */}
               <div className="border-t border-gray-100 mt-4 pt-4 px-6 pb-8">
                  <div className="flex flex-col space-y-3">

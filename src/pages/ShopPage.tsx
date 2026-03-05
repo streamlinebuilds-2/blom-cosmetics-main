@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { cartStore } from '../lib/cart';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
@@ -13,6 +14,7 @@ import { RangeSlider } from '../components/ui/RangeSlider';
 // Discount system disabled
 
 export const ShopPage: React.FC = () => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
@@ -42,30 +44,10 @@ export const ShopPage: React.FC = () => {
   }, []); // Remove viewMode dependency to avoid loop, let internal logic handle it
 
   useEffect(() => {
-    // Handle URL parameters and Hash for category selection
-    const handleUrlChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const categoryParam = params.get('category');
-      const hash = window.location.hash.replace('#', '');
-
-      if (categoryParam) {
-        setSelectedCategory(categoryParam);
-      } else if (hash && !hash.startsWith('price-')) {
-        setSelectedCategory(hash);
-      }
-    };
-
-    // Initial check
-    handleUrlChange();
-
-    // Listen for changes
-    window.addEventListener('popstate', handleUrlChange); // For query param changes via history
-    window.addEventListener('hashchange', handleUrlChange);
-    return () => {
-      window.removeEventListener('popstate', handleUrlChange);
-      window.removeEventListener('hashchange', handleUrlChange);
-    };
-  }, []);
+    const params = new URLSearchParams(location.search);
+    const categoryParam = params.get('category');
+    setSelectedCategory(categoryParam || 'all');
+  }, [location.search]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('featured');
