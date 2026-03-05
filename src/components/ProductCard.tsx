@@ -53,7 +53,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const safeShortDescription = shortDescription || 'Professional quality nail care product';
   const safeImages = Array.isArray(images) && images.length > 0 ? images : ['https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=400&h=400&fit=crop'];
 
-  const hasVariants = variants && variants.length > 0;
+  const hasVariants = variants && variants.length > 1;
   const lowestPrice = hasVariants ? Math.min(...variants.map(v => v.price || price), price) : price;
 
   React.useEffect(() => {
@@ -73,12 +73,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     if (hasVariants) {
       setShowVariantModal(true);
     } else {
+      // Handle single variant case (if exists but hasVariants is false)
+      const singleVariant = variants && variants.length === 1 ? variants[0] : null;
+      
       cartStore.addItem({
         id: `item_${Date.now()}`,
         productId: slug,
         name: safeName,
-        price,
-        image: safeImages[0]
+        price: singleVariant?.price || price,
+        image: singleVariant?.image || safeImages[0],
+        variant: singleVariant ? { title: singleVariant.name } : undefined
       });
       // Show notification that item was added
       showNotification(`${safeName} added to cart!`, 'success');
