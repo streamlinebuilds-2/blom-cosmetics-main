@@ -480,15 +480,23 @@ export const ProductDetailPage: React.FC = () => {
   const categoryDetails = useMemo(() => {
     if (!product) return { name: 'Shop', slug: 'all' };
     
-    // Safe category string
-    const categoryStr = (product.category || '').toString();
+    // Safe category string - handle array or string
+    const categoryVal = product.category;
+    let categoryStr = '';
+    
+    if (Array.isArray(categoryVal)) {
+        categoryStr = categoryVal[0] || '';
+    } else {
+        categoryStr = (categoryVal || '').toString();
+    }
+    
     const categoryLower = categoryStr.toLowerCase();
 
     // Check for Bundle Deals first (highest priority for these items)
     const isBundle = product.isBundle || 
-                     (product.category && (
-                       product.category === 'bundle-deals' || 
-                       product.category === 'Bundle Deals' ||
+                     (categoryStr && (
+                       categoryStr === 'bundle-deals' || 
+                       categoryStr === 'Bundle Deals' ||
                        categoryLower.includes('collection') ||
                        categoryLower.includes('bundle')
                      ));
