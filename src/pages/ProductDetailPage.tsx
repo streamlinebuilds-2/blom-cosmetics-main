@@ -448,13 +448,17 @@ export const ProductDetailPage: React.FC = () => {
   const categoryDetails = useMemo(() => {
     if (!product) return { name: 'Shop', slug: 'all' };
     
+    // Safe category string
+    const categoryStr = (product.category || '').toString();
+    const categoryLower = categoryStr.toLowerCase();
+
     // Check for Bundle Deals first (highest priority for these items)
     const isBundle = product.isBundle || 
                      (product.category && (
                        product.category === 'bundle-deals' || 
                        product.category === 'Bundle Deals' ||
-                       product.category.toLowerCase().includes('collection') ||
-                       product.category.toLowerCase().includes('bundle')
+                       categoryLower.includes('collection') ||
+                       categoryLower.includes('bundle')
                      ));
 
     if (isBundle) {
@@ -462,7 +466,7 @@ export const ProductDetailPage: React.FC = () => {
     }
 
     // Default category handling
-    let slug = product.category || 'all';
+    let slug = categoryStr || 'all';
     
     // Normalize if needed
     const map: Record<string, string> = {

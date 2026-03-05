@@ -568,16 +568,6 @@ export const ShopPage: React.FC = () => {
             p.category === 'Bundle Deals';
 
           if (isBundleOrCollection) {
-            // Determine badge based on original type
-            const isCollection = (p.product_type || '').toString().toLowerCase() === 'collection' || 
-                                 categoryLower.includes('collection');
-            
-            // Logic to determine if it is a Bundle
-            const isBundle = (p.product_type || '').toString().toLowerCase() === 'bundle' || 
-                             categoryLower.includes('bundle');
-
-            const typeBadge = isCollection ? 'Collection' : (isBundle ? 'Bundle' : 'Bundle Deal');
-
             return {
               id: `bundle-${p.id}`,
               name: p.name,
@@ -633,7 +623,7 @@ export const ShopPage: React.FC = () => {
               // Meta
               rating: 0,
               reviews: 0,
-              badges: [...(p.badges || []), typeBadge],
+              badges: p.badges || [],
               seo: {
                 title: p.meta_title || p.name,
                 description: p.meta_description || p.short_description || p.short_desc
@@ -741,11 +731,6 @@ export const ShopPage: React.FC = () => {
           // Force all bundles to be in 'bundle-deals' category as per requirement
           const category = 'bundle-deals';
           
-          // Determine badge based on original type
-          const isCollection = ((bundle.product_type || bundle.bundle_type || bundle.category || '').toString().toLowerCase().includes('collection')) ||
-            ((bundle.name || '').toLowerCase().includes('collection'));
-          const typeBadge = isCollection ? 'Collection' : 'Bundle';
-
           return {
           id: `bundle-${bundle.id}`,
           name: bundle.name,
@@ -798,7 +783,7 @@ export const ShopPage: React.FC = () => {
           // Meta
           rating: 0,
           reviews: 0,
-          badges: bundle.badges || [typeBadge],
+          badges: bundle.badges || [],
           seo: {
             title: bundle.meta_title || bundle.name,
             description: bundle.meta_description || bundle.short_desc || ''
