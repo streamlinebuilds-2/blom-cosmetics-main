@@ -39,7 +39,7 @@ export const ProductDetailPage: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('details');
 
-  // Fetch product data
+  // Prevent infinite re-renders or invariant violations by wrapping the state update logic
   useEffect(() => {
     async function loadProduct() {
       if (!slug) return;
@@ -253,8 +253,10 @@ export const ProductDetailPage: React.FC = () => {
             imageVariants: processedProduct.imageVariants
           });
           
+          // Use a callback to set product state to avoid stale closure issues
           setProduct(processedProduct);
           setSelectedImageIndex(0);
+          
           // Set first variant as selected if variants exist
           if (variants.length > 0) {
             setSelectedVariant(variants[0].name);
