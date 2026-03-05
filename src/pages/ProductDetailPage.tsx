@@ -48,37 +48,45 @@ export const ProductDetailPage: React.FC = () => {
         setLoading(true);
         console.log('Loading product for slug:', slug);
 
-        const { data: productData, error } = await supabase
-          .from('products')
-          .select(`
-            *, 
-            product_reviews(count)
-          `)
-          .eq('slug', slug)
-          .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 errors on 0 rows
-
-        console.log('Supabase response:', { productData, error });
-
-        if (error) throw error;
-
-        let productSource: 'products' | 'bundles' = 'products';
-        let resolvedProductData: any = productData;
-
-        if (!resolvedProductData) {
-          const { data: bundleData, error: bundleError } = await supabase
+        // Fetch from both tables in parallel to ensure we find the best match
+        // This handles cases where a product might exist in both tables (e.g. "ghost" product record)
+        const [productResponse, bundleResponse] = await Promise.all([
+          supabase
+            .from('products')
+            .select(`*, product_reviews(count)`)
+            .eq('slug', slug)
+            .maybeSingle(),
+          supabase
             .from('bundles')
             .select('*')
             .eq('slug', slug)
-            .maybeSingle();
+            .maybeSingle()
+        ]);
 
-          console.log('Bundle lookup response:', { bundleData, bundleError });
+        const { data: productData, error: productError } = productResponse;
+        const { data: bundleData, error: bundleError } = bundleResponse;
 
-          if (bundleError) throw bundleError;
+        if (productError && !bundleData) throw productError;
+        if (bundleError && !productData) throw bundleError;
 
-          if (bundleData) {
-            productSource = 'bundles';
+        let productSource: 'products' | 'bundles' = 'products';
+        let resolvedProductData: any = null;
 
-            const bundleImages = Array.isArray(bundleData.images)
+        // Decision Logic:
+        // 1. If we have a bundle record, checks if it should be prioritized
+        // 2. Prioritize bundle if:
+        //    a. No product record exists
+        //    b. Slug/Name implies it's a bundle/collection
+        const isBundleName = slug.toLowerCase().includes('bundle') || 
+                             slug.toLowerCase().includes('collection') ||
+                             (bundleData?.name || '').toLowerCase().includes('bundle') ||
+                             (bundleData?.name || '').toLowerCase().includes('collection');
+
+        if (bundleData && (!productData || isBundleName)) {
+           // Use bundle data
+           productSource = 'bundles';
+           
+           const bundleImages = Array.isArray(bundleData.images)
               ? bundleData.images
               : [bundleData.image_url || bundleData.thumbnail_url].filter(Boolean);
 
@@ -102,7 +110,9 @@ export const ProductDetailPage: React.FC = () => {
               stock_quantity: 1,
               product_reviews: [{ count: 0 }]
             };
-          }
+        } else if (productData) {
+           // Use product data
+           resolvedProductData = productData;
         }
 
         if (resolvedProductData) {
