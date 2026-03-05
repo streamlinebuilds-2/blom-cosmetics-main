@@ -610,7 +610,7 @@ export const ShopPage: React.FC = () => {
             <div className="p-4 border-t border-gray-100">
               <button 
                 onClick={() => setShowFilters(false)}
-                className="w-full bg-black text-white py-3 uppercase tracking-widest text-sm font-bold"
+                className="w-full bg-pink-500 hover:bg-pink-600 text-white py-3 uppercase tracking-widest text-sm font-bold transition-colors"
               >
                 View Results
               </button>
