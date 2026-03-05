@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from './Container';
-import { Button } from '../ui/Button';
-import { User, Menu, X, ShoppingBag, Heart, Minus, Plus, ChevronDown } from 'lucide-react';
+import { User, Menu, X, Minus, Plus } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 import { WishlistButton } from '../wishlist/WishlistButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
-import { ClickableContact } from '../ui/ClickableContact';
 import { AnnouncementBar } from './AnnouncementBar';
 
 interface HeaderProps {
@@ -17,17 +15,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
   
-  // Mobile Accordion State
-  const [expandedMobileItems, setExpandedMobileItems] = useState<Record<string, boolean>>({
-    'blom-cosmetics': true // Default open as per image style suggestion
-  });
-
-  const toggleMobileItem = (id: string) => {
-    setExpandedMobileItems(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
+  // Mobile Accordion State for Shop
+  const [isShopExpanded, setIsShopExpanded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -49,28 +38,22 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   }, [lastScrollY]);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    try {
-      const currentPath = window.location.pathname.replace(/\/$/, '');
-      const targetPath = href.replace(/\/$/, '');
-      const isSamePage = currentPath === targetPath;
+    // Allow default behavior for external links or if we want standard navigation
+    // But for SPA feel and smooth scroll reset:
+    
+    const isSamePage = window.location.pathname === href.split('?')[0] && href.split('?')[0] === '/shop';
 
-      // Always intercept to apply smooth scroll effect for consistency
-      e.preventDefault();
-
-      // Smooth scroll to top first
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-
-      // Close mobile menu if open
-      if (isMobileMenuOpen) setIsMobileMenuOpen(false);
-
-      // If navigating to a different page, perform instant navigation
-      if (!isSamePage) {
-        window.location.assign(href);
-      }
-      // If same page, the smooth scroll already achieved the effect
-    } catch {
-      // no-op safeguard
+    if (isSamePage && href.includes('?category=')) {
+       // We are on shop page and clicking a category filter
+       // Let the browser handle the history push, but we might want to close menu
+       setIsMobileMenuOpen(false);
+       window.scrollTo({ top: 0, behavior: 'smooth' });
+       return; // Let default anchor click happen so URL updates
     }
+
+    // For other navigations
+    setIsMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const navigationItems = [
@@ -81,45 +64,15 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     { name: 'Contact', href: '/contact' }
   ];
 
-  // Custom Mobile Navigation Structure matching image_1
-  const mobileNavigationItems = [
-    // Top Section
-    { name: 'Efiles and Bits', href: '/shop#tools-essentials' },
-    { name: 'Nail Art', href: '/shop#nail-art' }, // Assuming nail-art category exists or mapped
-    { name: 'Preps and Finishes', href: '/shop#prep-finishing' },
-    { name: 'Training', href: '/courses' },
-    
-    // Divider
-    { type: 'divider' },
-    
-    // Groups
-    {
-      id: 'blom-cosmetics',
-      name: 'BLOM COSMETICS',
-      type: 'group',
-      items: [
-        { name: 'Shop All', href: '/shop' },
-        { name: 'Acrylic', href: '/shop#acrylic-system' },
-        { name: 'Colour Acrylic', href: '/shop#acrylic-system' },
-        { name: 'Gel', href: '/shop#gel-system' },
-        { name: 'Files and Buffers', href: '/shop#tools-essentials' },
-        { name: 'Efiles and Bits', href: '/shop#tools-essentials' },
-        { name: 'Nail Art', href: '/shop#nail-art' },
-        { name: 'Preps and Finishes', href: '/shop#prep-finishing' }
-      ]
-    },
-    { type: 'divider' },
-    {
-      id: 'nele',
-      name: 'NELE',
-      type: 'group',
-      items: [
-        { name: 'Shop All', href: '/shop' },
-        { name: 'Acrylic Gel', href: '/shop' },
-        { name: 'Colour Gel', href: '/shop' },
-        { name: 'Nail Couture Sculpting Gel', href: '/shop' }
-      ]
-    }
+  const shopCategories = [
+    { name: 'Shop All', href: '/shop' },
+    { name: 'Acrylic System', href: '/shop?category=acrylic-system' },
+    { name: 'Gel System', href: '/shop?category=gel-system' },
+    { name: 'Prep & Finishing', href: '/shop?category=prep-finishing' },
+    { name: 'Tools & Essentials', href: '/shop?category=tools-essentials' },
+    { name: 'Nail Art', href: '/shop?category=nail-art' },
+    { name: 'Bundle Deals', href: '/shop?category=bundle-deals' },
+    { name: 'Furniture', href: '/shop?category=furniture' }
   ];
 
   // Get current page for active highlighting
@@ -203,20 +156,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 href="/account"
                 className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
                 onClick={(e) => {
-                  e.preventDefault();
-                  try {
-                    const baseUrl = (import.meta as any).env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL || '';
-                    const supabaseSession = localStorage.getItem('sb-' + baseUrl.split('//')[1]?.split('.')[0] + '-auth-token');
-                    const hasSession = supabaseSession || document.cookie.includes('sb-');
-                    
-                    if (!hasSession) {
-                      window.location.assign('/login?redirect=/account');
-                    } else {
-                      window.location.assign('/account');
-                    }
-                  } catch {
-                    window.location.assign('/account');
-                  }
+                  // Standard link behavior for account check
                 }}
                 aria-label="Account"
               >
@@ -240,37 +180,32 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
           >
             <div className="bg-white h-full pb-20">
               <div className="py-2">
-                {mobileNavigationItems.map((item, index) => {
-                  if (item.type === 'divider') {
-                    return <div key={`div-${index}`} className="border-t border-gray-100 my-2" />;
-                  }
-
-                  if (item.type === 'group' && item.items) {
-                    const isExpanded = expandedMobileItems[item.id!];
+                {navigationItems.map((item) => {
+                  if (item.name === 'Shop') {
                     return (
-                      <div key={item.id} className="py-2">
+                      <div key={item.name} className="py-2 border-b border-gray-50">
                         <button 
-                          onClick={() => toggleMobileItem(item.id!)}
-                          className="flex items-center justify-between w-full px-6 py-2 text-left"
+                          onClick={() => setIsShopExpanded(!isShopExpanded)}
+                          className="flex items-center justify-between w-full px-6 py-3 text-left hover:bg-gray-50"
                         >
-                          <span className="font-bold text-black text-sm tracking-wider">{item.name}</span>
-                          {isExpanded ? <Minus className="w-4 h-4 text-gray-900" /> : <Plus className="w-4 h-4 text-gray-900" />}
+                          <span className="text-black text-base font-medium">{item.name}</span>
+                          {isShopExpanded ? <Minus className="w-4 h-4 text-gray-900" /> : <Plus className="w-4 h-4 text-gray-900" />}
                         </button>
                         
-                        {isExpanded && (
-                          <div className="bg-white">
-                            {item.items.map((subItem, subIndex) => (
+                        <div className={`overflow-hidden transition-all duration-300 ${isShopExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                          <div className="bg-gray-50 py-2">
+                            {shopCategories.map((subItem, subIndex) => (
                               <a
                                 key={subIndex}
                                 href={subItem.href}
-                                className="block py-2 px-10 text-gray-600 text-sm hover:text-black transition-colors"
+                                className="block py-2.5 px-10 text-gray-600 text-sm hover:text-black transition-colors border-l-2 border-transparent hover:border-black"
                                 onClick={(e) => handleNavClick(e, subItem.href)}
                               >
                                 {subItem.name}
                               </a>
                             ))}
                           </div>
-                        )}
+                        </div>
                       </div>
                     );
                   }
@@ -279,8 +214,8 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="block py-3 px-6 text-black text-sm font-medium hover:bg-gray-50 transition-colors"
-                      onClick={(e) => handleNavClick(e, item.href!)}
+                      className="block py-4 px-6 text-black text-base font-medium hover:bg-gray-50 transition-colors border-b border-gray-50"
+                      onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
                     </a>

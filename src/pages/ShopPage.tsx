@@ -42,22 +42,29 @@ export const ShopPage: React.FC = () => {
   }, []); // Remove viewMode dependency to avoid loop, let internal logic handle it
 
   useEffect(() => {
-    // If navigated with hash to a category (e.g., #acrylic-system), preselect it
-    const handleHashChange = () => {
+    // Handle URL parameters and Hash for category selection
+    const handleUrlChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const categoryParam = params.get('category');
       const hash = window.location.hash.replace('#', '');
-      if (hash && !hash.startsWith('price-')) {
+
+      if (categoryParam) {
+        setSelectedCategory(categoryParam);
+      } else if (hash && !hash.startsWith('price-')) {
         setSelectedCategory(hash);
-        // Scroll to filter bar smoothly
-        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
       }
     };
 
     // Initial check
-    handleHashChange();
+    handleUrlChange();
 
-    // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    // Listen for changes
+    window.addEventListener('popstate', handleUrlChange); // For query param changes via history
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
   }, []);
 
   const [searchTerm, setSearchTerm] = useState('');
