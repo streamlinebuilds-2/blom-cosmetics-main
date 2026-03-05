@@ -360,6 +360,63 @@ export const ProductDetailPage: React.FC = () => {
     window.scrollTo(0, 0);
   }, [slug]);
 
+  const categoryDetails = useMemo(() => {
+    if (!product) return { name: 'Shop', slug: 'all' };
+    
+    // Safe category string - handle array or string
+    const categoryVal = product.category;
+    let categoryStr = '';
+    
+    if (Array.isArray(categoryVal)) {
+        categoryStr = categoryVal[0] || '';
+    } else {
+        categoryStr = (categoryVal || '').toString();
+    }
+    
+    const categoryLower = categoryStr.toLowerCase();
+
+    // Check for Bundle Deals first (highest priority for these items)
+    const isBundle = product.isBundle || 
+                     (categoryStr && (
+                       categoryStr === 'bundle-deals' || 
+                       categoryStr === 'Bundle Deals' ||
+                       categoryLower.includes('collection') ||
+                       categoryLower.includes('bundle')
+                     ));
+
+    if (isBundle) {
+      return { name: 'Bundle Deals', slug: 'bundle-deals' };
+    }
+
+    // Default category handling
+    let slug = categoryStr || 'all';
+    
+    // Normalize if needed
+    const map: Record<string, string> = {
+      'Acrylic System': 'acrylic-system',
+      'Prep & Finish': 'prep-finishing',
+      'Prep & Finishing': 'prep-finishing',
+      'Gel System': 'gel-system',
+      'Tools & Essentials': 'tools-essentials',
+      'Furniture': 'furniture',
+      'Coming Soon': 'coming-soon'
+    };
+    
+    if (map[slug]) slug = map[slug];
+    else slug = slug.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
+    
+    // Explicit name overrides
+    const nameOverrides: Record<string, string> = {
+      'prep-finishing': 'Prep & Finishing',
+      'tools-essentials': 'Tools & Essentials'
+    };
+
+    // Generate display name
+    const name = nameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    
+    return { name, slug };
+  }, [product]);
+
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -482,63 +539,6 @@ export const ProductDetailPage: React.FC = () => {
     : 0;
 
   const shortDescriptionText = product.short_description || product.shortDescription;
-
-  const categoryDetails = useMemo(() => {
-    if (!product) return { name: 'Shop', slug: 'all' };
-    
-    // Safe category string - handle array or string
-    const categoryVal = product.category;
-    let categoryStr = '';
-    
-    if (Array.isArray(categoryVal)) {
-        categoryStr = categoryVal[0] || '';
-    } else {
-        categoryStr = (categoryVal || '').toString();
-    }
-    
-    const categoryLower = categoryStr.toLowerCase();
-
-    // Check for Bundle Deals first (highest priority for these items)
-    const isBundle = product.isBundle || 
-                     (categoryStr && (
-                       categoryStr === 'bundle-deals' || 
-                       categoryStr === 'Bundle Deals' ||
-                       categoryLower.includes('collection') ||
-                       categoryLower.includes('bundle')
-                     ));
-
-    if (isBundle) {
-      return { name: 'Bundle Deals', slug: 'bundle-deals' };
-    }
-
-    // Default category handling
-    let slug = categoryStr || 'all';
-    
-    // Normalize if needed
-    const map: Record<string, string> = {
-      'Acrylic System': 'acrylic-system',
-      'Prep & Finish': 'prep-finishing',
-      'Prep & Finishing': 'prep-finishing',
-      'Gel System': 'gel-system',
-      'Tools & Essentials': 'tools-essentials',
-      'Furniture': 'furniture',
-      'Coming Soon': 'coming-soon'
-    };
-    
-    if (map[slug]) slug = map[slug];
-    else slug = slug.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
-    
-    // Explicit name overrides
-    const nameOverrides: Record<string, string> = {
-      'prep-finishing': 'Prep & Finishing',
-      'tools-essentials': 'Tools & Essentials'
-    };
-
-    // Generate display name
-    const name = nameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    
-    return { name, slug };
-  }, [product]);
 
   return (
     <div className="min-h-screen bg-white">
