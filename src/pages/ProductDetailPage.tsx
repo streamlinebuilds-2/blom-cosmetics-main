@@ -63,8 +63,28 @@ export const ProductDetailPage: React.FC = () => {
             .maybeSingle()
         ]);
 
-        const { data: productData, error: productError } = productResponse;
-        const { data: bundleData, error: bundleError } = bundleResponse;
+        let { data: productData, error: productError } = productResponse;
+        let { data: bundleData, error: bundleError } = bundleResponse;
+
+        // Fallback: Try case-insensitive search or partial match if exact match failed
+        if (!productData && !bundleData) {
+            console.log('Exact slug match failed, trying case-insensitive search...');
+            // Try product table fallback
+            const { data: pData } = await supabase
+                .from('products')
+                .select(`*, product_reviews(count)`)
+                .ilike('slug', slug)
+                .maybeSingle();
+            if (pData) productData = pData;
+
+            // Try bundle table fallback
+            const { data: bData } = await supabase
+                .from('bundles')
+                .select('*')
+                .ilike('slug', slug)
+                .maybeSingle();
+            if (bData) bundleData = bData;
+        }
 
         if (productError && !bundleData) throw productError;
         if (bundleError && !productData) throw bundleError;
