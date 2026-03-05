@@ -4,6 +4,13 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || (import.meta as any).env.SUPABASE_ANON_KEY;
 
+export const supabaseConfigured = Boolean(
+  supabaseUrl &&
+  supabaseAnonKey &&
+  !String(supabaseUrl).includes('placeholder.supabase.co') &&
+  !String(supabaseAnonKey).includes('placeholder-key')
+);
+
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Missing Supabase environment variables (VITE_SUPABASE_URL/SUPABASE_URL/SUPABASE_DATABASE_URL, VITE_SUPABASE_ANON_KEY/SUPABASE_ANON_KEY)');
   // Use placeholder values to prevent the app from crashing

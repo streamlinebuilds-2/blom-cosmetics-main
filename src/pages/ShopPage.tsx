@@ -7,7 +7,7 @@ import { ProductCard } from '../components/ProductCard';
 import { Search, Filter, Grid3x3 as Grid3X3, Grid2x2 as Grid2X2, List, ChevronDown, ChevronUp, BookOpen, Download, ShoppingCart, X, Square } from 'lucide-react';
 import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
 import { PageLoadingSpinner, ProductGridSkeleton } from '../components/ui/LoadingSpinner';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseConfigured } from '../lib/supabase';
 import { RangeSlider } from '../components/ui/RangeSlider';
 
 // Discount system disabled
@@ -20,7 +20,7 @@ export const ShopPage: React.FC = () => {
   // View Mode State
   // Mobile: 'grid-2' (default) or 'grid-3' (was list replacement)
   // Desktop: 'compact' (3x3)
-  const [viewMode, setViewMode] = useState<'grid-2' | 'grid-3' | 'compact'>('grid-2');
+  const [viewMode, setViewMode] = useState<'grid-1' | 'grid-2' | 'grid-3' | 'compact'>('grid-2');
 
   // Handle Resize for View Mode
   useEffect(() => {
@@ -154,34 +154,69 @@ export const ShopPage: React.FC = () => {
             badges: Array.isArray(p.badges) ? p.badges : []
           }));
 
-        setDisplayProducts(mapped);
+        return mapped;
+      };
 
-        const max = Math.max(...mapped.map((p: any) => p.price), 2000);
-        const roundedMax = Math.ceil(max / 100) * 100;
-        setMaxPrice(roundedMax);
-        setPriceRange([0, roundedMax]);
+      const mergeBySlug = (base: any[], override: any[]) => {
+        const map = new Map<string, any>();
+        base.forEach((p) => map.set(p.slug, p));
+        override.forEach((p) => map.set(p.slug, { ...map.get(p.slug), ...p }));
+        return Array.from(map.values());
       };
 
       try {
+        const fallbackProducts = await loadFallbackProducts().catch(() => []);
+
+        if (!supabaseConfigured) {
+          setDisplayProducts(fallbackProducts);
+          const max = Math.max(...fallbackProducts.map((p: any) => p.price), 2000);
+          const roundedMax = Math.ceil(max / 100) * 100;
+          setMaxPrice(roundedMax);
+          setPriceRange([0, roundedMax]);
+          return;
+        }
+
         const { data: products, error: productsError } = await supabase
           .from('products')
-          .select('*, product_reviews(count), hover_image')
-          .eq('status', 'active')
-          .order('category', { ascending: true });
+          .select('*, product_reviews(count), hover_image, product_categories ( category:categories ( id, slug, name ) )')
+          .in('status', ['active', 'published'])
+          .order('created_at', { ascending: false });
 
         const { data: bundles, error: bundlesError } = await supabase
           .from('bundles')
           .select('*')
-          .eq('status', 'active')
+          .in('status', ['active', 'published'])
           .order('name', { ascending: true });
 
         if (productsError && bundlesError) {
-          await loadFallbackProducts();
+          setDisplayProducts(fallbackProducts);
+
+          const max = Math.max(...fallbackProducts.map((p: any) => p.price), 2000);
+          const roundedMax = Math.ceil(max / 100) * 100;
+          setMaxPrice(roundedMax);
+          setPriceRange([0, roundedMax]);
           return;
         }
 
+        const categoryIds = Array.from(
+          new Set((products || []).map((p: any) => p.category_id).filter(Boolean))
+        );
+
+        const categoryById: Record<string, { slug: string; name: string }> = {};
+        if (categoryIds.length > 0) {
+          const { data: categories } = await supabase
+            .from('categories')
+            .select('id, slug, name')
+            .in('id', categoryIds);
+
+          (categories || []).forEach((c: any) => {
+            if (c?.id) categoryById[c.id] = { slug: c.slug, name: c.name };
+          });
+        }
+
         const mappedProducts = (products || []).map((p: any) => {
-          const categoryLower = (p.category || '').toString().toLowerCase();
+          const joinedCategorySlug = p.product_categories?.[0]?.category?.slug;
+          const categoryLower = (p.category || categoryById[p.category_id]?.slug || joinedCategorySlug || '').toString().toLowerCase();
           const explicitBundleDeal = categoryLower.includes('bundle'); 
           const isBundleOrCollection = explicitBundleDeal || 
             (p.product_type || '').toLowerCase() === 'collection' ||
@@ -206,7 +241,8 @@ export const ShopPage: React.FC = () => {
              };
           }
           
-          const baseCategory = normalizeCategoryToSlug(p.category || 'all');
+          const rawCategory = p.category || categoryById[p.category_id]?.slug || joinedCategorySlug || 'all';
+          const baseCategory = normalizeCategoryToSlug(rawCategory);
           const categories = [baseCategory];
           const productNameLower = (p.name || '').toLowerCase();
 
@@ -231,7 +267,7 @@ export const ShopPage: React.FC = () => {
             price: p.price || (p.price_cents ? p.price_cents / 100 : 0),
             compareAtPrice: p.compare_at_price || p.compare_at || null,
             stock: p.stock ?? 0,
-            inStock: true,
+            inStock: (p.stock ?? 0) > 0 && (p.price || (p.price_cents ? p.price_cents / 100 : 0)) !== -1,
             shortDescription: p.short_description || '',
             description: p.description || '',
             images: [p.thumbnail_url, p.hover_image, ...(p.gallery_urls || [])].filter(Boolean),
@@ -244,7 +280,7 @@ export const ShopPage: React.FC = () => {
             id: `bundle-${bundle.id}`,
             name: bundle.name,
             slug: bundle.slug,
-            category: 'bundle-deals',
+            categories: ['bundle-deals'],
             price: bundle.price_cents ? bundle.price_cents / 100 : (bundle.price || 0),
             compareAtPrice: bundle.compare_at_price_cents ? bundle.compare_at_price_cents / 100 : bundle.compare_at_price || null,
             stock: 1,
@@ -258,21 +294,23 @@ export const ShopPage: React.FC = () => {
         }));
 
         const combined = [...mappedProducts, ...mappedBundles];
-        if (combined.length === 0) {
-          await loadFallbackProducts();
-          return;
-        }
+        const merged = mergeBySlug(fallbackProducts, combined);
 
-        setDisplayProducts(combined);
+        setDisplayProducts(merged);
 
-        // Calculate max price for slider
-        const max = Math.max(...combined.map(p => p.price), 2000);
-        setMaxPrice(Math.ceil(max / 100) * 100);
-        setPriceRange([0, Math.ceil(max / 100) * 100]);
+        const max = Math.max(...merged.map((p: any) => p.price), 2000);
+        const roundedMax = Math.ceil(max / 100) * 100;
+        setMaxPrice(roundedMax);
+        setPriceRange([0, roundedMax]);
 
       } catch (err) {
         try {
-          await loadFallbackProducts();
+          const fallbackProducts = await loadFallbackProducts();
+          setDisplayProducts(fallbackProducts);
+          const max = Math.max(...fallbackProducts.map((p: any) => p.price), 2000);
+          const roundedMax = Math.ceil(max / 100) * 100;
+          setMaxPrice(roundedMax);
+          setPriceRange([0, roundedMax]);
         } catch {
           console.error(err);
         }
@@ -300,21 +338,6 @@ export const ShopPage: React.FC = () => {
     } else {
       window.scrollTo({ top: 0 });
     }
-
-    // Hash Change Logic for Categories
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (hash && !hash.startsWith('price-')) {
-        setSelectedCategory(hash);
-        if (!savedScroll) {
-           try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
-        }
-      }
-    };
-
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
   // --- DYNAMIC CATEGORY GENERATION ---
@@ -367,6 +390,17 @@ export const ShopPage: React.FC = () => {
     { value: 'date-new', label: 'Date, new to old' }
   ];
 
+  const categoryLabels: Record<string, string> = {
+    all: 'Shop All',
+    'acrylic-system': 'Acrylic System',
+    'gel-system': 'Gel System',
+    'prep-finishing': 'Prep & Finishing',
+    'tools-essentials': 'Tools & Essentials',
+    'bundle-deals': 'Bundle Deals',
+    'nail-art': 'Nail Art',
+    furniture: 'Furniture'
+  };
+
   // Filtering Logic
   const filteredProducts = useMemo(() => {
     return displayProducts.filter((product: any) => {
@@ -413,8 +447,12 @@ export const ShopPage: React.FC = () => {
   const getGridClasses = () => {
     if (viewMode === 'compact') return 'grid-cols-3'; // Desktop
     if (viewMode === 'grid-3') return 'grid-cols-3'; // Mobile 3x3
+    if (viewMode === 'grid-1') return 'grid-cols-1'; // Mobile 1x1
     return 'grid-cols-2'; // Mobile 2x2 (Default)
   };
+
+  const activeCategoryName = categoryLabels[selectedCategory] || selectedCategory.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
+  const activeResultsCount = sortedProducts.length;
 
   if (loading) {
     return (
@@ -439,23 +477,36 @@ export const ShopPage: React.FC = () => {
             Image 2 shows a banner "BLOM'S ACRYLIC" over an image.
             For now, I'll keep the standard header but maybe simpler.
         */}
-        <div className="hidden lg:block bg-gray-50 py-12 mb-8">
+        <div className="hidden lg:block bg-pink-50/60 py-10 mb-8 border-b border-pink-100">
           <Container>
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 text-center">Shop All</h1>
-            <p className="text-center text-gray-600 max-w-2xl mx-auto">
-              Professional nail supplies for salons and technicians.
-            </p>
+            <div className="text-center">
+              <p className="text-xs uppercase tracking-[0.25em] text-gray-500">Shop</p>
+              <h1 className="text-4xl font-bold text-gray-900 mt-2">{activeCategoryName}</h1>
+              <p className="text-sm text-gray-500 mt-2">{activeResultsCount} products</p>
+            </div>
           </Container>
         </div>
 
         <Container>
+          <div className="lg:hidden pt-4 pb-4">
+            <p className="text-xs uppercase tracking-[0.25em] text-gray-500">Shop</p>
+            <h1 className="text-2xl font-bold text-gray-900 mt-2">{activeCategoryName}</h1>
+            <p className="text-sm text-gray-500 mt-1">{activeResultsCount} products</p>
+          </div>
+
+          {!supabaseConfigured && (
+            <div className="lg:hidden -mt-1 mb-4 rounded-xl border border-pink-100 bg-pink-50 px-4 py-3 text-sm text-gray-700">
+              Showing sample products. To show your admin products, set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in Vercel.
+            </div>
+          )}
+
           {/* Mobile Toolbar (Sticky) */}
           <div className="sticky top-0 z-30 bg-white border-b border-gray-200 lg:hidden -mx-4 px-4 mb-6">
             <div className="flex items-center h-14">
               {/* Filter Button */}
               <button 
                 onClick={() => setShowFilters(true)}
-                className="flex-1 flex items-center justify-center h-full border-r border-gray-200 text-xs font-bold tracking-widest uppercase"
+                className="flex-1 flex items-center justify-center h-full border-r border-gray-200 text-xs font-semibold tracking-widest uppercase text-gray-700"
               >
                 Filter
               </button>
@@ -463,23 +514,29 @@ export const ShopPage: React.FC = () => {
               {/* Sort Button */}
               <button 
                 onClick={() => setShowSort(true)}
-                className="flex-1 flex items-center justify-center h-full border-r border-gray-200 text-xs font-bold tracking-widest uppercase"
+                className="flex-1 flex items-center justify-center h-full border-r border-gray-200 text-xs font-semibold tracking-widest uppercase text-gray-700"
               >
                 Sort By
-                <ChevronDown className="w-3 h-3 ml-1" />
+                <ChevronDown className="w-3 h-3 ml-1 text-gray-400" />
               </button>
               
               {/* View Toggles */}
               <div className="flex items-center justify-center px-4 gap-3">
                 <button 
+                  onClick={() => setViewMode('grid-1')}
+                  className={`${viewMode === 'grid-1' ? 'text-pink-600' : 'text-gray-300'}`}
+                >
+                  <Square className="w-5 h-5" />
+                </button>
+                <button 
                   onClick={() => setViewMode('grid-2')}
-                  className={`${viewMode === 'grid-2' ? 'text-black' : 'text-gray-300'}`}
+                  className={`${viewMode === 'grid-2' ? 'text-pink-600' : 'text-gray-300'}`}
                 >
                   <Grid2X2 className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => setViewMode('grid-3')}
-                  className={`${viewMode === 'grid-3' ? 'text-black' : 'text-gray-300'}`}
+                  className={`${viewMode === 'grid-3' ? 'text-pink-600' : 'text-gray-300'}`}
                 >
                   <Grid3X3 className="w-5 h-5" />
                 </button>
@@ -498,7 +555,7 @@ export const ShopPage: React.FC = () => {
                     {productCategories.map(cat => (
                       <div 
                         key={cat.slug}
-                        className={`cursor-pointer text-sm ${selectedCategory === cat.slug ? 'font-bold text-black' : 'text-gray-600 hover:text-black'}`}
+                        className={`cursor-pointer text-sm ${selectedCategory === cat.slug ? 'font-bold text-pink-600' : 'text-gray-600 hover:text-gray-900'}`}
                         onClick={() => setSelectedCategory(cat.slug)}
                       >
                         {cat.name} ({cat.count})
@@ -528,6 +585,7 @@ export const ShopPage: React.FC = () => {
                     key={product.id}
                     {...product}
                     isListView={false}
+                    displayVariant={viewMode === 'grid-3' ? 'compact' : 'default'}
                     onCardClickOverride={() => handleProductClick(product.slug)}
                   />
                 ))}

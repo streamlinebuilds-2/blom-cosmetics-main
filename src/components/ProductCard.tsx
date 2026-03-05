@@ -19,6 +19,7 @@ interface ProductCardProps {
   isListView?: boolean; 
   hoverShine?: boolean;
   hideDescription?: boolean; 
+  displayVariant?: 'default' | 'compact';
   variants?: Array<{ 
     name: string; 
     price?: number; 
@@ -42,6 +43,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isListView = false, 
   hoverShine = false,
   hideDescription = false,
+  displayVariant = 'default',
   variants = [],
   onCardClickOverride 
 }) => { 
@@ -172,6 +174,84 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   }
 
   // --- PREMIUM GRID VIEW ---
+  if (displayVariant === 'compact') {
+    return (
+      <>
+        <article
+          className={`
+            group relative flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden
+            transition-all duration-300 hover:shadow-lg hover:-translate-y-1
+            ${className}
+          `}
+          onClick={handleCardClick}
+        >
+          <div className="relative aspect-square overflow-hidden bg-gray-50">
+            <OptimizedImage
+              src={safeImages[0]}
+              alt={safeName}
+              width={500}
+              height={500}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+
+            <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
+              {badges.map((badge) => (
+                <span key={badge} className="bg-black/90 backdrop-blur-md text-white text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
+                  {badge}
+                </span>
+              ))}
+            </div>
+
+            <button
+              onClick={handleWishlistToggle}
+              className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 backdrop-blur-sm shadow-sm hover:bg-white transition-all z-10"
+            >
+              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-pink-500 text-pink-500' : 'text-gray-600'}`} />
+            </button>
+          </div>
+
+          <div className="p-3 flex flex-col flex-grow">
+            <h3 className="font-bold text-gray-900 text-sm leading-snug line-clamp-2">
+              {safeName}
+            </h3>
+
+            <div className="mt-auto pt-3 flex items-center justify-between gap-2">
+              <span className="font-bold text-gray-900 text-sm">
+                {price === -1 ? 'Coming Soon' : hasVariants ? `From ${formatPrice(lowestPrice)}` : formatPrice(price)}
+              </span>
+
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (price === -1) return;
+                  if (hasVariants) {
+                    setShowVariantModal(true);
+                  } else {
+                    handleAddToCart(e);
+                  }
+                }}
+                disabled={price === -1}
+                className="w-9 h-9 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-md shadow-pink-200 hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label={hasVariants ? 'Select options' : 'Add to cart'}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </article>
+
+        {showVariantModal && (
+          <ProductVariantModal
+            isOpen={showVariantModal}
+            onClose={() => setShowVariantModal(false)}
+            product={{ id, name: safeName, slug, price, images: safeImages, variants }}
+          />
+        )}
+      </>
+    );
+  }
+
   return (
     <>
       <article

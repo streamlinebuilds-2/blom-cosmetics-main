@@ -58,7 +58,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: black;
+            background: #ec4899;
             cursor: pointer;
             pointer-events: all;
           }
@@ -66,7 +66,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: black;
+            background: #ec4899;
             cursor: pointer;
             pointer-events: all;
             border: none;
@@ -97,7 +97,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
 
         <div className="relative w-full h-1 bg-gray-200 rounded-full top-3">
           <div
-            className="absolute h-1 bg-black rounded-full"
+            className="absolute h-1 bg-pink-500 rounded-full"
             style={{
               left: `${getPercent(localValue[0])}%`,
               width: `${getPercent(localValue[1]) - getPercent(localValue[0])}%`,
@@ -107,7 +107,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
       </div>
 
       <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center border border-gray-200 rounded px-3 py-2 w-full">
+        <div className="flex items-center border border-gray-200 rounded px-3 py-2 w-full focus-within:ring-2 focus-within:ring-pink-200 focus-within:border-pink-300">
             <span className="text-gray-500 mr-1">R</span>
             <input 
                 type="number" 
@@ -119,7 +119,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
             />
         </div>
         <span className="text-gray-500">to</span>
-        <div className="flex items-center border border-gray-200 rounded px-3 py-2 w-full">
+        <div className="flex items-center border border-gray-200 rounded px-3 py-2 w-full focus-within:ring-2 focus-within:ring-pink-200 focus-within:border-pink-300">
             <span className="text-gray-500 mr-1">R</span>
             <input 
                 type="number" 
