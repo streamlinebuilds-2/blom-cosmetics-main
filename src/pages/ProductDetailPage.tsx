@@ -435,12 +435,12 @@ export const ProductDetailPage: React.FC = () => {
       price: variantPrice,
       image: variantImage,
       quantity: quantity,
-      variant: selectedVariant ? { title: selectedVariant } : { title: 'Default' }
+      variant: selectedVariant && selectedVariant !== 'Default Title' ? { title: selectedVariant } : undefined
     });
 
     toast({
       title: "Added to cart",
-      description: `${product.name}${selectedVariant ? ` (${selectedVariant})` : ''} has been added to your cart.`
+      description: `${product.name}${selectedVariant && selectedVariant !== 'Default Title' ? ` (${selectedVariant})` : ''} has been added to your cart.`
     });
   };
   
@@ -488,12 +488,17 @@ export const ProductDetailPage: React.FC = () => {
   
   // Get current variant name for label
   const getCurrentVariantName = () => {
+    let name = selectedVariant;
+    
     // First check if current image is linked to a variant
     if (product.imageVariants && product.imageVariants[selectedImageIndex]?.variantName) {
-      return product.imageVariants[selectedImageIndex].variantName;
+      name = product.imageVariants[selectedImageIndex].variantName;
     }
-    // Fallback to selected variant
-    return selectedVariant;
+    
+    // Don't show "Default Title" as a variant name
+    if (name === 'Default Title') return null;
+    
+    return name;
   };
 
   const handleBuyNow = () => {
@@ -679,7 +684,7 @@ export const ProductDetailPage: React.FC = () => {
               )}
 
               {/* Variant Selector */}
-              {product.variants && product.variants.length > 0 && (
+              {product.variants && product.variants.length > 0 && !(product.variants.length === 1 && product.variants[0].name === 'Default Title') && (
                 <div className="mb-8">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-sm font-semibold text-gray-900">
