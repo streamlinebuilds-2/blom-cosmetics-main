@@ -130,6 +130,38 @@ export const ShopPage: React.FC = () => {
   // Fetch products
   useEffect(() => {
     async function loadDbProducts() {
+      const loadFallbackProducts = async () => {
+        const res = await fetch('/content/products/index.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Failed to load fallback products: ${res.status}`);
+        const list = await res.json();
+        const mapped = (Array.isArray(list) ? list : [])
+          .filter((p: any) => p && (p.status || 'active') === 'active')
+          .map((p: any) => ({
+            id: p.slug,
+            name: p.title,
+            slug: p.slug,
+            categories: [p.category].filter(Boolean),
+            price: typeof p.price === 'number' ? p.price : Number(p.price ?? 0),
+            compareAtPrice: typeof p.compareAt === 'number' ? p.compareAt : (p.compareAt ? Number(p.compareAt) : null),
+            stock: p.stockStatus === 'In Stock' ? 999 : 0,
+            inStock: p.stockStatus === 'In Stock' && p.price !== -1,
+            shortDescription: p.shortDescription || '',
+            description: '',
+            images: Array.isArray(p.images) && p.images.length > 0 ? p.images : [p.thumbnail].filter(Boolean),
+            variants: [],
+            rating: p.rating || 0,
+            reviews: p.reviews || 0,
+            badges: Array.isArray(p.badges) ? p.badges : []
+          }));
+
+        setDisplayProducts(mapped);
+
+        const max = Math.max(...mapped.map((p: any) => p.price), 2000);
+        const roundedMax = Math.ceil(max / 100) * 100;
+        setMaxPrice(roundedMax);
+        setPriceRange([0, roundedMax]);
+      };
+
       try {
         const { data: products, error: productsError } = await supabase
           .from('products')
@@ -144,10 +176,7 @@ export const ShopPage: React.FC = () => {
           .order('name', { ascending: true });
 
         if (productsError && bundlesError) {
-          console.warn('Using static products due to DB error');
-          // In a real scenario, we'd use staticProducts here, but for this rewrite assuming DB works or empty array
-          setDisplayProducts([]); 
-          setLoading(false);
+          await loadFallbackProducts();
           return;
         }
 
@@ -229,6 +258,11 @@ export const ShopPage: React.FC = () => {
         }));
 
         const combined = [...mappedProducts, ...mappedBundles];
+        if (combined.length === 0) {
+          await loadFallbackProducts();
+          return;
+        }
+
         setDisplayProducts(combined);
 
         // Calculate max price for slider
@@ -237,7 +271,11 @@ export const ShopPage: React.FC = () => {
         setPriceRange([0, Math.ceil(max / 100) * 100]);
 
       } catch (err) {
-        console.error(err);
+        try {
+          await loadFallbackProducts();
+        } catch {
+          console.error(err);
+        }
       } finally {
         setLoading(false);
       }
