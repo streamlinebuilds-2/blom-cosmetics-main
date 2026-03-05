@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from './Container';
 import { Button } from '../ui/Button';
-import { User, Menu, X, ShoppingBag, Heart } from 'lucide-react';
+import { User, Menu, X, ShoppingBag, Heart, Minus, Plus, ChevronDown } from 'lucide-react';
 import { CartButton } from '../cart/CartButton';
 import { WishlistButton } from '../wishlist/WishlistButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
@@ -16,6 +16,18 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolledDown, setIsScrolledDown] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  
+  // Mobile Accordion State
+  const [expandedMobileItems, setExpandedMobileItems] = useState<Record<string, boolean>>({
+    'blom-cosmetics': true // Default open as per image style suggestion
+  });
+
+  const toggleMobileItem = (id: string) => {
+    setExpandedMobileItems(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,25 +74,51 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   };
 
   const navigationItems = [
+    { name: 'Home', href: '/' },
+    { name: 'Shop', href: '/shop' },
+    { name: 'Courses & Blog', href: '/courses' },
+    { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' }
+  ];
+
+  // Custom Mobile Navigation Structure matching image_1
+  const mobileNavigationItems = [
+    // Top Section
+    { name: 'Efiles and Bits', href: '/shop#tools-essentials' },
+    { name: 'Nail Art', href: '/shop#nail-art' }, // Assuming nail-art category exists or mapped
+    { name: 'Preps and Finishes', href: '/shop#prep-finishing' },
+    { name: 'Training', href: '/courses' },
+    
+    // Divider
+    { type: 'divider' },
+    
+    // Groups
     {
-      name: 'Home',
-      href: '/'
+      id: 'blom-cosmetics',
+      name: 'BLOM COSMETICS',
+      type: 'group',
+      items: [
+        { name: 'Shop All', href: '/shop' },
+        { name: 'Acrylic', href: '/shop#acrylic-system' },
+        { name: 'Colour Acrylic', href: '/shop#acrylic-system' },
+        { name: 'Gel', href: '/shop#gel-system' },
+        { name: 'Files and Buffers', href: '/shop#tools-essentials' },
+        { name: 'Efiles and Bits', href: '/shop#tools-essentials' },
+        { name: 'Nail Art', href: '/shop#nail-art' },
+        { name: 'Preps and Finishes', href: '/shop#prep-finishing' }
+      ]
     },
+    { type: 'divider' },
     {
-      name: 'Shop',
-      href: '/shop'
-    },
-    {
-      name: 'Courses & Blog',
-      href: '/courses'
-    },
-    {
-      name: 'About',
-      href: '/about'
-    },
-    {
-      name: 'Contact',
-      href: '/contact'
+      id: 'nele',
+      name: 'NELE',
+      type: 'group',
+      items: [
+        { name: 'Shop All', href: '/shop' },
+        { name: 'Acrylic Gel', href: '/shop' },
+        { name: 'Colour Gel', href: '/shop' },
+        { name: 'Nail Couture Sculpting Gel', href: '/shop' }
+      ]
     }
   ];
 
@@ -149,63 +187,14 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
-                      
-                      {/* Pink underline stripe - only on hover */}
                       <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-pink-400 transition-all duration-200 opacity-0 group-hover:opacity-100"></span>
-                      
-                      {/* Light pink highlight background - behind text */}
                       <span className={`absolute inset-0 bg-pink-50 rounded-md transition-all duration-200 -z-10 ${
                         isActive ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
                       }`}></span>
                     </a>
-
-                  {/* Dropdown/Mega Menu */}
-                  {(item.dropdown || item.megaMenu) && (
-                    <div className="absolute top-full left-0 mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                      {item.dropdown && (
-                        <div className="bg-white rounded-lg shadow-lg border py-2 min-w-48">
-                          {item.dropdown.map((subItem) => (
-                            <a
-                              key={subItem.name}
-                              href={subItem.href}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-pink-50 hover:text-pink-400"
-                            >
-                              {subItem.name}
-                            </a>
-                          ))}
-                        </div>
-                      )}
-
-                      {item.megaMenu && (
-                        <div className="bg-white rounded-lg shadow-lg border p-6 w-96 lg:w-[800px]">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-                            {item.megaMenu.columns.map((column) => (
-                              <div key={column.title}>
-                                <h4 className="font-semibold text-gray-900 mb-3">
-                                  {column.title}
-                                </h4>
-                                <ul className="space-y-2">
-                                  {column.items.map((subItem) => (
-                                    <li key={subItem.name}>
-                                      <a
-                                        href={subItem.href}
-                                        className="text-sm text-gray-600 hover:text-pink-400 transition-colors"
-                                      >
-                                        {subItem.name}
-                                      </a>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
             </nav>
 
             {/* Action Icons - Right side */}
@@ -215,11 +204,9 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                 className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
-                  // Check authentication state properly
                   try {
-                    // Check for Supabase session in localStorage
-            const baseUrl = (import.meta as any).env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL || '';
-            const supabaseSession = localStorage.getItem('sb-' + baseUrl.split('//')[1]?.split('.')[0] + '-auth-token');
+                    const baseUrl = (import.meta as any).env.VITE_SUPABASE_URL || (import.meta as any).env.SUPABASE_URL || (import.meta as any).env.SUPABASE_DATABASE_URL || '';
+                    const supabaseSession = localStorage.getItem('sb-' + baseUrl.split('//')[1]?.split('.')[0] + '-auth-token');
                     const hasSession = supabaseSession || document.cookie.includes('sb-');
                     
                     if (!hasSession) {
@@ -228,7 +215,6 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                       window.location.assign('/account');
                     }
                   } catch {
-                    // Fallback: let the account page handle auth check
                     window.location.assign('/account');
                   }
                 }}
@@ -246,81 +232,73 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
         {showMobileMenu && (
           <div
             id="mobile-menu"
-            className={`lg:hidden border-t bg-white shadow-lg overflow-hidden transition-all duration-300 ease-out ${
-              isMobileMenuOpen ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
+            className={`lg:hidden border-t bg-white shadow-lg overflow-hidden transition-all duration-300 ease-out fixed inset-0 top-[105px] z-40 overflow-y-auto ${
+              isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
+            style={{ height: 'calc(100vh - 105px)' }} // Adjust based on header height
             aria-hidden={!isMobileMenuOpen}
           >
-            <Container>
-              <div className="py-6 space-y-1">
-                {navigationItems.map((item) => {
-                  const isActive = currentPath === item.href;
-                  return (
-                    <div key={item.name}>
-                      <a
-                        href={item.href}
-                        className={`block py-3 px-4 font-medium rounded-lg transition-all duration-200 relative ${
-                          isActive 
-                            ? 'text-gray-900' 
-                            : 'text-gray-700 hover:text-gray-900'
-                        }`}
-                        style={{
-                          backgroundColor: isActive ? '#CEE5FF' : 'transparent'
-                        }}
-                        onClick={(e) => handleNavClick(e, item.href)}
-                      >
-                        {item.name}
+            <div className="bg-white h-full pb-20">
+              <div className="py-2">
+                {mobileNavigationItems.map((item, index) => {
+                  if (item.type === 'divider') {
+                    return <div key={`div-${index}`} className="border-t border-gray-100 my-2" />;
+                  }
+
+                  if (item.type === 'group' && item.items) {
+                    const isExpanded = expandedMobileItems[item.id!];
+                    return (
+                      <div key={item.id} className="py-2">
+                        <button 
+                          onClick={() => toggleMobileItem(item.id!)}
+                          className="flex items-center justify-between w-full px-6 py-2 text-left"
+                        >
+                          <span className="font-bold text-black text-sm tracking-wider">{item.name}</span>
+                          {isExpanded ? <Minus className="w-4 h-4 text-gray-900" /> : <Plus className="w-4 h-4 text-gray-900" />}
+                        </button>
                         
-                        {/* Pink underline stripe for mobile - only on hover */}
-                        <span className="absolute bottom-0 left-4 right-4 h-0.5 bg-pink-400 transition-all duration-200 opacity-0 group-hover:opacity-100"></span>
-                        
-                        {/* Light pink highlight background - behind text for mobile */}
-                        <span className={`absolute inset-0 bg-pink-50 rounded-lg transition-all duration-200 -z-10 ${
-                          isActive ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
-                        }`}></span>
-                      </a>
-                      
-                      {item.dropdown && (
-                      <div className="pl-6 space-y-1">
-                        {item.dropdown.map((subItem) => (
-                          <a
-                            key={subItem.name}
-                            href={subItem.href}
-                            className="block py-2 text-sm text-gray-600 hover:text-pink-400 hover:bg-pink-50 rounded-lg transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            {subItem.name}
-                          </a>
-                        ))}
+                        {isExpanded && (
+                          <div className="bg-white">
+                            {item.items.map((subItem, subIndex) => (
+                              <a
+                                key={subIndex}
+                                href={subItem.href}
+                                className="block py-2 px-10 text-gray-600 text-sm hover:text-black transition-colors"
+                                onClick={(e) => handleNavClick(e, subItem.href)}
+                              >
+                                {subItem.name}
+                              </a>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    );
+                  }
+
+                  return (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      className="block py-3 px-6 text-black text-sm font-medium hover:bg-gray-50 transition-colors"
+                      onClick={(e) => handleNavClick(e, item.href!)}
+                    >
+                      {item.name}
+                    </a>
                   );
                 })}
-
-                {/* Mobile Contact Info */}
-                <div className="pt-6 border-t mt-6 bg-gray-50 -mx-4 px-4 py-4 rounded-lg">
-                  <h4 className="font-semibold text-gray-900 mb-3">Contact Info</h4>
-                  <div className="space-y-2">
-                    <ClickableContact 
-                      type="email" 
-                      value="shopblomcosmetics@gmail.com" 
-                      className="text-sm text-gray-600"
-                    />
-                    <ClickableContact 
-                      type="phone" 
-                      value="+27 79 548 3317" 
-                      className="text-sm text-gray-600"
-                    />
-                  </div>
-                </div>
               </div>
-            </Container>
+              
+              {/* Footer Links in Menu */}
+              <div className="border-t border-gray-100 mt-4 pt-4 px-6 pb-8">
+                 <div className="flex flex-col space-y-3">
+                    <a href="/login" className="text-gray-500 text-sm">Log in</a>
+                    <a href="/signup" className="text-gray-500 text-sm">Create account</a>
+                 </div>
+              </div>
+            </div>
           </div>
         )}
       </header>
     </>
   );
 };
-
-
