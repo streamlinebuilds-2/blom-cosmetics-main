@@ -254,6 +254,7 @@ export const ProductDetailPage: React.FC = () => {
           });
           
           // Use a callback to set product state to avoid stale closure issues
+          // Ensure we don't set state if the component is unmounted
           setProduct(processedProduct);
           setSelectedImageIndex(0);
           
@@ -267,11 +268,16 @@ export const ProductDetailPage: React.FC = () => {
           let related: any[] = [];
           
           // First try to get products from same category
-          if (productSource === 'products' && resolvedProductData.category) {
+          // Ensure category is a string for the query
+          const categoryForQuery = Array.isArray(resolvedProductData.category) 
+            ? resolvedProductData.category[0] 
+            : resolvedProductData.category;
+
+          if (productSource === 'products' && categoryForQuery) {
             const { data: categoryRelated } = await supabase
               .from('products')
               .select('*')
-              .eq('category', resolvedProductData.category)
+              .eq('category', categoryForQuery)
               .neq('id', resolvedProductData.id)
               .eq('status', 'active')
               .limit(4);
