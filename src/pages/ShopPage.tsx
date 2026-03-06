@@ -110,6 +110,8 @@ export const ShopPage: React.FC = () => {
       'Collection': 'bundle-deals',
       'Collections': 'bundle-deals',
       'Acrylic System': 'acrylic-system',
+      'Core Acrylics': 'core-acrylics',
+      'Coloured Acrylics': 'coloured-acrylics',
       'Prep & Finish': 'prep-finishing',
       'Prep & Finishing': 'prep-finishing',
       'Gel System': 'gel-system',
@@ -209,8 +211,10 @@ export const ShopPage: React.FC = () => {
         }
 
         const mappedProducts = (products || []).map((p: any) => {
-          const joinedCategorySlug = p.product_categories?.[0]?.category?.slug;
-          const categoryLower = (p.category || categoryById[p.category_id]?.slug || joinedCategorySlug || '').toString().toLowerCase();
+          const joinedCategorySlugs = (Array.isArray(p.product_categories) ? p.product_categories : [])
+            .map((pc: any) => pc?.category?.slug)
+            .filter(Boolean);
+          const categoryLower = (p.category || categoryById[p.category_id]?.slug || joinedCategorySlugs[0] || '').toString().toLowerCase();
           const explicitBundleDeal = categoryLower.includes('bundle'); 
           const isBundleOrCollection = explicitBundleDeal || 
             (p.product_type || '').toLowerCase() === 'collection' ||
@@ -235,9 +239,14 @@ export const ShopPage: React.FC = () => {
              };
           }
           
-          const rawCategory = p.category || categoryById[p.category_id]?.slug || joinedCategorySlug || 'all';
+          const rawCategory = p.category || categoryById[p.category_id]?.slug || joinedCategorySlugs[0] || 'all';
           const baseCategory = normalizeCategoryToSlug(rawCategory);
-          const categories = [baseCategory];
+          const categories = Array.from(
+            new Set([
+              baseCategory,
+              ...joinedCategorySlugs.map((s: any) => normalizeCategoryToSlug(String(s)))
+            ].filter(Boolean))
+          );
           const productNameLower = (p.name || '').toLowerCase();
 
           if (productNameLower.includes('brush') || productNameLower.includes('file') || productNameLower.includes('form')) {

@@ -267,21 +267,25 @@ export const ProductDetailPage: React.FC = () => {
           // Fetch related products (same category, or fallback to any active products)
           let related: any[] = [];
           
-          // First try to get products from same category
-          // Ensure category is a string for the query
-          const categoryForQuery = Array.isArray(resolvedProductData.category) 
-            ? resolvedProductData.category[0] 
+          const categoryIdForQuery = resolvedProductData.category_id;
+          const categoryForQuery = Array.isArray(resolvedProductData.category)
+            ? resolvedProductData.category[0]
             : resolvedProductData.category;
 
-          if (productSource === 'products' && categoryForQuery) {
-            const { data: categoryRelated } = await supabase
+          if (productSource === 'products') {
+            const baseQuery = supabase
               .from('products')
               .select('*')
-              .eq('category', categoryForQuery)
               .neq('id', resolvedProductData.id)
-              .eq('status', 'active')
+              .in('status', ['active', 'published'])
               .limit(4);
-            
+
+            const { data: categoryRelated } = categoryIdForQuery
+              ? await baseQuery.eq('category_id', categoryIdForQuery)
+              : categoryForQuery
+                ? await baseQuery.eq('category', categoryForQuery)
+                : await baseQuery;
+
             if (categoryRelated && categoryRelated.length > 0) {
               related = categoryRelated;
             }
@@ -292,7 +296,7 @@ export const ProductDetailPage: React.FC = () => {
             const otherProductsQuery = supabase
               .from('products')
               .select('*')
-              .eq('status', 'active')
+              .in('status', ['active', 'published'])
               .limit(4 - related.length);
 
             const { data: otherProducts } = productSource === 'products'
