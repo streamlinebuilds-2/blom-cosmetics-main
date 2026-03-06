@@ -133,7 +133,8 @@ export const ShopPage: React.FC = () => {
             variants: [],
             rating: p.rating || 0,
             reviews: p.reviews || 0,
-            badges: Array.isArray(p.badges) ? p.badges : []
+            badges: Array.isArray(p.badges) ? p.badges : [],
+            createdAt: p.createdAt || new Date().toISOString()
           }));
 
         return mapped;
@@ -236,9 +237,32 @@ export const ShopPage: React.FC = () => {
           }
           if (productNameLower.includes('acrylic') || productNameLower.includes('monomer') || productNameLower.includes('liquid')) {
             if (!categories.includes('acrylic-system')) categories.push('acrylic-system');
+            
+            // Subcategory Logic
+            const isCore = productNameLower.includes('clear') || 
+                          productNameLower.includes('pink') || 
+                          productNameLower.includes('white') || 
+                          productNameLower.includes('cover') || 
+                          productNameLower.includes('monomer') || 
+                          productNameLower.includes('liquid');
+                          
+            const isColoured = productNameLower.includes('colour') || 
+                              productNameLower.includes('color') || 
+                              productNameLower.includes('collection') || 
+                              productNameLower.includes('glitter') ||
+                              productNameLower.includes('neon') ||
+                              productNameLower.includes('pastel');
+
+            if (isCore && !categories.includes('core-acrylics')) categories.push('core-acrylics');
+            if (isColoured && !categories.includes('coloured-acrylics')) categories.push('coloured-acrylics');
+            // Fallback: if in acrylic system but not identified as coloured, default to core if it looks like a basic powder? 
+            // For now, let's stick to explicit matches.
           }
           if (productNameLower.includes('gel') || productNameLower.includes('top coat') || productNameLower.includes('base coat')) {
-            if (!categories.includes('gel-system')) categories.push('gel-system');
+            // Exclude furniture/racks from Gel System
+            if (!productNameLower.includes('rack') && !productNameLower.includes('furniture') && !productNameLower.includes('garden')) {
+               if (!categories.includes('gel-system')) categories.push('gel-system');
+            }
           }
 
           return {
@@ -254,7 +278,8 @@ export const ShopPage: React.FC = () => {
             description: p.description || '',
             images: [p.thumbnail_url, p.hover_image, ...(p.gallery_urls || [])].filter(Boolean),
             variants: Array.isArray(p.variants) ? p.variants : [],
-            rating: 0, reviews: 0, badges: p.badges || []
+            rating: 0, reviews: 0, badges: p.badges || [],
+            createdAt: p.created_at || new Date().toISOString()
           };
         });
 
@@ -272,7 +297,8 @@ export const ShopPage: React.FC = () => {
             images: Array.isArray(bundle.images) ? bundle.images : [bundle.image_url].filter(Boolean),
             variants: [],
             rating: 0, reviews: 0, badges: bundle.badges || [],
-            isBundle: true
+            isBundle: true,
+            createdAt: bundle.created_at || new Date().toISOString()
         }));
 
         const combined = [...mappedProducts, ...mappedBundles];
@@ -328,12 +354,17 @@ export const ShopPage: React.FC = () => {
     cats.set('all', { name: 'All Products', slug: 'all', count: displayProducts.length });
 
     const priorityOrder = [
-      'acrylic-system', 'prep-finishing', 'bundle-deals', 'gel-system', 'tools-essentials', 'furniture'
+      'acrylic-system', 
+      'core-acrylics',
+      'coloured-acrylics',
+      'prep-finishing', 'bundle-deals', 'gel-system', 'tools-essentials', 'furniture'
     ];
     
     const categoryNameOverrides: Record<string, string> = {
       'prep-finishing': 'Prep & Finishing',
-      'tools-essentials': 'Tools & Essentials'
+      'tools-essentials': 'Tools & Essentials',
+      'core-acrylics': 'Core Acrylics',
+      'coloured-acrylics': 'Coloured Acrylics'
     };
     
     // Process priority order
@@ -405,7 +436,8 @@ export const ShopPage: React.FC = () => {
         case 'name-desc': return b.name.localeCompare(a.name);
         case 'price-low': return a.price - b.price;
         case 'price-high': return b.price - a.price;
-        // Add other sort logic if needed
+        case 'date-old': return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+        case 'date-new': return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
         default: return 0; // featured
       }
     });
@@ -534,21 +566,39 @@ export const ShopPage: React.FC = () => {
                 <div>
                   <h3 className="font-bold text-lg mb-4">Categories</h3>
                   <div className="space-y-2">
-                    {productCategories.map(cat => (
-                      <div 
-                        key={cat.slug}
-                        className={`cursor-pointer text-sm ${selectedCategory === cat.slug ? 'font-bold text-pink-600' : 'text-gray-600 hover:text-gray-900'}`}
-                        onClick={() => setSelectedCategory(cat.slug)}
-                      >
-                        {cat.name} ({cat.count})
-                      </div>
-                    ))}
+                    {productCategories.map(cat => {
+                      const isSub = cat.slug === 'core-acrylics' || cat.slug === 'coloured-acrylics';
+                      // Only show subcategories if Acrylic System has products or if they have products themselves
+                      if (isSub && cat.count === 0) return null;
+                      
+                      return (
+                        <div 
+                          key={cat.slug}
+                          className={`cursor-pointer text-sm flex justify-between items-center group ${
+                            selectedCategory === cat.slug 
+                              ? 'font-bold text-pink-600' 
+                              : 'text-gray-600 hover:text-gray-900'
+                          } ${isSub ? 'pl-4 border-l-2 border-transparent hover:border-pink-200' : ''}`}
+                          onClick={() => setSelectedCategory(cat.slug)}
+                        >
+                          <span className={isSub ? '' : 'font-medium'}>{cat.name}</span>
+                          <span className={`text-xs ${selectedCategory === cat.slug ? 'text-pink-400' : 'text-gray-400 group-hover:text-gray-500'}`}>
+                            ({cat.count})
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
                 {/* Desktop Price Filter */}
                 <div>
-                  <h3 className="font-bold text-lg mb-4">Price</h3>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-bold text-lg">Price</h3>
+                    <span className="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded-full">
+                      {activeResultsCount} found
+                    </span>
+                  </div>
                   <RangeSlider 
                     min={0} 
                     max={maxPrice} 
@@ -636,6 +686,11 @@ export const ShopPage: React.FC = () => {
                 
                 {expandedFilterSection === 'price' && (
                   <div className="px-2 pb-2">
+                    <div className="flex justify-end mb-2">
+                      <span className="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded-full">
+                        {activeResultsCount} found
+                      </span>
+                    </div>
                     <RangeSlider 
                       min={0} 
                       max={maxPrice} 
