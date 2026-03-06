@@ -185,12 +185,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           `}
           onClick={handleCardClick}
         >
-          <div className="relative aspect-[9/16] overflow-hidden bg-gray-50">
+          <div className="relative aspect-square overflow-hidden bg-gray-50">
             <OptimizedImage
               src={safeImages[0]}
               alt={safeName}
               width={500}
-              height={889}
+              height={500}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
 
@@ -262,17 +262,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         `}
         onClick={handleCardClick}
       >
-        {/* 1920x1080 Aspect Ratio Image Area (16:9 vertical or 9:16?) User said "longer instead of square" which implies portrait 9:16 usually, but "1920x1080" is landscape. 
-            However, "longer" usually means tall in mobile/web context. 
-            Let's assume Portrait (9:16) for "longer". If they meant landscape 16:9, it would be shorter.
-            "make them longer" -> taller -> 9:16 aspect ratio.
-        */}
-        <div className="relative aspect-[9/16] overflow-hidden bg-gray-50">
+
+        <div className="relative aspect-square overflow-hidden bg-gray-50">
           <OptimizedImage
             src={safeImages[0]}
             alt={safeName}
             width={500}
-            height={889}
+            height={500}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           
