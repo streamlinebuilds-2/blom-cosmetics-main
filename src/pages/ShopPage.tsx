@@ -368,10 +368,10 @@ export const ShopPage: React.FC = () => {
       'acrylic-system', 
       'core-acrylics',
       'coloured-acrylics',
+      'bundle-deals', 
       'gel-system', 
       'prep-finishing', 
       'tools-essentials', 
-      'bundle-deals', 
       'furniture'
     ];
     
