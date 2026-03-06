@@ -65,11 +65,10 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const shopCategories = [
     { name: 'Shop All', href: '/shop' },
     { name: 'Acrylic System', href: '/shop?category=acrylic-system' },
+    { name: 'Bundle Deals', href: '/shop?category=bundle-deals' },
     { name: 'Gel System', href: '/shop?category=gel-system' },
     { name: 'Prep & Finishing', href: '/shop?category=prep-finishing' },
     { name: 'Tools & Essentials', href: '/shop?category=tools-essentials' },
-    { name: 'Nail Art', href: '/shop?category=nail-art' },
-    { name: 'Bundle Deals', href: '/shop?category=bundle-deals' },
     { name: 'Furniture', href: '/shop?category=furniture' }
   ];
 

@@ -57,6 +57,17 @@ export const ShopPage: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showSort, setShowSort] = useState(false);
   const [expandedFilterSection, setExpandedFilterSection] = useState<string | null>('price');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  // Auto-expand Acrylic System if a subcategory is selected
+  useEffect(() => {
+    if (selectedCategory === 'core-acrylics' || selectedCategory === 'coloured-acrylics') {
+      setExpandedCategories(prev => {
+        if (!prev.includes('acrylic-system')) return [...prev, 'acrylic-system'];
+        return prev;
+      });
+    }
+  }, [selectedCategory]);
 
   const [displayProducts, setDisplayProducts] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -357,14 +368,19 @@ export const ShopPage: React.FC = () => {
       'acrylic-system', 
       'core-acrylics',
       'coloured-acrylics',
-      'prep-finishing', 'bundle-deals', 'gel-system', 'tools-essentials', 'furniture'
+      'bundle-deals', 
+      'gel-system', 
+      'prep-finishing', 
+      'tools-essentials', 
+      'furniture'
     ];
     
     const categoryNameOverrides: Record<string, string> = {
       'prep-finishing': 'Prep & Finishing',
       'tools-essentials': 'Tools & Essentials',
       'core-acrylics': 'Core Acrylics',
-      'coloured-acrylics': 'Coloured Acrylics'
+      'coloured-acrylics': 'Coloured Acrylics',
+      'bundle-deals': 'Bundle Deals'
     };
     
     // Process priority order
@@ -567,21 +583,92 @@ export const ShopPage: React.FC = () => {
                   <h3 className="font-bold text-lg mb-4">Categories</h3>
                   <div className="space-y-2">
                     {productCategories.map(cat => {
-                      const isSub = cat.slug === 'core-acrylics' || cat.slug === 'coloured-acrylics';
-                      // Only show subcategories if Acrylic System has products or if they have products themselves
-                      if (isSub && cat.count === 0) return null;
+                      // Skip if subcategory (will be rendered by parent)
+                      if (cat.slug === 'core-acrylics' || cat.slug === 'coloured-acrylics') return null;
+
+                      // Special handling for Acrylic System (Parent)
+                      if (cat.slug === 'acrylic-system') {
+                        const isExpanded = expandedCategories.includes('acrylic-system');
+                        const core = productCategories.find(c => c.slug === 'core-acrylics');
+                        const coloured = productCategories.find(c => c.slug === 'coloured-acrylics');
+                        const hasChildren = (core && core.count > 0) || (coloured && coloured.count > 0);
+
+                        return (
+                          <div key={cat.slug} className="flex flex-col mb-1">
+                            <div 
+                              className={`cursor-pointer text-sm flex justify-between items-center group py-1.5 ${
+                                selectedCategory === cat.slug 
+                                  ? 'font-bold text-pink-600' 
+                                  : 'text-gray-600 hover:text-gray-900'
+                              }`}
+                              onClick={() => {
+                                setSelectedCategory(cat.slug);
+                                setExpandedCategories(prev => 
+                                  prev.includes('acrylic-system') 
+                                    ? prev.filter(c => c !== 'acrylic-system') 
+                                    : [...prev, 'acrylic-system']
+                                );
+                              }}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{cat.name}</span>
+                                {hasChildren && (
+                                  <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                                )}
+                              </div>
+                              <span className={`text-xs ${selectedCategory === cat.slug ? 'text-pink-400' : 'text-gray-400 group-hover:text-gray-500'}`}>
+                                ({cat.count})
+                              </span>
+                            </div>
+
+                            {/* Subcategories Dropdown */}
+                            {isExpanded && hasChildren && (
+                              <div className="flex flex-col gap-1 mt-1 ml-3 pl-3 border-l-2 border-gray-100 animate-in slide-in-from-top-1 duration-200">
+                                {core && core.count > 0 && (
+                                  <div 
+                                    className={`cursor-pointer text-sm flex justify-between items-center py-1 hover:text-pink-500 ${
+                                      selectedCategory === core.slug ? 'font-bold text-pink-600' : 'text-gray-500'
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedCategory(core.slug);
+                                    }}
+                                  >
+                                    <span>{core.name}</span>
+                                    <span className="text-xs text-gray-400">({core.count})</span>
+                                  </div>
+                                )}
+                                {coloured && coloured.count > 0 && (
+                                  <div 
+                                    className={`cursor-pointer text-sm flex justify-between items-center py-1 hover:text-pink-500 ${
+                                      selectedCategory === coloured.slug ? 'font-bold text-pink-600' : 'text-gray-500'
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setSelectedCategory(coloured.slug);
+                                    }}
+                                  >
+                                    <span>{coloured.name}</span>
+                                    <span className="text-xs text-gray-400">({coloured.count})</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
                       
                       return (
                         <div 
                           key={cat.slug}
-                          className={`cursor-pointer text-sm flex justify-between items-center group ${
+                          className={`cursor-pointer text-sm flex justify-between items-center group py-1.5 ${
                             selectedCategory === cat.slug 
                               ? 'font-bold text-pink-600' 
                               : 'text-gray-600 hover:text-gray-900'
-                          } ${isSub ? 'pl-4 border-l-2 border-transparent hover:border-pink-200' : ''}`}
+                          }`}
                           onClick={() => setSelectedCategory(cat.slug)}
                         >
-                          <span className={isSub ? '' : 'font-medium'}>{cat.name}</span>
+                          <span className="font-medium">{cat.name}</span>
                           <span className={`text-xs ${selectedCategory === cat.slug ? 'text-pink-400' : 'text-gray-400 group-hover:text-gray-500'}`}>
                             ({cat.count})
                           </span>
