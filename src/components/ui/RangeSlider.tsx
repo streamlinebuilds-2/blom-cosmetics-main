@@ -43,14 +43,15 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
         {`
           .range-slider-thumb {
             -webkit-appearance: none;
-            pointer-events: all;
-            width: 24px;
+            pointer-events: none;
+            width: 100%;
             height: 24px;
             -webkit-tap-highlight-color: transparent;
             z-index: 30;
-            position: relative;
+            position: absolute;
             outline: none;
             cursor: pointer;
+            background: transparent;
           }
           .range-slider-thumb::-webkit-slider-thumb {
             -webkit-appearance: none;
@@ -60,7 +61,9 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
             border-radius: 50%;
             background: #ec4899;
             cursor: pointer;
-            pointer-events: all;
+            pointer-events: auto;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
           }
           .range-slider-thumb::-moz-range-thumb {
             width: 24px;
@@ -68,12 +71,25 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
             border-radius: 50%;
             background: #ec4899;
             cursor: pointer;
-            pointer-events: all;
-            border: none;
+            pointer-events: auto;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
           }
         `}
       </style>
-      <div className="relative w-full h-6 mb-8">
+      <div className="relative w-full h-8 mb-6 flex items-center">
+        {/* Track Background */}
+        <div className="absolute w-full h-2 bg-gray-200 rounded-full"></div>
+        
+        {/* Active Range Track */}
+        <div
+          className="absolute h-2 bg-pink-500 rounded-full z-10"
+          style={{
+            left: `${getPercent(localValue[0])}%`,
+            width: `${getPercent(localValue[1]) - getPercent(localValue[0])}%`,
+          }}
+        />
+
         <input
           type="range"
           min={min}
@@ -81,8 +97,7 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           step={step}
           value={localValue[0]}
           onChange={handleMinChange}
-          className="absolute pointer-events-none appearance-none z-20 h-2 w-full bg-transparent cursor-pointer range-slider-thumb"
-          style={{ zIndex: localValue[0] > max - 100 ? 50 : 30 }} 
+          className="range-slider-thumb z-20"
         />
         <input
           type="range"
@@ -91,19 +106,8 @@ export const RangeSlider: React.FC<RangeSliderProps> = ({
           step={step}
           value={localValue[1]}
           onChange={handleMaxChange}
-          className="absolute pointer-events-none appearance-none z-20 h-2 w-full bg-transparent cursor-pointer range-slider-thumb"
-          style={{ zIndex: 40 }}
+          className="range-slider-thumb z-30"
         />
-
-        <div className="relative w-full h-1 bg-gray-200 rounded-full top-3">
-          <div
-            className="absolute h-1 bg-pink-500 rounded-full"
-            style={{
-              left: `${getPercent(localValue[0])}%`,
-              width: `${getPercent(localValue[1]) - getPercent(localValue[0])}%`,
-            }}
-          />
-        </div>
       </div>
 
       <div className="flex items-center justify-between gap-4">
