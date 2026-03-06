@@ -241,7 +241,7 @@ export const ShopPage: React.FC = () => {
           
           const rawCategory = p.category || categoryById[p.category_id]?.slug || joinedCategorySlugs[0] || 'all';
           const baseCategory = normalizeCategoryToSlug(rawCategory);
-          const categories = Array.from(
+          let categories = Array.from(
             new Set([
               baseCategory,
               ...joinedCategorySlugs.map((s: any) => normalizeCategoryToSlug(String(s)))
@@ -249,31 +249,49 @@ export const ShopPage: React.FC = () => {
           );
           const productNameLower = (p.name || '').toLowerCase();
 
+          const isSizedNailLiquid =
+            productNameLower.includes('nail liquid') &&
+            (productNameLower.includes('250ml') || productNameLower.includes('500ml'));
+
           if (productNameLower.includes('brush') || productNameLower.includes('file') || productNameLower.includes('form')) {
             if (!categories.includes('tools-essentials')) categories.push('tools-essentials');
           }
           if (productNameLower.includes('prep') || productNameLower.includes('primer') || productNameLower.includes('dehydrator')) {
             if (!categories.includes('prep-finishing')) categories.push('prep-finishing');
           }
-          if (productNameLower.includes('acrylic') || productNameLower.includes('monomer') || productNameLower.includes('liquid')) {
+
+          if (isSizedNailLiquid) {
+            if (!categories.includes('prep-finishing')) categories.push('prep-finishing');
+            categories = categories.filter(
+              (c) => c !== 'acrylic-system' && c !== 'core-acrylics' && c !== 'coloured-acrylics'
+            );
+          }
+
+          if (!isSizedNailLiquid && (productNameLower.includes('acrylic') || productNameLower.includes('monomer') || productNameLower.includes('liquid'))) {
             if (!categories.includes('acrylic-system')) categories.push('acrylic-system');
             
             // Subcategory Logic
-            const isCore = productNameLower.includes('clear') || 
+            const isExplicitColouredAcrylic =
+              productNameLower.includes('colour acrylic') ||
+              productNameLower.includes('color acrylic') ||
+              productNameLower.includes('colour acrylics') ||
+              productNameLower.includes('color acrylics');
+
+            const isCore = !isExplicitColouredAcrylic && (productNameLower.includes('clear') || 
                           productNameLower.includes('pink') || 
                           productNameLower.includes('white') || 
                           productNameLower.includes('cover') || 
                           productNameLower.includes('monomer') || 
-                          productNameLower.includes('liquid');
+                          productNameLower.includes('liquid'));
                           
-            const isColoured = productNameLower.includes('colour') || 
+            const isColoured = isExplicitColouredAcrylic || productNameLower.includes('colour') || 
                               productNameLower.includes('color') || 
                               productNameLower.includes('collection') || 
                               productNameLower.includes('glitter') ||
                               productNameLower.includes('neon') ||
                               productNameLower.includes('pastel');
 
-            if (isCore && !categories.includes('core-acrylics')) categories.push('core-acrylics');
+            if (isCore && !isColoured && !categories.includes('core-acrylics')) categories.push('core-acrylics');
             if (isColoured && !categories.includes('coloured-acrylics')) categories.push('coloured-acrylics');
             // Fallback: if in acrylic system but not identified as coloured, default to core if it looks like a basic powder? 
             // For now, let's stick to explicit matches.
