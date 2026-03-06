@@ -197,6 +197,45 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                         >
                           <div className="py-2">
                             {shopCategories.map((subItem, subIndex) => {
+                              // Special handling for Acrylic System with collapsible logic
+                              if (subItem.name === 'Acrylic System') {
+                                const isAcrylicExpanded = true; // For now keep it expanded or manage with state if preferred. 
+                                // To make it collapsible, we'd need another state variable.
+                                // Given the user request is just "open up subcategories", showing them inline is the most direct fix.
+                                
+                                return (
+                                  <div key={subIndex} className="block">
+                                    <div className="flex items-center justify-between px-4 mx-4 rounded-lg hover:bg-pink-50 transition-colors">
+                                      <a
+                                        href={subItem.href}
+                                        className="flex-1 py-2.5 text-sm text-gray-600"
+                                        onClick={(e) => handleNavClick(e, subItem.href)}
+                                      >
+                                        {subItem.name}
+                                      </a>
+                                    </div>
+                                    
+                                    {/* Subcategories always visible for now to ensure accessibility */}
+                                    <div className="flex flex-col ml-12 border-l-2 border-pink-100 my-1 space-y-1">
+                                       <a 
+                                         href="/shop?category=core-acrylics"
+                                         className="py-2 pl-4 text-xs font-medium text-gray-500 hover:text-pink-600 hover:bg-pink-50 rounded-r-md transition-colors block"
+                                         onClick={(e) => handleNavClick(e, '/shop?category=core-acrylics')}
+                                       >
+                                         Core Acrylics
+                                       </a>
+                                       <a 
+                                         href="/shop?category=coloured-acrylics"
+                                         className="py-2 pl-4 text-xs font-medium text-gray-500 hover:text-pink-600 hover:bg-pink-50 rounded-r-md transition-colors block"
+                                         onClick={(e) => handleNavClick(e, '/shop?category=coloured-acrylics')}
+                                       >
+                                         Coloured Acrylics
+                                       </a>
+                                    </div>
+                                  </div>
+                                );
+                              }
+
                               const subCategory = new URLSearchParams(subItem.href.split('?')[1] || '').get('category') || 'all';
                               const subActive = currentPath === '/shop' && currentCategory === subCategory;
 

@@ -430,6 +430,31 @@ export const ShopPage: React.FC = () => {
     furniture: 'Furniture'
   };
 
+  // Calculate Max Price dynamically based on filtered products (ignoring price filter)
+  const dynamicMaxPrice = useMemo(() => {
+    // We want the max price of products that match the current category/search, 
+    // BUT ignoring the current price range itself.
+    const relevantProducts = displayProducts.filter(product => {
+      const productCategories = product.categories || (product.category ? [product.category] : []);
+      const matchesCategory = selectedCategory === 'all' || productCategories.includes(selectedCategory);
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStock = !showInStockOnly || (product.inStock && product.price !== -1);
+      const isNotArchived = !productCategories.includes('archived');
+      
+      return matchesCategory && matchesSearch && matchesStock && isNotArchived;
+    });
+
+    if (relevantProducts.length === 0) return 2000;
+    const max = Math.max(...relevantProducts.map(p => p.price));
+    return Math.ceil(max / 100) * 100;
+  }, [displayProducts, selectedCategory, searchTerm, showInStockOnly]);
+
+  // Update price range when category changes or max price changes
+  useEffect(() => {
+    setPriceRange([0, dynamicMaxPrice]);
+    setMaxPrice(dynamicMaxPrice);
+  }, [dynamicMaxPrice]);
+
   // Filtering Logic
   const filteredProducts = useMemo(() => {
     return displayProducts.filter((product: any) => {
