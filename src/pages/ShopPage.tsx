@@ -279,6 +279,8 @@ export const ShopPage: React.FC = () => {
               productNameLower.includes('color acrylics');
 
             const isCore = !isExplicitColouredAcrylic && (productNameLower.includes('clear') || 
+                          productNameLower.includes('core acrylic') ||
+                          productNameLower.includes('core acrylics') ||
                           productNameLower.includes('pink') || 
                           productNameLower.includes('white') || 
                           productNameLower.includes('cover') || 
