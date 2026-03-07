@@ -421,6 +421,63 @@ export const ProductDetailPage: React.FC = () => {
     return { name, slug };
   }, [product]);
 
+  const subcategoryDetails = useMemo(() => {
+    if (!product) return null;
+
+    const normalize = (category: string): string => {
+      const map: Record<string, string> = {
+        'Bundle Deals': 'bundle-deals',
+        'Acrylic System': 'acrylic-system',
+        'Core Acrylics': 'core-acrylics',
+        'Coloured Acrylics': 'coloured-acrylics',
+        'Prep & Finish': 'prep-finishing',
+        'Prep & Finishing': 'prep-finishing',
+        'Gel System': 'gel-system',
+        'Tools & Essentials': 'tools-essentials',
+        'Furniture': 'furniture',
+        'Coming Soon': 'coming-soon'
+      };
+      return map[category] || category.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '');
+    };
+
+    const nameLower = (product.name || '').toLowerCase();
+    const tags = Array.isArray((product as any).tags) ? (product as any).tags : [];
+    const tagSlugs = tags.map((t: any) => normalize(String(t))).filter(Boolean);
+
+    const isSizedNailLiquid =
+      nameLower.includes('nail liquid') && (nameLower.includes('250ml') || nameLower.includes('500ml'));
+    if (isSizedNailLiquid) return null;
+
+    if (tagSlugs.includes('core-acrylics')) return { name: 'Core Acrylics', slug: 'core-acrylics' };
+    if (tagSlugs.includes('coloured-acrylics')) return { name: 'Coloured Acrylics', slug: 'coloured-acrylics' };
+
+    if (categoryDetails.slug !== 'acrylic-system') return null;
+
+    const has56g = /\b56\s?g\b/.test(nameLower);
+    const isExplicitColouredAcrylic =
+      nameLower.includes('colour acrylic') ||
+      nameLower.includes('color acrylic') ||
+      nameLower.includes('colour acrylics') ||
+      nameLower.includes('color acrylics');
+
+    if (isExplicitColouredAcrylic) return { name: 'Coloured Acrylics', slug: 'coloured-acrylics' };
+    if (has56g || nameLower.includes('core acrylic') || nameLower.includes('core acrylics')) {
+      return { name: 'Core Acrylics', slug: 'core-acrylics' };
+    }
+
+    return null;
+  }, [product, categoryDetails.slug]);
+
+  const shopLinkTarget = useMemo(() => {
+    try {
+      const last = sessionStorage.getItem('shopLastCategory');
+      if (last && last !== 'all') return `/shop#${last}`;
+    } catch {
+      return '/shop';
+    }
+    return '/shop';
+  }, []);
+
   const handleAddToCart = () => {
     if (!product) return;
 
@@ -532,7 +589,7 @@ export const ProductDetailPage: React.FC = () => {
           <Container>
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h1>
             <p className="text-gray-600 mb-8">The product you are looking for does not exist or has been moved.</p>
-            <Link to="/shop" className="inline-block bg-pink-400 text-white px-8 py-3 rounded-full hover:bg-pink-500 transition-colors">
+            <Link to={shopLinkTarget} className="inline-block bg-pink-400 text-white px-8 py-3 rounded-full hover:bg-pink-500 transition-colors">
               Back to Shop
             </Link>
           </Container>
@@ -559,7 +616,7 @@ export const ProductDetailPage: React.FC = () => {
           <nav className="flex items-center text-sm text-gray-500">
             <Link to="/" className="hover:text-pink-500 transition-colors">Home</Link>
             <span className="mx-2">/</span>
-            <Link to="/shop" className="hover:text-pink-500 transition-colors">Shop</Link>
+            <Link to={shopLinkTarget} className="hover:text-pink-500 transition-colors">Shop</Link>
             
             {/* Dynamic Category Breadcrumb */}
             {categoryDetails.slug !== 'all' && (
@@ -571,6 +628,19 @@ export const ProductDetailPage: React.FC = () => {
                   onClick={() => sessionStorage.removeItem('shopScrollY')} // Reset scroll when explicitly navigating to category
                 >
                   {categoryDetails.name}
+                </Link>
+              </>
+            )}
+
+            {subcategoryDetails && (
+              <>
+                <span className="mx-2">/</span>
+                <Link
+                  to={`/shop#${subcategoryDetails.slug}`}
+                  className="hover:text-pink-500 transition-colors"
+                  onClick={() => sessionStorage.removeItem('shopScrollY')}
+                >
+                  {subcategoryDetails.name}
                 </Link>
               </>
             )}

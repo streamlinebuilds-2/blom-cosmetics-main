@@ -214,6 +214,11 @@ export const ShopPage: React.FC = () => {
           const joinedCategorySlugs = (Array.isArray(p.product_categories) ? p.product_categories : [])
             .map((pc: any) => pc?.category?.slug)
             .filter(Boolean);
+
+          const tagSlugs = (Array.isArray(p.tags) ? p.tags : [])
+            .map((t: any) => normalizeCategoryToSlug(String(t)))
+            .filter(Boolean);
+
           const categoryLower = (p.category || categoryById[p.category_id]?.slug || joinedCategorySlugs[0] || '').toString().toLowerCase();
           const explicitBundleDeal = categoryLower.includes('bundle'); 
           const isBundleOrCollection = explicitBundleDeal || 
@@ -244,11 +249,19 @@ export const ShopPage: React.FC = () => {
           let categories = Array.from(
             new Set([
               baseCategory,
-              ...joinedCategorySlugs.map((s: any) => normalizeCategoryToSlug(String(s)))
+              ...joinedCategorySlugs.map((s: any) => normalizeCategoryToSlug(String(s))),
+              ...tagSlugs
             ].filter(Boolean))
           );
           const productNameLower = (p.name || '').toLowerCase();
           const has56g = /\b56\s?g\b/.test(productNameLower);
+
+          if (
+            (categories.includes('core-acrylics') || categories.includes('coloured-acrylics')) &&
+            !categories.includes('acrylic-system')
+          ) {
+            categories.push('acrylic-system');
+          }
 
           const isSizedNailLiquid =
             productNameLower.includes('nail liquid') &&
@@ -379,6 +392,14 @@ export const ShopPage: React.FC = () => {
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription) {
       metaDescription.setAttribute('content', 'Shop professional nail care products, acrylic systems, and tools. High-quality products trusted by nail artists and beauty professionals.');
+    }
+
+    const hashCategory = window.location.hash?.replace('#', '').trim();
+    if (hashCategory) {
+      setSelectedCategory(hashCategory);
+      if (hashCategory === 'core-acrylics' || hashCategory === 'coloured-acrylics') {
+        setExpandedCategories((prev) => ({ ...prev, 'acrylic-system': true }));
+      }
     }
 
     // Scroll Restoration Logic
@@ -520,6 +541,7 @@ export const ShopPage: React.FC = () => {
 
   const handleProductClick = (slug: string) => {
     sessionStorage.setItem('shopScrollY', window.scrollY.toString());
+    sessionStorage.setItem('shopLastCategory', selectedCategory);
     window.location.href = `/products/${slug}`;
   };
 
