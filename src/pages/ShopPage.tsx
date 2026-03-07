@@ -248,6 +248,7 @@ export const ShopPage: React.FC = () => {
             ].filter(Boolean))
           );
           const productNameLower = (p.name || '').toLowerCase();
+          const has56g = /\b56\s?g\b/.test(productNameLower);
 
           const isSizedNailLiquid =
             productNameLower.includes('nail liquid') &&
@@ -291,10 +292,14 @@ export const ShopPage: React.FC = () => {
                               productNameLower.includes('neon') ||
                               productNameLower.includes('pastel');
 
-            if (isCore && !isColoured && !categories.includes('core-acrylics')) categories.push('core-acrylics');
+            if ((isCore || has56g) && !categories.includes('core-acrylics')) categories.push('core-acrylics');
             if (isColoured && !categories.includes('coloured-acrylics')) categories.push('coloured-acrylics');
             // Fallback: if in acrylic system but not identified as coloured, default to core if it looks like a basic powder? 
             // For now, let's stick to explicit matches.
+          }
+
+          if (!isSizedNailLiquid && has56g && categories.includes('acrylic-system') && !categories.includes('core-acrylics')) {
+            categories.push('core-acrylics');
           }
           if (productNameLower.includes('gel') || productNameLower.includes('top coat') || productNameLower.includes('base coat')) {
             // Exclude furniture/racks from Gel System
