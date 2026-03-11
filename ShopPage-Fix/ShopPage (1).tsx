@@ -177,23 +177,6 @@ export const ShopPage: React.FC = () => {
       inStock: true,
       variants: []
     },
-    {
-      id: '8',
-      name: 'Acetone (Remover)',
-      slug: 'acetone-remover',
-      price: 60,
-      compareAtPrice: undefined,
-      short_description: 'Professional-grade, fast acting nail remover.',
-      shortDescription: 'Professional-grade, fast acting nail remover.',
-      description: 'Professional-grade acetone for fast and effective nail polish removal.',
-      images: ['/acetone-remover-white.webp', '/acetone-remover-colorful.webp'],
-      category: 'archived',
-      rating: 0,
-      reviews: 112,
-      badges: [],
-      inStock: false,
-      variants: []
-    },
 
     // Coming Soon Products (Prices TBA) - HIDDEN
     // {

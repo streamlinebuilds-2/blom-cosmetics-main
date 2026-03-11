@@ -105,21 +105,6 @@
     "shortDescription": "Holographic guide, strong adhesive, 300 forms per roll."
   },
   {
-    "slug": "acetone-remover",
-    "title": "Acetone (Remover)",
-    "price": 60,
-    "thumbnail": "/acetone-remover-white.webp",
-    "images": ["/acetone-remover-white.webp", "/acetone-remover-colorful.webp"],
-    "badges": ["Bestseller"],
-    "status": "active",
-    "rating": 4.8,
-    "reviews": 112,
-    "compareAt": null,
-    "stockStatus": "In Stock",
-    "category": "tools-essentials",
-    "shortDescription": "Professional-grade, fast acting nail remover."
-  },
-  {
     "slug": "nail-liquid-monomer",
     "title": "Nail Liquid (Monomer)",
     "price": -1,
