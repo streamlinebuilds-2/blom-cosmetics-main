@@ -606,6 +606,8 @@ export const ProductDetailPage: React.FC = () => {
 
   const shortDescriptionText = product.short_description || product.shortDescription;
 
+  const isOutOfStock = product.stockStatus === 'Sold Out' || (product.stock_quantity !== undefined && product.stock_quantity <= 0);
+
   return (
     <div className="min-h-screen bg-white">
       <Header showMobileMenu={true} />
@@ -669,7 +671,16 @@ export const ProductDetailPage: React.FC = () => {
                       -{discountPercentage}%
                     </span>
                   )}
-                  {/* Out of Stock badge removed per request - always show available */}
+                  {isOutOfStock && (
+                    <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      Sold Out
+                    </span>
+                  )}
+                  {product.price === -1 && !isOutOfStock && (
+                    <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      Coming Soon
+                    </span>
+                  )}
                 </div>
 
                 {/* Variant Name Label - Bottom Left Corner */}
@@ -867,20 +878,34 @@ export const ProductDetailPage: React.FC = () => {
                   {/* Add to Cart Button - Larger on mobile, match Buy Now size */}
                   <button
                     onClick={handleAddToCart}
-                    className="w-full sm:flex-1 h-16 sm:h-12 bg-pink-500 text-white font-bold rounded-full uppercase transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 text-base sm:text-sm px-6"
+                    disabled={product.price === -1 || isOutOfStock}
+                    className={`
+                      w-full sm:flex-1 h-16 sm:h-12 font-bold rounded-full uppercase transition-all flex items-center justify-center gap-2 text-base sm:text-sm px-6
+                      ${(product.price === -1 || isOutOfStock)
+                        ? 'bg-gray-200 text-gray-500 cursor-not-allowed shadow-none'
+                        : 'bg-pink-500 text-white shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95'
+                      }
+                    `}
                   >
                     <ShoppingCart className="w-6 h-6 sm:w-5 sm:h-5" />
-                    Add to Cart
+                    {isOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Add to Cart'}
                   </button>
                 </div>
 
                 {/* Buy Now Button - Larger on mobile */}
                 <button
                   onClick={handleBuyNow}
-                  className="w-full h-16 sm:h-12 bg-white border-2 border-gray-900 text-gray-900 font-bold rounded-full uppercase hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 text-base sm:text-sm px-6"
+                  disabled={product.price === -1 || isOutOfStock}
+                  className={`
+                    w-full h-16 sm:h-12 font-bold rounded-full uppercase transition-all flex items-center justify-center gap-2 text-base sm:text-sm px-6
+                    ${(product.price === -1 || isOutOfStock)
+                      ? 'bg-gray-100 text-gray-400 border-2 border-gray-200 cursor-not-allowed shadow-none'
+                      : 'bg-white border-2 border-gray-900 text-gray-900 hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95'
+                    }
+                  `}
                 >
                   <CreditCard className="w-6 h-6 sm:w-5 sm:h-5" />
-                  Buy Now
+                  {isOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Buy Now'}
                 </button>
               </div>
 

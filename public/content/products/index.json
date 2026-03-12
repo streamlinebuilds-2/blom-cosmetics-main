@@ -107,15 +107,15 @@
   {
     "slug": "nail-liquid-monomer",
     "title": "Nail Liquid (Monomer)",
-    "price": -1,
+    "price": 899,
     "thumbnail": "/nail-liquid-monomer-white.webp",
     "images": ["/nail-liquid-monomer-white.webp", "/nail-liquid-monomer-colorful.webp"],
-    "badges": [],
+    "badges": ["Sold Out"],
     "status": "active",
     "rating": 4.8,
     "reviews": 87,
     "compareAt": null,
-    "stockStatus": "Coming Soon",
+    "stockStatus": "Sold Out",
     "category": "acrylic-system",
     "shortDescription": "Low-odor EMA formula, MMA/HEMA-free."
   },

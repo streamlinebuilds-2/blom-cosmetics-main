@@ -329,11 +329,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                   handleAddToCart(e);
                 }
               }}
-              disabled={price === -1}
-              className="w-full bg-pink-500 text-white font-bold py-3.5 md:py-3 px-4 rounded-full shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
+              disabled={price === -1 || !inStock}
+              className="w-full bg-pink-500 text-white font-bold py-3.5 md:py-3 px-4 rounded-full shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-pink-300 hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:cursor-not-allowed text-xs md:text-sm"
             >
               <Plus className="w-5 h-5" />
-              <span>{hasVariants ? 'Select Options' : 'Add to Cart'}</span>
+              <span>{price === -1 ? 'Coming Soon' : !inStock ? 'Sold Out' : hasVariants ? 'Select Options' : 'Add to Cart'}</span>
             </button>
           </div>
         </div>
