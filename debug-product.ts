@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 // Let's try Anon first to match user experience.
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://yvmnedjybrpvlupygusf.supabase.co';
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bW5lZGp5YnJwdmx1cHlndXNmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODYwOTY0MywiZXhwIjoyMDc0MTg1NjQzfQ.dI1D3wtCcM_HwBDyT5bg_H5Yj5e0GUT2ILjDfw6gSyI'; // Using provided Service Key for debugging
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || ''; // Use env var // Using provided Service Key for debugging
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error('Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY env vars');
