@@ -45,6 +45,24 @@ export const CourseDetailPage: React.FC = () => {
         image: '/avane-crous-headshot.webp',
         bio: 'Professional nail artist and educator with over 8 years of experience in acrylic nail application. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.'
       },
+      instructors: [
+        {
+          name: 'Avané Crous',
+          image: '/avane-crous-headshot.webp',
+          bio: 'Professional nail artist and educator with over 8 years of experience in acrylic nail application. Avané specializes in teaching proper techniques, safety protocols, and helping students build confidence in their nail artistry skills.',
+          location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
+          email: 'shopblomcosmetics@gmail.com',
+          phone: '+27 79 548 3317'
+        },
+        {
+          name: 'Yolanda Botha',
+          image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1774267387/WhatsApp_Image_2026-03-23_at_13.25.03_nzsq0y.jpg',
+          bio: 'Professional nail artist with years of experience in nail artistry. Yolanda specializes in teaching proper techniques and helping students build confidence in their nail artistry skills.',
+          location: '9 Addison str, Golf Park, Orkney',
+          email: 'blom.orkney.northwest@gmail.com',
+          phone: '0731518407'
+        }
+      ],
       about: [
         'This comprehensive 5-day hands-on training program is designed to give you the skills and confidence to start your career as a professional nail technician. You\'ll master every aspect of acrylic nail application, from preparation to finishing, using professional-grade products and techniques.',
         'Our expert instructors will guide you through proper nail preparation, acrylic application, shaping, and finishing techniques. By the end of this course, you\'ll have the knowledge and practical experience needed to provide professional acrylic nail services to clients.'
@@ -424,7 +442,19 @@ export const CourseDetailPage: React.FC = () => {
   const [expandedAccordion, setExpandedAccordion] = useState<number | null>(0);
   const [selectedPackage, setSelectedPackage] = useState<string>('');
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedInstructor, setSelectedInstructor] = useState<string>('');
+  const [selectedInstructorIndex, setSelectedInstructorIndex] = useState<number>(0);
   const [showComparePackages, setShowComparePackages] = useState(false);
+
+  // Initialize selectedInstructor with first instructor on mount
+  useEffect(() => {
+    const instructors = (course as any).instructors;
+    if (instructors && instructors.length > 0) {
+      const firstInstructor = instructors[0];
+      setSelectedInstructor(`${firstInstructor.name} - ${firstInstructor.location}`);
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -525,6 +555,13 @@ export const CourseDetailPage: React.FC = () => {
       return;
     }
 
+    // For in-person courses, validate instructor selection
+    if (!course.isOnline && !selectedInstructor) {
+      showNotification('Please select an instructor and location', 'error');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const nowBase36 = Date.now().toString(36).toUpperCase();
       const bytes = globalThis.crypto?.getRandomValues?.(new Uint8Array(3));
@@ -571,6 +608,7 @@ export const CourseDetailPage: React.FC = () => {
             amount_paid_cents: paymentAmountCents,
             amount_owed_cents: amountOwedCents,
             payment_kind: paymentKind,
+            instructor: selectedInstructor || null,
             details: {
               course_id: course.id,
               course_price_cents: Math.round(coursePrice * 100),
@@ -741,22 +779,87 @@ export const CourseDetailPage: React.FC = () => {
               </h2>
               <div className="w-20 h-1 bg-pink-400 mx-auto mb-12 rounded-full"></div>
 
+              {/* Instructor Tabs - Only show if there are multiple instructors */}
+              {(course as any).instructors && (course as any).instructors.length > 1 && (
+                <div className="flex justify-center gap-4 mb-8">
+                  {(course as any).instructors.map((inst: any, idx: number) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setSelectedInstructorIndex(idx);
+                        setSelectedInstructor(`${inst.name} - ${inst.location}`);
+                      }}
+                      className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                        selectedInstructorIndex === idx
+                          ? 'bg-pink-400 text-white shadow-lg'
+                          : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-pink-400'
+                      }`}
+                    >
+                      {inst.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl">
                 <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-center">
                   <div className="w-48 h-48 flex-shrink-0">
                     <div className="w-full h-full rounded-full overflow-hidden border-4 border-pink-400 shadow-lg">
                       <img
-                        src={course.instructor.image}
-                        alt={course.instructor.name}
+                        src={(course as any).instructors ? (course as any).instructors[selectedInstructorIndex]?.image : course.instructor.image}
+                        alt={(course as any).instructors ? (course as any).instructors[selectedInstructorIndex]?.name : course.instructor.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <h3 className="text-3xl font-bold text-gray-900 mb-4">{course.instructor.name}</h3>
+                    <h3 className="text-3xl font-bold text-gray-900 mb-4">
+                      {(course as any).instructors ? (course as any).instructors[selectedInstructorIndex]?.name : course.instructor.name}
+                    </h3>
                     <p className="text-lg text-gray-700 leading-relaxed">
-                      {course.instructor.bio}
+                      {(course as any).instructors ? (course as any).instructors[selectedInstructorIndex]?.bio : course.instructor.bio}
                     </p>
+                    {(course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.location && (
+                      <div className="mt-4 p-4 bg-pink-50 rounded-xl">
+                        <p className="text-gray-700 font-semibold flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-pink-400 flex-shrink-0" />
+                          <span 
+                            className="cursor-pointer hover:text-pink-500 transition-colors relative group"
+                            onClick={() => {
+                              navigator.clipboard.writeText((course as any).instructors[selectedInstructorIndex]?.location);
+                            }}
+                            title="Click to copy location"
+                          >
+                            {(course as any).instructors[selectedInstructorIndex]?.location}
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                              Click to copy
+                            </span>
+                          </span>
+                        </p>
+                        {(course as any).instructors[selectedInstructorIndex]?.email && (
+                          <p className="text-gray-700 font-semibold mt-2 flex items-center gap-2">
+                            <Mail className="h-4 w-4 text-pink-400" />
+                            <a 
+                              href={`mailto:${(course as any).instructors[selectedInstructorIndex]?.email}`}
+                              className="hover:text-pink-500 transition-colors"
+                            >
+                              {(course as any).instructors[selectedInstructorIndex]?.email}
+                            </a>
+                          </p>
+                        )}
+                        {(course as any).instructors[selectedInstructorIndex]?.phone && (
+                          <p className="text-gray-700 font-semibold mt-2 flex items-center gap-2">
+                            <Phone className="h-4 w-4 text-pink-400" />
+                            <a 
+                              href={`tel:${(course as any).instructors[selectedInstructorIndex]?.phone}`}
+                              className="hover:text-pink-500 transition-colors"
+                            >
+                              {(course as any).instructors[selectedInstructorIndex]?.phone}
+                            </a>
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -983,8 +1086,23 @@ export const CourseDetailPage: React.FC = () => {
                     <MapPin className="h-8 w-8 text-pink-400" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">Location</h3>
-                  <p className="text-gray-800 text-base md:text-lg leading-relaxed">
-                    {course.location}<br />
+                  <p 
+                    className="text-gray-800 text-base md:text-lg leading-relaxed cursor-pointer hover:text-pink-500 transition-colors relative group"
+                    onClick={() => {
+                      const location = (course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.location 
+                        ? (course as any).instructors[selectedInstructorIndex]?.location 
+                        : course.location;
+                      navigator.clipboard.writeText(location);
+                    }}
+                    title="Click to copy location"
+                  >
+                    {(course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.location 
+                      ? (course as any).instructors[selectedInstructorIndex]?.location 
+                      : course.location}
+                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                      Click to copy
+                    </span>
+                    <br />
                     {course.isOnline && (
                       <span className="text-base text-gray-700">Access from anywhere</span>
                     )}
@@ -1099,19 +1217,31 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">Contact</h3>
                   <div className="space-y-3">
-                    <ClickableContact 
-                      type="phone" 
-                      value="+27 79 548 3317" 
-                      className="text-gray-800 text-base md:text-lg"
-                    >
-                      WhatsApp: +27 79 548 3317
-                    </ClickableContact>
+                    {/* Dynamic Phone based on selected instructor */}
+                    {((course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.phone) || !course.isOnline ? (
+                      <ClickableContact 
+                        type="phone" 
+                        value={(course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.phone 
+                          ? (course as any).instructors[selectedInstructorIndex]?.phone 
+                          : '+27 79 548 3317'} 
+                        className="text-gray-800 text-base md:text-lg"
+                      >
+                        WhatsApp: {(course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.phone 
+                          ? (course as any).instructors[selectedInstructorIndex]?.phone 
+                          : '+27 79 548 3317'}
+                      </ClickableContact>
+                    ) : null}
+                    {/* Dynamic Email based on selected instructor */}
                     <ClickableContact 
                       type="email" 
-                      value="shopblomcosmetics@gmail.com" 
+                      value={(course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.email 
+                        ? (course as any).instructors[selectedInstructorIndex]?.email 
+                        : 'shopblomcosmetics@gmail.com'} 
                       className="text-gray-800 text-base md:text-lg"
                     >
-                      Email: shopblomcosmetics@gmail.com
+                      Email: {(course as any).instructors && (course as any).instructors[selectedInstructorIndex]?.email 
+                        ? (course as any).instructors[selectedInstructorIndex]?.email 
+                        : 'shopblomcosmetics@gmail.com'}
                     </ClickableContact>
                   </div>
                 </div>
@@ -1221,6 +1351,37 @@ export const CourseDetailPage: React.FC = () => {
                         </select>
                       </div>
                     </div>
+
+                    {/* Instructor/Location Selection - Only for in-person courses */}
+                    {!course.isOnline && course.instructors && course.instructors.length > 0 && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
+                          Instructor & Location <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={selectedInstructor}
+                          onChange={(e) => {
+                            setSelectedInstructor(e.target.value);
+                            // Find the index of the selected instructor
+                            const inst = (course as any).instructors?.find((i: any) => `${i.name} - ${i.location}` === e.target.value);
+                            const idx = (course as any).instructors?.findIndex((i: any) => `${i.name} - ${i.location}` === e.target.value);
+                            if (idx !== undefined && idx >= 0) {
+                              setSelectedInstructorIndex(idx);
+                            }
+                          }}
+                          className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base bg-white"
+                        >
+                          <option value="" disabled>
+                            Select an instructor and location
+                          </option>
+                          {course.instructors.map((inst) => (
+                            <option key={inst.name} value={`${inst.name} - ${inst.location}`}>
+                              {inst.name} - {inst.location}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     {/* Row 2: Name & Email */}
                     <div className="grid md:grid-cols-2 gap-6">
