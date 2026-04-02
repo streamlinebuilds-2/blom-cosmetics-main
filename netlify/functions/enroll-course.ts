@@ -1,131 +1,49 @@
-import type { Handler } from '@netlify/functions';
-import { createClient } from '@supabase/supabase-js';
-
-const STORE_SUPABASE = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-const ACADEMY_SUPABASE = createClient(
-  process.env.ACADEMY_SUPABASE_URL!,
-  process.env.ACADEMY_SUPABASE_ANON_KEY!
-);
+import type { Handler } from '@netlify/functions'
+import { enrollCourse } from './_lib/enroll-helper'
 
 export const handler: Handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Content-Type': 'application/json'
-  };
+  }
 
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers };
+    return { statusCode: 204, headers }
   }
 
   try {
-    const { order_id, course_slug, buyer_email, buyer_name, buyer_phone } = JSON.parse(event.body || '{}');
+    const { order_id, course_slug, buyer_email, buyer_name, buyer_phone } =
+      JSON.parse(event.body || '{}')
 
-    console.log('Enrolling in course:', { order_id, course_slug, buyer_email });
-
-    // 1. Get course ID from slug
-    console.log('Looking up course with slug:', course_slug);
-    console.log('Academy URL:', process.env.ACADEMY_SUPABASE_URL);
-
-    // First, try to list all courses to verify connection
-    const { data: allCourses, error: listError } = await ACADEMY_SUPABASE
-      .from('courses')
-      .select('id, title, slug');
-
-    console.log('All courses:', allCourses);
-    console.log('List error:', listError);
-
-    // Then try to find specific course
-    const { data: course, error: courseError } = await ACADEMY_SUPABASE
-      .from('courses')
-      .select('id')
-      .eq('slug', course_slug)
-      .single();
-
-    console.log('Course found:', course);
-    console.log('Course error:', courseError);
-
-    if (courseError || !course) {
-      throw new Error(`Course not found: ${course_slug}. Available courses: ${allCourses?.map(c => c.slug).join(', ')}`);
+    if (!order_id || !course_slug || !buyer_email) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Missing required fields: order_id, course_slug, buyer_email' })
+      }
     }
 
-    const course_id = course.id;
-    console.log('Course ID:', course_id);
+    console.log('Enrolling in course:', { order_id, course_slug, buyer_email })
 
-    // 2. Create invitation token
-    const token = crypto.randomUUID();
-    const expires_at = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-
-    const { error: inviteError } = await ACADEMY_SUPABASE
-      .from('course_invites')
-      .insert({
-        course_id,
-        email: buyer_email,
-        token,
-        expires_at: expires_at.toISOString(),
-        created_at: new Date().toISOString()
-      });
-
-    if (inviteError) {
-      console.error('Invite creation error:', inviteError);
-      throw new Error(`Failed to create invite: ${inviteError.message}`);
-    }
-
-    console.log('Invite token created:', token);
-
-    // 3. Send invitation email via n8n
-    const inviteUrl = `${process.env.ACADEMY_URL}/invite/${token}`;
-
-    await fetch(`${process.env.N8N_BASE}/webhook/course-invite`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: buyer_email,
-        name: buyer_name,
-        course_name: course_slug.replace(/-/g, ' ').replace(/^./, s => s.toUpperCase()),
-        invite_url: inviteUrl,
-        expires_at: expires_at.toISOString()
-      })
-    }).catch(err => console.warn('n8n email failed:', err));
-
-    // 4. Track in store database
-    await STORE_SUPABASE
-      .from('course_purchases')
-      .insert({
-        order_id,
-        course_slug,
-        buyer_email,
-        buyer_name,
-        buyer_phone,
-        invited_at: new Date().toISOString(),
-        invitation_status: 'sent',
-        academy_user_id: null // Will be set when they redeem
-      });
-
-    console.log('Course enrollment complete');
+    const result = await enrollCourse({
+      orderId: order_id,
+      courseSlug: course_slug,
+      buyerEmail: buyer_email,
+      buyerName: buyer_name || '',
+      buyerPhone: buyer_phone || ''
+    })
 
     return {
-      statusCode: 200,
+      statusCode: result.success ? 200 : 502,
       headers,
-      body: JSON.stringify({
-        success: true,
-        invite_token: token,
-        invite_url: inviteUrl,
-        message: 'Enrollment successful. Check your email for course access link.'
-      })
-    };
-
+      body: JSON.stringify(result)
+    }
   } catch (error: any) {
-    console.error('Course enrollment error:', error);
+    console.error('Course enrollment error:', error)
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({
-        error: error.message || 'Failed to enroll in course'
-      })
-    };
+      body: JSON.stringify({ error: error.message || 'Failed to enroll in course' })
+    }
   }
-};
+}

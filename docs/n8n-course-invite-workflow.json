@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/course-invite",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        128
+      ],
+      "id": "495ad3f1-8c81-46bf-8c80-c00fb11385c0",
+      "name": "Webhook",
+      "webhookId": "27772dbf-95ad-47e1-bdbe-0d83dbc91707"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body || $json;\n\nconst to = String(b.to || '').trim();\nconst name = String(b.name || '').trim();\nconst phone = String(b.phone || '').replace(/[^\\d+]/g, '');\nconst course_slug = String(b.course_slug || '').trim();\nconst invite_url = String(b.invite_url || '').trim();\nconst expires_at = String(b.expires_at || '').trim();\n\nif (!to || !invite_url) {\n  throw new Error('Missing required fields: to=' + to + ', invite_url=' + invite_url);\n}\n\nreturn [{ to, name, phone, course_slug, invite_url, expires_at }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        128
+      ],
+      "id": "b14d3c7e-6dc2-4420-90f8-f0bb52c8435f",
+      "name": "Extract Fields"
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@blom-cosmetics.co.za",
+        "toEmail": "={{ $json.to }}",
+        "subject": "=BLOM Academy: Your enrollment in {{ $json.course_slug }} is confirmed",
+        "emailFormat": "html",
+        "html": "=<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>Welcome to Your BLOM Academy Course</title>\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n  <style>\n    body { margin:0; padding:0; -webkit-text-size-adjust:100%; width:100% !important; }\n    table { border-spacing:0; }\n    td { padding:0; }\n    img { border:0; }\n    a { color: #E75C9C; text-decoration: none; }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#FBEAF2;font-family:Arial,Helvetica,sans-serif;color:#111;\">\n  \n  <div style=\"display:none;max-height:0;overflow:hidden;opacity:0;\">\n    Welcome, {{ $json.name }}! Your BLOM Academy course is ready.\n  </div>\n\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:linear-gradient(180deg,#FBEAF2 0%,#E3F1FF 100%);\">\n    <tr>\n      <td align=\"center\" style=\"padding:40px 16px;\">\n        \n        <table role=\"presentation\" width=\"640\" cellpadding=\"0\" cellspacing=\"0\" bgcolor=\"#ffffff\" style=\"max-width:640px;border:1px solid #E9DDE4;border-radius:14px;overflow:hidden;\">\n          \n          <tr>\n            <td align=\"center\" style=\"padding:32px 24px 16px;\">\n              <img src=\"https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png\" \n                   width=\"140\" alt=\"BLOM Cosmetics\" style=\"display:block;border:0;outline:none;text-decoration:none;\">\n            </td>\n          </tr>\n\n          <tr>\n            <td align=\"center\" style=\"padding:0 28px 8px;\">\n              <h1 style=\"margin:0;font-size:24px;line-height:32px;color:#111;\">\n                Welcome to <span style=\"color:#E75C9C;\">BLOM Academy</span>!\n              </h1>\n              <p style=\"margin:12px 0 0;font-size:16px;color:#555;\">\n                Hi <strong>{{ $json.name }}</strong>, thank you for enrolling in <strong>{{ $json.course_slug }}</strong>! &#127881;\n              </p>\n            </td>\n          </tr>\n\n          <tr>\n            <td align=\"center\" style=\"padding:24px 28px 28px;\">\n              <a href=\"{{ $json.invite_url }}\" \n                 style=\"background:#E75C9C;color:#ffffff;text-decoration:none;padding:15px 28px;border-radius:8px;font-weight:bold;font-size:16px;display:inline-block;box-shadow:0 4px 6px rgba(231,92,156,0.2);\">\n                Access Your Course\n              </a>\n            </td>\n          </tr>\n\n          <tr>\n            <td style=\"padding:0 28px 20px;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background-color: #FAEFF6; border:1px solid #E9DDE4; border-radius:10px;\">\n                <tr>\n                  <td style=\"padding: 20px; font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#555;line-height:1.6;\">\n                    <p style=\"margin: 0 0 10px;\">\n                      <strong>&#128218; Course:</strong> {{ $json.course_slug }}\n                    </p>\n                    <p style=\"margin: 0 0 10px;\">\n                      <strong>&#9993;&#65039; Registered Email:</strong> {{ $json.to }}\n                    </p>\n                    <p style=\"margin: 0;\">\n                      <strong>&#9200; Link Expires:</strong> {{ $json.expires_at }}\n                    </p>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n          \n          <tr>\n            <td style=\"padding:8px 28px 28px;\">\n              <p style=\"margin:0;font-size:14px;color:#666;line-height:22px;\">\n                Questions? Reply to this email or contact us:\n              </p>\n              <p style=\"margin:8px 0 0;font-size:14px;color:#111;line-height:22px;\">\n                &#128231; shopblomcosmetics@gmail.com<br>\n                &#128241; +27 79 548 3317\n              </p>\n            </td>\n          </tr>\n          \n          <tr>\n            <td bgcolor=\"#FAEFF6\" align=\"center\" style=\"padding:14px 20px;border-top:1px solid #E9DDE4;border-radius:0 0 14px 14px\">\n              <p style=\"margin:0;font-size:12px;color:#6B7280;\">\n                &copy; 2025 BLOM Cosmetics &middot; <a href=\"mailto:support@blom-cosmetics.co.za\" style=\"color:#E75C9C;text-decoration:none;\">support@blom-cosmetics.co.za</a>\n              </p>\n              <p style=\"margin:8px 0 0;font-size:12px;color:#9CA3AF;\">\n                BLOM Academy | Randfontein, South Africa\n              </p>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "0770b3e2-de5c-4d95-8aba-76715ab43b89",
+      "name": "Send Email (Brevo)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        416,
+        128
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "UPqY4jX0fLOzQlMb",
+          "name": "no-reply@blom-cosmetics.co.za"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/840414442487843/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer EAAgd2AGtrT0BQp7ZCvQVkJ6xAIM47H1VHGiuWTi6hz64gxpnnHQrldyMO5nmuFJC5vc5VrJCwLIE0KYneNGD0F3iIcrY5TZBvMMmLL4Wc3Po5nmLTlyn32cSjWyF2QIvbs9RqpgiNRAIiQdCZC2hFDiZB1QlpUklzJ9fIFcRp6XZB6HZCw0eJDOBPP5EcFX6YWjwZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "=json",
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.phone }}\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"course_invite_text\",\n    \"language\": {\n      \"code\": \"en\"\n    },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $json.name }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $json.course_slug }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $json.invite_url }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $json.expires_at }}\"\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+        "options": {}
+      },
+      "id": "6b56d4ef-ca5d-43b3-9805-57a7333bd292",
+      "name": "Send WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        640,
+        128
+      ],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Fields": {
+      "main": [
+        [
+          {
+            "node": "Send Email (Brevo)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email (Brevo)": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea68ba36ca0942af7da3c2dc6d22a13e526fb635f2a177627caaad60d354fa33"
+  }
+}
