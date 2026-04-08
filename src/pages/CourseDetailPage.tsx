@@ -542,6 +542,8 @@ export const CourseDetailPage: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const promoActive = promoCode.trim().toUpperCase() === 'BLOMTEST5';
 
   // Auto-select package and date if there's only one option
   useEffect(() => {
@@ -658,7 +660,8 @@ export const CourseDetailPage: React.FC = () => {
 
       // Extract numeric price from package (e.g., "R450" -> 450)
       const priceMatch = selectedPkg.price.match(/[\d,]+/);
-      const coursePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
+      const basePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
+      const coursePrice = promoActive ? 5 : basePrice;
       const paymentAmount = course.isOnline ? coursePrice : depositAmount;
       const paymentAmountCents = Math.round(paymentAmount * 100);
       const paymentLabel = course.isOnline ? 'Purchase' : 'Deposit';
@@ -1561,6 +1564,20 @@ export const CourseDetailPage: React.FC = () => {
                         <p className="text-red-500 text-sm">{formErrors.terms}</p>
                       )}
 
+                      {/* Promo code */}
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Promo code (optional)"
+                          value={promoCode}
+                          onChange={e => setPromoCode(e.target.value)}
+                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
+                        />
+                        {promoActive && (
+                          <p className="text-green-600 text-sm font-semibold mt-1">Promo applied — price set to R5</p>
+                        )}
+                      </div>
+
                       {/* Submit Button */}
                     <div>
                       <button
@@ -1569,7 +1586,7 @@ export const CourseDetailPage: React.FC = () => {
                         className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                         style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                       >
-                        {isSubmitting ? 'Processing...' : course.isOnline ? 'Complete Purchase' : `Pay Deposit & Secure Spot (R${depositAmount.toLocaleString('en-ZA')})`}
+                        {isSubmitting ? 'Processing...' : course.isOnline ? `Complete Purchase${promoActive ? ' — R5' : ''}` : `Pay Deposit & Secure Spot (R${depositAmount.toLocaleString('en-ZA')})`}
                       </button>
 
                       {/* Help text when button is disabled */}
