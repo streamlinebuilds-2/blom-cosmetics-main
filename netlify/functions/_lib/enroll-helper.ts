@@ -93,7 +93,7 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
     p_expires_in_days: 30
   })
 
-  if (rpcError || !rpcData?.success) {
+  if (rpcError || !rpcData?.token) {
     console.error('Academy RPC create_course_invite failed:', rpcError?.message || rpcData)
 
     // Fallback: upsert into Academy pending_enrollments
