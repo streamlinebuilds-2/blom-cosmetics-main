@@ -49,9 +49,46 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
   const academy = academyClient()
   const store = storeClient()
 
+  // Step 0: Look up the Academy course UUID from slug
+  const { data: courseRow, error: lookupError } = await academy
+    .from('courses')
+    .select('id')
+    .eq('slug', courseSlug)
+    .single()
+
+  if (lookupError || !courseRow?.id) {
+    console.error('Academy course lookup failed for slug:', courseSlug, lookupError?.message)
+
+    // Fallback: upsert into Academy pending_enrollments
+    const { error: fallbackErr } = await academy
+      .from('pending_enrollments')
+      .upsert(
+        { email: buyerEmail, course_slug: courseSlug },
+        { onConflict: 'email,course_slug' }
+      )
+
+    if (fallbackErr) {
+      console.error('pending_enrollments upsert also failed:', fallbackErr.message)
+    }
+
+    await store
+      .from('course_purchases')
+      .update({ invitation_status: 'failed' })
+      .eq('order_id', orderId)
+      .eq('course_slug', courseSlug)
+
+    return {
+      success: false,
+      error: `Course not found in Academy: ${courseSlug} — ${lookupError?.message || 'no row'}`,
+      fallbackSaved: !fallbackErr
+    }
+  }
+
+  const courseUuid = courseRow.id
+
   // Step 1: Call Academy RPC to create invite
   const { data: rpcData, error: rpcError } = await academy.rpc('create_course_invite', {
-    p_course_id: courseSlug,
+    p_course_id: courseUuid,
     p_email: buyerEmail,
     p_expires_in_days: 30
   })

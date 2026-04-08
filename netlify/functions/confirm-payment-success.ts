@@ -4,7 +4,6 @@ import { enrollCourse } from './_lib/enroll-helper'
 
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
-const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
 
 const supabase = createClient(SUPABASE_URL!, SERVICE_KEY!)
 
@@ -75,31 +74,8 @@ export const handler: Handler = async (event) => {
       console.error('Course purchase update error:', e)
     }
 
-    // 4. TRIGGER N8N WORKFLOW
-    // Constructing the specific payload you asked for: Amount, Name, Email, Phone, Order ID
-    const n8nPayload = {
-      order_id: order.id,
-      order_number: order.order_number,
-      amount: order.total,
-      name: order.buyer_name || order.customer_name || 'Customer',
-      email: order.buyer_email || order.customer_email || 'No Email',
-      phone: order.buyer_phone || order.customer_phone || '',
-      status: 'paid',
-      source: 'website_success_page'
-    }
-
-    console.log(`📡 Sending Alert to n8n: ${N8N_WEBHOOK_URL}`)
-    const n8nRes = await fetch(N8N_WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(n8nPayload)
-    })
-
-    if (!n8nRes.ok) {
-      console.error('N8N Error:', await n8nRes.text())
-    } else {
-      console.log('✅ N8N Alert Sent!')
-    }
+    // 4. N8N notification is NOT sent here — payfast-itn.ts already handles it.
+    //    This function only retries course enrollment if the ITN's attempt failed.
 
     try {
       const { data: cps } = await supabase
