@@ -45,6 +45,17 @@ const CoursesPage: React.FC = () => {
       comparePrice: 650,
       onSale: true,
       discount: 31
+    },
+    {
+      id: 4,
+      slug: 'faded-flowers-workshop',
+      title: 'Faded Flowers Workshop',
+      description: 'Master the art of faded flower nail designs with 8 step-by-step video tutorials. From sketching to six stunning faded flower designs, learn at your own pace from home.',
+      image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1775453928/WhatsApp_Image_2026-04-03_at_12.34.07_uelxcc.jpg',
+      duration: 'Self-Paced',
+      location: 'Online',
+      price: 690,
+      onSale: false
     }
   ];
 

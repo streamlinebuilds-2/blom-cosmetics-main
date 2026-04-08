@@ -223,7 +223,7 @@ export const CourseDetailPage: React.FC = () => {
         {
           name: 'Complete Workshop',
           price: 'R480',
-          kitValue: 'Included',
+          kitValue: 'Not Included',
           features: [
             'Lifetime access to video tutorials',
             'Step-by-step guides',
@@ -301,7 +301,7 @@ export const CourseDetailPage: React.FC = () => {
         {
           name: 'Complete Workshop',
           price: 'R480',
-          kitValue: 'Included',
+          kitValue: 'Not Included',
           features: [
             'Lifetime access to video tutorials',
             'Step-by-step guides',
@@ -354,6 +354,84 @@ export const CourseDetailPage: React.FC = () => {
         }
       ]
     },
+    'faded-flowers-workshop': {
+      id: 'faded-flowers-workshop',
+      sku: 'SKU_FADED_FLOWERS_WORKSHOP',
+      title: 'Faded Flowers Workshop',
+      description: 'Master the art of faded flower nail designs from the comfort of your home. Step-by-step video tutorials guide you through sketching, shading, and creating six stunning faded flower designs.',
+      heroImage: 'https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1775453928/WhatsApp_Image_2026-04-03_at_12.34.07_uelxcc.jpg',
+      duration: 'Self-Paced',
+      price: 'R690',
+      numericPrice: 690,
+      depositAmount: 0,
+      isOnline: true,
+      location: 'Online',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané specializes in teaching proper techniques and helping students build confidence in their nail artistry skills.'
+      },
+      about: [
+        'This online workshop takes you through the beautiful art of faded flower nail designs. With 8 in-depth video tutorials, you\'ll learn everything from setting up your workspace to completing six unique faded flower designs.',
+        'Perfect for nail artists at any level, this workshop covers sketching, colour application, and fading techniques — giving you the skills and confidence to recreate these designs on your clients or yourself.'
+      ],
+      packages: [
+        {
+          name: 'Complete Workshop',
+          price: 'R690',
+          kitValue: 'Not Included',
+          features: [
+            'Lifetime access to 8 video tutorials',
+            'What You Need — tools & materials guide',
+            'Sketch Description Part 1',
+            'Design 1 through Design 6 step-by-step',
+            'Certificate after completing your exam'
+          ]
+        }
+      ],
+      availableDates: ['Available Now'],
+      thingsToBring: [],
+      trainingSchedule: [],
+      studentDiscount: [],
+      accordionData: [
+        {
+          title: 'VIDEO 1: WHAT YOU NEED',
+          content: [
+            'Tools and materials overview',
+            'Recommended products',
+            'Workspace setup',
+            'Preparation tips'
+          ]
+        },
+        {
+          title: 'VIDEO 2: SKETCH DESCRIPTION PART 1',
+          content: [
+            'Faded flower sketch basics',
+            'Pencil technique',
+            'Petal structure',
+            'Building confidence with line work'
+          ]
+        },
+        {
+          title: 'DESIGNS 1–3',
+          content: [
+            'Design 1 step-by-step',
+            'Design 2 step-by-step',
+            'Design 3 step-by-step',
+            'Colour application and fading techniques'
+          ]
+        },
+        {
+          title: 'DESIGNS 4–6',
+          content: [
+            'Design 4 step-by-step',
+            'Design 5 step-by-step',
+            'Design 6 step-by-step',
+            'Finishing and sealing tips'
+          ]
+        }
+      ]
+    },
     'holiday-watercolor-workshop': {
       id: 'efe16488-1de6-4522-aeb3-b08cfae3a640',
       sku: 'SKU_XMAS_WATERCOLOR',
@@ -381,7 +459,7 @@ export const CourseDetailPage: React.FC = () => {
           name: 'Christmas Workshop',
           price: 'R450',
           originalPrice: 'R650',
-          kitValue: 'Included',
+          kitValue: 'Not Included',
           features: [
             'Lifetime access to Christmas tutorials',
             'Holiday design templates',
@@ -1047,7 +1125,13 @@ export const CourseDetailPage: React.FC = () => {
                       {pkg.originalPrice && (
                         <div className="text-lg text-gray-500 line-through mb-2">{pkg.originalPrice}</div>
                       )}
-                      <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: {pkg.kitValue}</div>
+                      {pkg.kitValue === 'Not Included' ? (
+                        <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 text-sm font-bold px-4 py-1.5 rounded-full uppercase">
+                          No Kit Included
+                        </div>
+                      ) : (
+                        <div className="text-sm font-semibold text-gray-500 uppercase">Kit Value: {pkg.kitValue}</div>
+                      )}
                     </div>
                     
                     <ul className="space-y-4 mb-8 flex-grow">
