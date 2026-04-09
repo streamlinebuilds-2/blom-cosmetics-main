@@ -331,6 +331,14 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const fetchUberQuote = async (lat: number, lng: number) => {
+    // Frontend mock for UI testing (active when ?devmode=uber123 was used)
+    if (localStorage.getItem('uber_delivery_mock') === 'true') {
+      setUberQuote({ loading: true, available: false, fee: 0, eta: '', quoteId: '' });
+      await new Promise(r => setTimeout(r, 600)); // brief realistic delay
+      setUberQuote({ loading: false, available: true, fee: 85, eta: '45–60 min', quoteId: 'mock-test-quote' });
+      return;
+    }
+
     setUberQuote({ loading: true, available: false, fee: 0, eta: '', quoteId: '' });
     try {
       const res = await fetch('/.netlify/functions/uber-quote', {
@@ -339,13 +347,15 @@ export const CheckoutPage: React.FC = () => {
         body: JSON.stringify({ lat, lng }),
       });
       const data = await res.json();
+      console.log('[Uber quote]', data);
       if (data.available) {
         setUberQuote({ loading: false, available: true, fee: data.fee, eta: data.eta, quoteId: data.quoteId });
       } else {
         setUberQuote(null);
         setShippingMethod(prev => prev === 'uber-same-day' ? 'door-to-door' : prev);
       }
-    } catch {
+    } catch (e) {
+      console.error('[Uber quote error]', e);
       setUberQuote(null);
       setShippingMethod(prev => prev === 'uber-same-day' ? 'door-to-door' : prev);
     }

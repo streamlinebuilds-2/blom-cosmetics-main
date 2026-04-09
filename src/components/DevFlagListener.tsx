@@ -21,8 +21,8 @@ export function DevFlagListener() {
       try {
         const alreadySet = localStorage.getItem(FLAG_KEY) === 'true';
         localStorage.setItem(FLAG_KEY, 'true');
-        console.log('[DevFlag] Uber same-day delivery ENABLED');
-        // Reload without the query param so React re-reads localStorage on mount
+        localStorage.setItem('uber_delivery_mock', 'true');
+        console.log('[DevFlag] Uber same-day delivery ENABLED (mock mode)');
         if (!alreadySet) {
           window.location.replace(window.location.pathname);
         }
