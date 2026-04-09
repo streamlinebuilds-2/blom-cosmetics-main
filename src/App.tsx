@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { CartWidget } from './components/cart/CartWidget';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LoadingSpinner } from './components/LoadingSpinner';
+import { DevFlagListener } from './components/DevFlagListener';
 
 // Eager loaded pages (critical for initial load) → switch to lazy to enable route-level code splitting
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -75,6 +76,7 @@ function App() {
   return (
     <BrowserRouter>
       <ErrorBoundary>
+        <DevFlagListener />
         <PrefetchRoutes />
         <Routes>
           {/* Homepage */}

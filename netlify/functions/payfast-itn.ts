@@ -2,6 +2,101 @@ import type { Handler } from '@netlify/functions'
 import crypto from 'crypto'
 import { enrollCourse } from './_lib/enroll-helper'
 
+async function bookUberDelivery(quoteId: string, order: any) {
+  const clientId = process.env.UBER_DIRECT_CLIENT_ID
+  const clientSecret = process.env.UBER_DIRECT_CLIENT_SECRET
+  const customerId = process.env.UBER_DIRECT_CUSTOMER_ID
+  const storeLat = Number(process.env.STORE_LAT ?? -26.1726)
+  const storeLng = Number(process.env.STORE_LNG ?? 27.7014)
+  const storeAddress = process.env.STORE_ADDRESS ?? '123 Main Road, Randfontein, 1759'
+  const storePhone = process.env.STORE_PHONE ?? ''
+
+  if (!clientId || !clientSecret || !customerId) {
+    console.warn('Uber Direct not configured — skipping delivery booking')
+    return
+  }
+
+  // 1. Get OAuth token
+  const tokenRes = await fetch('https://login.uber.com/oauth/v2/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: 'client_credentials',
+      scope: 'eats.deliveries',
+    }),
+  })
+  if (!tokenRes.ok) throw new Error(`Uber auth failed: ${await tokenRes.text()}`)
+  const { access_token } = await tokenRes.json()
+
+  // 2. Build dropoff address from stored order
+  const addr = order.delivery_address || {}
+  const dropoffAddress = [addr.street_address, addr.local_area, addr.city, addr.code]
+    .filter(Boolean)
+    .join(', ')
+
+  // 3. Create delivery using the pre-agreed quote
+  const deliveryRes = await fetch(
+    `https://api.uber.com/v1/customers/${customerId}/deliveries`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quote_id: quoteId,
+        pickup: {
+          name: 'BLOM Cosmetics',
+          address: storeAddress,
+          location: { lat: storeLat, lng: storeLng },
+          contact: { name: 'BLOM Cosmetics', phone: storePhone },
+        },
+        dropoff: {
+          name: order.customer_name || order.buyer_name || '',
+          address: dropoffAddress,
+          location: { lat: addr.lat, lng: addr.lng },
+          contact: {
+            name: order.customer_name || order.buyer_name || '',
+            phone: order.customer_mobile || order.buyer_phone || '',
+          },
+        },
+        manifest_items: [{
+          name: `BLOM Order ${order.order_number || order.m_payment_id}`,
+          quantity: 1,
+        }],
+      }),
+    }
+  )
+
+  if (!deliveryRes.ok) {
+    throw new Error(`Uber delivery creation failed: ${await deliveryRes.text()}`)
+  }
+
+  const delivery = await deliveryRes.json()
+  console.log('✅ Uber delivery booked:', delivery.id, delivery.tracking_url)
+
+  // 4. Persist delivery ID + tracking URL back into the order's delivery_address JSON
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (supabaseUrl && serviceKey && delivery.id) {
+    await fetch(`${supabaseUrl}/rest/v1/orders?id=eq.${order.id}`, {
+      method: 'PATCH',
+      headers: {
+        apikey: serviceKey,
+        Authorization: `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        delivery_address: {
+          ...addr,
+          uber_delivery_id: delivery.id,
+          uber_tracking_url: delivery.tracking_url ?? null,
+        },
+        updated_at: new Date().toISOString(),
+      }),
+    })
+  }
+}
+
 const PF_ENV = String(process.env.PAYFAST_ENV || 'live').toLowerCase()
 const SUPABASE_URL = process.env.SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -227,6 +322,17 @@ export const handler: Handler = async (event) => {
         });
         console.log('✅ Notification sent')
       } catch (e) { console.error('Notification error:', e) }
+
+      // F) Book Uber Direct delivery if a quote ID was stored on the order
+      const uberQuoteId = order.delivery_address?.uber_quote_id
+      if (uberQuoteId) {
+        try {
+          await bookUberDelivery(uberQuoteId, order)
+        } catch (e) {
+          // Non-fatal: log and continue — order is already paid
+          console.error('Uber delivery booking failed:', e)
+        }
+      }
     }
 
     if (isCourse && Array.isArray(coursePurchases)) {

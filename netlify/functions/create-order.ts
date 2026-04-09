@@ -71,14 +71,21 @@ export const handler: Handler = async (event) => {
     }
 
     // --- FIX 1 & 2: Normalize Fulfillment Method ---
-    // The checkout sends 'shipping.method' as 'store-pickup' or 'door-to-door'
+    // The checkout sends 'shipping.method' as 'store-pickup', 'door-to-door', or 'uber-same-day'
     // We need to map this to 'collection' or 'delivery' for the DB
     const rawMethod = body.shipping?.method || body.fulfillment?.method || 'delivery';
+    const isUberSameDay = rawMethod === 'uber-same-day';
     const fulfillmentMethod = (rawMethod === 'store-pickup' || rawMethod === 'collection') ? 'collection' : 'delivery';
-    
+
     // Select the correct address object
-    // If delivery, use shipping address. If collection, it is null.
-    const deliveryAddress = fulfillmentMethod === 'delivery' ? (body.shipping?.address || body.fulfillment?.address || body.delivery_address) : null;
+    // If delivery (including uber), use shipping address. If collection, it is null.
+    const rawDeliveryAddress = fulfillmentMethod === 'delivery'
+      ? (body.shipping?.address || body.fulfillment?.address || body.delivery_address)
+      : null;
+    // Attach uber_quote_id into the delivery address JSON if present
+    const deliveryAddress = rawDeliveryAddress && body.uber?.quoteId
+      ? { ...rawDeliveryAddress, uber_quote_id: body.uber.quoteId }
+      : rawDeliveryAddress;
     const collectionLocation = fulfillmentMethod === 'collection' ? 'BLOM HQ' : null;
 
     const hasFurniture = validItems.some((it) => {
@@ -99,6 +106,9 @@ export const handler: Handler = async (event) => {
     let shippingCents = 0
     if (fulfillmentMethod === 'collection') {
       shippingCents = hasFurniture ? 500 * 100 : 0
+    } else if (isUberSameDay) {
+      // Trust the quoted fee sent from the frontend (already validated server-side by Uber)
+      shippingCents = Math.max(0, Math.round(Number(body.uber?.feeCents ?? 0)))
     } else if (hasFurniture) {
       shippingCents = 0
     } else {

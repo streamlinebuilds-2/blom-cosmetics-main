@@ -5,7 +5,8 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
-import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2, AlertCircle } from 'lucide-react';
+import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2, AlertCircle, Zap } from 'lucide-react';
+import { useUberDeliveryFlag } from '../hooks/useUberDeliveryFlag';
 import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
@@ -92,7 +93,15 @@ export const CheckoutPage: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isWishlisted, setIsWishlisted] = useState<{[key: string]: boolean}>({});
   
-  const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'door-to-door'>('door-to-door');
+  const uberEnabled = useUberDeliveryFlag();
+  const [shippingMethod, setShippingMethod] = useState<'store-pickup' | 'door-to-door' | 'uber-same-day'>('door-to-door');
+  const [uberQuote, setUberQuote] = useState<{
+    loading: boolean;
+    available: boolean;
+    fee: number;
+    eta: string;
+    quoteId: string;
+  } | null>(null);
   
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
@@ -247,6 +256,9 @@ export const CheckoutPage: React.FC = () => {
   // Handle saved address selection
   const handleSavedAddressSelect = (addressId: string) => {
     setSelectedAddressId(addressId);
+    // Saved addresses have no lat/lng — clear Uber quote and fall back
+    setUberQuote(null);
+    setShippingMethod(prev => prev === 'uber-same-day' ? 'door-to-door' : prev);
 
     const address = savedAddresses.find(addr => addr.id === addressId);
     if (address) {
@@ -318,10 +330,33 @@ export const CheckoutPage: React.FC = () => {
     cartStore.removeItem(itemId);
   };
 
+  const fetchUberQuote = async (lat: number, lng: number) => {
+    setUberQuote({ loading: true, available: false, fee: 0, eta: '', quoteId: '' });
+    try {
+      const res = await fetch('/.netlify/functions/uber-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ lat, lng }),
+      });
+      const data = await res.json();
+      if (data.available) {
+        setUberQuote({ loading: false, available: true, fee: data.fee, eta: data.eta, quoteId: data.quoteId });
+      } else {
+        setUberQuote(null);
+        setShippingMethod(prev => prev === 'uber-same-day' ? 'door-to-door' : prev);
+      }
+    } catch {
+      setUberQuote(null);
+      setShippingMethod(prev => prev === 'uber-same-day' ? 'door-to-door' : prev);
+    }
+  };
+
   // Handle address selection from autocomplete
   const handleAddressSelect = (suggestion: any) => {
     const { properties, geometry } = suggestion;
-    
+    const lat = geometry.coordinates[1];
+    const lng = geometry.coordinates[0];
+
     setDeliveryAddress({
       street_address: properties.address_line1 || '',
       local_area: properties.city || '',
@@ -329,9 +364,13 @@ export const CheckoutPage: React.FC = () => {
       zone: properties.state || '',
       code: properties.postcode || '',
       country: 'ZA',
-      lat: geometry.coordinates[1], // lat
-      lng: geometry.coordinates[0]  // lon
+      lat,
+      lng,
     });
+
+    if (uberEnabled && lat && lng) {
+      fetchUberQuote(lat, lng);
+    }
   };
 
   const validateShippingForm = () => {
@@ -344,7 +383,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     // Validate based on shipping method
-    if (shippingMethod === 'door-to-door') {
+    if (shippingMethod === 'door-to-door' || shippingMethod === 'uber-same-day') {
       const addressValidation = validateAddress(deliveryAddress);
       if (!addressValidation.isValid) {
         errors.address = addressValidation.errors;
@@ -602,8 +641,11 @@ export const CheckoutPage: React.FC = () => {
           },
           shipping: {
             method: shippingMethod,
-            address: shippingMethod === 'door-to-door' ? deliveryAddress : null
+            address: (shippingMethod === 'door-to-door' || shippingMethod === 'uber-same-day') ? deliveryAddress : null
           },
+          ...(shippingMethod === 'uber-same-day' && uberQuote?.quoteId ? {
+            uber: { quoteId: uberQuote.quoteId, feeCents: Math.round(uberQuote.fee * 100) }
+          } : {}),
           items: cartState.items.map((it) => ({
             product_id: it.productId || it.id,
             name: it.name,
@@ -679,12 +721,16 @@ export const CheckoutPage: React.FC = () => {
 
       // Step 2: Redirect to PayFast with minimal payload
       // All customer/delivery data already saved to Supabase via create-order above
-      const pfRequestBody = {
-        order_id: orderData.order_id, // Pass the actual order ID for proper redirect
+      const pfRequestBody: Record<string, string> = {
+        order_id: orderData.order_id,
         m_payment_id: paymentId,
         amount: (totalCents / 100).toFixed(2),
         item_name: `BLOM Order ${paymentId}`
       };
+      if (shippingMethod === 'uber-same-day' && uberQuote?.quoteId) {
+        pfRequestBody.custom_str2 = uberQuote.quoteId;
+        pfRequestBody.custom_str3 = String(Math.round(uberQuote.fee * 100));
+      }
 
       console.log('🔍 PayFast request:', pfRequestBody);
 
@@ -738,20 +784,21 @@ export const CheckoutPage: React.FC = () => {
   const calculateShipping = () => {
     // 1. Collection Handling
     if (shippingMethod === 'store-pickup') {
-      // If ANY furniture is present, charge R500
       if (hasFurniture) return 500;
-      // Normal products = FREE collection
-      return 0;
-    }
-    
-    // 2. Furniture Delivery Handling
-    if (hasFurniture) {
-      // Furniture shipping is calculated separately, so we charge R0 now
-      // and invoice them later.
       return 0;
     }
 
-    // 3. Standard Delivery Rules
+    // 2. Uber Same-Day
+    if (shippingMethod === 'uber-same-day') {
+      return uberQuote?.fee ?? 0;
+    }
+
+    // 3. Furniture Delivery Handling
+    if (hasFurniture) {
+      return 0;
+    }
+
+    // 4. Standard Delivery Rules
     return cartState.subtotal >= 2000 ? 0 : 120;
   };
 
@@ -908,6 +955,54 @@ export const CheckoutPage: React.FC = () => {
                             </div>
                           </label>
                           
+                          {/* Same-Day Delivery via Uber Direct (dev flag only) */}
+                          {uberEnabled && uberQuote?.loading && (
+                            <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg">
+                              <div className="flex items-center gap-2 text-gray-500 text-sm">
+                                <div className="animate-spin h-4 w-4 border-2 border-pink-400 border-t-transparent rounded-full" />
+                                Checking same-day delivery availability...
+                              </div>
+                            </div>
+                          )}
+
+                          {uberEnabled && uberQuote?.available && !uberQuote.loading && (
+                            <label
+                              className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                                shippingMethod === 'uber-same-day'
+                                  ? 'border-pink-500 bg-pink-50'
+                                  : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <input
+                                  type="radio"
+                                  name="shippingMethod"
+                                  value="uber-same-day"
+                                  checked={shippingMethod === 'uber-same-day'}
+                                  onChange={(e) => setShippingMethod(e.target.value as any)}
+                                  className="mt-1"
+                                />
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between mb-1">
+                                    <span className="font-semibold text-gray-900 flex items-center gap-1.5">
+                                      <Zap className="h-4 w-4 text-pink-500" />
+                                      Same-Day Delivery
+                                    </span>
+                                    <span className="text-lg font-bold text-gray-900">
+                                      R{uberQuote.fee.toFixed(2)}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-gray-600">
+                                    Delivered today via Uber Direct. ETA: {uberQuote.eta}
+                                  </p>
+                                  <span className="inline-block mt-2 px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">
+                                    Express
+                                  </span>
+                                </div>
+                              </div>
+                            </label>
+                          )}
+
                         </div>
                       </div>
 
