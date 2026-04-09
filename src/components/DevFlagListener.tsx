@@ -19,13 +19,19 @@ export function DevFlagListener() {
 
     if (devMode === 'uber123') {
       try {
+        const alreadySet = localStorage.getItem(FLAG_KEY) === 'true';
         localStorage.setItem(FLAG_KEY, 'true');
         console.log('[DevFlag] Uber same-day delivery ENABLED');
+        // Reload without the query param so React re-reads localStorage on mount
+        if (!alreadySet) {
+          window.location.replace(window.location.pathname);
+        }
       } catch { /* ignore */ }
     } else if (devMode === 'off') {
       try {
         localStorage.removeItem(FLAG_KEY);
         console.log('[DevFlag] Uber same-day delivery DISABLED');
+        window.location.replace(window.location.pathname);
       } catch { /* ignore */ }
     }
   }, [location.search]);

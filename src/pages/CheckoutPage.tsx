@@ -956,21 +956,12 @@ export const CheckoutPage: React.FC = () => {
                           </label>
                           
                           {/* Same-Day Delivery via Uber Direct (dev flag only) */}
-                          {uberEnabled && uberQuote?.loading && (
-                            <div className="p-4 border-2 border-dashed border-gray-200 rounded-lg">
-                              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                                <div className="animate-spin h-4 w-4 border-2 border-pink-400 border-t-transparent rounded-full" />
-                                Checking same-day delivery availability...
-                              </div>
-                            </div>
-                          )}
-
-                          {uberEnabled && uberQuote?.available && !uberQuote.loading && (
+                          {uberEnabled && (
                             <label
-                              className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                                shippingMethod === 'uber-same-day'
-                                  ? 'border-pink-500 bg-pink-50'
-                                  : 'border-gray-200 hover:border-gray-300'
+                              className={`block p-4 border-2 rounded-lg transition-all ${
+                                uberQuote?.available
+                                  ? `cursor-pointer ${shippingMethod === 'uber-same-day' ? 'border-pink-500 bg-pink-50' : 'border-gray-200 hover:border-gray-300'}`
+                                  : 'cursor-not-allowed opacity-60 border-gray-200 bg-gray-50'
                               }`}
                             >
                               <div className="flex items-start gap-3">
@@ -979,6 +970,7 @@ export const CheckoutPage: React.FC = () => {
                                   name="shippingMethod"
                                   value="uber-same-day"
                                   checked={shippingMethod === 'uber-same-day'}
+                                  disabled={!uberQuote?.available}
                                   onChange={(e) => setShippingMethod(e.target.value as any)}
                                   className="mt-1"
                                 />
@@ -989,15 +981,29 @@ export const CheckoutPage: React.FC = () => {
                                       Same-Day Delivery
                                     </span>
                                     <span className="text-lg font-bold text-gray-900">
-                                      R{uberQuote.fee.toFixed(2)}
+                                      {uberQuote?.loading
+                                        ? <span className="text-sm text-gray-400">Checking...</span>
+                                        : uberQuote?.available
+                                          ? `R${uberQuote.fee.toFixed(2)}`
+                                          : <span className="text-sm text-gray-400">Select address to check</span>
+                                      }
                                     </span>
                                   </div>
-                                  <p className="text-sm text-gray-600">
-                                    Delivered today via Uber Direct. ETA: {uberQuote.eta}
-                                  </p>
-                                  <span className="inline-block mt-2 px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">
-                                    Express
-                                  </span>
+                                  {uberQuote?.loading && (
+                                    <div className="flex items-center gap-2 text-gray-500 text-sm">
+                                      <div className="animate-spin h-3 w-3 border-2 border-pink-400 border-t-transparent rounded-full" />
+                                      Checking availability for your address...
+                                    </div>
+                                  )}
+                                  {uberQuote?.available && !uberQuote.loading && (
+                                    <>
+                                      <p className="text-sm text-gray-600">Delivered today via Uber Direct. ETA: {uberQuote.eta}</p>
+                                      <span className="inline-block mt-2 px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full text-xs font-medium">Express</span>
+                                    </>
+                                  )}
+                                  {!uberQuote?.available && !uberQuote?.loading && (
+                                    <p className="text-sm text-gray-500">Enter and select your delivery address above to check same-day availability.</p>
+                                  )}
                                 </div>
                               </div>
                             </label>
