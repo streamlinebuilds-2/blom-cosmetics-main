@@ -67,11 +67,18 @@ export const handler: Handler = async (event) => {
     }
 
     if (!UBER_CLIENT_ID || !UBER_CLIENT_SECRET || !UBER_CUSTOMER_ID) {
-      console.warn('Uber Direct env vars not configured');
+      console.warn('Uber Direct env vars not configured — returning mock quote for UI testing');
       return {
         statusCode: 200,
         headers,
-        body: JSON.stringify({ available: false, reason: 'not_configured' }),
+        body: JSON.stringify({
+          available: true,
+          fee: 85,
+          currency: 'ZAR',
+          eta: '45–60 min',
+          quoteId: 'mock-quote-test',
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        }),
       };
     }
 
