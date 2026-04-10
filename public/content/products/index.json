@@ -133,5 +133,20 @@
     "stockStatus": "In Stock",
     "category": "tools-essentials",
     "shortDescription": "Premium Kolinsky brush with floating glitter handle."
+  },
+  {
+    "slug": "blom-gel-paint-set-12-colours",
+    "title": "Blom Gel Paint Set - 12x colours",
+    "price": 1020,
+    "thumbnail": "/gel-paint-set-white.webp",
+    "images": ["/gel-paint-set-white.webp", "/gel-paint-set-colorful.webp"],
+    "badges": ["Sold Out"],
+    "status": "active",
+    "rating": 0,
+    "reviews": 0,
+    "compareAt": 1350,
+    "stockStatus": "Sold Out",
+    "category": "gel-system",
+    "shortDescription": "Professional Gel Paint Kit designed for nail artists who want precision, pigmentation, and performance — all in one set."
   }
 ]
