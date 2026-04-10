@@ -19,14 +19,15 @@ export const handler: Handler = async (event) => {
     Prefer: 'return=representation',
   };
 
-  // Fetch ALL products, filter in JS — avoids all URL encoding issues
+  // Step 1: fetch only id,name,slug — we know these columns exist
   const allRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/products?select=id,name,slug,stock,is_active,featured_image&limit=500`,
+    `${SUPABASE_URL}/rest/v1/products?select=id,name,slug&limit=500`,
     { headers: h }
   );
-  const allProducts: any[] = allRes.ok ? await allRes.json() : [];
+  const allRaw = await allRes.text();
+  const allProducts: any[] = allRes.ok ? JSON.parse(allRaw) : [];
 
-  // Find gel paint by slug (we know it from the URL)
+  // Step 2: find gel paint products
   const gelPaint = allProducts.filter((p: any) => {
     const slug = String(p.slug ?? '').toLowerCase();
     const name = String(p.name ?? '').toLowerCase();
@@ -35,50 +36,29 @@ export const handler: Handler = async (event) => {
   });
 
   if (gelPaint.length === 0) {
-    // Not found — return a sample of all slugs so we can spot it manually
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        error: 'Gel paint product not found in first 500 products',
+        fetch_status: allRes.status,
         total_fetched: allProducts.length,
         all_slugs: allProducts.map((p: any) => p.slug),
+        raw_sample: allRaw.slice(0, 500),
       }, null, 2),
     };
   }
 
-  const withImage    = gelPaint.filter((p: any) => p.featured_image && String(p.featured_image).trim() !== '');
-  const withoutImage = gelPaint.filter((p: any) => !p.featured_image || String(p.featured_image).trim() === '');
-
-  const steps: any[] = [];
-
-  // Delete the imageless duplicate (clean up children first)
-  for (const p of withoutImage) {
-    const id = p.id;
-    const imgDel = await fetch(`${SUPABASE_URL}/rest/v1/product_images?product_id=eq.${id}`, { method: 'DELETE', headers: h });
-    steps.push({ action: 'delete_product_images', id, status: imgDel.status });
-
-    const varDel = await fetch(`${SUPABASE_URL}/rest/v1/product_variants?product_id=eq.${id}`, { method: 'DELETE', headers: h });
-    steps.push({ action: 'delete_variants', id, status: varDel.status });
-
-    const del = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, { method: 'DELETE', headers: h });
-    steps.push({ action: 'DELETE product', id, name: p.name, slug: p.slug, status: del.status });
-  }
-
-  // Mark the one with image as out of stock
-  for (const p of withImage) {
-    const id = p.id;
-    const patch = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
-      method: 'PATCH',
-      headers: h,
-      body: JSON.stringify({ stock: 0 }),
-    });
-    steps.push({ action: 'set stock=0', id, name: p.name, slug: p.slug, status: patch.status });
+  // Step 3: for each gel paint product, fetch ALL columns so we know the schema
+  const details: any[] = [];
+  for (const p of gelPaint) {
+    const dr = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${p.id}&select=*`, { headers: h });
+    const d = dr.ok ? await dr.json() : await dr.text();
+    details.push(d);
   }
 
   return {
     statusCode: 200,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ gelPaint, withImage, withoutImage, steps }, null, 2),
+    body: JSON.stringify({ gelPaint, full_details: details }, null, 2),
   };
 };
