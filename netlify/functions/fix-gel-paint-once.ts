@@ -25,9 +25,10 @@ export const handler: Handler = async (event) => {
     Prefer: 'return=representation',
   };
 
-  // 1. Find ALL products with "gel paint" in the name (catches both regardless of slug)
+  // 1. Find ALL products with "gel paint" in the name
+  // PostgREST ilike uses % as wildcard, which must be encoded as %25 in the URL
   const findRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/products?name=ilike.*gel+paint*&select=id,name,slug,stock,is_active,featured_image`,
+    `${SUPABASE_URL}/rest/v1/products?name=ilike.%25gel%20paint%25&select=id,name,slug,stock,is_active,featured_image`,
     { headers: h }
   );
   const allProducts = findRes.ok ? await findRes.json() : [];
@@ -41,7 +42,7 @@ export const handler: Handler = async (event) => {
   for (const p of withoutImage) {
     const id = p.id;
 
-    const imgDel = await fetch(`${SUPABASE_URL}/rest/v1/product_images?product_id=eq.${id}`, { method: 'DELETE', headers: h });
+    const imgDel = await fetch(`${SUPABASE_URL}/rest/v1/product_images?product_id=eq.${encodeURIComponent(id)}`, { method: 'DELETE', headers: h });
     log.steps.push({ action: 'delete_product_images', id, status: imgDel.status });
 
     const varDel = await fetch(`${SUPABASE_URL}/rest/v1/product_variants?product_id=eq.${id}`, { method: 'DELETE', headers: h });
