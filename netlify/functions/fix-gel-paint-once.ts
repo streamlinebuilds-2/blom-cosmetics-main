@@ -25,18 +25,32 @@ export const handler: Handler = async (event) => {
     Prefer: 'return=representation',
   };
 
-  // 1. Find ALL products with "gel paint" in the name
-  // PostgREST ilike uses % as wildcard, which must be encoded as %25 in the URL
+  // 1. Dump ALL products so we can see exact names + image column
   const findRes = await fetch(
-    `${SUPABASE_URL}/rest/v1/products?name=ilike.%25gel%20paint%25&select=id,name,slug,stock,is_active,featured_image`,
+    `${SUPABASE_URL}/rest/v1/products?select=id,name,slug,stock,is_active,featured_image,images&order=name.asc&limit=200`,
     { headers: h }
   );
-  const allProducts = findRes.ok ? await findRes.json() : [];
+  const findText = await findRes.text();
+  const allProducts = findRes.ok ? JSON.parse(findText) : [];
 
-  const withImage    = allProducts.filter((p: any) => p.featured_image && p.featured_image.trim() !== '');
-  const withoutImage = allProducts.filter((p: any) => !p.featured_image || p.featured_image.trim() === '');
+  // Filter in JS — case-insensitive, covers any name variation
+  const gelPaint = allProducts.filter((p: any) =>
+    String(p.name || '').toLowerCase().includes('gel paint') ||
+    String(p.slug || '').toLowerCase().includes('gel-paint') ||
+    String(p.slug || '').toLowerCase().includes('gel_paint')
+  );
 
-  const log: any = { found: allProducts, toDelete: withoutImage, toMarkOOS: withImage, steps: [] };
+  const withImage    = gelPaint.filter((p: any) => p.featured_image && p.featured_image.trim() !== '');
+  const withoutImage = gelPaint.filter((p: any) => !p.featured_image || p.featured_image.trim() === '');
+
+  // Return full dump so we can see all names if gelPaint is still empty
+  const log: any = {
+    all_product_names: allProducts.map((p: any) => ({ name: p.name, slug: p.slug })),
+    found: gelPaint,
+    toDelete: withoutImage,
+    toMarkOOS: withImage,
+    steps: []
+  };
 
   // 2. Hard-delete the imageless one(s) — remove children first to avoid FK errors
   for (const p of withoutImage) {
