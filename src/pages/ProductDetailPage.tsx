@@ -40,6 +40,28 @@ export const ProductDetailPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('details');
 
   // Prevent infinite re-renders or invariant violations by wrapping the state update logic
+  // Payflex instalment widget — reinject whenever price changes
+  useEffect(() => {
+    if (!product?.price || product.price === -1) return;
+    const activePrice = selectedVariant
+      ? (product.variants?.find((v: any) => v.name === selectedVariant)?.price || product.price)
+      : product.price;
+    const container = document.getElementById('payflex-widget-container');
+    if (!container) return;
+    // Remove previous script if any
+    const old = container.querySelector('script');
+    if (old) container.removeChild(old);
+    const script = document.createElement('script');
+    script.src = `https://widgets.payflex.co.za/payflex-widget-2.0.0.js?type=calculator&amount=${Number(activePrice).toFixed(2)}`;
+    script.async = true;
+    script.type = 'application/javascript';
+    container.appendChild(script);
+    return () => {
+      const s = container.querySelector('script');
+      if (s) container.removeChild(s);
+    };
+  }, [product?.price, selectedVariant, product?.variants]);
+
   useEffect(() => {
     async function loadProduct() {
       if (!slug) return;
@@ -127,7 +149,7 @@ export const ProductDetailPage: React.FC = () => {
               image_url: bundleData.image_url || bundleData.thumbnail_url || bundleImages[0] || null,
               thumbnail_url: bundleData.thumbnail_url || bundleData.image_url || bundleImages[0] || null,
               gallery_urls: bundleImages.slice(1),
-              stock_quantity: 1,
+              stock_quantity: bundleData.stock_quantity ?? bundleData.stock_on_hand ?? bundleData.inventory_quantity ?? bundleData.stock ?? 0,
               product_reviews: [{ count: 0 }]
             };
         } else if (productData) {
@@ -760,6 +782,9 @@ export const ProductDetailPage: React.FC = () => {
                   </span>
                 )}
               </div>
+
+              {/* Payflex instalment widget */}
+              <div id="payflex-widget-container" className="mb-4" />
 
               {/* Short Description */}
               {shortDescriptionText && (

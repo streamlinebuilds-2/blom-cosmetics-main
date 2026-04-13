@@ -5,7 +5,7 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { cartStore, CartState, formatPrice } from '../lib/cart';
-import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2, AlertCircle, Zap } from 'lucide-react';
+import { CreditCard, Truck, Shield, Lock, MapPin, Phone, Mail, CreditCard as Edit, Plus, Minus, ArrowLeft, Heart, Trash2, AlertCircle, Zap, Calendar } from 'lucide-react';
 import { useUberDeliveryFlag } from '../hooks/useUberDeliveryFlag';
 import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
@@ -729,57 +729,90 @@ export const CheckoutPage: React.FC = () => {
         timestamp: new Date().toISOString()
       }));
 
-      // Step 2: Redirect to PayFast with minimal payload
-      // All customer/delivery data already saved to Supabase via create-order above
-      const pfRequestBody: Record<string, string> = {
-        order_id: orderData.order_id,
-        m_payment_id: paymentId,
-        amount: (totalCents / 100).toFixed(2),
-        item_name: `BLOM Order ${paymentId}`
-      };
-      if (shippingMethod === 'uber-same-day' && uberQuote?.quoteId) {
-        pfRequestBody.custom_str2 = uberQuote.quoteId;
-        pfRequestBody.custom_str3 = String(Math.round(uberQuote.fee * 100));
-      }
+      // Step 2: Route to selected payment provider
+      if (paymentInfo.method === 'payflex') {
+        // Payflex BNPL
+        const pfxResponse = await fetch('/.netlify/functions/payflex-redirect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: orderId,
+            m_payment_id: paymentId,
+            amount: totalCents / 100,
+            shipping_amount: shippingCost,
+            consumer: {
+              givenNames: shippingInfo.firstName,
+              surname: shippingInfo.lastName,
+              email: shippingInfo.email,
+              phoneNumber: shippingInfo.phone
+            },
+            items: cartState.items.map((it) => ({
+              name: it.name,
+              sku: (it as any).sku || '',
+              quantity: it.quantity,
+              price: it.price
+            }))
+          })
+        });
 
-      console.log('🔍 PayFast request:', pfRequestBody);
+        if (!pfxResponse.ok) {
+          const pfxError = await pfxResponse.json().catch(() => ({ error: 'Payflex initiation failed' }));
+          console.error('❌ Payflex redirect error:', pfxError);
+          alert(`Payflex Error: ${pfxError.error || 'Payment initiation failed'}`);
+          throw new Error(pfxError.error || 'Payflex initiation failed');
+        }
 
-      const pfResponse = await fetch('/.netlify/functions/payfast-redirect', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pfRequestBody)
-      });
+        const pfxData = await pfxResponse.json();
+        console.log('🚀 Redirecting to Payflex:', pfxData.checkout_url);
+        window.location.href = pfxData.checkout_url;
 
-      if (!pfResponse.ok) {
-        const pfError = await pfResponse.json().catch(() => ({ error: 'PayFast initiation failed' }));
-        console.error('❌ PayFast redirect error:', pfError);
-        alert(`PayFast Error: ${JSON.stringify(pfError, null, 2)}`);
-        throw new Error(pfError.error || 'Payment initiation failed');
-      }
-
-      // payfast-redirect returns HTML with auto-submit form
-      const contentType = pfResponse.headers.get('content-type') || '';
-
-      if (contentType.includes('text/html')) {
-        // HTML response: inject and let it auto-submit
-        const html = await pfResponse.text();
-        console.log('🚀 Redirecting to PayFast via auto-submit form');
-
-        // Replace current page with the PayFast redirect form
-        document.open();
-        document.write(html);
-        document.close();
       } else {
-        // JSON fallback (for backward compatibility)
-        const pfData = await pfResponse.json();
-        console.log('✅ PayFast response:', pfData);
+        // PayFast (default)
+        const pfRequestBody: Record<string, string> = {
+          order_id: orderData.order_id,
+          m_payment_id: paymentId,
+          amount: (totalCents / 100).toFixed(2),
+          item_name: `BLOM Order ${paymentId}`
+        };
+        if (shippingMethod === 'uber-same-day' && uberQuote?.quoteId) {
+          pfRequestBody.custom_str2 = uberQuote.quoteId;
+          pfRequestBody.custom_str3 = String(Math.round(uberQuote.fee * 100));
+        }
 
-        const redirectUrl = pfData.redirect || pfData.url;
-        if (redirectUrl) {
-          console.log('🚀 Redirecting to PayFast:', redirectUrl);
-          window.location.href = redirectUrl;
+        console.log('🔍 PayFast request:', pfRequestBody);
+
+        const pfResponse = await fetch('/.netlify/functions/payfast-redirect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(pfRequestBody)
+        });
+
+        if (!pfResponse.ok) {
+          const pfError = await pfResponse.json().catch(() => ({ error: 'PayFast initiation failed' }));
+          console.error('❌ PayFast redirect error:', pfError);
+          alert(`PayFast Error: ${JSON.stringify(pfError, null, 2)}`);
+          throw new Error(pfError.error || 'Payment initiation failed');
+        }
+
+        // payfast-redirect returns HTML with auto-submit form
+        const contentType = pfResponse.headers.get('content-type') || '';
+
+        if (contentType.includes('text/html')) {
+          const html = await pfResponse.text();
+          console.log('🚀 Redirecting to PayFast via auto-submit form');
+          document.open();
+          document.write(html);
+          document.close();
         } else {
-          throw new Error('No redirect URL received from PayFast');
+          const pfData = await pfResponse.json();
+          console.log('✅ PayFast response:', pfData);
+          const redirectUrl = pfData.redirect || pfData.url;
+          if (redirectUrl) {
+            console.log('🚀 Redirecting to PayFast:', redirectUrl);
+            window.location.href = redirectUrl;
+          } else {
+            throw new Error('No redirect URL received from PayFast');
+          }
         }
       }
       
@@ -819,8 +852,14 @@ export const CheckoutPage: React.FC = () => {
     {
       id: 'payfast',
       name: 'PayFast',
-      description: 'Secure payment via PayFast (Cards, EFT, etc.)',
+      description: 'Cards, EFT, Instant EFT, MoreTyme & more',
       icon: CreditCard
+    },
+    {
+      id: 'payflex',
+      name: 'Payflex',
+      description: 'Buy now, pay later in 4 interest-free instalments',
+      icon: Calendar
     }
   ];
 
@@ -1307,13 +1346,30 @@ export const CheckoutPage: React.FC = () => {
                     {/* Payment Method */}
                     <div>
                       <h3 className="font-medium mb-2 sm:mb-3 text-sm sm:text-base">Payment Method</h3>
-                      <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                        <p className="font-medium text-sm sm:text-base">
-                          {paymentMethods.find(m => m.id === paymentInfo.method)?.name}
-                        </p>
-                        <p className="text-xs sm:text-sm text-gray-600">
-                          {paymentMethods.find(m => m.id === paymentInfo.method)?.description}
-                        </p>
+                      <div className="space-y-2">
+                        {paymentMethods.map((method) => (
+                          <label
+                            key={method.id}
+                            className={`flex items-start gap-3 p-3 sm:p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                              paymentInfo.method === method.id
+                                ? 'border-pink-400 bg-pink-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="paymentMethod"
+                              value={method.id}
+                              checked={paymentInfo.method === method.id}
+                              onChange={() => setPaymentInfo({ ...paymentInfo, method: method.id })}
+                              className="mt-1"
+                            />
+                            <div>
+                              <p className="font-medium text-sm sm:text-base">{method.name}</p>
+                              <p className="text-xs sm:text-sm text-gray-600">{method.description}</p>
+                            </div>
+                          </label>
+                        ))}
                       </div>
                     </div>
 
