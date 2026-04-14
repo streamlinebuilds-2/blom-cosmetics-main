@@ -26,6 +26,16 @@ async function getPayflexToken(): Promise<string> {
 }
 
 export const handler: Handler = async (event) => {
+  console.log('=== PAYFLEX REDIRECT DEBUG ===');
+  console.log('Environment:', {
+    PAYFLEX_CLIENT_ID: PAYFLEX_CLIENT_ID,
+    PAYFLEX_CLIENT_SECRET: PAYFLEX_CLIENT_SECRET ? 'SET' : 'MISSING',
+    PAYFLEX_API_URL: PAYFLEX_API_URL,
+    PAYFLEX_AUTH_URL: PAYFLEX_AUTH_URL,
+    PAYFLEX_AUDIENCE: PAYFLEX_AUDIENCE,
+    SITE_BASE_URL: SITE_BASE_URL,
+  });
+
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',

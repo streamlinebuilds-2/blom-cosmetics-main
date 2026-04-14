@@ -1260,19 +1260,19 @@ export const CheckoutPage: React.FC = () => {
                         </div>
                       )}
 
-                      <div className="flex flex-col sm:flex-row justify-between gap-3">
-                        <Button type="submit" size="lg" className="w-full sm:w-auto">
-                          <span className="text-xs sm:text-sm">Continue to Review</span>
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full sm:w-auto"
-                          onClick={() => window.location.href = '/shop'}
-                        >
-                          <span className="text-xs sm:text-sm">Continue Shopping</span>
-                        </Button>
-                      </div>
+<div className="flex flex-col sm:flex-row justify-between gap-3">
+  <Button
+    type="button"
+    variant="outline"
+    className="w-full sm:w-auto"
+    onClick={() => window.location.href = '/shop'}
+  >
+    <span className="text-xs sm:text-sm">Continue Shopping</span>
+  </Button>
+  <Button type="submit" size="lg" className="w-full sm:w-auto">
+    <span className="text-xs sm:text-sm">Continue to Review</span>
+  </Button>
+</div>
                     </form>
                   </CardContent>
                 </Card>
