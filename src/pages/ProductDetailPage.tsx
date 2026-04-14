@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../components/ui/use-toast';
 import { ProductCard } from '../components/ProductCard';
+import { PaymentMethods } from '../components/payment/PaymentMethods';
 
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -784,7 +785,12 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Payflex instalment widget */}
-              <div id="payflex-widget-container" className="mb-4" />
+              <div id="payflex-widget-container" className="mb-2" />
+
+              {/* Payment method badges */}
+              <div className="mb-6">
+                <PaymentMethods variant="compact" />
+              </div>
 
               {/* Short Description */}
               {shortDescriptionText && (

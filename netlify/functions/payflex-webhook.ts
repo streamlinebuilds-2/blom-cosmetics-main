@@ -207,6 +207,25 @@ export const handler: Handler = async (event) => {
       console.log('✅ Stock deducted');
     } catch (e) { console.error('Stock deduction error:', e); }
 
+    // D2) Update amount_paid_cents on course purchases
+    try {
+      const amountCents = order.total_cents ?? Math.round(Number(order.total || 0) * 100);
+      const cpCheckRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}&select=id&limit=1`,
+        { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+      );
+      if (cpCheckRes.ok) {
+        const cps = await cpCheckRes.json();
+        if (Array.isArray(cps) && cps.length > 0 && Number.isFinite(amountCents) && amountCents > 0) {
+          await fetch(`${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}`, {
+            method: 'PATCH',
+            headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount_paid_cents: amountCents })
+          });
+        }
+      }
+    } catch (e) { console.error('Course purchase amount update error:', e); }
+
     // E) Notify N8N
     try {
       await fetch(N8N_WEBHOOK_URL, {
@@ -215,10 +234,10 @@ export const handler: Handler = async (event) => {
         body: JSON.stringify({
           order_id: order.id,
           order_number: order.order_number,
-          customer_name: order.customer_name,
-          customer_email: order.customer_email,
-          customer_phone: order.customer_mobile,
-          total_amount: order.total_amount,
+          customer_name: order.buyer_name,
+          customer_email: order.buyer_email,
+          customer_phone: order.buyer_phone,
+          total_amount: order.total || (order.total_cents ? order.total_cents / 100 : 0),
           payment_status: 'PAID'
         })
       });
@@ -244,11 +263,11 @@ export const handler: Handler = async (event) => {
         for (const cp of coursePurchases) {
           const status = String(cp?.invitation_status || '').toLowerCase();
           if (status === 'sent' || status === 'redeemed') continue;
-          const buyerEmail = String(order.customer_email || cp.buyer_email || '').trim();
+          const buyerEmail = String(order.buyer_email || cp.buyer_email || '').trim();
           const courseSlug = String(cp.course_slug || '');
           if (!buyerEmail || !courseSlug) continue;
           try {
-            await enrollCourse({ orderId: order.id, courseSlug, buyerEmail, buyerName: order.customer_name || cp.buyer_name, buyerPhone: order.customer_mobile || cp.buyer_phone });
+            await enrollCourse({ orderId: order.id, courseSlug, buyerEmail, buyerName: order.buyer_name || cp.buyer_name, buyerPhone: order.buyer_phone || cp.buyer_phone });
           } catch (e) { console.error('Course enrollment error:', courseSlug, e); }
         }
       }
