@@ -10,6 +10,11 @@ async function bookUberDelivery(quoteId: string, order: any) {
   const storeLng = Number(process.env.STORE_LNG ?? 27.7014)
   const storeAddress = process.env.STORE_ADDRESS ?? '123 Main Road, Randfontein, 1759'
   const storePhone = process.env.STORE_PHONE ?? ''
+  const sandbox = process.env.UBER_SANDBOX === 'true'
+  const uberApiBase = sandbox ? 'https://sandbox-api.uber.com' : 'https://api.uber.com'
+  const uberAuthUrl = sandbox
+    ? 'https://sandbox-login.uber.com/oauth/v2/token'
+    : 'https://login.uber.com/oauth/v2/token'
 
   if (!clientId || !clientSecret || !customerId) {
     console.warn('Uber Direct not configured — skipping delivery booking')
@@ -17,7 +22,7 @@ async function bookUberDelivery(quoteId: string, order: any) {
   }
 
   // 1. Get OAuth token
-  const tokenRes = await fetch('https://login.uber.com/oauth/v2/token', {
+  const tokenRes = await fetch(uberAuthUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -38,7 +43,7 @@ async function bookUberDelivery(quoteId: string, order: any) {
 
   // 3. Create delivery using the pre-agreed quote
   const deliveryRes = await fetch(
-    `https://api.uber.com/v1/customers/${customerId}/deliveries`,
+    `${uberApiBase}/v1/customers/${customerId}/deliveries`,
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${access_token}`, 'Content-Type': 'application/json' },

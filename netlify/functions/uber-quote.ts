@@ -8,6 +8,11 @@ const STORE_ADDRESS = process.env.STORE_ADDRESS ?? '123 Main Road, Randfontein, 
 const UBER_CLIENT_ID = process.env.UBER_DIRECT_CLIENT_ID;
 const UBER_CLIENT_SECRET = process.env.UBER_DIRECT_CLIENT_SECRET;
 const UBER_CUSTOMER_ID = process.env.UBER_DIRECT_CUSTOMER_ID;
+const UBER_SANDBOX = process.env.UBER_SANDBOX === 'true';
+const UBER_API_BASE = UBER_SANDBOX ? 'https://sandbox-api.uber.com' : 'https://api.uber.com';
+const UBER_AUTH_URL = UBER_SANDBOX
+  ? 'https://sandbox-login.uber.com/oauth/v2/token'
+  : 'https://login.uber.com/oauth/v2/token';
 
 /** Haversine great-circle distance in km */
 function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -21,7 +26,7 @@ function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): 
 }
 
 async function getUberToken(): Promise<string> {
-  const res = await fetch('https://login.uber.com/oauth/v2/token', {
+  const res = await fetch(UBER_AUTH_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -85,7 +90,7 @@ export const handler: Handler = async (event) => {
     const token = await getUberToken();
 
     const quoteRes = await fetch(
-      `https://api.uber.com/v1/customers/${UBER_CUSTOMER_ID}/delivery_quotes`,
+      `${UBER_API_BASE}/v1/customers/${UBER_CUSTOMER_ID}/delivery_quotes`,
       {
         method: 'POST',
         headers: {

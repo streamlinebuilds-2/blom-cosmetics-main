@@ -21,15 +21,24 @@ export function DevFlagListener() {
       try {
         const alreadySet = localStorage.getItem(FLAG_KEY) === 'true';
         localStorage.setItem(FLAG_KEY, 'true');
-        localStorage.setItem('uber_delivery_mock', 'true');
-        console.log('[DevFlag] Uber same-day delivery ENABLED (mock mode)');
+        localStorage.removeItem('uber_delivery_mock'); // real API mode
+        console.log('[DevFlag] Uber same-day delivery ENABLED (live API mode)');
         if (!alreadySet) {
           window.location.replace(window.location.pathname);
         }
       } catch { /* ignore */ }
+    } else if (devMode === 'ubermock') {
+      // Use this when Uber credentials aren't set yet — hardcoded quote for UI testing
+      try {
+        localStorage.setItem(FLAG_KEY, 'true');
+        localStorage.setItem('uber_delivery_mock', 'true');
+        console.log('[DevFlag] Uber same-day delivery ENABLED (mock mode)');
+        window.location.replace(window.location.pathname);
+      } catch { /* ignore */ }
     } else if (devMode === 'off') {
       try {
         localStorage.removeItem(FLAG_KEY);
+        localStorage.removeItem('uber_delivery_mock');
         console.log('[DevFlag] Uber same-day delivery DISABLED');
         window.location.replace(window.location.pathname);
       } catch { /* ignore */ }
