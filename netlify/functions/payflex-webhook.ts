@@ -148,8 +148,9 @@ export const handler: Handler = async (event) => {
       return { statusCode: 200, body: 'Order not found — acknowledged' };
     }
 
-    // Handle non-approved statuses
-    if (orderStatus !== 'Approved') {
+    // Handle non-approved statuses — only act on definite decline/abandon, never on undefined
+    const definitelyDeclined = orderStatus && orderStatus !== 'Approved' && orderStatus !== 'Created' && orderStatus !== 'Initiated';
+    if (definitelyDeclined) {
       console.log(`Payflex status ${orderStatus} — marking order as cancelled`);
       await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
         method: 'PATCH',
@@ -157,6 +158,10 @@ export const handler: Handler = async (event) => {
         body: JSON.stringify({ status: 'cancelled', payment_status: 'failed', updated_at: new Date().toISOString() })
       });
       return { statusCode: 200, body: 'Payment declined recorded' };
+    }
+    if (!orderStatus || orderStatus !== 'Approved') {
+      console.log(`Payflex status ${orderStatus || 'unknown'} — not processing, waiting`);
+      return { statusCode: 200, body: 'Status not Approved — acknowledged' };
     }
 
     // Already paid — idempotent

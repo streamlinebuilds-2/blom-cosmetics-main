@@ -67,7 +67,17 @@ export default function CheckoutSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const orderId = params.get('order');
-    
+    const payflexOrderId = params.get('orderId'); // Payflex appends this to the redirect URL
+
+    // If this is a Payflex return, actively verify & fulfil via payflex-confirm
+    if (orderId && payflexOrderId) {
+      fetch('/.netlify/functions/payflex-confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_id: orderId, payflex_order_id: payflexOrderId })
+      }).catch(err => console.error('payflex-confirm error:', err));
+    }
+
     // Fallback to local storage if URL param is missing
     if (orderId) {
       checkStatus(orderId);
