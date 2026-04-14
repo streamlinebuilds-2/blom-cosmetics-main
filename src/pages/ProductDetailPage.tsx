@@ -785,12 +785,7 @@ export const ProductDetailPage: React.FC = () => {
               </div>
 
               {/* Payflex instalment widget */}
-              <div id="payflex-widget-container" className="mb-2" />
-
-              {/* Payment method badges */}
-              <div className="mb-6">
-                <PaymentMethods variant="compact" />
-              </div>
+              <div id="payflex-widget-container" className="mb-4" />
 
               {/* Short Description */}
               {shortDescriptionText && (
@@ -938,6 +933,11 @@ export const ProductDetailPage: React.FC = () => {
                   <CreditCard className="w-6 h-6 sm:w-5 sm:h-5" />
                   {isOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Buy Now'}
                 </button>
+              </div>
+
+              {/* Payment method badges */}
+              <div className="mb-6">
+                <PaymentMethods variant="compact" />
               </div>
 
               {/* Trust Badges */}
