@@ -853,13 +853,27 @@ export const CheckoutPage: React.FC = () => {
       id: 'payfast',
       name: 'PayFast',
       description: 'Cards, EFT, Instant EFT, MoreTyme & more',
-      icon: CreditCard
+      icon: CreditCard,
+      logo: (
+        <svg viewBox="0 0 72 22" className="h-5 w-auto flex-shrink-0" aria-label="PayFast">
+          <rect width="72" height="22" rx="4" fill="#0A4DA1"/>
+          <text x="6" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#FFFFFF">Pay</text>
+          <text x="28" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#5BC4F5">Fast</text>
+        </svg>
+      )
     },
     {
       id: 'payflex',
       name: 'Payflex',
       description: 'Buy now, pay later in 4 interest-free instalments',
-      icon: Calendar
+      icon: Calendar,
+      logo: (
+        <svg viewBox="0 0 72 22" className="h-5 w-auto flex-shrink-0" aria-label="Payflex">
+          <rect width="72" height="22" rx="4" fill="#6D28D9"/>
+          <text x="6" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#FFFFFF">pay</text>
+          <text x="30" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#C4B5FD">flex</text>
+        </svg>
+      )
     }
   ];
 
@@ -1364,8 +1378,11 @@ export const CheckoutPage: React.FC = () => {
                               onChange={() => setPaymentInfo({ ...paymentInfo, method: method.id })}
                               className="mt-1"
                             />
-                            <div>
-                              <p className="font-medium text-sm sm:text-base">{method.name}</p>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-0.5">
+                                {(method as any).logo}
+                                <p className="font-medium text-sm sm:text-base">{method.name}</p>
+                              </div>
                               <p className="text-xs sm:text-sm text-gray-600">{method.description}</p>
                             </div>
                           </label>
