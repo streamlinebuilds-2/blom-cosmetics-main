@@ -855,7 +855,7 @@ export const CheckoutPage: React.FC = () => {
       description: 'Cards, EFT, Instant EFT, MoreTyme & more',
       icon: CreditCard,
       logo: (
-        <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237198/Payfast_logo_fsryos.png" alt="PayFast" className="h-6 w-auto flex-shrink-0 object-contain" />
+        <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237198/Payfast_logo_fsryos.png" alt="PayFast" className="h-5 w-auto flex-shrink-0 object-contain" />
       )
     },
     {
@@ -864,7 +864,7 @@ export const CheckoutPage: React.FC = () => {
       description: 'Buy now, pay later in 4 interest-free instalments',
       icon: Calendar,
       logo: (
-        <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237251/a65340aacf8a80f5029d90f502460b539230993ffc89107fa4adbd83800f6d07-Payflex_Logo_-_Navy_v1tbdx.png" alt="Payflex" className="h-6 w-auto flex-shrink-0 object-contain" />
+        <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237251/a65340aacf8a80f5029d90f502460b539230993ffc89107fa4adbd83800f6d07-Payflex_Logo_-_Navy_v1tbdx.png" alt="Payflex" className="h-7 w-auto flex-shrink-0 object-contain" />
       )
     }
   ];
