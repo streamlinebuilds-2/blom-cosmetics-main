@@ -13,12 +13,10 @@ export const PaymentMethods: React.FC<PaymentMethodsProps> = ({ variant = 'full'
           Secure payment via
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          {/* Payflex BNPL badge */}
-          <div className="h-8 px-2 flex items-center bg-white border border-gray-200 rounded-md">
-            <span className="text-xs font-bold" style={{ color: '#6B2D8B' }}>Pay</span>
-            <span className="text-xs font-bold text-gray-800">flex</span>
-            <span className="ml-1 text-[9px] text-gray-500 leading-tight">4×<br/>interest<br/>free</span>
-          </div>
+          {/* PayFast */}
+          <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237198/Payfast_logo_fsryos.png" alt="PayFast" className="h-8 w-auto object-contain bg-white border border-gray-200 rounded-md px-2 py-1" />
+          {/* Payflex BNPL */}
+          <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237251/a65340aacf8a80f5029d90f502460b539230993ffc89107fa4adbd83800f6d07-Payflex_Logo_-_Navy_v1tbdx.png" alt="Payflex" className="h-8 w-auto object-contain bg-white border border-gray-200 rounded-md px-2 py-1" />
           <img src="/moretyme.svg" alt="MoreTyme" className="h-8 w-12 object-contain bg-white border border-gray-200 rounded-md p-1" />
           <img src="/credit-card.svg" alt="Visa / Mastercard" className="h-8 w-12 object-contain bg-white border border-gray-200 rounded-md p-1" />
           <img src="/debit-card.svg" alt="Debit Card" className="h-8 w-12 object-contain bg-white border border-gray-200 rounded-md p-1" />

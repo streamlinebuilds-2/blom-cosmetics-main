@@ -855,11 +855,7 @@ export const CheckoutPage: React.FC = () => {
       description: 'Cards, EFT, Instant EFT, MoreTyme & more',
       icon: CreditCard,
       logo: (
-        <svg viewBox="0 0 72 22" className="h-5 w-auto flex-shrink-0" aria-label="PayFast">
-          <rect width="72" height="22" rx="4" fill="#0A4DA1"/>
-          <text x="6" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#FFFFFF">Pay</text>
-          <text x="28" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#5BC4F5">Fast</text>
-        </svg>
+        <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237198/Payfast_logo_fsryos.png" alt="PayFast" className="h-6 w-auto flex-shrink-0 object-contain" />
       )
     },
     {
@@ -868,11 +864,7 @@ export const CheckoutPage: React.FC = () => {
       description: 'Buy now, pay later in 4 interest-free instalments',
       icon: Calendar,
       logo: (
-        <svg viewBox="0 0 72 22" className="h-5 w-auto flex-shrink-0" aria-label="Payflex">
-          <rect width="72" height="22" rx="4" fill="#6D28D9"/>
-          <text x="6" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#FFFFFF">pay</text>
-          <text x="30" y="15" fontFamily="Arial,sans-serif" fontSize="10" fontWeight="bold" fill="#C4B5FD">flex</text>
-        </svg>
+        <img src="https://res.cloudinary.com/dnlgohkcc/image/upload/q_auto/f_auto/v1776237251/a65340aacf8a80f5029d90f502460b539230993ffc89107fa4adbd83800f6d07-Payflex_Logo_-_Navy_v1tbdx.png" alt="Payflex" className="h-6 w-auto flex-shrink-0 object-contain" />
       )
     }
   ];
