@@ -8,6 +8,7 @@ export interface EnrollInput {
   buyerEmail: string
   buyerName: string
   buyerPhone: string
+  amountCents?: number
 }
 
 export interface EnrollResult {
@@ -18,18 +19,7 @@ export interface EnrollResult {
   fallbackSaved?: boolean
 }
 
-// ---------- Lazy singleton clients ----------
-
-let _academy: SupabaseClient | null = null
-function academyClient(): SupabaseClient {
-  if (!_academy) {
-    _academy = createClient(
-      process.env.ACADEMY_SUPABASE_URL!,
-      process.env.ACADEMY_SUPABASE_SERVICE_KEY!
-    )
-  }
-  return _academy
-}
+// ---------- Lazy singleton client ----------
 
 let _store: SupabaseClient | null = null
 function storeClient(): SupabaseClient {
@@ -45,121 +35,62 @@ function storeClient(): SupabaseClient {
 // ---------- Main function ----------
 
 export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
-  const { orderId, courseSlug, buyerEmail, buyerName, buyerPhone } = input
-  const academy = academyClient()
+  const { orderId, courseSlug, buyerEmail, buyerName, buyerPhone, amountCents } = input
   const store = storeClient()
 
-  // Step 0: Look up the Academy course UUID from slug
-  const { data: courseRow, error: lookupError } = await academy
-    .from('courses')
-    .select('id')
-    .eq('slug', courseSlug)
-    .single()
-
-  if (lookupError || !courseRow?.id) {
-    console.error('Academy course lookup failed for slug:', courseSlug, lookupError?.message)
-
-    // Fallback: upsert into Academy pending_enrollments
-    const { error: fallbackErr } = await academy
-      .from('pending_enrollments')
-      .upsert(
-        { email: buyerEmail, course_slug: courseSlug },
-        { onConflict: 'email,course_slug' }
-      )
-
-    if (fallbackErr) {
-      console.error('pending_enrollments upsert also failed:', fallbackErr.message)
-    }
-
-    await store
-      .from('course_purchases')
-      .update({ invitation_status: 'failed' })
-      .eq('order_id', orderId)
-      .eq('course_slug', courseSlug)
-
-    return {
-      success: false,
-      error: `Course not found in Academy: ${courseSlug} — ${lookupError?.message || 'no row'}`,
-      fallbackSaved: !fallbackErr
-    }
-  }
-
-  const courseUuid = courseRow.id
-
-  // Step 1: Call Academy RPC to create invite
-  const { data: rpcData, error: rpcError } = await academy.rpc('create_course_invite', {
-    p_course_id: courseUuid,
-    p_email: buyerEmail,
-    p_expires_in_days: 30
-  })
-
-  if (rpcError || !rpcData?.token) {
-    console.error('Academy RPC create_course_invite failed:', rpcError?.message || rpcData)
-
-    // Fallback: upsert into Academy pending_enrollments
-    const { error: fallbackErr } = await academy
-      .from('pending_enrollments')
-      .upsert(
-        { email: buyerEmail, course_slug: courseSlug },
-        { onConflict: 'email,course_slug' }
-      )
-
-    if (fallbackErr) {
-      console.error('pending_enrollments upsert also failed:', fallbackErr.message)
-    }
-
-    // Mark as failed in Store
-    await store
-      .from('course_purchases')
-      .update({ invitation_status: 'failed' })
-      .eq('order_id', orderId)
-      .eq('course_slug', courseSlug)
-
-    return {
-      success: false,
-      error: rpcError?.message || 'RPC returned failure',
-      fallbackSaved: !fallbackErr
-    }
-  }
-
-  // Step 2: RPC succeeded — update Store DB
-  const academyBase = (process.env.ACADEMY_URL || 'https://blom-academy.vercel.app').replace(/\/+$/, '')
-  const inviteUrl =
-    rpcData.invite_url ||
-    `${academyBase}/accept-invite?invite=${encodeURIComponent(rpcData.token)}`
-
-  await store
-    .from('course_purchases')
-    .update({
-      invitation_status: 'sent',
-      invited_at: new Date().toISOString()
-    })
-    .eq('order_id', orderId)
-    .eq('course_slug', courseSlug)
-
-  // Step 3: Best-effort n8n email notification (5s timeout, swallow errors)
   try {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 5_000)
-    await fetch(
-      `${process.env.N8N_BASE || 'https://dockerfile-1n82.onrender.com'}/webhook/course-invite`,
+    const timeout = setTimeout(() => controller.abort(), 15_000)
+
+    const response = await fetch(
+      `${process.env.ACADEMY_FUNCTION_URL}/course-purchase`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.ACADEMY_WEBHOOK_SECRET}`,
+        },
         body: JSON.stringify({
-          to: buyerEmail,
+          order_id: orderId,
+          email: buyerEmail,
           name: buyerName,
           phone: buyerPhone,
           course_slug: courseSlug,
-          invite_url: inviteUrl,
-          expires_at: rpcData.expires_at
+          amount_cents: amountCents,
         }),
-        signal: controller.signal
+        signal: controller.signal,
       }
-    ).finally(() => clearTimeout(timeout))
-  } catch {
-    console.warn('n8n email notification failed (best-effort, invite already created)')
-  }
+    )
+    clearTimeout(timeout)
 
-  return { success: true, token: rpcData.token, inviteUrl }
+    const result = await response.json()
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || `HTTP ${response.status}`)
+    }
+
+    // result.action = 'enrolled' | 'invited' | 'skipped'
+    const invitationStatus = result.action === 'enrolled' ? 'enrolled' : 'sent'
+
+    await store
+      .from('course_purchases')
+      .update({
+        invitation_status: invitationStatus,
+        invited_at: new Date().toISOString(),
+      })
+      .eq('order_id', orderId)
+      .eq('course_slug', courseSlug)
+
+    return { success: true }
+  } catch (err: any) {
+    console.error('Academy course-purchase edge function failed:', err.message)
+
+    await store
+      .from('course_purchases')
+      .update({ invitation_status: 'failed' })
+      .eq('order_id', orderId)
+      .eq('course_slug', courseSlug)
+
+    return { success: false, error: err.message }
+  }
 }
