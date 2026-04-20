@@ -16,7 +16,8 @@ export default function AccountPageFullCore() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
-  const [orders, setOrders] = useState<Array<{ id: string; m_payment_id?: string | null; order_number?: string | null; order_display?: string | null; status: string; shipping_status?: string | null; order_packed_at?: string | null; total: number; created_at: string; invoice_url?: string | null; buyer_name?: string | null; buyer_email?: string | null }>>([]);
+  const [orders, setOrders] = useState<Array<{ id: string; m_payment_id?: string | null; order_number?: string | null; order_display?: string | null; status: string; shipping_status?: string | null; order_packed_at?: string | null; total: number; created_at: string; invoice_url?: string | null; buyer_name?: string | null; buyer_email?: string | null; payment_status?: string | null; payment_method?: string | null }>>([]);
+  const [retryingOrderId, setRetryingOrderId] = useState<string | null>(null);
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [wishlistItems, setWishlistItems] = useState(wishlistStore.getItems());
@@ -86,7 +87,9 @@ export default function AccountPageFullCore() {
             created_at: String(o.created_at || new Date().toISOString()),
             invoice_url: o.invoice_url || null,
             buyer_name: o.buyer_name || null,
-            buyer_email: o.buyer_email || null
+            buyer_email: o.buyer_email || null,
+            payment_status: o.payment_status || null,
+            payment_method: o.payment_method || null
           };
         });
         setOrders(normalized);
@@ -146,8 +149,49 @@ export default function AccountPageFullCore() {
   const phone = profile?.phone || '—';
   const memberSince = authService.formatMemberSince(authState.user.created_at || '');
   const totalOrders = orders.length;
-  const totalSpent = orders.reduce((sum, o) => sum + (Number.isFinite(o.total) ? o.total : 0), 0);
+  const paidOrders = orders.filter(o => o.payment_status !== 'unpaid');
+  const totalSpent = paidOrders.reduce((sum, o) => sum + (Number.isFinite(o.total) ? o.total : 0), 0);
   const points = Math.floor(totalSpent / 10);
+
+  const handleRetryPayment = async (order: typeof orders[number]) => {
+    if (retryingOrderId) return;
+    setRetryingOrderId(order.id);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const jwt = session?.access_token ?? null;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (jwt) headers['Authorization'] = `Bearer ${jwt}`;
+      const res = await fetch('/.netlify/functions/retry-payment', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ order_id: order.id, buyer_email: order.buyer_email ?? authState.user?.email ?? null })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Retry failed' }));
+        alert(`Could not restart payment: ${err.error || 'Please try again.'}`);
+        return;
+      }
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('text/html')) {
+        const html = await res.text();
+        document.open();
+        document.write(html);
+        document.close();
+      } else {
+        const data = await res.json();
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          alert('Could not retrieve payment URL. Please try again.');
+        }
+      }
+    } catch (e: any) {
+      console.error('Retry payment error:', e);
+      alert('Failed to restart payment. Please try again.');
+    } finally {
+      setRetryingOrderId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -289,17 +333,29 @@ export default function AccountPageFullCore() {
                               </div>
                               <div className="text-right">
                                 <div className="font-bold">R{o.total.toFixed(2)}</div>
-                                <div className="text-sm text-gray-500 capitalize">
-                                  {o.shipping_status === 'ready_for_collection' && o.order_packed_at 
-                                    ? 'Ready for Collection' 
-                                    : o.shipping_status === 'pending' 
-                                      ? 'Processing' 
-                                      : o.status}
+                                <div className="text-sm capitalize">
+                                  {o.payment_status === 'unpaid' && o.status === 'placed'
+                                    ? <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">Payment Pending</span>
+                                    : o.shipping_status === 'ready_for_collection' && o.order_packed_at
+                                      ? <span className="text-gray-500">Ready for Collection</span>
+                                      : o.shipping_status === 'pending'
+                                        ? <span className="text-gray-500">Processing</span>
+                                        : <span className="text-gray-500">{o.status}</span>}
                                 </div>
                               </div>
                             </div>
                             <div className="mt-4 flex flex-wrap gap-2">
                               <Button variant="outline" size="sm" onClick={() => (window.location.href = `/orders/${o.id}`)}>View Details</Button>
+                              {o.payment_status === 'unpaid' && o.status === 'placed' && (
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  disabled={retryingOrderId === o.id}
+                                  onClick={() => handleRetryPayment(o)}
+                                >
+                                  {retryingOrderId === o.id ? 'Redirecting…' : 'Complete Payment'}
+                                </Button>
+                              )}
                               {(o as any).m_payment_id && (
                                 <Button 
                                   variant="outline" 

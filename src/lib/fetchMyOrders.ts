@@ -15,6 +15,8 @@ export interface Order {
   invoice_url: string | null;
   buyer_name: string | null;
   buyer_email: string | null;
+  payment_status: string | null;
+  payment_method: string | null;
   // Financial fields
   subtotal_cents?: number;
   shipping_cents?: number;
@@ -37,7 +39,7 @@ export async function fetchMyOrders(): Promise<Order[]> {
 
   // 1. Define Safe Fields (Columns guaranteed to exist on the 'orders' table)
   // removed 'order_display' from this list to prevent the 400 error
-  const safeFields = 'id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, total_cents, subtotal_cents, shipping_cents, discount_cents, currency, created_at, invoice_url, buyer_name, buyer_email';
+  const safeFields = 'id, m_payment_id, order_number, status, shipping_status, order_packed_at, total, total_cents, subtotal_cents, shipping_cents, discount_cents, currency, created_at, invoice_url, buyer_name, buyer_email, payment_status, payment_method';
 
   // 2. Try querying the VIEW first (It might have extra fields like order_display)
   let q = supabase
