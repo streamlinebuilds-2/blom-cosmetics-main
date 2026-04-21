@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { cartStore } from '../lib/cart';
 import { Header } from '../components/layout/Header';
@@ -75,6 +76,7 @@ export const ShopPage: React.FC = () => {
   // Price Range State (Custom Slider)
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000]);
   const [maxPrice, setMaxPrice] = useState(2000);
+  const [priceAdjustedByUser, setPriceAdjustedByUser] = useState(false);
 
   // Static products - Keep existing products working while database is being populated
   const staticProducts = useMemo(() => [
@@ -504,11 +506,18 @@ export const ShopPage: React.FC = () => {
     return Math.ceil(max / 100) * 100;
   }, [displayProducts, selectedCategory, searchTerm, showInStockOnly]);
 
-  // Update price range when category changes or max price changes
+  // Reset user-adjusted price flag when category or search changes
   useEffect(() => {
-    setPriceRange([0, dynamicMaxPrice]);
+    setPriceAdjustedByUser(false);
+  }, [selectedCategory, searchTerm]);
+
+  // Only reset price range when category/search changes (not when user manually set it)
+  useEffect(() => {
     setMaxPrice(dynamicMaxPrice);
-  }, [dynamicMaxPrice]);
+    if (!priceAdjustedByUser) {
+      setPriceRange([0, dynamicMaxPrice]);
+    }
+  }, [dynamicMaxPrice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Filtering Logic
   const filteredProducts = useMemo(() => {
@@ -584,25 +593,68 @@ export const ShopPage: React.FC = () => {
       <Header showMobileMenu={true} />
 
       <main className="pb-16">
-        {/* Desktop Header / Banner Area (Hidden on mobile if using the image style?) 
-            Image 2 shows a banner "BLOM'S ACRYLIC" over an image.
-            For now, I'll keep the standard header but maybe simpler.
-        */}
-        <div className="hidden lg:block bg-pink-50/60 py-10 mb-8 border-b border-pink-100">
+        {/* Desktop Hero Banner */}
+        <div className="hidden lg:block relative overflow-hidden bg-gradient-to-br from-pink-50 via-white to-pink-50/40 border-b border-pink-100/80 py-14 mb-8">
+          {/* Decorative background dots */}
+          <div className="absolute inset-0 pointer-events-none" aria-hidden>
+            <div className="absolute top-4 right-24 w-40 h-40 rounded-full bg-pink-200/20 blur-3xl" />
+            <div className="absolute bottom-0 left-10 w-32 h-32 rounded-full bg-pink-300/15 blur-2xl" />
+          </div>
           <Container>
-            <div className="text-center">
-              <p className="text-xs uppercase tracking-[0.25em] text-gray-500">Shop</p>
-              <h1 className="text-4xl font-bold text-gray-900 mt-2">{activeCategoryName}</h1>
-              <p className="text-sm text-gray-500 mt-2">{activeResultsCount} products</p>
+            <div className="flex flex-col items-center text-center gap-5 relative z-10">
+              <div>
+                <p className="text-xs uppercase tracking-[0.3em] text-pink-400 font-semibold mb-2">Blom Cosmetics</p>
+                <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight">{activeCategoryName}</h1>
+                <p className="text-sm text-gray-400 mt-2 font-medium">{activeResultsCount} {activeResultsCount === 1 ? 'product' : 'products'}</p>
+              </div>
+              {/* Search bar */}
+              <div className="relative w-full max-w-md">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search products…"
+                  className="w-full pl-11 pr-10 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all"
+                />
+                {searchTerm && (
+                  <button
+                    onClick={() => setSearchTerm('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-3.5 h-3.5 text-gray-400" />
+                  </button>
+                )}
+              </div>
             </div>
           </Container>
         </div>
 
         <Container>
-          <div className="lg:hidden pt-4 pb-4">
-            <p className="text-xs uppercase tracking-[0.25em] text-gray-500">Shop</p>
-            <h1 className="text-2xl font-bold text-gray-900 mt-2">{activeCategoryName}</h1>
-            <p className="text-sm text-gray-500 mt-1">{activeResultsCount} products</p>
+          <div className="lg:hidden pt-4 pb-2">
+            <p className="text-xs uppercase tracking-[0.25em] text-pink-400 font-semibold">Blom Cosmetics</p>
+            <h1 className="text-2xl font-bold text-gray-900 mt-1">{activeCategoryName}</h1>
+            <p className="text-sm text-gray-400 mt-0.5">{activeResultsCount} {activeResultsCount === 1 ? 'product' : 'products'}</p>
+          </div>
+
+          {/* Mobile search bar */}
+          <div className="lg:hidden mt-3 mb-2 relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search products…"
+              className="w-full pl-10 pr-9 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all"
+            />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
+              >
+                <X className="w-3.5 h-3.5 text-gray-400" />
+              </button>
+            )}
           </div>
 
           {!supabaseConfigured && (
@@ -659,9 +711,26 @@ export const ShopPage: React.FC = () => {
             {/* Desktop Sidebar (Categories & Filters) */}
             <div className="w-64 flex-shrink-0 hidden lg:block">
               <div className="sticky top-24 space-y-8">
+                {/* Sidebar Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search products…"
+                    className="w-full pl-9 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:border-pink-300 transition-all"
+                  />
+                  {searchTerm && (
+                    <button onClick={() => setSearchTerm('')} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                      <X className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
+                    </button>
+                  )}
+                </div>
+
                 {/* Categories */}
                 <div>
-                  <h3 className="font-bold text-lg mb-4">Categories</h3>
+                  <h3 className="font-bold text-sm uppercase tracking-widest text-gray-500 mb-4">Categories</h3>
                   <div className="space-y-2">
                     {productCategories.map(cat => {
                       // Skip if subcategory (will be rendered by parent)
@@ -762,42 +831,121 @@ export const ShopPage: React.FC = () => {
                 {/* Desktop Price Filter */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold text-lg">Price</h3>
+                    <h3 className="font-bold text-sm uppercase tracking-widest text-gray-500">Price</h3>
                     <span className="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded-full">
                       {activeResultsCount} found
                     </span>
                   </div>
-                  <RangeSlider 
-                    min={0} 
-                    max={maxPrice} 
-                    value={priceRange} 
-                    onChange={setPriceRange} 
+                  <RangeSlider
+                    min={0}
+                    max={maxPrice}
+                    value={priceRange}
+                    onChange={(val) => { setPriceAdjustedByUser(true); setPriceRange(val); }}
                   />
+                </div>
+
+                {/* Availability */}
+                <div>
+                  <h3 className="font-bold text-sm uppercase tracking-widest text-gray-500 mb-3">Availability</h3>
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <div
+                      onClick={() => setShowInStockOnly(!showInStockOnly)}
+                      className={`w-10 h-5 rounded-full relative transition-colors duration-200 flex-shrink-0 ${showInStockOnly ? 'bg-pink-500' : 'bg-gray-200'}`}
+                    >
+                      <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${showInStockOnly ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                    </div>
+                    <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">In stock only</span>
+                  </label>
                 </div>
               </div>
             </div>
 
             {/* Product Grid */}
             <div className="flex-1">
+              {/* Active Filter Chips */}
+              {(selectedCategory !== 'all' || searchTerm || showInStockOnly || priceAdjustedByUser) && (
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {selectedCategory !== 'all' && (
+                    <button
+                      onClick={() => setSelectedCategory('all')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded-full hover:bg-gray-700 transition-colors"
+                    >
+                      {activeCategoryName}
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded-full hover:bg-gray-700 transition-colors"
+                    >
+                      "{searchTerm}"
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {showInStockOnly && (
+                    <button
+                      onClick={() => setShowInStockOnly(false)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded-full hover:bg-gray-700 transition-colors"
+                    >
+                      In Stock
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  {priceAdjustedByUser && (
+                    <button
+                      onClick={() => { setPriceRange([0, maxPrice]); setPriceAdjustedByUser(false); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-900 text-white text-xs font-medium rounded-full hover:bg-gray-700 transition-colors"
+                    >
+                      R{priceRange[0]}–R{priceRange[1]}
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                  <button
+                    onClick={clearFilters}
+                    className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-500 hover:text-gray-800 transition-colors underline underline-offset-2"
+                  >
+                    Clear all
+                  </button>
+                </div>
+              )}
+
               <div className={`grid ${getGridClasses()} gap-4 sm:gap-6 lg:gap-8`}>
-                {sortedProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    {...product}
-                    isListView={false}
-                    displayVariant={viewMode === 'grid-3' ? 'compact' : 'default'}
-                    onCardClickOverride={() => handleProductClick(product.slug)}
-                  />
-                ))}
+                <AnimatePresence mode="sync">
+                  {sortedProducts.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.4) }}
+                    >
+                      <ProductCard
+                        {...product}
+                        isListView={false}
+                        displayVariant={viewMode === 'grid-3' ? 'compact' : 'default'}
+                        onCardClickOverride={() => handleProductClick(product.slug)}
+                      />
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
 
               {sortedProducts.length === 0 && (
-                <div className="text-center py-20">
-                  <p className="text-gray-500">No products found matching your filters.</p>
-                  <button onClick={clearFilters} className="mt-4 text-pink-500 font-medium hover:underline">
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-24"
+                >
+                  <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-7 h-7 text-gray-300" />
+                  </div>
+                  <p className="text-gray-500 font-medium mb-1">No products found</p>
+                  <p className="text-gray-400 text-sm mb-5">Try adjusting or clearing your filters.</p>
+                  <button onClick={clearFilters} className="px-5 py-2 bg-gray-900 text-white text-sm font-medium rounded-full hover:bg-gray-700 transition-colors">
                     Clear all filters
                   </button>
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
@@ -859,11 +1007,11 @@ export const ShopPage: React.FC = () => {
                         {activeResultsCount} found
                       </span>
                     </div>
-                    <RangeSlider 
-                      min={0} 
-                      max={maxPrice} 
-                      value={priceRange} 
-                      onChange={setPriceRange} 
+                    <RangeSlider
+                      min={0}
+                      max={maxPrice}
+                      value={priceRange}
+                      onChange={(val) => { setPriceAdjustedByUser(true); setPriceRange(val); }}
                     />
                   </div>
                 )}

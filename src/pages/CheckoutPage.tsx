@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -12,76 +13,22 @@ import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete'
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
 import { ProductVariantModal } from '../components/product/ProductVariantModal';
-// --- Simple Coupon Data (Memory for Recalculation) ---
-let simpleCouponData = {
+// Coupon data type (moved inside component as a ref — avoids shared module-level mutable state)
+type SimpleCouponData = {
+  couponCode: string;
+  discountType: 'percent' | 'fixed' | null;
+  discountValue: number;
+  originalDiscountCents: number;
+  maxDiscountCents: number | null;
+};
+
+const emptyCouponData = (): SimpleCouponData => ({
   couponCode: '',
-  discountType: null as 'percent' | 'fixed' | null,
+  discountType: null,
   discountValue: 0,
   originalDiscountCents: 0,
-  maxDiscountCents: null as number | null // <--- Stores the limit
-};
-
-const setSimpleCouponData = (data: any) => {
-  console.log('💾 Storing Coupon Rules:', data);
-  
-  // Extract Max Discount carefully
-  let maxCap = null;
-  if (data.max_discount_cents) maxCap = Number(data.max_discount_cents);
-  else if (data.coupon?.max_discount_cents) maxCap = Number(data.coupon.max_discount_cents);
-
-  simpleCouponData = {
-    couponCode: data.code || 'UNKNOWN',
-    discountType: (data.discount_type === 'fixed_amount' || data.type === 'fixed' || data.discount_type === 'fixed') ? 'fixed' : 'percent',
-    discountValue: Number(data.discount_value || data.value || 0),
-    originalDiscountCents: Number(data.discount_cents || 0),
-    maxDiscountCents: maxCap
-  };
-};
-
-const recalculateSimpleDiscount = (cartSubtotal: number): number => {
-  const { discountType, discountValue, originalDiscountCents, maxDiscountCents } = simpleCouponData;
-  
-  if (!discountType || discountValue <= 0) return 0;
-
-  // Fixed Discount: Can't exceed cart total
-  if (discountType === 'fixed') {
-    const rands = originalDiscountCents / 100;
-    return Math.min(rands, cartSubtotal);
-  }
-
-  // Percentage Discount: Recalculate & Enforce Cap
-  if (discountType === 'percent') {
-    const subtotalCents = Math.round(cartSubtotal * 100);
-    let newDiscountCents = Math.round(subtotalCents * (discountValue / 100));
-
-    // 1. Enforce Max Cap (If exists)
-    if (maxDiscountCents !== null && maxDiscountCents > 0) {
-      if (newDiscountCents > maxDiscountCents) {
-        console.log(`🛑 Discount Capped! R${newDiscountCents/100} -> R${maxDiscountCents/100}`);
-        newDiscountCents = maxDiscountCents;
-      }
-    }
-
-    // 2. Enforce Subtotal Cap (Can't be free+)
-    if (newDiscountCents > subtotalCents) {
-      newDiscountCents = subtotalCents;
-    }
-    
-    return newDiscountCents / 100;
-  }
-
-  return 0;
-};
-
-const clearSimpleCouponData = () => {
-  simpleCouponData = {
-    couponCode: '',
-    discountType: null,
-    discountValue: 0,
-    originalDiscountCents: 0,
-    maxDiscountCents: null
-  };
-};
+  maxDiscountCents: null,
+});
 
 export const CheckoutPage: React.FC = () => {
   const [cartState, setCartState] = useState<CartState>(cartStore.getState());
@@ -131,6 +78,42 @@ export const CheckoutPage: React.FC = () => {
   // Address input for autocomplete
   const [addressInput, setAddressInput] = useState('');
 
+
+  // Coupon data ref (replaces module-level mutable state to avoid HMR/SSR issues)
+  const simpleCouponDataRef = useRef<SimpleCouponData>(emptyCouponData());
+
+  const setSimpleCouponData = (data: any) => {
+    let maxCap: number | null = null;
+    if (data.max_discount_cents) maxCap = Number(data.max_discount_cents);
+    else if (data.coupon?.max_discount_cents) maxCap = Number(data.coupon.max_discount_cents);
+    simpleCouponDataRef.current = {
+      couponCode: data.code || 'UNKNOWN',
+      discountType: (data.discount_type === 'fixed_amount' || data.type === 'fixed' || data.discount_type === 'fixed') ? 'fixed' : 'percent',
+      discountValue: Number(data.discount_value || data.value || 0),
+      originalDiscountCents: Number(data.discount_cents || 0),
+      maxDiscountCents: maxCap,
+    };
+  };
+
+  const recalculateSimpleDiscount = (cartSubtotal: number): number => {
+    const { discountType, discountValue, originalDiscountCents, maxDiscountCents } = simpleCouponDataRef.current;
+    if (!discountType || discountValue <= 0) return 0;
+    if (discountType === 'fixed') return Math.min(originalDiscountCents / 100, cartSubtotal);
+    if (discountType === 'percent') {
+      const subtotalCents = Math.round(cartSubtotal * 100);
+      let newDiscountCents = Math.round(subtotalCents * (discountValue / 100));
+      if (maxDiscountCents !== null && maxDiscountCents > 0 && newDiscountCents > maxDiscountCents) {
+        newDiscountCents = maxDiscountCents;
+      }
+      if (newDiscountCents > subtotalCents) newDiscountCents = subtotalCents;
+      return newDiscountCents / 100;
+    }
+    return 0;
+  };
+
+  const clearSimpleCouponData = () => {
+    simpleCouponDataRef.current = emptyCouponData();
+  };
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
@@ -880,21 +863,43 @@ export const CheckoutPage: React.FC = () => {
       <main className="section-padding">
         <Container>
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4">Checkout</h1>
-            <div className="flex items-center justify-center gap-3 sm:gap-4">
-              <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm sm:text-base ${step === 'shipping' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
-                  1
+          <div className="text-center mb-10">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-6">Checkout</h1>
+            <div className="flex items-center justify-center gap-0 max-w-xs mx-auto">
+              {/* Step 1 */}
+              <div className="flex flex-col items-center">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                  step === 'shipping' ? 'bg-pink-500 text-white ring-4 ring-pink-100' :
+                  step === 'review' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-400'
+                }`}>
+                  {step === 'review' ? (
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : '1'}
                 </div>
-                <span className="text-sm sm:text-base">Shipping</span>
+                <span className={`text-xs mt-1.5 font-medium ${step === 'shipping' ? 'text-gray-900' : 'text-gray-400'}`}>Shipping</span>
               </div>
-              <div className="w-6 sm:w-8 h-px bg-gray-300"></div>
-              <div className={`flex items-center gap-2 ${step === 'review' ? 'text-gray-900' : 'text-gray-400'}`}>
-                <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-sm sm:text-base ${step === 'review' ? 'bg-pink-400 text-white' : 'bg-gray-200'}`}>
+
+              {/* Connector */}
+              <div className="flex-1 h-px mx-3 mb-4 bg-gray-200 relative overflow-hidden max-w-[80px]">
+                <motion.div
+                  className="absolute inset-0 bg-gray-900"
+                  initial={{ scaleX: 0 }}
+                  animate={{ scaleX: step === 'review' ? 1 : 0 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ transformOrigin: 'left' }}
+                />
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex flex-col items-center">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                  step === 'review' ? 'bg-pink-500 text-white ring-4 ring-pink-100' : 'bg-gray-200 text-gray-400'
+                }`}>
                   2
                 </div>
-                <span className="text-sm sm:text-base">Review</span>
+                <span className={`text-xs mt-1.5 font-medium ${step === 'review' ? 'text-gray-900' : 'text-gray-400'}`}>Review</span>
               </div>
             </div>
           </div>
@@ -902,8 +907,16 @@ export const CheckoutPage: React.FC = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
+              <AnimatePresence mode="wait">
               {/* Shipping Information */}
               {step === 'shipping' && (
+                <motion.div
+                  key="shipping"
+                  initial={{ opacity: 0, x: -18 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -18 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
                 <Card>
                   <CardHeader className="p-4 sm:p-6 pb-4 sm:pb-4">
                     <h2 className="text-xl sm:text-2xl font-bold">Shipping Information</h2>
@@ -1282,10 +1295,18 @@ export const CheckoutPage: React.FC = () => {
                     </form>
                   </CardContent>
                 </Card>
+                </motion.div>
               )}
 
               {/* Order Review */}
               {step === 'review' && (
+                <motion.div
+                  key="review"
+                  initial={{ opacity: 0, x: 18 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 18 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
                 <Card>
                   <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-6">
                     <h2 className="text-xl sm:text-2xl font-bold">Review Your Order</h2>
@@ -1451,7 +1472,9 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
+                </motion.div>
               )}
+              </AnimatePresence>
             </div>
 
             {/* Order Summary Sidebar */}
@@ -1512,7 +1535,7 @@ export const CheckoutPage: React.FC = () => {
                               <details className="mt-2 text-xs text-gray-600">
                                 <summary>Debug Info</summary>
                                 <div className="mt-1 p-2 bg-gray-100 rounded">
-                                  <p>Simple Data: {JSON.stringify(simpleCouponData, null, 2)}</p>
+                                  <p>Simple Data: {JSON.stringify(simpleCouponDataRef.current, null, 2)}</p>
                                   <p>Coupon Details: {couponDetails ? `Type: ${couponDetails.discount_type}, Value: ${couponDetails.discount_value}` : 'null'}</p>
                                 </div>
                               </details>

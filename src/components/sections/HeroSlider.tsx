@@ -132,11 +132,9 @@ export const HeroSlider: React.FC = () => {
               <img
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
-                // Applied mobileImagePosition and fixed loading issues
                 className={`w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'} blur-[0.5px]`}
-                // Changed all to eager to fix loading glitch on carousel rotation
-                loading="eager" 
-                decoding="sync"
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding={index === 0 ? 'sync' : 'async'}
                 fetchPriority={index === 0 ? 'high' : 'auto'}
               />
             </picture>

@@ -21,6 +21,7 @@
     "@supabase/supabase-js": "^2.57.4",
     "@vitejs/plugin-react": "^4.7.0",
     "crypto-js": "^4.2.0",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^0.344.0",
     "node-fetch": "^3.3.2",
     "pdf-lib": "^1.17.1",
