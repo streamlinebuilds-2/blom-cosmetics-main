@@ -61,7 +61,16 @@ export const CourseDetailPage: React.FC = () => {
           location: '9 Addison str, Golf Park, Orkney',
           email: 'blom.orkney.northwest@gmail.com',
           phone: '0731518407',
-          availableDates: ['April/May 2026 (27-30 Apr & 2 May)'],
+          availableDates: [
+            'April/May 2026 (27-30 Apr & 2 May) (Ultimate Acrylic Nail Course: Beginners)',
+            '20 May 2026 (Aquarelle Art Workshop: Watercolor Art)',
+            '16 June 2026 (3D Flower Workshop)',
+            '6–10 July 2026 (Ultimate Acrylic Nail Course: Beginners)',
+            '21–24 July 2026 (Rubberbase Basic Gel Course)',
+            '4 August 2026 (Gelpolish Advance Class - Art)',
+            '17–21 August 2026 (Ultimate Acrylic Nail Course: Beginners)',
+            '14–17 September 2026 (Rubberbase Gel Basic Gel Course)'
+          ],
           trainingSchedule: [
             {
               title: 'April/May 2026',
