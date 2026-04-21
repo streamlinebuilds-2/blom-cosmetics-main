@@ -60,7 +60,30 @@ export const CourseDetailPage: React.FC = () => {
           bio: 'Professional nail artist with years of experience in nail artistry. Yolanda specializes in teaching proper techniques and helping students build confidence in their nail artistry skills.',
           location: '9 Addison str, Golf Park, Orkney',
           email: 'blom.orkney.northwest@gmail.com',
-          phone: '0731518407'
+          phone: '0731518407',
+          availableDates: ['April/May 2026 (27-30 Apr & 2 May)'],
+          trainingSchedule: [
+            {
+              title: 'April/May 2026',
+              items: [
+                '27 April 2026',
+                '28 April 2026',
+                '29 April 2026',
+                '30 April 2026',
+                '2 May 2026'
+              ]
+            }
+          ],
+          scheduleImages: [
+            {
+              src: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1776768138/WhatsApp_Image_2026-04-20_at_08.40.34_muq7lz.jpg',
+              alt: 'All Course Dates – Yolanda Botha Orkney'
+            },
+            {
+              src: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1776768467/WhatsApp_Image_2026-04-20_at_08.41.50_kz7sex.jpg',
+              alt: 'April Course Dates – Yolanda Botha Orkney'
+            }
+          ]
         }
       ],
       about: [
@@ -523,6 +546,7 @@ export const CourseDetailPage: React.FC = () => {
   const [selectedInstructor, setSelectedInstructor] = useState<string>('');
   const [selectedInstructorIndex, setSelectedInstructorIndex] = useState<number>(0);
   const [showComparePackages, setShowComparePackages] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
 
   // Initialize selectedInstructor with first instructor on mount
   useEffect(() => {
@@ -869,6 +893,7 @@ export const CourseDetailPage: React.FC = () => {
                       onClick={() => {
                         setSelectedInstructorIndex(idx);
                         setSelectedInstructor(`${inst.name} - ${inst.location}`);
+                        setSelectedDate('');
                       }}
                       className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
                         selectedInstructorIndex === idx
@@ -1209,42 +1234,76 @@ export const CourseDetailPage: React.FC = () => {
                 </div>
 
                 {/* Course Dates */}
-                <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
-                  <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
-                    <Calendar className="h-8 w-8 text-pink-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Course Dates'}</h3>
-                  <div className="space-y-2">
-                    {course.availableDates.map((date, index) => (
-                      <button
-                        key={index}
-                        onClick={() => selectDate(date)}
-                        className={`block w-full px-5 py-3 rounded-full text-base font-semibold transition-all duration-300 hover:-translate-y-1`}
-                        style={selectedDate === date ? {
-                          backgroundColor: '#FF74A4',
-                          color: 'white'
-                        } : {
-                          backgroundColor: '#CEE5FF',
-                          color: '#1a1a1a'
-                        }}
-                        onMouseEnter={(e) => {
-                          if (selectedDate !== date) {
-                            e.currentTarget.style.backgroundColor = '#FF74A4';
-                            e.currentTarget.style.color = 'white';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (selectedDate !== date) {
-                            e.currentTarget.style.backgroundColor = '#CEE5FF';
-                            e.currentTarget.style.color = '#1a1a1a';
-                          }
-                        }}
-                      >
-                        {date}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                {(() => {
+                  const activeInstructor = (course as any).instructors?.[selectedInstructorIndex];
+                  const displayDates = activeInstructor?.availableDates ?? course.availableDates;
+                  const scheduleImages: { src: string; alt: string }[] = activeInstructor?.scheduleImages ?? [];
+                  return (
+                    <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                      <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <Calendar className="h-8 w-8 text-pink-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{course.isOnline ? 'Access' : 'Course Dates'}</h3>
+                      <div className="space-y-2">
+                        {displayDates.map((date: string, index: number) => (
+                          <button
+                            key={index}
+                            onClick={() => selectDate(date)}
+                            className="block w-full px-5 py-3 rounded-full text-base font-semibold transition-all duration-300 hover:-translate-y-1"
+                            style={selectedDate === date ? {
+                              backgroundColor: '#FF74A4',
+                              color: 'white'
+                            } : {
+                              backgroundColor: '#CEE5FF',
+                              color: '#1a1a1a'
+                            }}
+                            onMouseEnter={(e) => {
+                              if (selectedDate !== date) {
+                                e.currentTarget.style.backgroundColor = '#FF74A4';
+                                e.currentTarget.style.color = 'white';
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (selectedDate !== date) {
+                                e.currentTarget.style.backgroundColor = '#CEE5FF';
+                                e.currentTarget.style.color = '#1a1a1a';
+                              }
+                            }}
+                          >
+                            {date}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Schedule images – only shown when instructor has them */}
+                      {scheduleImages.length > 0 && (
+                        <div className="mt-6">
+                          <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Schedule Details</p>
+                          <div className="flex justify-center gap-3">
+                            {scheduleImages.map((img, i) => (
+                              <button
+                                key={i}
+                                onClick={() => setLightboxImage(img.src)}
+                                className="group relative w-20 h-20 rounded-xl overflow-hidden border-2 border-white shadow-md hover:shadow-xl hover:border-pink-400 hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-pink-400"
+                                aria-label={`View ${img.alt}`}
+                              >
+                                <img
+                                  src={img.src}
+                                  alt={img.alt}
+                                  className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                  <span className="text-white text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow">View</span>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">Tap images to enlarge</p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {!course.isOnline && course.thingsToBring.length > 0 && (
                   <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
@@ -1263,22 +1322,26 @@ export const CourseDetailPage: React.FC = () => {
                   </div>
                 )}
 
-                {!course.isOnline && course.trainingSchedule.length > 0 && course.trainingSchedule.map((block: any) => (
-                  <div key={block.title} className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
-                    <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
-                      <Clock className="h-8 w-8 text-pink-400" />
+                {!course.isOnline && (() => {
+                  const activeInstructor = (course as any).instructors?.[selectedInstructorIndex];
+                  const displaySchedule = activeInstructor?.trainingSchedule ?? course.trainingSchedule;
+                  return displaySchedule.length > 0 && displaySchedule.map((block: any) => (
+                    <div key={block.title} className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
+                      <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
+                        <Clock className="h-8 w-8 text-pink-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide">{`Training Times - ${block.title}`}</h3>
+                      <ul className="text-gray-800 text-base md:text-lg leading-relaxed space-y-3 text-left mt-4">
+                        {block.items.map((t: string, index: number) => (
+                          <li key={index} className="flex gap-2">
+                            <span className="text-pink-400 mt-0.5">•</span>
+                            <span>{t}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-3 uppercase tracking-wide">{`Training Times - ${block.title}`}</h3>
-                    <ul className="text-gray-800 text-base md:text-lg leading-relaxed space-y-3 text-left mt-4">
-                      {block.items.map((t: string, index: number) => (
-                        <li key={index} className="flex gap-2">
-                          <span className="text-pink-400 mt-0.5">•</span>
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                  ));
+                })()}
 
                 {!course.isOnline && course.studentDiscount.length > 0 && (
                   <div className="p-10 md:p-12 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 text-center" style={{ backgroundColor: '#CEE5FF' }}>
@@ -1430,7 +1493,7 @@ export const CourseDetailPage: React.FC = () => {
                           <option value="" disabled>
                             Select a date
                           </option>
-                          {course.availableDates.map((date) => (
+                          {((course as any).instructors?.[selectedInstructorIndex]?.availableDates ?? course.availableDates).map((date: string) => (
                             <option key={date} value={date}>
                               {date}
                             </option>
@@ -1449,11 +1512,10 @@ export const CourseDetailPage: React.FC = () => {
                           value={selectedInstructor}
                           onChange={(e) => {
                             setSelectedInstructor(e.target.value);
-                            // Find the index of the selected instructor
-                            const inst = (course as any).instructors?.find((i: any) => `${i.name} - ${i.location}` === e.target.value);
                             const idx = (course as any).instructors?.findIndex((i: any) => `${i.name} - ${i.location}` === e.target.value);
                             if (idx !== undefined && idx >= 0) {
                               setSelectedInstructorIndex(idx);
+                              setSelectedDate('');
                             }
                           }}
                           className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-300 focus:border-pink-400 outline-none transition-all text-base bg-white"
@@ -1626,6 +1688,29 @@ export const CourseDetailPage: React.FC = () => {
           </Container>
         </section>
       </main>
+
+      {/* Lightbox for schedule images */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute -top-10 right-0 text-white hover:text-pink-300 transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-8 w-8" />
+            </button>
+            <img
+              src={lightboxImage}
+              alt="Schedule"
+              className="w-full rounded-2xl shadow-2xl"
+            />
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
