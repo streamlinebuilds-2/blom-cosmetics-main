@@ -105,21 +105,6 @@
     "shortDescription": "Holographic guide, strong adhesive, 300 forms per roll."
   },
   {
-    "slug": "nail-liquid-monomer",
-    "title": "Nail Liquid (Monomer)",
-    "price": 899,
-    "thumbnail": "/nail-liquid-monomer-white.webp",
-    "images": ["/nail-liquid-monomer-white.webp", "/nail-liquid-monomer-colorful.webp"],
-    "badges": ["Sold Out"],
-    "status": "active",
-    "rating": 4.8,
-    "reviews": 87,
-    "compareAt": null,
-    "stockStatus": "Sold Out",
-    "category": "acrylic-system",
-    "shortDescription": "Low-odor EMA formula, MMA/HEMA-free."
-  },
-  {
     "slug": "crystal-kolinsky-sculpting-brush",
     "title": "Crystal Kolinsky Sculpting Brush",
     "price": 384,
@@ -134,19 +119,4 @@
     "category": "tools-essentials",
     "shortDescription": "Premium Kolinsky brush with floating glitter handle."
   },
-  {
-    "slug": "blom-gel-paint-set-12-colours",
-    "title": "Blom Gel Paint Set - 12x colours",
-    "price": 1020,
-    "thumbnail": "/gel-paint-set-white.webp",
-    "images": ["/gel-paint-set-white.webp", "/gel-paint-set-colorful.webp"],
-    "badges": ["Sold Out"],
-    "status": "active",
-    "rating": 0,
-    "reviews": 0,
-    "compareAt": 1350,
-    "stockStatus": "Sold Out",
-    "category": "gel-system",
-    "shortDescription": "Professional Gel Paint Kit designed for nail artists who want precision, pigmentation, and performance — all in one set."
-  }
 ]
