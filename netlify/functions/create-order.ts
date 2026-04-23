@@ -198,6 +198,7 @@ export const handler: Handler = async (event) => {
         course_type: booking.course_type || null,
         selected_package: booking.selected_package || null,
         selected_date: booking.selected_date || null,
+        instructor: booking.instructor || null,
         amount_paid_cents: typeof booking.amount_paid_cents === 'number' ? booking.amount_paid_cents : null,
         payment_kind: booking.payment_kind || null,
         details: booking.details || null
