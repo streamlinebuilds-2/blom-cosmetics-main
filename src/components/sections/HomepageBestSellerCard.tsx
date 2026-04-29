@@ -3,6 +3,7 @@ import { Heart } from 'lucide-react';
 import { cartStore } from '../../lib/cart';
 import { wishlistStore } from '../../lib/wishlist';
 import { ProductVariantModal } from '../product/ProductVariantModal';
+import { useImageBackgroundColor } from '../../hooks/useImageBackgroundColor';
 
 interface HomepageBestSellerCardProps {
   id: string;
@@ -36,6 +37,7 @@ export const HomepageBestSellerCard: React.FC<HomepageBestSellerCardProps> = ({
 }) => {
   const cardRef = useRef<HTMLElement>(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
+  const { bgColor } = useImageBackgroundColor(image);
 
   useEffect(() => {
     const card = cardRef.current;
@@ -121,7 +123,7 @@ export const HomepageBestSellerCard: React.FC<HomepageBestSellerCardProps> = ({
       onClick={handleCardClick}
     >
       {/* Image Container with Shine Effect */}
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden" style={{ backgroundColor: bgColor }}>
         <img
           src={image}
           alt={name}

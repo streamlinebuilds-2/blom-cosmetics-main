@@ -53,7 +53,7 @@ export const ShopByCategory: React.FC = () => {
               variants={cardVariant}
               className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
             >
-              <div className="aspect-square overflow-hidden">
+              <div className="aspect-[4/5] overflow-hidden">
                 <img
                   src={category.image}
                   alt={category.name}

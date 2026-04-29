@@ -4,6 +4,7 @@ import { cartStore, showNotification } from '../lib/cart';
 import { wishlistStore } from '../lib/wishlist';
 import { OptimizedImage } from './seo/OptimizedImage';
 import { ProductVariantModal } from './product/ProductVariantModal';
+import { useImageBackgroundColor } from '../hooks/useImageBackgroundColor';
 
 interface ProductCardProps { 
   id: string; 
@@ -57,6 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const hasVariants = variants && variants.length > 1;
   const lowestPrice = hasVariants ? Math.min(...variants.map(v => v.price || price), price) : price;
+  const { bgColor } = useImageBackgroundColor(safeImages[0]);
 
   React.useEffect(() => {
     setIsWishlisted(wishlistStore.isInWishlist(slug));
@@ -118,7 +120,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           `}
           onClick={handleCardClick}
         >
-          <div className="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gray-50">
+          <div className="w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden" style={{ backgroundColor: bgColor }}>
             <OptimizedImage
               src={safeImages[0]}
               alt={safeName}
@@ -185,12 +187,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           `}
           onClick={handleCardClick}
         >
-          <div className="relative aspect-square overflow-hidden bg-gray-50">
+          <div className="relative aspect-[4/5] overflow-hidden" style={{ backgroundColor: bgColor }}>
             <OptimizedImage
               src={safeImages[0]}
               alt={safeName}
               width={500}
-              height={500}
+              height={625}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
 
@@ -263,12 +265,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         onClick={handleCardClick}
       >
 
-        <div className="relative aspect-square overflow-hidden bg-gray-50">
+        <div className="relative aspect-[4/5] overflow-hidden" style={{ backgroundColor: bgColor }}>
           <OptimizedImage
             src={safeImages[0]}
             alt={safeName}
             width={500}
-            height={500}
+            height={625}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           

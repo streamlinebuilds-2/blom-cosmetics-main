@@ -34,7 +34,8 @@ export const handler: Handler = async (event) => {
     
     for (const it of items) {
       let baseName = (it.product_name || it.name || 'Unknown Product').trim();
-      let variantName = it.variant?.title && it.variant.title !== 'Default Title' ? it.variant.title.trim() : '';
+      const skipVariant = ['default title', 'default'];
+      let variantName = it.variant?.title && !skipVariant.includes(it.variant.title.toLowerCase().trim()) ? it.variant.title.trim() : '';
       
       // Clean base name if it already contains the variant
       if (variantName && baseName.endsWith(` - ${variantName}`)) {

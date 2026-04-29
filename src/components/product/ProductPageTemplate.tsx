@@ -252,7 +252,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
               {/* Product Media */}
               <div>
                 {/* Main Image */}
-                <div className="relative aspect-square mb-4 overflow-hidden rounded-lg bg-gray-100 shadow-md">
+                <div className="relative aspect-[4/5] mb-4 overflow-hidden rounded-lg bg-gray-100 shadow-md">
                   <img
                     src={product.images[selectedImage] || 'https://images.pexels.com/photos/3997993/pexels-photo-3997993.jpeg?auto=compress&cs=tinysrgb&w=600&h=600&fit=crop'}
                     alt={product.name}
@@ -527,7 +527,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
             <div className="grid md:grid-cols-3 gap-8">
               {relatedProducts.map((relatedProduct) => (
                 <Card key={relatedProduct.id} className="group cursor-pointer">
-                  <div className="aspect-square overflow-hidden">
+                  <div className="aspect-[4/5] overflow-hidden">
                     <img
                       src={relatedProduct.image}
                       alt={relatedProduct.name}

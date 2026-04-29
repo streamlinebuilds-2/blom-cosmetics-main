@@ -519,12 +519,12 @@ export const ProductDetailPage: React.FC = () => {
       price: variantPrice,
       image: variantImage,
       quantity: quantity,
-      variant: selectedVariant && selectedVariant !== 'Default Title' ? { title: selectedVariant } : undefined
+      variant: selectedVariant && !['Default Title', 'Default'].includes(selectedVariant) ? { title: selectedVariant } : undefined
     });
 
     toast({
       title: "Added to cart",
-      description: `${product.name}${selectedVariant && selectedVariant !== 'Default Title' ? ` (${selectedVariant})` : ''} has been added to your cart.`
+      description: `${product.name}${selectedVariant && !['Default Title', 'Default'].includes(selectedVariant) ? ` (${selectedVariant})` : ''} has been added to your cart.`
     });
   };
   
@@ -579,8 +579,8 @@ export const ProductDetailPage: React.FC = () => {
       name = product.imageVariants[selectedImageIndex].variantName;
     }
     
-    // Don't show "Default Title" as a variant name
-    if (name === 'Default Title') return null;
+    // Don't show "Default Title" or "Default" as a variant name
+    if (name === 'Default Title' || name === 'Default') return null;
     
     return name;
   };
@@ -795,7 +795,7 @@ export const ProductDetailPage: React.FC = () => {
               )}
 
               {/* Variant Selector */}
-              {product.variants && product.variants.length > 0 && !(product.variants.length === 1 && product.variants[0].name === 'Default Title') && (
+              {product.variants && product.variants.length > 0 && !product.variants.every((v: any) => v.name === 'Default Title' || v.name === 'Default') && (
                 <div className="mb-8">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-sm font-semibold text-gray-900">
