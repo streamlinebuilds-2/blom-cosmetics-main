@@ -451,11 +451,11 @@ export const ShopPage: React.FC = () => {
       }
     });
 
-    // Process others
+    // Process others (categories not in priorityOrder)
     displayProducts.forEach((product: any) => {
       const productCategories = product.categories || (product.category ? [product.category] : []);
       productCategories.forEach((slug: string) => {
-        if (!slug || slug === 'all' || slug === 'archived' || cats.has(slug)) return;
+        if (!slug || slug === 'all' || slug === 'archived' || priorityOrder.includes(slug)) return;
         const name = categoryNameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
         if (!cats.has(slug)) cats.set(slug, { name, slug, count: 0 });
         cats.get(slug).count++;

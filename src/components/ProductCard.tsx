@@ -193,7 +193,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               alt={safeName}
               width={500}
               height={625}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.03]"
             />
 
             <div className="absolute top-2 left-2 flex flex-col gap-1 z-10">
@@ -271,7 +271,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             alt={safeName}
             width={500}
             height={625}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
           />
           
           {/* Badges */}
