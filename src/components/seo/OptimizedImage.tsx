@@ -80,8 +80,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         // Provide generic responsive sizing to reduce layout shifts
         sizes="(max-width: 768px) 100vw, 50vw"
         style={{
-          maxWidth: '100%',
-          height: 'auto'
+          maxWidth: '100%'
         }}
         // Add structured data attributes for better indexing
         data-product-name={productName}
