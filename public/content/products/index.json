@@ -60,21 +60,6 @@
     "shortDescription": "Exotic dragon fruit & lotus scented cuticle oil with Vitamin E, Jojoba & Soybean Oil."
   },
   {
-    "slug": "cuticle-oil-watermelon",
-    "title": "Cuticle Oil - Watermelon",
-    "price": 140,
-    "thumbnail": "https://res.cloudinary.com/dnlgohkcc/image/upload/v1777445885/Watermelon_l1dyge.png",
-    "images": ["https://res.cloudinary.com/dnlgohkcc/image/upload/v1777445885/Watermelon_l1dyge.png", "/cuticle-oil-colorful.webp"],
-    "badges": ["Bestseller"],
-    "status": "active",
-    "rating": 4.9,
-    "reviews": 156,
-    "compareAt": null,
-    "stockStatus": "In Stock",
-    "category": "prep-finishing",
-    "shortDescription": "Fresh watermelon scented cuticle oil with Vitamin E, Jojoba & Soybean Oil."
-  },
-  {
     "slug": "cuticle-oil-sweet-peach",
     "title": "Cuticle Oil - Sweet Peach",
     "price": 140,

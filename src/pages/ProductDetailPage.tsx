@@ -684,7 +684,7 @@ export const ProductDetailPage: React.FC = () => {
                 <OptimizedImage
                   src={product.images[selectedImageIndex]}
                   alt={product.name}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-contain object-center"
                 />
                 
                 {/* Badges */}
@@ -734,7 +734,7 @@ export const ProductDetailPage: React.FC = () => {
                       <OptimizedImage
                         src={img}
                         alt={`${product.name} view ${idx + 1}`}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                       />
                       {/* Variant indicator on thumbnail */}
                       {product.imageVariants && product.imageVariants[idx]?.variantName && (
@@ -862,7 +862,7 @@ export const ProductDetailPage: React.FC = () => {
                               <OptimizedImage
                                 src={variant.image}
                                 alt={variant.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-contain"
                               />
                               {isSelected && (
                                 <div className="absolute inset-0 bg-pink-400/20 border-2 border-pink-400 rounded-lg" />
