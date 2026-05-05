@@ -105,21 +105,6 @@
     "shortDescription": "Removes oils & moisture for better adhesion."
   },
   {
-    "slug": "top-coat",
-    "title": "Top Coat",
-    "price": 190,
-    "thumbnail": "/top-coat-white.webp",
-    "images": ["/top-coat-white.webp", "/top-coat-colorful.webp"],
-    "badges": ["Bestseller"],
-    "status": "active",
-    "rating": 4.9,
-    "reviews": 201,
-    "compareAt": null,
-    "stockStatus": "In Stock",
-    "category": "gel-system",
-    "shortDescription": "Mirror shine, chip-resistant, professional finish."
-  },
-  {
     "slug": "fairy-dust-top-coat",
     "title": "Fairy Dust Top Coat",
     "price": 195,
@@ -133,21 +118,6 @@
     "stockStatus": "In Stock",
     "category": "gel-system",
     "shortDescription": "Subtle glitter-infused top coat with smooth shine."
-  },
-  {
-    "slug": "nail-file",
-    "title": "Nail File (80/80 Grit)",
-    "price": 35,
-    "thumbnail": "/nail-file-white.webp",
-    "images": ["/nail-file-white.webp", "/nail-file-colorful.webp"],
-    "badges": ["Sold Out"],
-    "status": "active",
-    "rating": 4.5,
-    "reviews": 67,
-    "compareAt": null,
-    "stockStatus": "Sold Out",
-    "category": "tools-essentials",
-    "shortDescription": "Durable pro file with floral design."
   },
   {
     "slug": "nail-forms",

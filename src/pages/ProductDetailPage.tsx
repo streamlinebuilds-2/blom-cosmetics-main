@@ -78,6 +78,7 @@ export const ProductDetailPage: React.FC = () => {
             .from('products')
             .select(`*, product_reviews(count)`)
             .eq('slug', slug)
+            .in('status', ['active', 'published'])
             .maybeSingle(),
           supabase
             .from('bundles')
@@ -97,6 +98,7 @@ export const ProductDetailPage: React.FC = () => {
                 .from('products')
                 .select(`*, product_reviews(count)`)
                 .ilike('slug', slug)
+                .in('status', ['active', 'published'])
                 .maybeSingle();
             if (pData) productData = pData;
 
