@@ -631,7 +631,8 @@ export const ProductDetailPage: React.FC = () => {
 
   const shortDescriptionText = product.short_description || product.shortDescription;
 
-  const isOutOfStock = product.stockStatus === 'Sold Out' || (product.stock_quantity !== undefined && product.stock_quantity <= 0);
+  const stockLevel = product.stock_qty ?? product.stock_on_hand ?? product.inventory_quantity ?? product.stock ?? 0;
+  const isOutOfStock = product.out_of_stock === true || (product.stockStatus === 'Sold Out') || (!product.out_of_stock && stockLevel === 0 && product.stock_qty !== undefined);
 
   return (
     <div className="min-h-screen bg-white">
