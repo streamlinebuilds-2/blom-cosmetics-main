@@ -113,7 +113,7 @@ export const handler: Handler = async (event) => {
     } else if (hasFurniture) {
       shippingCents = 0
     } else {
-      shippingCents = subtotalCents >= 2000 * 100 ? 0 : 120 * 100
+      shippingCents = subtotalCents >= 2000 * 100 ? 0 : 125 * 100
     }
 
     const rawDiscountCents = Math.round(Number(body.totals?.discount_cents ?? body.discount_cents ?? 0))

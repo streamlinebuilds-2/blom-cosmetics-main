@@ -70,7 +70,7 @@ export const TermsPage: React.FC = () => {
               <p className="mb-4">We deliver throughout South Africa using reputable courier services.</p>
               
               <h3 className="text-xl font-semibold mb-3">6.1 Shipping Costs</h3>
-              <p className="mb-4">Shipping costs are calculated at checkout based on your delivery address. Orders over <strong>R1,500</strong> qualify for free shipping. Standard delivery costs are <strong>R120</strong> for orders under R1,500.</p>
+              <p className="mb-4">Shipping costs are calculated at checkout based on your delivery address. Orders over <strong>R1,500</strong> qualify for free shipping. Standard delivery costs are <strong>R125</strong> for orders under R1,500.</p>
               
               <h3 className="text-xl font-semibold mb-3">6.2 Delivery Times</h3>
               <p className="mb-4">Standard delivery takes 5-10 business days. Processing time is 1-3 business days from order confirmation. You will receive a tracking number via email once your order is dispatched.</p>

@@ -825,7 +825,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     // 4. Standard Delivery Rules
-    return cartState.subtotal >= 2000 ? 0 : 120;
+    return cartState.subtotal >= 2000 ? 0 : 125;
   };
 
   const shippingCost = calculateShipping();
@@ -999,7 +999,7 @@ export const CheckoutPage: React.FC = () => {
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Door-to-Door Delivery</span>
                                   <span className="text-lg font-bold text-gray-900">
-                                    {hasFurniture ? 'Calculated Later' : (cartState.subtotal >= 2000 ? 'FREE' : 'R120')}
+                                    {hasFurniture ? 'Calculated Later' : (cartState.subtotal >= 2000 ? 'FREE' : 'R125')}
                                   </span>
                                 </div>
                                 
@@ -1573,7 +1573,7 @@ export const CheckoutPage: React.FC = () => {
                     {shippingMethod === 'door-to-door' && cartState.subtotal >= 2000 && !hasFurniture && (
                       <div className="flex justify-between text-xs text-green-600">
                         <span>✨ Free shipping applied!</span>
-                        <span>-R120</span>
+                        <span>-R125</span>
                       </div>
                     )}
                     {appliedCoupon && discount > 0 && (
