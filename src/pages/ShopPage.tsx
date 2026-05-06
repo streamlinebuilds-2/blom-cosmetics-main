@@ -663,6 +663,26 @@ export const ShopPage: React.FC = () => {
             </div>
           )}
 
+          {/* Category Pills - Mobile Optimized */}
+          <div className="lg:hidden mb-4">
+            <div className="flex flex-wrap gap-1.5">
+              {productCategories.map((category) => (
+                <button
+                  key={category.slug}
+                  onClick={() => setSelectedCategory(category.slug)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
+                    selectedCategory === category.slug
+                      ? 'bg-pink-400 text-white shadow-md'
+                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                  }`}
+                >
+                  {category.name}
+                  <span className="ml-1 text-xs opacity-75">({category.count})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Mobile Toolbar (Sticky) */}
           <div className="sticky top-0 z-30 bg-white border-b border-gray-200 lg:hidden -mx-4 px-4 mb-6">
             <div className="flex items-center h-14">
