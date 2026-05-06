@@ -451,14 +451,23 @@ export const ShopPage: React.FC = () => {
       }
     });
 
-    // Process others (categories not in priorityOrder)
+          // Process others (categories not in priorityOrder)
     displayProducts.forEach((product: any) => {
       const productCategories = product.categories || (product.category ? [product.category] : []);
       productCategories.forEach((slug: string) => {
-        if (!slug || slug === 'all' || slug === 'archived' || priorityOrder.includes(slug)) return;
-        const name = categoryNameOverrides[slug] || slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-        if (!cats.has(slug)) cats.set(slug, { name, slug, count: 0 });
-        cats.get(slug).count++;
+        if (!slug || slug === 'all' || slug === 'archived') return;
+
+        // Merge tools-accessories and accessories into tools-essentials for mobile consistency
+        let effectiveSlug = slug;
+        if (slug === 'tools-accessories' || slug === 'accessories') {
+          effectiveSlug = 'tools-essentials';
+        }
+
+        if (priorityOrder.includes(effectiveSlug)) return;
+
+        const name = categoryNameOverrides[effectiveSlug] || effectiveSlug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        if (!cats.has(effectiveSlug)) cats.set(effectiveSlug, { name, slug: effectiveSlug, count: 0 });
+        cats.get(effectiveSlug).count++;
       });
     });
 
