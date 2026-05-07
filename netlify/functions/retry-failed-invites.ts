@@ -23,11 +23,12 @@ export const handler: Handler = async (event) => {
 
   const store = createClient(process.env.SUPABASE_URL!, SERVICE_KEY)
 
-  // Fetch failed course purchases
+  // Fetch failed or stuck-pending course purchases (pending > 10 min = race condition victim)
+  const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString()
   const { data: failed, error: fetchErr } = await store
     .from('course_purchases')
     .select('order_id,course_slug,buyer_email,buyer_name,buyer_phone')
-    .eq('invitation_status', 'failed')
+    .or(`invitation_status.eq.failed,and(invitation_status.eq.pending,created_at.lt.${tenMinutesAgo})`)
     .limit(50)
 
   if (fetchErr) {
