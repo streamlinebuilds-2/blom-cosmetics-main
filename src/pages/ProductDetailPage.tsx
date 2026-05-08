@@ -951,7 +951,7 @@ export const ProductDetailPage: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-sm text-gray-900">Free Shipping</h4>
-                    <p className="text-xs text-gray-500 mt-1">On orders over R2000</p>
+                    <p className="text-xs text-gray-500 mt-1">On orders over R2500</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">

@@ -111,9 +111,9 @@ export const handler = async (event: any) => {
     // Add shipping as a line item if shipping cost exists
     if (order.shipping_cents && order.shipping_cents > 0) {
       const shippingAmount = order.shipping_cents / 100
-      const freeShippingThreshold = 2000 // R2000 threshold for free shipping
-      
-      // Check if this qualifies for free shipping (order subtotal >= R2000)
+      const freeShippingThreshold = 2500 // R2500 threshold for free shipping
+
+      // Check if this qualifies for free shipping (order subtotal >= R2500)
       const subtotalAmount = (order.subtotal_cents || 0) / 100
       const isFreeShipping = subtotalAmount >= freeShippingThreshold && shippingAmount === 0
       

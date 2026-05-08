@@ -175,14 +175,14 @@ export const handler = async (event: any) => {
     const discountAmount = discountCents / 100
 
     // Shipping
-    const isFreeShipping = subtotalAmount >= 2000 && shippingAmount === 0;
+    const isFreeShipping = subtotalAmount >= 2500 && shippingAmount === 0;
     
     if (hasFurniture && shippingAmount === 0) {
       drawText("Shipping (Furniture)", left, y, 10)
       drawRightText("Invoiced Later", right - 20, y, 10)
       y -= 16
     } else if (isFreeShipping) {
-      drawText("FREE SHIPPING - Order over R2000", left, y, 10)
+      drawText("FREE SHIPPING - Order over R2500", left, y, 10)
       drawRightText("R 0.00", right - 20, y, 10)
       y -= 16
     } else if (shippingAmount > 0) {

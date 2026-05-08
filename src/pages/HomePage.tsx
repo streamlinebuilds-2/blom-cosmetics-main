@@ -163,7 +163,7 @@ export const HomePage: React.FC = () => {
               {[
                 { icon: Heart, title: 'HEMA-Free Formulas', desc: 'Safe for sensitive clients with our carefully formulated, hypoallergenic products' },
                 { icon: Star, title: 'Professional Grade', desc: 'Used by leading salons and nail technicians across South Africa' },
-                { icon: Truck, title: 'Fast & Reliable', desc: 'Free shipping on orders over R2000 with 2–3 day delivery nationwide' },
+                { icon: Truck, title: 'Fast & Reliable', desc: 'Free shipping on orders over R2500 with 2–3 day delivery nationwide' },
                 { icon: CheckCircle, title: 'Hassle-Free Returns', desc: '7-day return policy for unopened items. Damaged or incorrect orders replaced free.' },
               ].map(({ icon: Icon, title, desc }) => (
                 <motion.div key={title} variants={fadeUp} className="promise-card text-center p-6">

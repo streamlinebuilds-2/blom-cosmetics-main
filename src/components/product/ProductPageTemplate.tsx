@@ -423,7 +423,7 @@ export const ProductPageTemplate: React.FC<ProductPageTemplateProps> = ({ produc
                 <div className="space-y-3 py-6 border-t border-gray-200">
                   <div className="flex items-center gap-3">
                     <Truck className="h-5 w-5 text-gray-600 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">Free shipping on orders over R2000</span>
+                    <span className="text-sm text-gray-700">Free shipping on orders over R2500</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Shield className="h-5 w-5 text-gray-600 flex-shrink-0" />
