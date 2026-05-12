@@ -235,6 +235,9 @@ export const CourseDetailPage: React.FC = () => {
       title: 'Rubber Base Perfection & Russian Manicure',
       description: 'A 2-in-1 beginner-friendly intensive course. Master rubber base application and Russian manicure techniques over 3 to 4 full days of hands-on training.',
       heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778584938/ChatGPT_Image_May_12_2026_01_20_22_PM_ia7dr2.png',
+      mobileHeroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+      heroFit: 'contain',
+      heroBgColor: '#FBEAF2',
       duration: '3 Full Days (Intensive Training)',
       price: 'From R4,500',
       numericPrice: 4500,
@@ -1030,12 +1033,20 @@ export const CourseDetailPage: React.FC = () => {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
-          <img
-            src={(course as any).instructors?.[selectedInstructorIndex]?.heroImage || course.heroImage}
-            alt={course.title}
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+        <section
+          className="relative h-[70vh] md:h-[80vh] overflow-hidden"
+          style={{ backgroundColor: (course as any).heroBgColor || '#000' }}
+        >
+          <picture>
+            {(course as any).mobileHeroImage && (
+              <source media="(max-width: 768px)" srcSet={(course as any).mobileHeroImage} />
+            )}
+            <img
+              src={(course as any).instructors?.[selectedInstructorIndex]?.heroImage || course.heroImage}
+              alt={course.title}
+              className={`absolute inset-0 w-full h-full object-cover ${(course as any).heroFit === 'contain' ? 'md:object-contain' : ''}`}
+            />
+          </picture>
           <div className="absolute inset-0 bg-black bg-opacity-40"></div>
           
           <div className="relative h-full flex items-center justify-center">
