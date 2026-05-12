@@ -132,6 +132,42 @@ const CoursesPage: React.FC = () => {
       <Header showMobileMenu={true} />
 
       <main className="flex-1">
+        {/* Courses Hero Banner */}
+        <section
+          className="relative h-[40vh] md:h-[55vh] overflow-hidden"
+          style={{
+            backgroundImage: "url('https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778584938/ChatGPT_Image_May_12_2026_01_20_22_PM_ia7dr2.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative h-full flex items-center justify-center">
+            <div className="text-center text-white max-w-4xl mx-auto px-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4 uppercase tracking-wider" style={{ textShadow: '0 6px 12px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3)' }}>
+                BLOM Courses
+              </h1>
+              <p className="text-lg md:text-xl max-w-2xl mx-auto" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
+                Expert-led in-person training and self-paced online workshops to grow your nail artistry career.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Hero Image */}
+        <section className="py-12 bg-white">
+          <Container>
+            <div className="max-w-5xl mx-auto">
+              <img
+                src="https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778584938/ChatGPT_Image_May_12_2026_01_21_51_PM_w6mltc.png"
+                alt="BLOM Cosmetics Courses"
+                className="w-full h-auto rounded-2xl shadow-lg"
+              />
+            </div>
+          </Container>
+        </section>
+
         <Container>
           {/* In-Person Training */}
           <div id="in-person-training" className="py-16">

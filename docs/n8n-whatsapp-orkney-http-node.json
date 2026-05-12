@@ -1,0 +1,43 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/840414442487843/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer EAAgd2AGtrT0BQp7ZCvQVkJ6xAIM47H1VHGiuWTi6hz64gxpnnHQrldyMO5nmuFJC5vc5VrJCwLIE0KYneNGD0F3iIcrY5TZBvMMmLL4Wc3Po5nmLTlyn32cSjWyF2QIvbs9RqpgiNRAIiQdCZC2hFDiZB1QlpUklzJ9fIFcRp6XZB6HZCw0eJDOBPP5EcFX6YWjwZDZD"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"27731518407\",\n  \"type\": \"template\",\n  \"template\": {\n    \"name\": \"blom_orkney_course_booking\",\n    \"language\": {\n      \"code\": \"en\"\n    },\n    \"components\": [\n      {\n        \"type\": \"body\",\n        \"parameters\": [\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.buyer_name }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.buyer_email }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.buyer_phone }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.course_title }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.selected_package }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.selected_date }}\"\n          },\n          {\n            \"type\": \"text\",\n            \"text\": \"{{ $('Code in JavaScript1').item.json.amount_paid }}\"\n          }\n        ]\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "id": "c8224314-fa64-6375-b956-66c1c92cf673",
+      "name": "Send WhatsApp Orkney",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1504, 272],
+      "continueOnFail": true
+    }
+  ],
+  "connections": {
+    "Send WhatsApp Orkney": {
+      "main": [[]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ea68ba36ca0942af7da3c2dc6d22a13e526fb635f2a177627caaad60d354fa33"
+  }
+}

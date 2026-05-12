@@ -245,15 +245,24 @@ export const BlogPage: React.FC = () => {
 
       <main>
         {/* Blog Hero Section */}
-        <section className="bg-gradient-to-br from-pink-50 to-blue-50 section-padding">
+        <section
+          className="relative section-padding overflow-hidden"
+          style={{
+            backgroundImage: "url('https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778584938/ChatGPT_Image_May_12_2026_01_21_51_PM_w6mltc.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
           <Container>
-            <div className="text-center max-w-4xl mx-auto">
-              <h1 className="text-5xl font-bold mb-6">BLOM Beauty Blog</h1>
-              <p className="text-xl text-gray-600 leading-relaxed mb-8">
-                Stay inspired with the latest nail art tutorials, industry trends, 
+            <div className="relative text-center max-w-4xl mx-auto">
+              <h1 className="text-5xl font-bold mb-6" style={{ textShadow: '0 2px 4px rgba(255,255,255,0.8)' }}>BLOM Beauty Blog</h1>
+              <p className="text-xl text-gray-700 leading-relaxed mb-8">
+                Stay inspired with the latest nail art tutorials, industry trends,
                 product reviews, and professional tips from our expert team.
               </p>
-              
+
               {/* Search Bar */}
               <div className="max-w-md mx-auto relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />

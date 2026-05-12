@@ -57,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const navigationItems = [
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/shop' },
-    { name: 'Courses & Blog', href: '/courses' },
+    { name: 'Courses', href: '/courses' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' }
   ];
