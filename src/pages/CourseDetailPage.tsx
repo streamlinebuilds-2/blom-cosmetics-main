@@ -234,7 +234,7 @@ export const CourseDetailPage: React.FC = () => {
       id: 'b8f2a3e1-4c7d-4e2f-8a9b-1c3d5e7f9a0b',
       title: 'Rubber Base Perfection & Russian Manicure',
       description: 'A 2-in-1 beginner-friendly intensive course. Master rubber base application and Russian manicure techniques over 3 to 4 full days of hands-on training.',
-      heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+      heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778584938/ChatGPT_Image_May_12_2026_01_20_22_PM_ia7dr2.png',
       duration: '3 Full Days (Intensive Training)',
       price: 'From R4,500',
       numericPrice: 4500,
@@ -250,7 +250,6 @@ export const CourseDetailPage: React.FC = () => {
         {
           name: 'Avané Crous',
           image: '/avane-crous-headshot.webp',
-          heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
           bio: 'Professional nail artist and educator with over 8 years of experience. Avané specialises in rubber base systems, Russian manicure techniques, and helping students build the confidence and skill to succeed in the nail industry.',
           location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
           email: 'shopblomcosmetics@gmail.com',
@@ -274,7 +273,6 @@ export const CourseDetailPage: React.FC = () => {
         {
           name: 'Yolanda Botha',
           image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-12_at_09.20.39_kercfw.jpg',
-          heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778575375/WhatsApp_Image_2026-05-12_at_10.36.23_hgzamq.jpg',
           bio: 'Professional nail artist with years of experience in nail artistry. Yolanda specialises in teaching proper techniques and helping students build confidence in their nail artistry skills.',
           location: '9 Addison str, Golf Park, Orkney',
           email: 'blom.orkney.northwest@gmail.com',
