@@ -112,6 +112,7 @@ const PF_PASSPHRASE =
 const SITE = process.env.SITE_URL || process.env.SITE_BASE_URL || 'https://blom-cosmetics.co.za'
 const PF_BASE = PF_ENV === 'sandbox' ? 'https://sandbox.payfast.co.za' : 'https://www.payfast.co.za'
 const N8N_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/notify-order'
+const N8N_ORKNEY_WEBHOOK_URL = 'https://dockerfile-1n82.onrender.com/webhook/orkney-course-booking'
 
 function encPF(v: unknown) {
   return encodeURIComponent(String(v ?? '').trim())
@@ -223,7 +224,7 @@ export const handler: Handler = async (event) => {
     }
 
     const coursePurchasesRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}&select=course_slug,invitation_status,buyer_email,buyer_name,buyer_phone`,
+      `${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}&select=course_slug,invitation_status,buyer_email,buyer_name,buyer_phone,instructor,selected_package,selected_date,course_title`,
       { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
     )
     const coursePurchases = coursePurchasesRes.ok ? await coursePurchasesRes.json() : []
@@ -369,6 +370,29 @@ export const handler: Handler = async (event) => {
           }
         } catch (e) {
           console.error('Course enrollment error:', courseSlug, e)
+        }
+
+        // Notify Yolanda at Blom Orkney when a booking is for her location
+        if (String(cp.instructor || '').toLowerCase().includes('orkney')) {
+          try {
+            await fetch(N8N_ORKNEY_WEBHOOK_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                buyer_name: buyerName,
+                buyer_email: buyerEmail,
+                buyer_phone: buyerPhone,
+                course_title: String(cp.course_title || courseSlug),
+                selected_package: String(cp.selected_package || ''),
+                selected_date: String(cp.selected_date || ''),
+                amount_paid: data.amount,
+                instructor: String(cp.instructor || '')
+              })
+            })
+            console.log('✅ Orkney booking notification sent')
+          } catch (e) {
+            console.error('Orkney notification error:', e)
+          }
         }
       }
     }

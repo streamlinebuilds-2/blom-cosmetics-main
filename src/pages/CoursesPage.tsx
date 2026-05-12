@@ -16,8 +16,18 @@ const CoursesPage: React.FC = () => {
       description: 'Hands-on, career-start acrylic training in Randfontein. Master prep, application, structure & finishing in 5 days.',
       image: '/professional-acrylic-training-hero.webp',
       duration: '5 Days',
-      location: 'Randfontein',
+      location: 'Randfontein & Orkney',
       priceLabel: 'From R7,600'
+    },
+    {
+      id: 5,
+      slug: 'rubber-base-perfection-course',
+      title: 'Rubber Base Perfection & Russian Manicure',
+      description: '2-in-1 beginner-friendly course in Randfontein & Orkney. Master rubber base application, Russian manicure, sculpting, ombre, art & business skills over 3 to 4 intensive days.',
+      image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+      duration: '3–4 Full Days',
+      location: 'Randfontein & Orkney',
+      priceLabel: 'From R4,500'
     }
   ];
 

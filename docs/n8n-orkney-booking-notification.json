@@ -1,0 +1,93 @@
+{
+  "name": "Orkney Course Booking Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/orkney-course-booking",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-200, 200],
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Webhook – Orkney Booking",
+      "webhookId": "orkney-course-booking"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body || $json;\n\nconst buyer_name = String(b.buyer_name || '').trim();\nconst buyer_email = String(b.buyer_email || '').trim();\nconst buyer_phone = String(b.buyer_phone || '').trim();\nconst course_title = String(b.course_title || '').trim();\nconst selected_package = String(b.selected_package || '').trim();\nconst selected_date = String(b.selected_date || '').trim();\nconst amount_paid = String(b.amount_paid || '').trim();\nconst instructor = String(b.instructor || '').trim();\n\nif (!buyer_name || !buyer_email) {\n  throw new Error('Missing required fields');\n}\n\nreturn [{ buyer_name, buyer_email, buyer_phone, course_title, selected_package, selected_date, amount_paid, instructor }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [20, 200],
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Extract Fields"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "phoneNumberId": "={{$credentials.phoneNumberId}}",
+        "recipientPhoneNumber": "+27731518407",
+        "textBody": "=🌸 *New Course Booking – Blom Orkney!* 🌸\n\n*Student:* {{ $json.buyer_name }}\n*Email:* {{ $json.buyer_email }}\n*Phone:* {{ $json.buyer_phone }}\n\n*Course:* {{ $json.course_title }}\n*Package:* {{ $json.selected_package }}\n*Date:* {{ $json.selected_date }}\n*Deposit Paid:* R{{ $json.amount_paid }}\n\nPlease add this student to your list and confirm their booking! 💅\n\n_This is an automated notification from Blom Cosmetics._"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1,
+      "position": [240, 100],
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "WhatsApp – Notify Yolanda",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "whatsapp-creds",
+          "name": "WhatsApp API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "no-reply@blom-cosmetics.co.za",
+        "toEmail": "blom.orkney.northwest@gmail.com",
+        "subject": "=New Course Booking – {{ $json.course_title }} ({{ $json.selected_date }})",
+        "emailFormat": "html",
+        "html": "=<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf-8\">\n  <title>New Blom Orkney Course Booking</title>\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n  <style>\n    body { margin:0; padding:0; font-family:Arial,Helvetica,sans-serif; background:#FBEAF2; color:#111; }\n    a { color:#E75C9C; text-decoration:none; }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#FBEAF2;\">\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#FBEAF2;\">\n    <tr>\n      <td align=\"center\" style=\"padding:40px 16px;\">\n        <table role=\"presentation\" width=\"600\" cellpadding=\"0\" cellspacing=\"0\" bgcolor=\"#ffffff\" style=\"max-width:600px;border:1px solid #E9DDE4;border-radius:14px;overflow:hidden;\">\n\n          <tr>\n            <td align=\"center\" style=\"padding:32px 24px 16px;\">\n              <img src=\"https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/public/assets/blom_logo.png\" width=\"130\" alt=\"BLOM Cosmetics\" style=\"display:block;\">\n            </td>\n          </tr>\n\n          <tr>\n            <td style=\"padding:0 28px 24px;\">\n              <h1 style=\"margin:0 0 8px;font-size:22px;color:#E75C9C;\">New Course Booking – Blom Orkney 🎉</h1>\n              <p style=\"margin:0;font-size:15px;color:#555;\">Hi Yolanda! A new student has booked and paid their deposit. Please add them to your list.</p>\n            </td>\n          </tr>\n\n          <tr>\n            <td style=\"padding:0 28px 24px;\">\n              <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"background:#FAEFF6;border:1px solid #E9DDE4;border-radius:10px;\">\n                <tr>\n                  <td style=\"padding:20px;font-size:14px;color:#555;line-height:1.8;\">\n                    <p style=\"margin:0 0 8px;\"><strong>👤 Student Name:</strong> {{ $json.buyer_name }}</p>\n                    <p style=\"margin:0 0 8px;\"><strong>📧 Email:</strong> {{ $json.buyer_email }}</p>\n                    <p style=\"margin:0 0 8px;\"><strong>📱 Phone:</strong> {{ $json.buyer_phone }}</p>\n                    <hr style=\"border:none;border-top:1px solid #E9DDE4;margin:12px 0;\">\n                    <p style=\"margin:0 0 8px;\"><strong>📚 Course:</strong> {{ $json.course_title }}</p>\n                    <p style=\"margin:0 0 8px;\"><strong>📦 Package:</strong> {{ $json.selected_package }}</p>\n                    <p style=\"margin:0 0 8px;\"><strong>📅 Date:</strong> {{ $json.selected_date }}</p>\n                    <p style=\"margin:0;\"><strong>💳 Deposit Paid:</strong> R{{ $json.amount_paid }}</p>\n                  </td>\n                </tr>\n              </table>\n            </td>\n          </tr>\n\n          <tr>\n            <td style=\"padding:0 28px 28px;\">\n              <p style=\"margin:0;font-size:13px;color:#888;\">Questions? Contact the main Blom Cosmetics team:<br>\n              📞 +27 79 548 3317 &nbsp;|&nbsp; ✉️ shopblomcosmetics@gmail.com</p>\n            </td>\n          </tr>\n\n          <tr>\n            <td bgcolor=\"#FAEFF6\" align=\"center\" style=\"padding:14px 20px;border-top:1px solid #E9DDE4;border-radius:0 0 14px 14px;\">\n              <p style=\"margin:0;font-size:12px;color:#9CA3AF;\">&copy; 2026 BLOM Cosmetics &middot; blom-cosmetics.co.za</p>\n            </td>\n          </tr>\n\n        </table>\n      </td>\n    </tr>\n  </table>\n</body>\n</html>",
+        "options": {}
+      },
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "name": "Email – Notify Yolanda",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "credentials": {
+        "smtp": {
+          "id": "smtp-creds",
+          "name": "SMTP (Brevo)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook – Orkney Booking": {
+      "main": [
+        [{ "node": "Extract Fields", "type": "main", "index": 0 }]
+      ]
+    },
+    "Extract Fields": {
+      "main": [
+        [
+          { "node": "WhatsApp – Notify Yolanda", "type": "main", "index": 0 },
+          { "node": "Email – Notify Yolanda", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "instanceId": "blom-cosmetics"
+  },
+  "id": "orkney-booking-notification",
+  "tags": []
+}

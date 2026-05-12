@@ -56,7 +56,7 @@ export const CourseDetailPage: React.FC = () => {
         },
         {
           name: 'Yolanda Botha',
-          image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1774267387/WhatsApp_Image_2026-03-23_at_13.25.03_nzsq0y.jpg',
+          image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-12_at_09.20.39_kercfw.jpg',
           bio: 'Professional nail artist with years of experience in nail artistry. Yolanda specializes in teaching proper techniques and helping students build confidence in their nail artistry skills.',
           location: '9 Addison str, Golf Park, Orkney',
           email: 'blom.orkney.northwest@gmail.com',
@@ -227,6 +227,201 @@ export const CourseDetailPage: React.FC = () => {
             'Pricing strategies and business basics'
           ],
           note: 'Note: Models are required for Day 5. Please arrange one model in advance.'
+        }
+      ]
+    },
+    'rubber-base-perfection-course': {
+      id: 'b8f2a3e1-4c7d-4e2f-8a9b-1c3d5e7f9a0b',
+      title: 'Rubber Base Perfection & Russian Manicure',
+      description: 'A 2-in-1 beginner-friendly intensive course. Master rubber base application and Russian manicure techniques over 3 to 4 full days of hands-on training.',
+      heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+      duration: '3 Full Days (Intensive Training)',
+      price: 'From R4,500',
+      numericPrice: 4500,
+      depositAmount: 1800,
+      isOnline: false,
+      location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané specialises in rubber base systems, Russian manicure techniques, and helping students build the confidence and skill to succeed in the nail industry.'
+      },
+      instructors: [
+        {
+          name: 'Avané Crous',
+          image: '/avane-crous-headshot.webp',
+          heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+          bio: 'Professional nail artist and educator with over 8 years of experience. Avané specialises in rubber base systems, Russian manicure techniques, and helping students build the confidence and skill to succeed in the nail industry.',
+          location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
+          email: 'shopblomcosmetics@gmail.com',
+          phone: '+27 79 548 3317',
+          availableDates: [
+            'July 2026 (11–13 Jul)',
+            'September 2026 (26–28 Sep)',
+            'November 2026 (5–7 Nov)'
+          ],
+          trainingSchedule: [
+            {
+              title: 'All Sessions',
+              items: [
+                'Day 1: 09:00 – 16:00',
+                'Day 2: 09:00 – 15:00',
+                'Day 3: 09:00 – 14:30'
+              ]
+            }
+          ]
+        },
+        {
+          name: 'Yolanda Botha',
+          image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778573976/WhatsApp_Image_2026-05-12_at_09.20.39_kercfw.jpg',
+          heroImage: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778575375/WhatsApp_Image_2026-05-12_at_10.36.23_hgzamq.jpg',
+          bio: 'Professional nail artist with years of experience in nail artistry. Yolanda specialises in teaching proper techniques and helping students build confidence in their nail artistry skills.',
+          location: '9 Addison str, Golf Park, Orkney',
+          email: 'blom.orkney.northwest@gmail.com',
+          phone: '0731518407',
+          availableDates: [
+            'July 2026 (21–24 Jul)',
+            'September 2026 (14–17 Sep)'
+          ],
+          trainingSchedule: [
+            {
+              title: 'All Sessions',
+              items: [
+                'Day 1: 09:00 – 16:00',
+                'Day 2: 09:00 – 16:00',
+                'Day 3: 09:00 – 16:00',
+                'Day 4: 09:00 – 16:00'
+              ]
+            }
+          ]
+        }
+      ],
+      about: [
+        'This 2-in-1 course is designed to empower, uplift, and equip you with everything you need to succeed in the nail industry. Over 3 intensive days, you\'ll master both the Rubber Base system and Russian Manicure — two of the most in-demand techniques in professional nail artistry.',
+        'From nail anatomy and product chemistry through to sculpting, ombre, glitter fades, infills, and detailed basic art, this course covers it all. You\'ll leave with the skills, confidence, and business knowledge to start serving clients immediately.'
+      ],
+      packages: [
+        {
+          name: 'Standard',
+          price: 'R4,500',
+          kitValue: 'R3,200',
+          features: [
+            'Prep & Primer',
+            'Sculpting Forms (x50)',
+            'Glitter 5g',
+            'Top Coat',
+            'Nude Rubber Base',
+            'White Rubber Base',
+            'Clear Rubber Base',
+            'Base Gel',
+            'Builder in a Bottle',
+            'Chrome',
+            'Duster',
+            'Safety Bit',
+            'Detail Brush',
+            'Training Manual',
+            'Lint-Free Wipes',
+            'Nail Cleanser 200ml',
+            'Hand File & Buffer',
+            'Wooden Cuticle Pusher x2',
+            'Lifelong mentorship and modern techniques'
+          ]
+        },
+        {
+          name: 'Deluxe',
+          price: 'R5,800',
+          kitValue: 'R4,800',
+          features: [
+            'Prep & Primer',
+            'Sculpting Forms (x50)',
+            'Glitter 5g',
+            'Top Coat',
+            'Nude Rubber Base',
+            'White Rubber Base',
+            'Clear Rubber Base',
+            'Base Gel',
+            'Builder in a Bottle',
+            'Chrome',
+            'Duster',
+            'Safety Bit',
+            'Detail Brush',
+            'Training Manual',
+            'Lint-Free Wipes',
+            'Nail Cleanser 200ml',
+            'Hand File & Buffer',
+            'Wooden Cuticle Pusher x2',
+            'LED Lamp (x1) – worth R400',
+            'Electric File (x1) – worth R1,050',
+            'Lifelong mentorship and modern techniques'
+          ],
+          popular: true
+        }
+      ],
+      availableDates: [
+        'July 2026 (11–13 Jul)',
+        'September 2026 (26–28 Sep)',
+        'November 2026 (5–7 Nov)'
+      ],
+      thingsToBring: [
+        'Your own refreshments and lunch (Coffee & tea provided daily)',
+        'Practice hand – preferably a Habbill Hand (strongly recommended for long-term use)',
+        'Electric file (e-file) if you have the Standard Kit',
+        'Fine line brush if you have the Standard Kit',
+        'One hand model on Day 3 for assessment'
+      ],
+      trainingSchedule: [
+        {
+          title: 'All Sessions',
+          items: [
+            'Day 1: 09:00 – 16:00',
+            'Day 2: 09:00 – 15:00',
+            'Day 3: 09:00 – 14:30'
+          ]
+        }
+      ],
+      studentDiscount: [
+        'We have a shop inside the training studio',
+        '10% discount on all product purchases during your training'
+      ],
+      accordionData: [
+        {
+          title: 'FOUNDATION: HEALTH, SAFETY & NAIL SCIENCE',
+          content: [
+            'Health and Safety protocols',
+            'Nail anatomy',
+            'Nail diseases & disorders',
+            'Product chemistry'
+          ]
+        },
+        {
+          title: 'RUSSIAN MANICURE',
+          content: [
+            'Russian Manicure technique overview',
+            'Cuticle care and preparation',
+            'Hand file and Electric file techniques',
+            'Professional cuticle scissors & drill bit usage'
+          ]
+        },
+        {
+          title: 'RUBBER BASE SYSTEM & APPLICATION',
+          content: [
+            'Rubber Base system overview',
+            'Nail prep and application techniques',
+            'Sculpting forms – form fitting and placement',
+            'Application methods',
+            'Natural overlay',
+            'Sculptures & structure',
+            'Infills',
+            'Safe removal methods'
+          ]
+        },
+        {
+          title: 'NAIL ART, COLOUR & BUSINESS',
+          content: [
+            'Ombre, glitter fade and colour applications',
+            'Detailed basic art',
+            'Business tips and social media skills'
+          ]
         }
       ]
     },
@@ -839,7 +1034,7 @@ export const CourseDetailPage: React.FC = () => {
         {/* Hero Section */}
         <section className="relative h-[70vh] md:h-[80vh] overflow-hidden">
           <img
-            src={course.heroImage}
+            src={(course as any).instructors?.[selectedInstructorIndex]?.heroImage || course.heroImage}
             alt={course.title}
             className="absolute inset-0 w-full h-full object-cover"
           />
