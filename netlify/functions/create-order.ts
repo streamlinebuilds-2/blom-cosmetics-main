@@ -113,7 +113,8 @@ export const handler: Handler = async (event) => {
     } else if (hasFurniture) {
       shippingCents = 0
     } else {
-      shippingCents = subtotalCents >= 2000 * 100 ? 0 : 125 * 100
+      // Free shipping over R2500 (must match frontend cart.ts & CheckoutPage.tsx)
+      shippingCents = subtotalCents >= 2500 * 100 ? 0 : 125 * 100
     }
 
     const rawDiscountCents = Math.round(Number(body.totals?.discount_cents ?? body.discount_cents ?? 0))
