@@ -10,42 +10,43 @@ export const FeaturedProducts = () => {
   useEffect(() => {
     async function loadFeatured() {
       try {
-        // 1. Fetch the 3 slots + INCLUDE product_variants
-        const { data, error } = await supabase
-          .from('featured_items')
-          .select(`
-            slot_number,
-            custom_image_url,
-            products (
-              id, name, slug, price, compare_at_price,
-              short_description, thumbnail_url, category, stock,
-              product_variants (
-                id,
-                title,
-                price,
-                inventory_quantity
+        // Fire both queries in parallel — featured slots + all Colour Acrylics variants
+        const [{ data, error }, { data: allColourAcrylics }] = await Promise.all([
+          supabase
+            .from('featured_items')
+            .select(`
+              slot_number,
+              custom_image_url,
+              products (
+                id, name, slug, price, compare_at_price,
+                short_description, thumbnail_url, category, stock,
+                product_variants (
+                  id,
+                  title,
+                  price,
+                  inventory_quantity
+                )
               )
-            )
-          `)
-          .not('product_id', 'is', null) // Only get slots that have products
-          .order('slot_number');
+            `)
+            .not('product_id', 'is', null)
+            .order('slot_number'),
+          supabase
+            .from('products')
+            .select('id, name, price, thumbnail_url, stock, product_variants(id, title, price, inventory_quantity)')
+            .ilike('name', 'Colour Acrylics%')
+            .eq('status', 'active')
+        ]);
 
         if (error) throw error;
 
         if (data) {
-          // 2. Transform the data
           const items = data.map((item: any) => {
             const p = item.products;
-            // Safety check if product was deleted
             if (!p) return null;
 
-            // Map database variants to ProductCard format (same robust logic as ShopPage)
             const variants = Array.isArray(p.product_variants)
               ? p.product_variants.map((v: any) => {
-                  // Handle both object and string variants
-                  if (typeof v === 'string') {
-                    return { name: v, inStock: true };
-                  }
+                  if (typeof v === 'string') return { name: v, inStock: true };
                   return {
                     name: v.name || v.label || v.title || '',
                     label: v.label || v.name || v.title || '',
@@ -61,91 +62,55 @@ export const FeaturedProducts = () => {
               name: p.name,
               price: p.price,
               compareAtPrice: p.compare_at_price,
-              // Use custom image if set, otherwise fallback to product thumbnail
               image: item.custom_image_url || p.thumbnail_url,
               shortDescription: p.short_description,
               slug: p.slug,
               inStock: (p.stock || 0) > 0,
-              variants: variants // <--- Pass the fetched variants here
+              variants
             };
-          }).filter(Boolean); // Remove empty slots
+          }).filter(Boolean);
 
-          // Transform Colour Acrylics products - fetch all variants
-          const transformedItems = await Promise.all(items.map(async (item: any) => {
-            // Check if this is a Colour Acrylics product (case-insensitive)
-            const isColourAcrylics = item.name && item.name.toLowerCase().includes('colour acrylics');
-            
-            if (isColourAcrylics) {
-              // Remove variant suffix (e.g., "Colour Acrylics - Raspberry Santa" → "Colour Acrylics")
-              const baseName = item.name.split(' - ')[0];
-              
-              // Fetch all Colour Acrylics products from database to create variants
-              try {
-                const { data: allColourAcrylics, error } = await supabase
-                  .from('products')
-                  .select('id, name, price, thumbnail_url, stock, product_variants(id, title, price, inventory_quantity)')
-                  .ilike('name', 'Colour Acrylics%')
-                  .eq('status', 'active');
-                
-                if (!error && allColourAcrylics) {
-                  // Collect all variants - either from product_variants or create from product names
-                  const allVariants: any[] = [];
-                  
-                  allColourAcrylics.forEach((product: any) => {
-                    // If product has variants, use them
-                    if (Array.isArray(product.product_variants) && product.product_variants.length > 0) {
-                      product.product_variants.forEach((variant: any) => {
-                        if (!allVariants.find(v => v.name === (variant.title || variant.name))) {
-                          allVariants.push({
-                            name: variant.title || variant.name || '',
-                            price: variant.price || product.price || item.price,
-                            inStock: (variant.inventory_quantity || product.stock || 0) > 0,
-                            image: variant.image || product.thumbnail_url || item.image
-                          });
-                        }
-                      });
-                    } else {
-                      // If no variants, create variant from product name (extract variant name)
-                      const variantName = product.name.includes(' - ') 
-                        ? product.name.split(' - ').slice(1).join(' - ')
-                        : product.name.replace(/^Colour Acrylics\s*/i, '').trim() || 'Default';
-                      
-                      if (!allVariants.find(v => v.name === variantName)) {
-                        allVariants.push({
-                          name: variantName,
-                          price: product.price || item.price,
-                          inStock: (product.stock || 0) > 0,
-                          image: product.thumbnail_url || item.image
-                        });
-                      }
-                    }
+          // Build Colour Acrylics variant list from the pre-fetched parallel query
+          const colourAcrylicVariants: any[] = [];
+          if (Array.isArray(allColourAcrylics)) {
+            allColourAcrylics.forEach((product: any) => {
+              if (Array.isArray(product.product_variants) && product.product_variants.length > 0) {
+                product.product_variants.forEach((variant: any) => {
+                  if (!colourAcrylicVariants.find(v => v.name === (variant.title || variant.name))) {
+                    colourAcrylicVariants.push({
+                      name: variant.title || variant.name || '',
+                      price: variant.price || product.price,
+                      inStock: (variant.inventory_quantity || product.stock || 0) > 0,
+                      image: variant.image || product.thumbnail_url
+                    });
+                  }
+                });
+              } else {
+                const variantName = product.name.includes(' - ')
+                  ? product.name.split(' - ').slice(1).join(' - ')
+                  : product.name.replace(/^Colour Acrylics\s*/i, '').trim() || 'Default';
+                if (!colourAcrylicVariants.find(v => v.name === variantName)) {
+                  colourAcrylicVariants.push({
+                    name: variantName,
+                    price: product.price,
+                    inStock: (product.stock || 0) > 0,
+                    image: product.thumbnail_url
                   });
-                  
-                  // Return with all variants
-                  return {
-                    ...item,
-                    name: baseName,
-                    shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
-                    variants: allVariants.length > 0 ? allVariants : item.variants
-                    // No onCardClickOverride - let it work like normal product with variants
-                  };
                 }
-              } catch (err) {
-                console.error('Error fetching Colour Acrylics variants:', err);
               }
-              
-              // Fallback if fetch fails - keep original variants if any
-              return {
-                ...item,
-                name: baseName,
-                shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
-                variants: item.variants || []
-                // No onCardClickOverride - let it work like normal product with variants
-              };
-            }
-            
-            return item;
-          }));
+            });
+          }
+
+          const transformedItems = items.map((item: any) => {
+            const isColourAcrylics = item.name && item.name.toLowerCase().includes('colour acrylics');
+            if (!isColourAcrylics) return item;
+            return {
+              ...item,
+              name: item.name.split(' - ')[0],
+              shortDescription: 'Professional grade polymer powder for perfect sculpting and strength.',
+              variants: colourAcrylicVariants.length > 0 ? colourAcrylicVariants : item.variants
+            };
+          });
 
           setFeatured(transformedItems);
         }

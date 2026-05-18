@@ -68,14 +68,39 @@ export const useScrollReveal = (options: UseScrollRevealOptions = {}) => {
   };
 };
 
-// Hook for staggered animations
+// Hook for staggered animations — uses a single IntersectionObserver shared across all items
 export const useStaggerReveal = (itemCount: number, options: UseScrollRevealOptions = {}) => {
-  const items = Array.from({ length: itemCount }, (_, index) => {
-    const delay = options.delay ? options.delay + (index * 100) : index * 100;
-    return useScrollReveal({ ...options, delay });
-  });
+  const [visibleItems, setVisibleItems] = useState<boolean[]>(() => Array(itemCount).fill(false));
+  const containerRef = useRef<HTMLElement | null>(null);
 
-  return items;
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        // Stagger visibility with per-item delay
+        Array.from({ length: itemCount }, (_, i) => {
+          const delay = options.delay ? options.delay + i * 100 : i * 100;
+          setTimeout(() => {
+            setVisibleItems((prev) => {
+              const next = [...prev];
+              next[i] = true;
+              return next;
+            });
+          }, delay);
+        });
+      },
+      { threshold: options.threshold ?? 0.1, rootMargin: options.rootMargin ?? '0px 0px -50px 0px' }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [itemCount, options.threshold, options.rootMargin, options.delay]);
+
+  return { containerRef, visibleItems };
 };
 
 // Hook for fade up animation

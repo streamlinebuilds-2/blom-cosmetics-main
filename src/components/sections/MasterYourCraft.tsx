@@ -20,13 +20,7 @@ export const MasterYourCraft: React.FC = () => {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    
-    // Ensure seamless looping
-    const handleEnded = () => {
-      video.currentTime = 0;
-      video.play?.().catch(() => {});
-    };
-    
+    // `loop` attribute handles looping — no need for a manual `ended` listener
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -36,28 +30,19 @@ export const MasterYourCraft: React.FC = () => {
         }
       });
     }, { threshold: 0.5 });
-    
-    // Add event listener for seamless looping
-    video.addEventListener('ended', handleEnded);
     observer.observe(video);
-    
-    return () => {
-      observer.disconnect();
-      video.removeEventListener('ended', handleEnded);
-    };
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
+    // once: true — only add the class, never remove it, so the observer can disconnect
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          el.classList.add('reveal-on-scroll');
-        } else {
-          el.classList.remove('reveal-on-scroll');
-        }
-      });
+      if (entries[0].isIntersecting) {
+        el.classList.add('reveal-on-scroll');
+        observer.disconnect();
+      }
     }, { threshold: 0.15 });
     observer.observe(el);
     return () => observer.disconnect();

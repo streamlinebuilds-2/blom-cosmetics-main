@@ -58,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const hasVariants = variants && variants.length > 1;
   const lowestPrice = hasVariants ? Math.min(...variants.map(v => v.price || price), price) : price;
-  const { bgColor } = useImageBackgroundColor(safeImages[0]);
+  const { bgColor, ref: bgColorRef } = useImageBackgroundColor(safeImages[0]);
 
   React.useEffect(() => {
     setIsWishlisted(wishlistStore.isInWishlist(slug));
@@ -113,9 +113,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   if (isListView) {
     return (
       <>
-        <article 
+        <article
+          ref={bgColorRef as React.RefObject<HTMLElement>}
           className={`
-            group cursor-pointer bg-white rounded-2xl border border-gray-100 overflow-hidden relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-row items-center gap-4 p-4 
+            group cursor-pointer bg-white rounded-2xl border border-gray-100 overflow-hidden relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex flex-row items-center gap-4 p-4
             ${className}
           `}
           onClick={handleCardClick}
@@ -180,6 +181,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     return (
       <>
         <article
+          ref={bgColorRef as React.RefObject<HTMLElement>}
           className={`
             group relative flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden
             transition-all duration-300 hover:shadow-lg hover:-translate-y-1
@@ -257,6 +259,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <>
       <article
+        ref={bgColorRef as React.RefObject<HTMLElement>}
         className={`
           group relative flex flex-col h-full bg-white rounded-2xl border border-gray-100 overflow-hidden
           transition-all duration-500 hover:shadow-2xl hover:-translate-y-2

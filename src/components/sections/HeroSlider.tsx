@@ -124,7 +124,7 @@ export const HeroSlider: React.FC = () => {
             id={`slide-${slideItem.id}`}
             aria-hidden={index === currentSlide ? false : true}
             className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
+              index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           >
             <picture>
@@ -132,7 +132,7 @@ export const HeroSlider: React.FC = () => {
               <img
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
-                className={`w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'} blur-[0.5px]`}
+                className={`w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'}`}
                 loading={index === 0 ? 'eager' : 'lazy'}
                 decoding={index === 0 ? 'sync' : 'async'}
                 fetchPriority={index === 0 ? 'high' : 'auto'}

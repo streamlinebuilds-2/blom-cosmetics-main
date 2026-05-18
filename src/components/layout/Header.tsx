@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolledDown, setIsScrolledDown] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = React.useRef(0);
   
   // Mobile Accordion State for Shop
   const [isShopExpanded, setIsShopExpanded] = useState(false);
@@ -24,21 +24,13 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down
-        setIsScrolledDown(true);
-      } else {
-        // Scrolling up
-        setIsScrolledDown(false);
-      }
-      
-      setLastScrollY(currentScrollY);
+      setIsScrolledDown(currentScrollY > lastScrollY.current && currentScrollY > 100);
+      lastScrollY.current = currentScrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     if (href.startsWith('http')) return;

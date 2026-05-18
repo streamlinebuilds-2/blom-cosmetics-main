@@ -4,6 +4,8 @@ import { enrollCourse } from './_lib/enroll-helper';
 const PAYFLEX_AUTH_URL = process.env.PAYFLEX_AUTH_URL || 'https://auth-uat.payflex.co.za/auth/merchant';
 const PAYFLEX_API_URL = (process.env.PAYFLEX_API_URL || 'https://api.uat.payflex.co.za').replace(/\/+$/, '');
 const PAYFLEX_AUDIENCE = process.env.PAYFLEX_AUDIENCE || 'https://auth-dev.payflex.co.za';
+const IS_UAT = PAYFLEX_API_URL.includes('uat');
+console.log(`[payflex-webhook] ENV: ${IS_UAT ? '⚠️  UAT/SANDBOX — no real money' : '✅ PRODUCTION'}  API: ${PAYFLEX_API_URL}`);
 const PAYFLEX_CLIENT_ID = process.env.PAYFLEX_CLIENT_ID || '';
 const PAYFLEX_CLIENT_SECRET = process.env.PAYFLEX_CLIENT_SECRET || '';
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -171,6 +173,11 @@ export const handler: Handler = async (event) => {
     }
 
     console.log(`Processing Payflex payment for ${order.id}...`);
+
+    if (IS_UAT) {
+      console.error('🚫 UAT MODE — refusing to mark order paid. Update PAYFLEX_API_URL to production before go-live.');
+      return { statusCode: 200, body: 'UAT mode — payment not recorded' };
+    }
 
     // A) Mark as paid
     await fetch(`${SUPABASE_URL}/rest/v1/orders?id=eq.${order.id}`, {
