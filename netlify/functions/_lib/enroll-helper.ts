@@ -38,6 +38,24 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
   const { orderId, courseSlug, buyerEmail, buyerName, buyerPhone, amountCents } = input
   const store = storeClient()
 
+  // In-person courses (e.g. Professional Acrylic Training) have no online Academy
+  // course to enrol into. Skip the edge call entirely so they don't churn through
+  // retries and land as 'failed' / dead-lettered — they're handled as bookings and
+  // the customer already gets the order-confirmation notification.
+  try {
+    const { data: cpRow } = await store
+      .from('course_purchases')
+      .select('course_type')
+      .eq('order_id', orderId)
+      .eq('course_slug', courseSlug)
+      .limit(1)
+      .maybeSingle()
+    if (cpRow && String(cpRow.course_type || '').toLowerCase() === 'in-person') {
+      console.log('Skipping enrolment for in-person course:', courseSlug)
+      return { success: true }
+    }
+  } catch { /* non-fatal: fall through to normal enrolment */ }
+
   // Try the Academy edge function up to MAX_ATTEMPTS times. Supabase edge cold
   // starts can exceed a tight timeout, which previously produced spurious
   // 'failed' enrollments (buyer then got nothing). Retry + a 30s budget fixes
