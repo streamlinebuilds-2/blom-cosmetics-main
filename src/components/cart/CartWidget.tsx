@@ -1,8 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ShoppingCart, X, Plus, Minus, Trash2, Edit } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cartStore, CartState, formatPrice } from '../../lib/cart';
 import { ProductVariantModal } from '../product/ProductVariantModal';
+import {
+  CatalogProduct,
+  RecommendedProduct,
+  loadCatalog,
+  buildRecommendations,
+} from '../../lib/recommendations';
 
 export const CartWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,12 +16,30 @@ export const CartWidget: React.FC = () => {
   const [showCart, setShowCart] = useState(false);
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [selectedItemForVariant, setSelectedItemForVariant] = useState<any>(null);
+  const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
+  // Per-session rotation seed so the recommendation list isn't identical
+  // every visit. Computed once on mount.
+  const [rotationSeed] = useState(() => Math.floor(Math.random() * 1000));
   const scrollYRef = React.useRef<number>(0);
 
   useEffect(() => {
     const unsubscribe = cartStore.subscribe(setCartState);
     return unsubscribe;
   }, []);
+
+  // Load the product catalog (lazily, the first time the cart opens) so
+  // recommendations reflect live products without adding a request to every
+  // page load. loadCatalog() caches, so this only fetches once.
+  useEffect(() => {
+    if (!isOpen || catalog.length > 0) return;
+    let active = true;
+    loadCatalog().then((products) => {
+      if (active) setCatalog(products);
+    });
+    return () => {
+      active = false;
+    };
+  }, [isOpen, catalog.length]);
 
   // Handle cart visibility animation
   useEffect(() => {
@@ -89,7 +113,7 @@ export const CartWidget: React.FC = () => {
         { name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
         { name: 'Tiny Touch', inStock: true, image: '/cuticle-oil-tiny-touch.webp' },
         { name: 'Dragon Fruit Lotus', inStock: true, image: '/cuticle-oil-dragon-fruit-lotus.webp' },
-        { name: 'Watermelon', inStock: true, image: '/cuticle-oil-watermelon.webp' }
+        { name: 'Sweet Peach', inStock: true, image: '/cuticle-oil-sweet-peach.webp' }
       ],
       'nail-file': [
         { name: 'Single File', inStock: true, price: 35, image: '/nail-file-white.webp' },
@@ -124,76 +148,23 @@ export const CartWidget: React.FC = () => {
     setSelectedItemForVariant(null);
   };
 
-  const recommendedProducts = [
-    {
-      id: 'nail-file',
-      name: 'Nail File (80/80 Grit)',
-      price: 35,
-      image: '/nail-file-white.webp'
-    },
-    {
-      id: 'cuticle-oil',
-      name: 'Cuticle Oil',
-      price: 140,
-      image: '/cuticle-oil-white.webp'
-    },
-    {
-      id: 'top-coat',
-      name: 'Top Coat',
-      price: 190,
-      image: '/top-coat-white.webp'
-    }
-  ];
+  // Category-aware recommendations sourced from the live catalog. Recomputes
+  // as the cart changes, prioritises items in the same category as what's
+  // already in the cart, and excludes anything already added.
+  const recommendedProducts = useMemo<RecommendedProduct[]>(
+    () => buildRecommendations(catalog, cartState.items, 3, rotationSeed),
+    [catalog, cartState.items, rotationSeed]
+  );
 
-  const handleRecommendedProductClick = (product: any) => {
-    // Check if product has variants
-    if (getProductVariants(product.id).length > 0) {
-      // Show variant selector
-      const productData = {
-        id: product.id,
-        name: product.name,
-        slug: product.id,
-        price: product.price,
-        images: [product.image],
-        variants: getProductVariants(product.id)
-      };
-      
-      setSelectedItemForVariant({
-        productData,
-        isRecommendedProduct: true,
-        originalProduct: product
-      });
-      setShowVariantModal(true);
-      return;
-    }
-    
-    // Add directly to cart if no variants
+  const handleAddRecommendedProduct = (product: RecommendedProduct) => {
     cartStore.addItem({
       id: `item_${Date.now()}`,
-      productId: product.id,
+      productId: product.slug,
       name: product.name,
       price: product.price,
       image: product.image,
       variant: { title: 'Default' }
     });
-  };
-
-  const handleRecommendedVariantUpdate = (selectedVariant: any, quantity: number) => {
-    if (!selectedItemForVariant?.originalProduct) return;
-    
-    // Add the recommended product with selected variant
-    cartStore.addItem({
-      id: `item_${Date.now()}`,
-      productId: selectedItemForVariant.originalProduct.id,
-      variantId: selectedVariant.name,
-      name: selectedItemForVariant.originalProduct.name,
-      price: selectedVariant.price || selectedItemForVariant.originalProduct.price,
-      image: selectedVariant.image || selectedItemForVariant.originalProduct.image,
-      variant: { title: selectedVariant.name }
-    }, quantity);
-    
-    setShowVariantModal(false);
-    setSelectedItemForVariant(null);
   };
 
   return (
@@ -318,30 +289,32 @@ export const CartWidget: React.FC = () => {
                   </div>
 
                   {/* Recommended Products */}
-                  <div className="mb-8">
-                    <h3 className="font-medium mb-4">Recommended for you</h3>
-                    <div className="space-y-3">
-                      {recommendedProducts.map((product) => (
-                        <div key={product.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div className="flex-1">
-                            <h4 className="font-medium text-sm">{product.name}</h4>
-                            <p className="text-pink-400 font-bold text-sm">{formatPrice(product.price)}</p>
+                  {recommendedProducts.length > 0 && (
+                    <div className="mb-8">
+                      <h3 className="font-medium mb-4">Recommended for you</h3>
+                      <div className="space-y-3">
+                        {recommendedProducts.map((product) => (
+                          <div key={product.slug} className="flex items-center gap-3 p-3 border rounded-lg">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1">
+                              <h4 className="font-medium text-sm">{product.name}</h4>
+                              <p className="text-pink-400 font-bold text-sm">{formatPrice(product.price)}</p>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => handleAddRecommendedProduct(product)}
+                            >
+                              Add
+                            </Button>
                           </div>
-                          <Button
-                            size="sm"
-                            onClick={() => handleRecommendedProductClick(product)}
-                          >
-                            {getProductVariants(product.id).length > 0 ? 'Choose Variant' : 'Add'}
-                          </Button>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
             </div>
@@ -402,7 +375,7 @@ export const CartWidget: React.FC = () => {
           variants: []
         }}
         initialQuantity={selectedItemForVariant?.quantity || 1}
-        onVariantSelect={selectedItemForVariant?.isRecommendedProduct ? handleRecommendedVariantUpdate : handleVariantUpdate}
+        onVariantSelect={handleVariantUpdate}
       />
     </>
   );
