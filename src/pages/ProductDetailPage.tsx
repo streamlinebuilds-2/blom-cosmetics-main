@@ -39,6 +39,8 @@ export const ProductDetailPage: React.FC = () => {
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('details');
+  // For bundles/collections: the resolved component products shown in "What's Included"
+  const [bundleComponents, setBundleComponents] = useState<any[]>([]);
 
   // Prevent infinite re-renders or invariant violations by wrapping the state update logic
   // Payflex instalment widget — reinject whenever price changes
@@ -282,7 +284,43 @@ export const ProductDetailPage: React.FC = () => {
           // Ensure we don't set state if the component is unmounted
           setProduct(processedProduct);
           setSelectedImageIndex(0);
-          
+
+          // For bundles/collections: resolve the included component products so we can
+          // render a "What's Included" section. bundle_products is [{product_id, quantity, variant_id}]
+          if (productSource === 'bundles' && Array.isArray(resolvedProductData.bundle_products) && resolvedProductData.bundle_products.length > 0) {
+            const componentIds = resolvedProductData.bundle_products
+              .map((bp: any) => bp.product_id)
+              .filter(Boolean);
+
+            if (componentIds.length > 0) {
+              const { data: components } = await supabase
+                .from('products')
+                .select('id, name, slug, thumbnail_url, image_url, price, price_cents')
+                .in('id', componentIds);
+
+              // Preserve the bundle's ordering and attach quantity from bundle_products
+              const byId = new Map((components || []).map((c: any) => [c.id, c]));
+              const resolved = resolvedProductData.bundle_products
+                .map((bp: any) => {
+                  const c = byId.get(bp.product_id);
+                  if (!c) return null;
+                  return {
+                    id: c.id,
+                    name: c.name,
+                    slug: c.slug,
+                    image: c.thumbnail_url || c.image_url || '/assets/blom_logo.webp',
+                    quantity: bp.quantity || bp.qty || 1
+                  };
+                })
+                .filter(Boolean);
+              setBundleComponents(resolved);
+            } else {
+              setBundleComponents([]);
+            }
+          } else {
+            setBundleComponents([]);
+          }
+
           // Set first variant as selected if variants exist
           if (variants.length > 0) {
             setSelectedVariant(variants[0].name);
@@ -973,6 +1011,35 @@ export const ProductDetailPage: React.FC = () => {
                   <p>{product.overview || product.short_description || product.shortDescription || product.description || 'No description available for this product.'}</p>
                 </div>
                 </AccordionItem>
+
+                {/* What's Included (bundles/collections only) */}
+                {product.isBundle && bundleComponents.length > 0 && (
+                  <AccordionItem title={`What's Included (${bundleComponents.length})`} defaultOpen={true}>
+                    <ul className="space-y-3">
+                      {bundleComponents.map((item: any) => (
+                        <li key={item.id}>
+                          <Link
+                            to={`/product/${item.slug}`}
+                            className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-pink-50 transition-colors group"
+                          >
+                            <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
+                              <OptimizedImage
+                                src={item.image}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-gray-900 truncate group-hover:text-pink-600">{item.name}</p>
+                              <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-pink-500 flex-shrink-0" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionItem>
+                )}
 
                 {/* Features & Benefits */}
                 {product.features && product.features.length > 0 && (
