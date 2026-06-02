@@ -255,7 +255,7 @@ export const ProductDetailPage: React.FC = () => {
           
           const processedProduct = {
             ...resolvedProductData,
-            images: allImages.length > 0 ? allImages.map(img => img.url) : ['/assets/blom_logo.webp'],
+            images: allImages.length > 0 ? allImages.map(img => img.url) : ['/blom_logo.webp'],
             imageVariants: allImages, // Store variant mapping
             variants: variants,
             features: Array.isArray(resolvedProductData.features) ? resolvedProductData.features : [],
@@ -308,7 +308,7 @@ export const ProductDetailPage: React.FC = () => {
                     id: c.id,
                     name: c.name,
                     slug: c.slug,
-                    image: c.thumbnail_url || c.image_url || '/assets/blom_logo.webp',
+                    image: c.thumbnail_url || c.image_url || '/blom_logo.webp',
                     quantity: bp.quantity || bp.qty || 1
                   };
                 })

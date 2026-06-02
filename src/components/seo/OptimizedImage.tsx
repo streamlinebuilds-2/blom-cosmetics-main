@@ -53,7 +53,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       : 'https://cute-stroopwafel-203cac.netlify.app';
   
   // Handle missing src
-  const safeSrc = src || '/assets/blom_logo.webp'; // Fallback to logo or placeholder
+  const safeSrc = src || '/blom_logo.webp'; // Fallback to logo or placeholder
   
   // Apply SAFE optimization (adds f_auto,q_auto without changing cloud account)
   const optimizedSrc = transformImg(safeSrc, 'f_auto,q_auto');

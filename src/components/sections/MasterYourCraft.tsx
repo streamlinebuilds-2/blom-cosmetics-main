@@ -122,7 +122,6 @@ export const MasterYourCraft: React.FC = () => {
                 loop
                 autoPlay
                 preload="metadata"
-                poster="/workshop-poster.jpg"
               >
                 <source src="/workshop-video.mp4" type="video/mp4" />
               </video>
