@@ -1019,7 +1019,7 @@ export const ProductDetailPage: React.FC = () => {
                       {bundleComponents.map((item: any) => (
                         <li key={item.id}>
                           <Link
-                            to={`/product/${item.slug}`}
+                            to={`/products/${item.slug}`}
                             className="flex items-center gap-3 p-2 -mx-2 rounded-xl hover:bg-pink-50 transition-colors group"
                           >
                             <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-50 flex-shrink-0 border border-gray-100">
