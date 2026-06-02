@@ -34,7 +34,6 @@ const CheckoutCancel = lazy(() => import('./pages/CheckoutCancel'));
 const AuthResetPage = lazy(() => import('./pages/AuthResetPage').then(m => ({ default: m.AuthResetPage })));
 const TrackOrderPage = lazy(() => import('./pages/TrackOrderPage').then(m => ({ default: m.TrackOrderPage })));
 const InvoiceViewer = lazy(() => import('./pages/InvoiceViewer'));
-const DealsPage = lazy(() => import('./pages/DealsPage').then(m => ({ default: m.DealsPage })));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const AuthCallbackPage = lazy(() => import('./pages/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })));
 const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample').then(m => ({ default: m.ProductTemplateExample })));
@@ -102,10 +101,6 @@ function App() {
           
           {/* Contact */}
           <Route path="/contact" element={<PageWithCart><ContactPage /></PageWithCart>} />
-          
-          {/* Deals */}
-          <Route path="/deals" element={<PageWithCart><DealsPage /></PageWithCart>} />
-          
           {/* Checkout */}
           <Route path="/checkout" element={<PageWithCart><CheckoutPage /></PageWithCart>} />
           <Route path="/checkout/success" element={<PageWithCart><CheckoutSuccess /></PageWithCart>} />
