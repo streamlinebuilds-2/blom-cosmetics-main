@@ -1705,7 +1705,7 @@ export const CheckoutPage: React.FC = () => {
                       { name: 'Vanilla', image: '/cuticle-oil-vanilla.webp' },
                       { name: 'Tiny Touch', image: '/cuticle-oil-tiny-touch.webp' },
                       { name: 'Dragon Fruit Lotus', image: '/cuticle-oil-dragon-fruit-lotus.webp' },
-                      { name: 'Sweet Peach', image: '/cuticle-oil-sweet-peach.webp' }
+                      { name: 'Sweet Peach', image: '/cuticle-oil-sweet-peach.jpg' }
                     ]
                   })}
                   className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"

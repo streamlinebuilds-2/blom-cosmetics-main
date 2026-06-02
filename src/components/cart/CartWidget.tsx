@@ -113,7 +113,7 @@ export const CartWidget: React.FC = () => {
         { name: 'Vanilla', inStock: true, image: '/cuticle-oil-vanilla.webp' },
         { name: 'Tiny Touch', inStock: true, image: '/cuticle-oil-tiny-touch.webp' },
         { name: 'Dragon Fruit Lotus', inStock: true, image: '/cuticle-oil-dragon-fruit-lotus.webp' },
-        { name: 'Sweet Peach', inStock: true, image: '/cuticle-oil-sweet-peach.webp' }
+        { name: 'Sweet Peach', inStock: true, image: '/cuticle-oil-sweet-peach.jpg' }
       ],
       'nail-file': [
         { name: 'Single File', inStock: true, price: 35, image: '/nail-file-white.webp' },
