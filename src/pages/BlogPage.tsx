@@ -165,6 +165,17 @@ export const BlogPage: React.FC = () => {
     fetchPosts();
   }, []);
 
+  const filteredPosts = fallbackPosts.filter(post => {
+    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTag = selectedTag === 'all' || post.tags.includes(selectedTag);
+    return matchesSearch && matchesTag;
+  });
+
+  const featuredPost = filteredPosts[0];
+  const recentPosts = filteredPosts.slice(1, 4);
+  const allPosts = filteredPosts.slice(4);
+
   // Intersection Observer for mobile shimmer effect
   useEffect(() => {
     const observerOptions = {
@@ -213,17 +224,6 @@ export const BlogPage: React.FC = () => {
 
     return () => observer.disconnect();
   }, [filteredPosts]);
-
-  const filteredPosts = fallbackPosts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTag = selectedTag === 'all' || post.tags.includes(selectedTag);
-    return matchesSearch && matchesTag;
-  });
-
-  const featuredPost = filteredPosts[0];
-  const recentPosts = filteredPosts.slice(1, 4);
-  const allPosts = filteredPosts.slice(4);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -519,8 +519,8 @@ export const BlogPage: React.FC = () => {
                       </button>
                       <ShareButton
                         url={window.location.href}
-                        title={post.title}
-                        description={post.excerpt}
+                        title="BLOM Beauty Blog"
+                        description="Nail art tutorials, tips, and industry insights from BLOM Cosmetics."
                         className="p-2 bg-white rounded-lg hover:bg-pink-50 transition-colors"
                       />
                       <button className="p-2 bg-white rounded-lg hover:bg-pink-50 transition-colors">
