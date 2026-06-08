@@ -261,7 +261,7 @@ export const CourseDetailPage: React.FC = () => {
           email: 'shopblomcosmetics@gmail.com',
           phone: '+27 79 548 3317',
           availableDates: [
-            'July 2026 (11–13 Jul)',
+            'July 2026 (4–6 Jul)',
             'September 2026 (26–28 Sep)',
             'November 2026 (5–7 Nov)'
           ],
@@ -362,7 +362,7 @@ export const CourseDetailPage: React.FC = () => {
         }
       ],
       availableDates: [
-        'July 2026 (11–13 Jul)',
+        'July 2026 (4–6 Jul)',
         'September 2026 (26–28 Sep)',
         'November 2026 (5–7 Nov)'
       ],
