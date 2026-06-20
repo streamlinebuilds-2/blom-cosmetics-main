@@ -17,8 +17,49 @@ export const handler: Handler = async (event) => {
       return { statusCode: 500, body: JSON.stringify({ error: 'Server configuration error' }) }
     }
 
+    const numberOrNull = (value: unknown): number | null => {
+      const numberValue = Number(value)
+      return Number.isFinite(numberValue) ? numberValue : null
+    }
+
+    const getStockLevel = (product: any): number | null => {
+      const values = [
+        product?.stock_qty,
+        product?.stock_on_hand,
+        product?.inventory_quantity,
+        product?.stock,
+      ].map(numberOrNull).filter((value): value is number => value !== null)
+
+      return values.length > 0 ? Math.max(...values) : null
+    }
+
+    const isProductOutOfStock = (product: any): boolean => {
+      if (!product) return false
+      const stockLevel = getStockLevel(product)
+      return product.out_of_stock === true ||
+        product.stockStatus === 'Sold Out' ||
+        product.stock_status === 'Sold Out' ||
+        (stockLevel !== null && stockLevel <= 0)
+    }
+
+    const isVariantOutOfStock = (product: any, variantName: string): boolean => {
+      if (!variantName || !Array.isArray(product?.variants)) return false
+      const normalizedVariant = normalizeName(variantName)
+      const variant = product.variants.find((v: any) =>
+        normalizeName(v?.name || v?.label || v?.title || v?.id) === normalizedVariant
+      )
+      if (!variant) return false
+      const variantStock = numberOrNull(variant.inventory_quantity ?? variant.stock_qty ?? variant.stock)
+      return variant.inStock === false ||
+        variant.in_stock === false ||
+        variant.out_of_stock === true ||
+        (variantStock !== null && variantStock <= 0)
+    }
+
+    const normalizeName = (value: unknown) => String(value || '').toLowerCase().trim()
+
     // 1. Load Product Dictionary
-    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price`, {
+    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price,status,is_active,out_of_stock,stock,stock_qty,stock_on_hand,inventory_quantity,variants`, {
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
     });
     const dbProducts = productsRes.ok ? await productsRes.json() : [];
@@ -26,7 +67,9 @@ export const handler: Handler = async (event) => {
     const idMap = new Map();
     dbProducts.forEach((p: any) => {
       idMap.set(p.id.toLowerCase(), p.id);
-      if (p.name) idMap.set(p.name.toLowerCase().trim(), p.id);
+      if (p.name) idMap.set(normalizeName(p.name), p.id);
+      if (p.slug) idMap.set(normalizeName(p.slug), p.id);
+      if (p.sku) idMap.set(normalizeName(p.sku), p.id);
     });
 
     // 2. Process Items
@@ -54,10 +97,37 @@ export const handler: Handler = async (event) => {
 
       // If ID not found, try Name matching
       if (!resolvedId) {
-        if (idMap.has(baseName.toLowerCase())) {
-          resolvedId = idMap.get(baseName.toLowerCase());
+        if (idMap.has(normalizeName(baseName))) {
+          resolvedId = idMap.get(normalizeName(baseName));
           resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
         }
+      }
+
+      if (orderKind === 'product' && resolvedProduct && isProductOutOfStock(resolvedProduct)) {
+        return {
+          statusCode: 409,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: `${resolvedProduct.name || baseName} is sold out and has been removed from checkout.`,
+            code: 'OUT_OF_STOCK',
+            product_id: resolvedProduct.id,
+            product_name: resolvedProduct.name || baseName
+          })
+        };
+      }
+
+      if (orderKind === 'product' && resolvedProduct && isVariantOutOfStock(resolvedProduct, variantName)) {
+        return {
+          statusCode: 409,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: `${resolvedProduct.name || baseName}${variantName ? ` (${variantName})` : ''} is sold out and has been removed from checkout.`,
+            code: 'OUT_OF_STOCK',
+            product_id: resolvedProduct.id,
+            product_name: resolvedProduct.name || baseName,
+            variant: variantName
+          })
+        };
       }
 
       validItems.push({

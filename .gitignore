@@ -29,7 +29,9 @@ dist-ssr
 # Local tooling / build artifacts (not for the repo)
 .kilo/
 .kilocode/
-.agents/
+.agents/*
+!.agents/skills/
+!.agents/skills/**
 .n8nac/
 .claude/settings.local.json
 nul

@@ -25,6 +25,31 @@ import { useToast } from '../components/ui/use-toast';
 import { ProductCard } from '../components/ProductCard';
 import { PaymentMethods } from '../components/payment/PaymentMethods';
 
+const numericStock = (value: unknown): number | null => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : null;
+};
+
+const getProductStockLevel = (item: any): number | null => {
+  const values = [
+    item?.stock_qty,
+    item?.stock_on_hand,
+    item?.inventory_quantity,
+    item?.stock,
+  ].map(numericStock).filter((value): value is number => value !== null);
+
+  return values.length > 0 ? Math.max(...values) : null;
+};
+
+const isProductAvailable = (item: any): boolean => {
+  if (!item) return false;
+  const stockLevel = getProductStockLevel(item);
+  return item.out_of_stock !== true &&
+    item.stockStatus !== 'Sold Out' &&
+    (stockLevel === null || stockLevel > 0) &&
+    (item.price || (item.price_cents ? item.price_cents / 100 : 0)) !== -1;
+};
+
 export const ProductDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -182,7 +207,7 @@ export const ProductDetailPage: React.FC = () => {
                   return { 
                     id: v, 
                     name: v, 
-                    inStock: true,
+                    inStock: isProductAvailable(resolvedProductData),
                     image: null
                   };
                 }
@@ -224,7 +249,7 @@ export const ProductDetailPage: React.FC = () => {
                   id: v.id || variantName,
                   name: variantName,
                   price: v.price || resolvedProductData.price,
-                  inStock: v.inStock ?? v.in_stock ?? true,
+                  inStock: v.inStock ?? v.in_stock ?? (numericStock(v.inventory_quantity) === null ? isProductAvailable(resolvedProductData) : Number(v.inventory_quantity) > 0),
                   image: variantImage
                 };
               })
@@ -375,14 +400,14 @@ export const ProductDetailPage: React.FC = () => {
           }
           
           // Always set related products, even if empty (will show section with message)
-          setRelatedProducts(related.map(p => ({
+          setRelatedProducts(related.filter(isProductAvailable).map(p => ({
             id: p.id,
             name: p.name,
             slug: p.slug,
             price: p.price,
             images: [p.image_url || p.thumbnail_url],
             category: p.category,
-            inStock: true // Always in stock per request
+            inStock: isProductAvailable(p)
           })));
 
           // Fetch approved reviews
@@ -542,12 +567,20 @@ export const ProductDetailPage: React.FC = () => {
   }, []);
 
   const handleAddToCart = () => {
-    if (!product) return;
+    if (!product) return false;
 
     // Get selected variant details
     const variantData = selectedVariant 
       ? product.variants?.find((v: any) => v.name === selectedVariant)
       : null;
+
+    if (!isProductAvailable(product) || variantData?.inStock === false) {
+      toast({
+        title: "Sold out",
+        description: `${product.name}${selectedVariant && !['Default Title', 'Default'].includes(selectedVariant) ? ` (${selectedVariant})` : ''} is currently out of stock.`
+      });
+      return false;
+    }
     
     const variantImage = variantData?.image || product.images[selectedImageIndex] || product.images[0];
     const variantPrice = variantData?.price || product.price;
@@ -558,14 +591,15 @@ export const ProductDetailPage: React.FC = () => {
       name: product.name,
       price: variantPrice,
       image: variantImage,
-      quantity: quantity,
       variant: selectedVariant && !['Default Title', 'Default'].includes(selectedVariant) ? { title: selectedVariant } : undefined
-    });
+    }, quantity);
 
     toast({
       title: "Added to cart",
       description: `${product.name}${selectedVariant && !['Default Title', 'Default'].includes(selectedVariant) ? ` (${selectedVariant})` : ''} has been added to your cart.`
     });
+
+    return true;
   };
   
   // Handle variant selection - update image if variant has specific image
@@ -626,8 +660,9 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
-    navigate('/checkout');
+    if (handleAddToCart()) {
+      navigate('/checkout');
+    }
   };
 
   if (loading) {
@@ -669,8 +704,7 @@ export const ProductDetailPage: React.FC = () => {
 
   const shortDescriptionText = product.short_description || product.shortDescription;
 
-  const stockLevel = product.stock_qty ?? product.stock_on_hand ?? product.inventory_quantity ?? product.stock ?? 0;
-  const isOutOfStock = product.out_of_stock === true || (product.stockStatus === 'Sold Out') || (!product.out_of_stock && stockLevel === 0 && product.stock_qty !== undefined);
+  const isProductOutOfStock = !isProductAvailable(product);
 
   return (
     <div className="min-h-screen bg-white">
@@ -735,12 +769,12 @@ export const ProductDetailPage: React.FC = () => {
                       -{discountPercentage}%
                     </span>
                   )}
-                  {isOutOfStock && (
+                  {isProductOutOfStock && (
                     <span className="bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                       Sold Out
                     </span>
                   )}
-                  {product.price === -1 && !isOutOfStock && (
+                  {product.price === -1 && !isProductOutOfStock && (
                     <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                       Coming Soon
                     </span>
@@ -850,18 +884,18 @@ export const ProductDetailPage: React.FC = () => {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {product.variants.map((variant: any) => {
                       const isSelected = selectedVariant === variant.name;
-                      const isOutOfStock = false; // Always show as in stock per request
+                      const isVariantOutOfStock = variant.inStock === false || isProductOutOfStock;
                       
                       return (
                         <button
                           key={variant.id || variant.name}
                           onClick={() => handleVariantSelect(variant.name)}
-                          disabled={isOutOfStock}
+                          disabled={isVariantOutOfStock}
                           className={`
                             px-4 py-2 rounded-full text-sm font-medium transition-all
                             ${isSelected
                               ? 'bg-pink-500 text-white shadow-lg shadow-pink-200'
-                              : isOutOfStock
+                              : isVariantOutOfStock
                               ? 'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed'
                               : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-pink-300 hover:bg-pink-50'
                             }
@@ -945,34 +979,34 @@ export const ProductDetailPage: React.FC = () => {
                   {/* Add to Cart Button - Larger on mobile, match Buy Now size */}
                   <button
                     onClick={handleAddToCart}
-                    disabled={product.price === -1 || isOutOfStock}
+                    disabled={product.price === -1 || isProductOutOfStock}
                     className={`
                       w-full sm:flex-1 h-16 sm:h-12 font-bold rounded-full uppercase transition-all flex items-center justify-center gap-2 text-base sm:text-sm px-6
-                      ${(product.price === -1 || isOutOfStock)
+                      ${(product.price === -1 || isProductOutOfStock)
                         ? 'bg-gray-200 text-gray-500 cursor-not-allowed shadow-none'
                         : 'bg-pink-500 text-white shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95'
                       }
                     `}
                   >
                     <ShoppingCart className="w-6 h-6 sm:w-5 sm:h-5" />
-                    {isOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Add to Cart'}
+                    {isProductOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Add to Cart'}
                   </button>
                 </div>
 
                 {/* Buy Now Button - Larger on mobile */}
                 <button
                   onClick={handleBuyNow}
-                  disabled={product.price === -1 || isOutOfStock}
+                  disabled={product.price === -1 || isProductOutOfStock}
                   className={`
                     w-full h-16 sm:h-12 font-bold rounded-full uppercase transition-all flex items-center justify-center gap-2 text-base sm:text-sm px-6
-                    ${(product.price === -1 || isOutOfStock)
+                    ${(product.price === -1 || isProductOutOfStock)
                       ? 'bg-gray-100 text-gray-400 border-2 border-gray-200 cursor-not-allowed shadow-none'
                       : 'bg-white border-2 border-gray-900 text-gray-900 hover:bg-gradient-to-r hover:from-blue-400 hover:to-blue-500 hover:text-white hover:border-blue-400 hover:shadow-lg hover:shadow-blue-200 hover:scale-[1.02] active:scale-95'
                     }
                   `}
                 >
                   <CreditCard className="w-6 h-6 sm:w-5 sm:h-5" />
-                  {isOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Buy Now'}
+                  {isProductOutOfStock ? 'Sold Out' : product.price === -1 ? 'Coming Soon' : 'Buy Now'}
                 </button>
               </div>
 

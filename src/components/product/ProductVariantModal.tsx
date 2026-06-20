@@ -59,6 +59,10 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
     try {
       // Find the selected variant details
       const selectedVariantData = product.variants.find(v => v.name === selectedVariant);
+      if (!selectedVariantData || !isVariantInStock(selectedVariantData)) {
+        showNotification(`${product.name} (${selectedVariant}) is sold out.`, 'error');
+        return;
+      }
       
       const cartItem = {
         id: `item_${Date.now()}`,
@@ -96,8 +100,11 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
   };
 
   const isVariantInStock = (variant: ProductVariant) => {
-    return true; // Always return true per request
+    return variant.inStock !== false;
   };
+
+  const selectedVariantData = product.variants.find(v => v.name === selectedVariant);
+  const selectedVariantInStock = selectedVariantData ? isVariantInStock(selectedVariantData) : false;
 
   if (!isOpen) return null;
 
@@ -169,7 +176,9 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
                     <Check className="h-4 w-4 sm:h-5 sm:w-5 text-pink-600 flex-shrink-0 ml-2" />
                   )}
                 </div>
-                {/* Out of stock message removed per request */}
+                {!isVariantInStock(variant) && (
+                  <p className="text-xs text-red-500 mt-1">Sold out</p>
+                )}
               </button>
             ))}
           </div>
@@ -179,9 +188,9 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
         <div className="border-t border-gray-200 p-3 sm:p-6 bg-white flex-shrink-0">
           <button
             onClick={handleAddToCart}
-            disabled={!selectedVariant || loading}
+            disabled={!selectedVariant || !selectedVariantInStock || loading}
             className={`w-full px-6 py-3 rounded-full font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              !selectedVariant 
+              !selectedVariant || !selectedVariantInStock
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
                 : 'bg-pink-400 text-white hover:bg-pink-500'
             }`}
@@ -194,7 +203,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
             ) : (
               <div className="flex items-center justify-center gap-2">
                 <ShoppingCart className="h-4 w-4" />
-                {!selectedVariant ? 'Select a Variant' : 'Add to Cart'}
+                {!selectedVariant ? 'Select a Variant' : !selectedVariantInStock ? 'Sold Out' : 'Add to Cart'}
               </div>
             )}
           </button>

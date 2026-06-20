@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
@@ -13,6 +13,12 @@ import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete'
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
 import { ProductVariantModal } from '../components/product/ProductVariantModal';
+import {
+  CatalogProduct,
+  RecommendedProduct,
+  buildRecommendations,
+  loadCatalog,
+} from '../lib/recommendations';
 // Coupon data type (moved inside component as a ref — avoids shared module-level mutable state)
 type SimpleCouponData = {
   couponCode: string;
@@ -147,6 +153,8 @@ export const CheckoutPage: React.FC = () => {
   const [userSession, setUserSession] = useState<any>(null);
   const [showVariantModal, setShowVariantModal] = useState(false);
   const [selectedProductForVariant, setSelectedProductForVariant] = useState<any>(null);
+  const [catalog, setCatalog] = useState<CatalogProduct[]>([]);
+  const [rotationSeed] = useState(() => Math.floor(Math.random() * 1000));
 
   // --- FURNITURE DETECTION LOGIC ---
   const isFurnitureItem = (itemName: string) => {
@@ -175,15 +183,29 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [cartState.items.length]);
 
+  useEffect(() => {
+    let active = true;
+    loadCatalog().then((products) => {
+      if (active) setCatalog(products);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const recommendedProducts = useMemo<RecommendedProduct[]>(
+    () => buildRecommendations(catalog, cartState.items, 3, rotationSeed),
+    [catalog, cartState.items, rotationSeed]
+  );
+
   // Check wishlist status for recommended products
   useEffect(() => {
-    const recommendedProducts = ['nail-file', 'cuticle-oil', 'top-coat'];
     const wishlistStatus: {[key: string]: boolean} = {};
     recommendedProducts.forEach(productId => {
-      wishlistStatus[productId] = wishlistStore.isInWishlist(productId);
+      wishlistStatus[productId.slug] = wishlistStore.isInWishlist(productId.slug);
     });
     setIsWishlisted(wishlistStatus);
-  }, []);
+  }, [recommendedProducts]);
 
   // Fetch user session and saved addresses
   useEffect(() => {
@@ -297,7 +319,7 @@ export const CheckoutPage: React.FC = () => {
     // Add directly to cart if no variants
     cartStore.addItem({
       id: `item_${Date.now()}`,
-      productId: productData.id,
+      productId: productData.slug || productData.id,
       name: productData.name,
       price: productData.price,
       image: productData.image,
@@ -660,14 +682,35 @@ export const CheckoutPage: React.FC = () => {
 
       if (!createOrderRes.ok) {
         let errorMessage = 'Failed to create order';
+        let errorCode = '';
+        let productId = '';
+        let productName = '';
         try {
           const errData = await createOrderRes.json();
           errorMessage = errData.error || errData.details?.message || errorMessage;
+          errorCode = errData.code || '';
+          productId = errData.product_id || '';
+          productName = errData.product_name || '';
           console.error('Create order error:', errData);
         } catch (e) {
           console.error('Failed to parse error response:', e);
           errorMessage = `Server error: ${createOrderRes.status} ${createOrderRes.statusText}`;
         }
+
+        if (createOrderRes.status === 409 && errorCode === 'OUT_OF_STOCK') {
+          const productNameLower = productName.toLowerCase();
+          const staleItem = cartState.items.find((item) =>
+            item.productId === productId ||
+            item.id === productId ||
+            (productNameLower && item.name.toLowerCase() === productNameLower)
+          );
+          if (staleItem) {
+            cartStore.removeItem(staleItem.id);
+          }
+          alert(errorMessage);
+          throw new Error(errorMessage);
+        }
+
         alert(`Checkout Error: ${errorMessage}`);
         throw new Error(errorMessage);
       }
@@ -1618,145 +1661,49 @@ export const CheckoutPage: React.FC = () => {
           </div>
 
           {/* Recommended Products */}
-          <div className="mt-12">
-            <h3 className="text-2xl font-bold mb-6">Recommended for you</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Nail File Set */}
-              <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src="/nail-file-white.webp"
-                      alt="Nail File Set"
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Nail File (80/80 Grit)</h4>
-                      <p className="text-gray-900 font-bold">R35.00</p>
-                    </div>
-                  </div>
-                  
-                  {/* Wishlist Heart */}
-                  <button
-                    onClick={() => handleWishlistToggle('nail-file', 'Nail File (80/80 Grit)', 35, '/nail-file-white.webp')}
-                    className={`p-2 rounded-full transition-colors ${
-                      isWishlisted['nail-file']
-                        ? 'text-pink-500 bg-pink-50'
-                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
-                    }`}
-                  >
-                    <Heart className={`h-5 w-5 ${isWishlisted['nail-file'] ? 'fill-current' : ''}`} />
-                  </button>
-                </div>
-                
-                <button
-                  onClick={() => handleAddRecommendedProduct({
-                    id: 'nail-file',
-                    name: 'Nail File (80/80 Grit)',
-                    price: 35,
-                    image: '/nail-file-white.webp',
-                    variants: [
-                      { name: 'Single File', price: 35, image: '/nail-file-colorful.webp' },
-                      { name: '5-Pack Bundle', price: 160, image: '/nail-file-white.webp' }
-                    ]
-                  })}
-                  className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
-                >
-                  Add to Cart
-                </button>
-              </div>
+          {recommendedProducts.length > 0 && (
+            <div className="mt-12">
+              <h3 className="text-2xl font-bold mb-6">Recommended for you</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recommendedProducts.map((product) => (
+                  <div key={product.slug} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                        />
+                        <div className="min-w-0">
+                          <h4 className="font-semibold text-gray-900 truncate">{product.name}</h4>
+                          <p className="text-gray-900 font-bold">{formatPrice(product.price)}</p>
+                        </div>
+                      </div>
 
-              {/* Cuticle Oil */}
-              <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src="/cuticle-oil-white.webp"
-                      alt="Cuticle Oil"
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Cuticle Oil</h4>
-                      <p className="text-gray-900 font-bold">R140.00</p>
+                      <button
+                        onClick={() => handleWishlistToggle(product.slug, product.name, product.price, product.image)}
+                        className={`p-2 rounded-full transition-colors ${
+                          isWishlisted[product.slug]
+                            ? 'text-pink-500 bg-pink-50'
+                            : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
+                        }`}
+                        aria-label={isWishlisted[product.slug] ? 'Remove from wishlist' : 'Add to wishlist'}
+                      >
+                        <Heart className={`h-5 w-5 ${isWishlisted[product.slug] ? 'fill-current' : ''}`} />
+                      </button>
                     </div>
-                  </div>
-                  
-                  {/* Wishlist Heart */}
-                  <button
-                    onClick={() => handleWishlistToggle('cuticle-oil', 'Cuticle Oil', 140, '/cuticle-oil-white.webp')}
-                    className={`p-2 rounded-full transition-colors ${
-                      isWishlisted['cuticle-oil']
-                        ? 'text-pink-500 bg-pink-50'
-                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
-                    }`}
-                  >
-                    <Heart className={`h-5 w-5 ${isWishlisted['cuticle-oil'] ? 'fill-current' : ''}`} />
-                  </button>
-                </div>
-                
-                <button
-                  onClick={() => handleAddRecommendedProduct({
-                    id: 'cuticle-oil',
-                    name: 'Cuticle Oil',
-                    price: 140,
-                    image: '/cuticle-oil-white.webp',
-                    variants: [
-                      { name: 'Cotton Candy', image: '/cuticle-oil-cotton-candy.webp' },
-                      { name: 'Vanilla', image: '/cuticle-oil-vanilla.webp' },
-                      { name: 'Tiny Touch', image: '/cuticle-oil-tiny-touch.webp' },
-                      { name: 'Dragon Fruit Lotus', image: '/cuticle-oil-dragon-fruit-lotus.webp' },
-                      { name: 'Sweet Peach', image: '/cuticle-oil-sweet-peach.jpg' }
-                    ]
-                  })}
-                  className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
-                >
-                  Add to Cart
-                </button>
-              </div>
 
-              {/* Top Coat */}
-              <div className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow relative">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src="/top-coat-white.webp"
-                      alt="Top Coat"
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Top Coat</h4>
-                      <p className="text-gray-900 font-bold">R190.00</p>
-                    </div>
+                    <button
+                      onClick={() => handleAddRecommendedProduct(product)}
+                      className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
+                    >
+                      Add to Cart
+                    </button>
                   </div>
-                  
-                  {/* Wishlist Heart */}
-                  <button
-                    onClick={() => handleWishlistToggle('top-coat', 'Top Coat', 190, '/top-coat-white.webp')}
-                    className={`p-2 rounded-full transition-colors ${
-                      isWishlisted['top-coat']
-                        ? 'text-pink-500 bg-pink-50'
-                        : 'text-gray-400 hover:text-pink-500 hover:bg-pink-50'
-                    }`}
-                  >
-                    <Heart className={`h-5 w-5 ${isWishlisted['top-coat'] ? 'fill-current' : ''}`} />
-                  </button>
-                </div>
-                
-                <button
-                  onClick={() => handleAddRecommendedProduct({
-                    id: 'top-coat',
-                    name: 'Top Coat',
-                    price: 190,
-                    image: '/top-coat-white.webp',
-                    variants: []
-                  })}
-                  className="w-full bg-pink-500 text-white px-6 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-pink-200 hover:bg-pink-600 hover:shadow-xl hover:shadow-pink-300 hover:scale-[1.02] active:scale-95"
-                >
-                  Add to Cart
-                </button>
+                ))}
               </div>
             </div>
-          </div>
+          )}
         </Container>
       </main>
 
@@ -1770,9 +1717,9 @@ export const CheckoutPage: React.FC = () => {
           setSelectedProductForVariant(null);
         }}
         product={selectedProductForVariant ? {
-          id: selectedProductForVariant.id,
+          id: selectedProductForVariant.id || selectedProductForVariant.slug,
           name: selectedProductForVariant.name,
-          slug: selectedProductForVariant.id,
+          slug: selectedProductForVariant.slug || selectedProductForVariant.id,
           price: selectedProductForVariant.price,
           images: [selectedProductForVariant.image],
           variants: selectedProductForVariant.variants || []

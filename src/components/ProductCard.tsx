@@ -72,8 +72,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     e.preventDefault();
     e.stopPropagation();
 
-    // Allow add to cart even if out of stock (per request)
-    if (price === -1) return;
+    if (price === -1 || !inStock) {
+      showNotification(!inStock ? `${safeName} is sold out.` : `${safeName} is coming soon.`, 'error');
+      return;
+    }
     if (hasVariants) {
       setShowVariantModal(true);
     } else {
@@ -158,10 +160,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     handleAddToCart(e);
                   }
                 }}
-                disabled={price === -1}
-                className="bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors whitespace-nowrap shadow-md"
+                disabled={price === -1 || !inStock}
+                className="bg-pink-500 text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-pink-600 transition-colors whitespace-nowrap shadow-md disabled:bg-gray-300 disabled:text-gray-500 disabled:shadow-none disabled:cursor-not-allowed"
               >
-                {hasVariants ? 'Select' : 'Add'}
+                {price === -1 ? 'Coming Soon' : !inStock ? 'Sold Out' : hasVariants ? 'Select' : 'Add'}
               </button>
           </div>
         </article>
@@ -228,16 +230,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  if (price === -1) return;
+                  if (price === -1 || !inStock) return;
                   if (hasVariants) {
                     setShowVariantModal(true);
                   } else {
                     handleAddToCart(e);
                   }
                 }}
-                disabled={price === -1}
+                disabled={price === -1 || !inStock}
                 className="w-9 h-9 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-md shadow-pink-200 hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                aria-label={hasVariants ? 'Select options' : 'Add to cart'}
+                aria-label={price === -1 ? 'Coming soon' : !inStock ? 'Sold out' : hasVariants ? 'Select options' : 'Add to cart'}
               >
                 <Plus className="w-4 h-4" />
               </button>
