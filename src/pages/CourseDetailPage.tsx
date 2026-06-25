@@ -835,6 +835,18 @@ export const CourseDetailPage: React.FC = () => {
   const [promoCode, setPromoCode] = useState('');
   const promoActive = promoCode.trim().toUpperCase() === 'BLOMTEST5';
 
+  // In-person courses: the buyer chooses to pay the deposit (secure spot) or the full amount up front.
+  const [paymentOption, setPaymentOption] = useState<'deposit' | 'full'>('deposit');
+
+  // Full price (in Rands) of the currently selected package, honouring any active promo.
+  const selectedPackagePrice = (() => {
+    const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
+    const priceMatch = selectedPkg?.price.match(/[\d,]+/);
+    const basePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
+    return promoActive ? 5 : basePrice;
+  })();
+  const balanceAfterDeposit = Math.max(0, selectedPackagePrice - depositAmount);
+
   // Auto-select package and date if there's only one option
   useEffect(() => {
     if (course.packages.length === 1 && !selectedPackage) {
@@ -952,11 +964,14 @@ export const CourseDetailPage: React.FC = () => {
       const priceMatch = selectedPkg.price.match(/[\d,]+/);
       const basePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
       const coursePrice = promoActive ? 5 : basePrice;
-      const paymentAmount = course.isOnline ? coursePrice : depositAmount;
+      // Online courses are always paid in full. In-person courses let the buyer
+      // choose between paying just the deposit or the full course price up front.
+      const payInFull = course.isOnline || paymentOption === 'full';
+      const paymentAmount = payInFull ? coursePrice : depositAmount;
       const paymentAmountCents = Math.round(paymentAmount * 100);
-      const paymentLabel = course.isOnline ? 'Purchase' : 'Deposit';
-      const paymentKind = course.isOnline ? 'full' : 'deposit';
-      const amountOwedCents = course.isOnline ? 0 : Math.max(0, Math.round((coursePrice - depositAmount) * 100));
+      const paymentLabel = course.isOnline ? 'Purchase' : (payInFull ? 'Full Payment' : 'Deposit');
+      const paymentKind = payInFull ? 'full' : 'deposit';
+      const amountOwedCents = payInFull ? 0 : Math.max(0, Math.round((coursePrice - depositAmount) * 100));
 
       // Create order with course as product
       const orderRes = await fetch('/.netlify/functions/create-order', {
@@ -1500,10 +1515,10 @@ export const CourseDetailPage: React.FC = () => {
                   <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-5">
                     <CreditCard className="h-8 w-8 text-pink-400" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Deposit Required'}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 uppercase tracking-wide">{course.isOnline ? 'Payment' : 'Payment Options'}</h3>
                   <p className="text-gray-800 text-base md:text-lg leading-relaxed">
-                    {course.isOnline ? 'Full payment required' : `R${depositAmount.toLocaleString('en-ZA')} to secure your spot`}<br />
-                    <span className="text-base text-gray-700">{course.isOnline ? 'Instant access after payment' : 'Balance due on course start date'}</span>
+                    {course.isOnline ? 'Full payment required' : `R${depositAmount.toLocaleString('en-ZA')} deposit to secure your spot, or pay in full`}<br />
+                    <span className="text-base text-gray-700">{course.isOnline ? 'Instant access after payment' : 'Choose deposit or full payment at checkout'}</span>
                   </p>
                 </div>
 
@@ -1876,6 +1891,61 @@ export const CourseDetailPage: React.FC = () => {
                       </div>
                     </div>
 
+                    {/* Payment Option - deposit or full (in-person courses only) */}
+                    {!course.isOnline && (
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-800 mb-3">
+                          Payment Option <span className="text-red-500">*</span>
+                        </label>
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <button
+                            type="button"
+                            onClick={() => setPaymentOption('deposit')}
+                            aria-pressed={paymentOption === 'deposit'}
+                            className={`text-left p-5 rounded-xl border-2 transition-all duration-300 ${
+                              paymentOption === 'deposit'
+                                ? 'border-pink-400 bg-pink-50 shadow-md'
+                                : 'border-gray-200 bg-white hover:border-pink-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-bold text-gray-900">Pay Deposit</span>
+                              <span className="font-bold text-pink-500">R{depositAmount.toLocaleString('en-ZA')}</span>
+                            </div>
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                              Secure your spot now.{selectedPackage
+                                ? ` Remaining R${balanceAfterDeposit.toLocaleString('en-ZA')} due on the course start date.`
+                                : ' Balance due on the course start date.'}
+                            </p>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setPaymentOption('full')}
+                            aria-pressed={paymentOption === 'full'}
+                            className={`text-left p-5 rounded-xl border-2 transition-all duration-300 ${
+                              paymentOption === 'full'
+                                ? 'border-pink-400 bg-pink-50 shadow-md'
+                                : 'border-gray-200 bg-white hover:border-pink-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-bold text-gray-900">Pay in Full</span>
+                              <span className="font-bold text-pink-500">
+                                {selectedPackage ? `R${selectedPackagePrice.toLocaleString('en-ZA')}` : '—'}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                              Pay the full course price now — nothing left to settle on the day.
+                            </p>
+                          </button>
+                        </div>
+                        {!selectedPackage && (
+                          <p className="text-xs text-gray-500 mt-2">Select a package above to see the full price.</p>
+                        )}
+                      </div>
+                    )}
+
                     {/* Instructor/Location Selection - Only for in-person courses */}
                     {!course.isOnline && course.instructors && course.instructors.length > 0 && (
                       <div>
@@ -2022,7 +2092,13 @@ export const CourseDetailPage: React.FC = () => {
                         className="w-full bg-pink-400 hover:bg-transparent text-white hover:text-black font-bold py-5 px-6 rounded-full text-lg uppercase tracking-wide transition-all duration-300 border-2 border-transparent hover:border-black disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-pink-400 disabled:hover:text-white disabled:hover:border-transparent"
                         style={{ boxShadow: '0 4px 15px rgba(255,116,164,0.3)' }}
                       >
-                        {isSubmitting ? 'Processing...' : course.isOnline ? `Complete Purchase${promoActive ? ' — R5' : ''}` : `Pay Deposit & Secure Spot (R${depositAmount.toLocaleString('en-ZA')})`}
+                        {isSubmitting
+                          ? 'Processing...'
+                          : course.isOnline
+                            ? `Complete Purchase${promoActive ? ' — R5' : ''}`
+                            : paymentOption === 'full'
+                              ? `Pay in Full & Secure Spot${selectedPackage ? ` (R${selectedPackagePrice.toLocaleString('en-ZA')})` : ''}`
+                              : `Pay Deposit & Secure Spot (R${depositAmount.toLocaleString('en-ZA')})`}
                       </button>
 
                       {/* Help text when button is disabled */}
