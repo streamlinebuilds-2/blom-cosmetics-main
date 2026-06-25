@@ -834,6 +834,8 @@ export const CourseDetailPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   // In-person courses: the buyer chooses to pay the deposit (secure spot) or the full amount up front.
   const [paymentOption, setPaymentOption] = useState<'deposit' | 'full'>('deposit');
+  // Payment provider chooser (PayFast vs Payflex) shown after the buyer confirms their booking.
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Full price (in Rands) of the currently selected package.
   const selectedPackagePrice = (() => {
@@ -922,24 +924,29 @@ export const CourseDetailPage: React.FC = () => {
     validateField(name, fieldValue);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
     // Validate all fields
     const isValid = Object.entries(formData).every(([key, value]) => validateField(key, value));
     if (!isValid || !selectedPackage || !selectedDate) {
       showNotification('Please fill all required fields', 'error');
-      setIsSubmitting(false);
       return;
     }
 
     // For in-person courses, validate instructor selection
     if (!course.isOnline && !selectedInstructor) {
       showNotification('Please select an instructor and location', 'error');
-      setIsSubmitting(false);
       return;
     }
+
+    // All details valid — let the buyer pick a payment provider (PayFast / Payflex).
+    setShowPaymentModal(true);
+  };
+
+  const processCoursePayment = async (method: 'payfast' | 'payflex') => {
+    setShowPaymentModal(false);
+    setIsSubmitting(true);
 
     try {
       const nowBase36 = Date.now().toString(36).toUpperCase();
@@ -1024,18 +1031,61 @@ export const CourseDetailPage: React.FC = () => {
       const orderId = orderData.order_id;
       const merchantPaymentId = orderData.m_payment_id || orderData.merchant_payment_id || clientPaymentId;
 
-      // Redirect to PayFast
+      const itemName = `${course.title} - ${selectedPackage} ${paymentLabel}`;
+      const firstName = formData.name.trim().split(' ')[0];
+      const lastName = formData.name.trim().split(' ').slice(1).join(' ') || firstName;
+
+      // Payflex (Buy Now, Pay Later) — mirrors the checkout Payflex flow.
+      if (method === 'payflex') {
+        const pfxResponse = await fetch('/.netlify/functions/payflex-redirect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: orderId,
+            m_payment_id: merchantPaymentId,
+            amount: paymentAmount,
+            shipping_amount: 0,
+            consumer: {
+              givenNames: firstName,
+              surname: lastName,
+              email: formData.email,
+              phoneNumber: `${formData.countryCode}${formData.phone}`
+            },
+            items: [{
+              name: itemName,
+              sku: (course as any).sku || '',
+              quantity: 1,
+              price: paymentAmount
+            }]
+          })
+        });
+
+        if (!pfxResponse.ok) {
+          const pfxError = await pfxResponse.json().catch(() => ({ error: 'Payflex initiation failed' }));
+          throw new Error(pfxError.error || 'Payflex initiation failed');
+        }
+
+        const pfxData = await pfxResponse.json();
+        if (pfxData.checkout_url) {
+          window.location.href = pfxData.checkout_url;
+        } else {
+          throw new Error('No checkout URL received from Payflex');
+        }
+        return;
+      }
+
+      // PayFast (default)
       const paymentRes = await fetch('/.netlify/functions/payfast-redirect', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           order_id: orderId,
           amount: paymentAmount,
-          item_name: `${course.title} - ${selectedPackage} ${paymentLabel}`,
+          item_name: itemName,
           m_payment_id: merchantPaymentId,
           email_address: formData.email,
-          name_first: formData.name.split(' ')[0],
-          name_last: formData.name.split(' ').slice(1).join(' ') || formData.name.split(' ')[0],
+          name_first: firstName,
+          name_last: lastName,
           custom_str1: course.id, // Pass course ID
               custom_str2: academyCourseSlug // Pass course slug
         })
@@ -2117,6 +2167,71 @@ export const CourseDetailPage: React.FC = () => {
                   </form>
             </div>
               </div>
+
+              {/* Payment provider chooser modal (PayFast / Payflex) */}
+              {showPaymentModal && (
+                <div
+                  className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+                  onClick={() => !isSubmitting && setShowPaymentModal(false)}
+                >
+                  <div
+                    className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 md:p-8 relative"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setShowPaymentModal(false)}
+                      disabled={isSubmitting}
+                      aria-label="Close"
+                      className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl leading-none disabled:opacity-40"
+                    >
+                      ✕
+                    </button>
+
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">Choose how to pay</h3>
+                    <p className="text-sm text-gray-600 mb-6">
+                      {(() => {
+                        const payNow = course.isOnline || paymentOption === 'full';
+                        const amt = payNow ? selectedPackagePrice : depositAmount;
+                        return `${payNow ? 'Total' : 'Deposit'}: R${amt.toLocaleString('en-ZA')}`;
+                      })()}
+                    </p>
+
+                    <div className="space-y-4">
+                      <button
+                        type="button"
+                        onClick={() => processCoursePayment('payfast')}
+                        disabled={isSubmitting}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-pink-400 hover:bg-pink-50 transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <CreditCard className="h-7 w-7 text-pink-400 flex-shrink-0" />
+                        <div>
+                          <div className="font-bold text-gray-900">PayFast</div>
+                          <div className="text-xs text-gray-600">Cards, EFT, Instant EFT, MoreTyme &amp; more</div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => processCoursePayment('payflex')}
+                        disabled={isSubmitting}
+                        className="w-full flex items-center gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-pink-400 hover:bg-pink-50 transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Calendar className="h-7 w-7 text-pink-400 flex-shrink-0" />
+                        <div>
+                          <div className="font-bold text-gray-900">Payflex</div>
+                          <div className="text-xs text-gray-600">Buy now, pay later in 4 interest-free instalments</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {isSubmitting && (
+                      <p className="text-center text-sm text-gray-600 mt-5">Redirecting to secure payment…</p>
+                    )}
+                    <p className="text-center text-xs text-gray-400 mt-4">You'll be redirected to complete payment securely.</p>
+                  </div>
+                </div>
+              )}
             </div>
           </Container>
         </section>
