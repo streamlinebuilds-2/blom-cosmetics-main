@@ -832,18 +832,15 @@ export const CourseDetailPage: React.FC = () => {
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [promoCode, setPromoCode] = useState('');
-  const promoActive = promoCode.trim().toUpperCase() === 'BLOMTEST5';
-
   // In-person courses: the buyer chooses to pay the deposit (secure spot) or the full amount up front.
   const [paymentOption, setPaymentOption] = useState<'deposit' | 'full'>('deposit');
 
-  // Full price (in Rands) of the currently selected package, honouring any active promo.
+  // Full price (in Rands) of the currently selected package.
   const selectedPackagePrice = (() => {
     const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
     const priceMatch = selectedPkg?.price.match(/[\d,]+/);
     const basePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
-    return promoActive ? 5 : basePrice;
+    return basePrice;
   })();
   const balanceAfterDeposit = Math.max(0, selectedPackagePrice - depositAmount);
 
@@ -963,7 +960,7 @@ export const CourseDetailPage: React.FC = () => {
       // Extract numeric price from package (e.g., "R450" -> 450)
       const priceMatch = selectedPkg.price.match(/[\d,]+/);
       const basePrice = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : course.numericPrice;
-      const coursePrice = promoActive ? 5 : basePrice;
+      const coursePrice = basePrice;
       // Online courses are always paid in full. In-person courses let the buyer
       // choose between paying just the deposit or the full course price up front.
       const payInFull = course.isOnline || paymentOption === 'full';
@@ -2070,20 +2067,6 @@ export const CourseDetailPage: React.FC = () => {
                         <p className="text-red-500 text-sm">{formErrors.terms}</p>
                       )}
 
-                      {/* Promo code */}
-                      <div>
-                        <input
-                          type="text"
-                          placeholder="Promo code (optional)"
-                          value={promoCode}
-                          onChange={e => setPromoCode(e.target.value)}
-                          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-300"
-                        />
-                        {promoActive && (
-                          <p className="text-green-600 text-sm font-semibold mt-1">Promo applied — price set to R5</p>
-                        )}
-                      </div>
-
                       {/* Submit Button */}
                     <div>
                       <button
@@ -2095,7 +2078,7 @@ export const CourseDetailPage: React.FC = () => {
                         {isSubmitting
                           ? 'Processing...'
                           : course.isOnline
-                            ? `Complete Purchase${promoActive ? ' — R5' : ''}`
+                            ? 'Complete Purchase'
                             : paymentOption === 'full'
                               ? `Pay in Full & Secure Spot${selectedPackage ? ` (R${selectedPackagePrice.toLocaleString('en-ZA')})` : ''}`
                               : `Pay Deposit & Secure Spot (R${depositAmount.toLocaleString('en-ZA')})`}
