@@ -1203,7 +1203,7 @@ html, body {
 .nf__track {
   display: flex;
   align-items: stretch;
-  gap: 24px;
+  gap: 20px;
   width: max-content;
   margin: 0;
   padding: 8px 0;
@@ -1217,14 +1217,14 @@ html, body {
 }
 .nf__slide {
   flex: 0 0 auto;
-  width: 78vw;            /* mobile: one card + a peek of the next */
-  max-width: 320px;
+  width: 72vw;            /* mobile: one card + a peek of the next */
+  max-width: 280px;
 }
 @media (min-width: 640px) {
-  .nf__slide { width: 320px; }
+  .nf__slide { width: 280px; }
 }
 @media (min-width: 1024px) {
-  .nf__slide { width: 360px; }   /* ~3 cards visible inside the container */
+  .nf__slide { width: 310px; }   /* ~3 cards visible, with breathing room */
 }
 .nf__slide > * { height: 100%; }
 

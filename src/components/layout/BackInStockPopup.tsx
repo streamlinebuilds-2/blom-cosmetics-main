@@ -121,22 +121,22 @@ export const BackInStockPopup: React.FC = () => {
       className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={(e) => { if (e.target === e.currentTarget) dismiss(); }}
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-[min(820px,95vw)] max-h-[95vh] overflow-hidden grid grid-cols-1 md:grid-cols-2 animate-[bounce-in_0.4s_ease]">
+      <div className="bg-white rounded-2xl shadow-2xl w-[min(820px,95vw)] max-h-[92vh] overflow-hidden flex flex-col md:grid md:grid-cols-2 animate-[bounce-in_0.4s_ease]">
         {/* Visual Panel */}
-        <div className="relative overflow-hidden bg-pink-50 min-h-[180px] md:min-h-0" aria-hidden="true">
+        <div className="relative shrink-0 overflow-hidden bg-pink-50 h-44 sm:h-52 md:h-auto" aria-hidden="true">
           <img
             src={product.image}
             alt={product.name}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-contain md:object-cover object-center"
             loading="lazy"
           />
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-pink-500 text-white text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-full shadow">
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-pink-500 text-white text-[11px] md:text-xs font-bold uppercase tracking-wide px-2.5 py-1 md:px-3 md:py-1.5 rounded-full shadow">
             <Sparkles className="w-3.5 h-3.5" /> Back in Stock
           </span>
         </div>
 
         {/* Content Panel */}
-        <div className="relative p-5 md:p-7 overflow-y-auto">
+        <div className="relative p-5 md:p-7 flex-1 min-h-0 overflow-y-auto">
           <button
             aria-label="Close"
             className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-100 transition-colors z-10"
