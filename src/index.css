@@ -1192,3 +1192,54 @@ html, body {
     text-align: center;
   }
 }
+
+/* New & Featured auto-scrolling marquee */
+.nf__marquee {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+}
+.nf__track {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  width: max-content;
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  will-change: transform;
+  animation: nf-scroll var(--nf-duration, 40s) linear infinite;
+}
+.nf__marquee:hover .nf__track,
+.nf__marquee:focus-within .nf__track {
+  animation-play-state: paused;
+}
+.nf__slide {
+  flex: 0 0 auto;
+  width: 78vw;            /* mobile: one card + a peek of the next */
+  max-width: 320px;
+}
+@media (min-width: 640px) {
+  .nf__slide { width: 320px; }
+}
+@media (min-width: 1024px) {
+  .nf__slide { width: 360px; }   /* ~3 cards visible inside the container */
+}
+.nf__slide > * { height: 100%; }
+
+@keyframes nf-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nf__marquee {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+            mask-image: none;
+    scrollbar-width: none;
+  }
+  .nf__marquee::-webkit-scrollbar { display: none; }
+  .nf__track { animation: none; }
+}

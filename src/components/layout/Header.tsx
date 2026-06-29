@@ -6,6 +6,7 @@ import { CartButton } from '../cart/CartButton';
 import { WishlistButton } from '../wishlist/WishlistButton';
 import { AnnouncementSignup } from './AnnouncementSignup';
 import { AnnouncementBar } from './AnnouncementBar';
+import { BackInStockPopup } from './BackInStockPopup';
 
 interface HeaderProps {
   showMobileMenu?: boolean;
@@ -71,6 +72,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     <>
       <AnnouncementBar />
       <AnnouncementSignup />
+      <BackInStockPopup />
 
       {/* Main Header */}
       <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${
