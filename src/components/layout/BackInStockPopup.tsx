@@ -2,14 +2,33 @@ import React, { useEffect, useRef, useState } from 'react';
 import { X, Sparkles, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
-// One-time-per-visitor "back in stock" announcement for the 500ml Nail Liquid.
+// "Back in stock" announcement for the 500ml Nail Liquid.
 // Modeled on the Beauty Club signup popup (AnnouncementSignup) so the styling
 // stays consistent. It only appears if the product is genuinely in stock, so it
 // auto-disables itself once the restock sells out.
+//
+// It shows on the first visit, then resurfaces every 3rd–5th visit (a fresh
+// random interval each time) so returning shoppers get an occasional reminder
+// without being nagged on every visit. A "visit" is counted once per browser
+// session (sessionStorage), not per page navigation.
 
 const PRODUCT_SLUG = '500ml-nail-liquid';
-const SEEN_KEY = 'blom_restock_500ml_seen';
+const VISITS_KEY = 'blom_restock_500ml_visits';
+const SHOW_AT_KEY = 'blom_restock_500ml_show_at';
+const SESSION_KEY = 'blom_restock_500ml_session';
 const SHOW_DELAY_MS = 3500;
+
+const readInt = (key: string, fallback: number): number => {
+  try {
+    const v = parseInt(localStorage.getItem(key) || '', 10);
+    return Number.isFinite(v) ? v : fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+// Random interval of 3, 4 or 5 visits until the popup should reappear.
+const nextInterval = (): number => 3 + Math.floor(Math.random() * 3);
 
 interface RestockProduct {
   name: string;
@@ -26,13 +45,22 @@ export const BackInStockPopup: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const timerRef = useRef<number | null>(null);
 
-  const alreadySeen = (() => {
-    try { return localStorage.getItem(SEEN_KEY) === 'true'; } catch { return false; }
-  })();
-
   // Load the product and decide whether to show.
   useEffect(() => {
-    if (alreadySeen) return;
+    // Count this visit once per browser session.
+    let visits = readInt(VISITS_KEY, 0);
+    const showAt = readInt(SHOW_AT_KEY, 1); // show on the very first visit
+    try {
+      if (!sessionStorage.getItem(SESSION_KEY)) {
+        visits += 1;
+        localStorage.setItem(VISITS_KEY, String(visits));
+        sessionStorage.setItem(SESSION_KEY, '1');
+      }
+    } catch {}
+
+    // Not due yet — skip the query entirely.
+    if (visits < showAt) return;
+
     let cancelled = false;
 
     (async () => {
@@ -61,6 +89,10 @@ export const BackInStockPopup: React.FC = () => {
           blurb: 'The pro-favourite HEMA-free, low-odour nail liquid is back. Limited stock — grab yours before it sells out again.',
         });
 
+        // We're going to show it — schedule the next appearance 3–5 visits out
+        // so it won't re-open again this session and returns later.
+        try { localStorage.setItem(SHOW_AT_KEY, String(visits + nextInterval())); } catch {}
+
         // Don't collide with the Beauty Club popup's auto-timer this visit.
         if (typeof window !== 'undefined') {
           window.__blomSignup = window.__blomSignup || {};
@@ -79,7 +111,7 @@ export const BackInStockPopup: React.FC = () => {
       cancelled = true;
       if (timerRef.current) window.clearTimeout(timerRef.current);
     };
-  }, [alreadySeen]);
+  }, []);
 
   // Lock body scroll while open.
   useEffect(() => {
@@ -100,14 +132,13 @@ export const BackInStockPopup: React.FC = () => {
   const dismiss = () => {
     const currentScrollY = window.scrollY;
     setIsOpen(false);
-    try { localStorage.setItem(SEEN_KEY, 'true'); } catch {}
+    // Schedule already advanced when shown — nothing else to persist here.
     requestAnimationFrame(() => {
       window.scrollTo({ top: currentScrollY, left: 0, behavior: 'instant' as ScrollBehavior });
     });
   };
 
   const goToProduct = () => {
-    try { localStorage.setItem(SEEN_KEY, 'true'); } catch {}
     window.location.href = `/products/${PRODUCT_SLUG}`;
   };
 
