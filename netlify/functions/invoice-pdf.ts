@@ -11,6 +11,25 @@ function money(n: any) {
   return "R " + Number(n || 0).toFixed(2)
 }
 
+// pdf-lib StandardFonts can only encode WinAnsi (CP1252). Any character outside
+// that set (emoji, ⚠, non-Latin scripts, smart punctuation) makes drawText throw
+// and 500s the whole invoice. Normalize common punctuation to ASCII, then strip
+// anything still unencodable so a stray glyph in a name/address/product title can
+// never break invoice generation.
+function sanitizeWinAnsi(value: any): string {
+  if (value === null || value === undefined) return ""
+  return String(value)
+    .replace(/[‘’‚′]/g, "'")
+    .replace(/[“”„″]/g, '"')
+    .replace(/[–—−]/g, "-")
+    .replace(/…/g, "...")
+    .replace(/[•●·]/g, "-")
+    .replace(/ /g, " ")
+    .replace(/[^\x20-\x7E\xA1-\xFF]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim()
+}
+
 async function fetchJson(url: string) {
   const res = await fetch(url, { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } })
   if (!res.ok) throw new Error(await res.text())
@@ -83,14 +102,15 @@ export const handler = async (event: any) => {
     const right = width - 40
 
     const drawText = (text: string, x: number, yPos: number, size = 12, bold = false, color = rgb(0.1, 0.1, 0.15)) => {
-      page.drawText(String(text), { x, y: yPos, size, font: bold ? fontBold : font, color })
+      page.drawText(sanitizeWinAnsi(text), { x, y: yPos, size, font: bold ? fontBold : font, color })
     }
     const drawLine = (x1: number, y1: number, x2: number, y2: number) => {
       page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1, color: rgb(0.9, 0.92, 0.95) })
     }
     const drawRightText = (text: string, x: number, yPos: number, size = 12, bold = false, color = rgb(0.1, 0.1, 0.15)) => {
-      const textWidth = (bold ? fontBold : font).widthOfTextAtSize(String(text), size)
-      page.drawText(String(text), { x: x - textWidth, y: yPos, size, font: bold ? fontBold : font, color })
+      const safe = sanitizeWinAnsi(text)
+      const textWidth = (bold ? fontBold : font).widthOfTextAtSize(safe, size)
+      page.drawText(safe, { x: x - textWidth, y: yPos, size, font: bold ? fontBold : font, color })
     }
 
     // Add Logo

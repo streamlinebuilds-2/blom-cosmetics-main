@@ -8,6 +8,22 @@ const LOGO_URL = "https://yvmnedjybrpvlupygusf.supabase.co/storage/v1/object/pub
 
 const money = (n: any) => "R " + Number(n || 0).toFixed(2)
 
+// pdf-lib StandardFonts only encode WinAnsi (CP1252); emoji/⚠/non-Latin glyphs
+// make drawText throw and 500 the invoice. Normalize punctuation, strip the rest.
+function sanitizeWinAnsi(value: any): string {
+  if (value === null || value === undefined) return ""
+  return String(value)
+    .replace(/[‘’‚′]/g, "'")
+    .replace(/[“”„″]/g, '"')
+    .replace(/[–—−]/g, "-")
+    .replace(/…/g, "...")
+    .replace(/[•●·]/g, "-")
+    .replace(/ /g, " ")
+    .replace(/[^\x20-\x7E\xA1-\xFF]/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim()
+}
+
 const sb = (path: string, init?: any) =>
   fetch(`${SB_URL}${path}`, { ...init, headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, ...(init?.headers || {}) } })
 
@@ -36,11 +52,12 @@ export const handler = async (event: any) => {
     const right = width - 50;
 
     const text = (t: string, x: number, yy: number, s = 10, b = false, c = rgb(0,0,0)) =>
-      page.drawText(String(t), { x, y: yy, size: s, font: b ? bold : font, color: c })
+      page.drawText(sanitizeWinAnsi(t), { x, y: yy, size: s, font: b ? bold : font, color: c })
 
     const rightText = (t: string, x: number, yy: number, s = 10, b = false, c = rgb(0,0,0)) => {
-        const w = (b ? bold : font).widthOfTextAtSize(String(t), s)
-        page.drawText(String(t), { x: x - w, y: yy, size: s, font: b ? bold : font, color: c })
+        const safe = sanitizeWinAnsi(t)
+        const w = (b ? bold : font).widthOfTextAtSize(safe, s)
+        page.drawText(safe, { x: x - w, y: yy, size: s, font: b ? bold : font, color: c })
     }
     const line = (yPos: number) => page.drawLine({ start: { x: left, y: yPos }, end: { x: right, y: yPos }, thickness: 1, color: rgb(0.8,0.8,0.8) })
 
