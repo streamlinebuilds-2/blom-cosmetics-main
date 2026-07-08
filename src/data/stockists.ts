@@ -57,5 +57,29 @@ export const stockists: Stockist[] = [
     contactName: 'Ypolanda',
     phone: '+27 73 151 8407',
     email: 'blom.orkney.northwest@gmail.com'
+  },
+  {
+    id: 'lesinda-meyer-vanderbijlpark',
+    name: 'BLOM Vanderbijlpark',
+    kind: 'distributor',
+    town: 'Vanderbijlpark',
+    addressLines: ['34 Cornwallis Harris Street', 'Vanderbijlpark'],
+    fullAddress: '34 Cornwallis Harris Street, Vanderbijlpark, South Africa',
+    lat: -26.7111,
+    lng: 27.8442,
+    contactName: 'Lesinda Meyer',
+    phone: '+27 73 151 1083'
+  },
+  {
+    id: 'lesinda-meyer-three-rivers',
+    name: 'BLOM Three Rivers',
+    kind: 'distributor',
+    town: 'Three Rivers, Vereeniging',
+    addressLines: ['46 Umtata Street', 'Three Rivers, Vereeniging'],
+    fullAddress: '46 Umtata Street, Three Rivers, Vereeniging, South Africa',
+    lat: -26.6720,
+    lng: 27.9290,
+    contactName: 'Lesinda Meyer',
+    phone: '+27 73 151 1083'
   }
 ];
