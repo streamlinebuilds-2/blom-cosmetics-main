@@ -4,6 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { StockistsTeaser } from '../components/stockists/StockistsTeaser';
 import { 
   Award, 
   Heart, 
@@ -102,6 +103,8 @@ export const AboutPage: React.FC = () => {
             </div>
           </Container>
         </section>
+
+        <StockistsTeaser />
 
         {/* The Dream Behind BLOM Section */}
         <section className="section-padding">
