@@ -12,11 +12,10 @@ import { Container } from '../components/layout/Container';
 import { Card, CardContent, CardHeader } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { ClickableContact } from '../components/ui/ClickableContact';
+import { StockistLocator } from '../components/stockists/StockistLocator';
 import {
   Mail,
   Phone,
-  MapPin,
-  Clock,
   MessageCircle,
   Send,
   HelpCircle,
@@ -50,7 +49,6 @@ export const ContactPage: React.FC = () => {
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
-  const [isMapHovered, setIsMapHovered] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showAllFaqs, setShowAllFaqs] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -199,14 +197,6 @@ export const ContactPage: React.FC = () => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const handleMapMouseEnter = () => {
-    setIsMapHovered(true);
-  };
-
-  const handleMapMouseLeave = () => {
-    setIsMapHovered(false);
   };
 
   const scrollToContactForm = () => {
@@ -414,6 +404,8 @@ export const ContactPage: React.FC = () => {
             </div>
           </Container>
         </section>
+
+        <StockistLocator />
 
         {/* Contact Form Section */}
         <section id="contact-form" className="section-padding bg-gray-50">
@@ -759,69 +751,6 @@ export const ContactPage: React.FC = () => {
                 >
                   CALL NOW
                 </ClickableContact>
-              </Card>
-            </div>
-          </Container>
-        </section>
-
-        {/* Visit Our Location Section */}
-        <section className="section-padding">
-          <Container>
-            <div className="max-w-2xl mx-auto">
-              {/* Location Card */}
-              <Card className="mb-8">
-                <CardContent className="pt-10 pb-6 px-6">
-                  <div className="flex items-start gap-4 mb-6">
-                    <div className="mt-3 w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <MapPin className="h-6 w-6 text-pink-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg mb-2">BLOM Cosmetics Headquarters</h3>
-                      <p className="text-gray-600 mb-1">34 Horingbek Avenue</p>
-                      <p className="text-gray-600 mb-1">Helikonpark, Randfontein</p>
-                      <p className="text-gray-600 mb-2">South Africa</p>
-                      <p className="text-sm text-gray-500">Visits by appointment only</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <Clock className="h-5 w-5 text-gray-400" />
-                      <div>
-                        <p className="font-medium">Business Hours</p>
-                        <p className="text-sm text-gray-600">Monday - Friday: 9:00 AM - 6:00 PM (SAST)</p>
-                        <p className="text-sm text-gray-600">Saturday: 10:00 AM - 4:00 PM (SAST)</p>
-                        <p className="text-sm text-gray-600">Sunday: Closed</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Google Maps */}
-              <Card>
-                <div 
-                  className="aspect-video overflow-hidden rounded-lg relative"
-                  onMouseEnter={handleMapMouseEnter}
-                  onMouseLeave={handleMapMouseLeave}
-                >
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3580.8!2d27.7!3d-26.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2s34%20Horingbek%20Avenue%2C%20Helikonpark%2C%20Randfontein!5e0!3m2!1sen!2sza!4v1"
-                    width="100%"
-                    height="100%"
-                    style={{ 
-                      border: 0,
-                      pointerEvents: isMapHovered ? 'auto' : 'none'
-                    }}
-                    allowFullScreen={true}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="BLOM Cosmetics Headquarters - 34 Horingbek Avenue, Helikonpark, Randfontein"
-                  ></iframe>
-                  {!isMapHovered && (
-                    <div className="absolute inset-0 bg-transparent cursor-pointer" />
-                  )}
-                </div>
               </Card>
             </div>
           </Container>
