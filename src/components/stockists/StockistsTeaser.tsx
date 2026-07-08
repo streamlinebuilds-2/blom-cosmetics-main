@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from '../layout/Container';
 import { Button } from '../ui/Button';
+import { StockistMap } from './StockistMap';
 import { stockists } from '../../data/stockists';
 
 export const StockistsTeaser: React.FC = () => {
   const navigate = useNavigate();
-  const [mapHovered, setMapHovered] = useState(false);
-  const mainStore = stockists.find((s) => s.kind === 'main') ?? stockists[0];
 
   return (
     <section className="section-padding">
@@ -37,22 +36,7 @@ export const StockistsTeaser: React.FC = () => {
             </ul>
             <Button onClick={() => navigate('/contact#stockists')}>View All Locations</Button>
           </div>
-          <div
-            className="aspect-video md:aspect-square rounded-lg border border-gray-200 overflow-hidden relative"
-            onMouseEnter={() => setMapHovered(true)}
-            onMouseLeave={() => setMapHovered(false)}
-          >
-            <iframe
-              src={`https://www.google.com/maps?q=${encodeURIComponent(mainStore.fullAddress)}&output=embed`}
-              width="100%"
-              height="100%"
-              style={{ border: 0, pointerEvents: mapHovered ? 'auto' : 'none' }}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title={`${mainStore.name} — ${mainStore.fullAddress}`}
-            />
-            {!mapHovered && <div className="absolute inset-0 bg-transparent cursor-pointer" />}
-          </div>
+          <StockistMap heightClassName="h-72 md:h-96" />
         </div>
       </Container>
     </section>
