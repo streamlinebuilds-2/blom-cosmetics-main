@@ -28,7 +28,7 @@ export const StockistCard: React.FC<StockistCardProps> = ({ stockist }) => {
                 isMain ? 'text-pink-500' : 'text-blue-500'
               }`}
             >
-              {isMain ? 'Main Store' : 'Stockist'}
+              {isMain ? 'Main Store' : 'Distributor'}
             </span>
             <h3 className="font-bold text-lg">{stockist.name}</h3>
           </div>

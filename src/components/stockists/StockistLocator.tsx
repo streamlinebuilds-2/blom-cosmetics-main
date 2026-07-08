@@ -14,7 +14,7 @@ export const StockistLocator: React.FC = () => {
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="heading-with-stripe">Find Us</h2>
           <p className="text-gray-600">
-            Visit our main store or one of our trusted stockists across South Africa.
+            Visit our main store or one of our trusted distributors across South Africa.
           </p>
         </div>
 

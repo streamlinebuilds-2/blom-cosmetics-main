@@ -54,7 +54,7 @@ export const stockists: Stockist[] = [
     fullAddress: '9 Addison Street, Golf Park, Orkney, South Africa',
     lat: -26.9773,
     lng: 26.6688,
-    contactName: 'Ypolanda',
+    contactName: 'Yolanda',
     phone: '+27 73 151 8407',
     email: 'blom.orkney.northwest@gmail.com'
   },
