@@ -393,6 +393,8 @@ export const ContactPage: React.FC = () => {
       <Header showMobileMenu={true} />
 
       <main className="flex-1">
+        <StockistLocator />
+
         {/* Contact Hero Section - Original Design */}
         <section className="bg-gradient-to-r from-pink-50 to-blue-50 section-padding">
           <Container>
@@ -404,8 +406,6 @@ export const ContactPage: React.FC = () => {
             </div>
           </Container>
         </section>
-
-        <StockistLocator />
 
         {/* Contact Form Section */}
         <section id="contact-form" className="section-padding bg-gray-50">
