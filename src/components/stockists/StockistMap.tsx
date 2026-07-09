@@ -1,50 +1,120 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { stockists } from '../../data/stockists';
+import { stockists, Stockist } from '../../data/stockists';
 
-const redPinIcon = L.divIcon({
-  className: '',
-  html: `
-    <svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
-      <path d="M13 0C5.82 0 0 5.82 0 13c0 9.75 13 21 13 21s13-11.25 13-21C26 5.82 20.18 0 13 0z" fill="#dc2626" stroke="#fff" stroke-width="1.5"/>
-      <circle cx="13" cy="13" r="5" fill="#fff"/>
-    </svg>
-  `,
-  iconSize: [26, 34],
-  iconAnchor: [13, 34],
-  popupAnchor: [0, -30]
-});
+const flowerIcon = (isMain: boolean) => {
+  const size = isMain ? 40 : 34;
+  const height = isMain ? 52 : 44;
+  return L.divIcon({
+    className: 'blom-pin',
+    html: `
+      <svg width="${size}" height="${height}" viewBox="0 0 34 44" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 4px 8px rgba(15,23,42,0.35));">
+        <path d="M17 0C7.6 0 0 7.6 0 17c0 12.75 17 27 17 27s17-14.25 17-27C34 7.6 26.4 0 17 0z" fill="#FF74A4" stroke="#ffffff" stroke-width="2"/>
+        <g transform="translate(17,16.5)">
+          <circle cx="0" cy="-5.2" r="3.7" fill="#ffffff"/>
+          <circle cx="4.9" cy="-1.6" r="3.7" fill="#ffffff"/>
+          <circle cx="3" cy="4.2" r="3.7" fill="#ffffff"/>
+          <circle cx="-3" cy="4.2" r="3.7" fill="#ffffff"/>
+          <circle cx="-4.9" cy="-1.6" r="3.7" fill="#ffffff"/>
+          <circle cx="0" cy="0" r="2.5" fill="#FF74A4"/>
+        </g>
+      </svg>
+    `,
+    iconSize: [size, height],
+    iconAnchor: [size / 2, height],
+    popupAnchor: [0, -height + 6]
+  });
+};
 
 const bounds = L.latLngBounds(stockists.map((s) => [s.lat, s.lng] as [number, number]));
+
+interface MapFlyToProps {
+  selectedId?: string;
+  markerRefs: React.MutableRefObject<Record<string, L.Marker | null>>;
+}
+
+const MapFlyTo: React.FC<MapFlyToProps> = ({ selectedId, markerRefs }) => {
+  const map = useMap();
+  const prevIdRef = useRef(selectedId);
+
+  useEffect(() => {
+    if (selectedId === prevIdRef.current) return;
+    prevIdRef.current = selectedId;
+
+    if (!selectedId) return;
+    const stockist = stockists.find((s) => s.id === selectedId);
+    if (!stockist) return;
+
+    map.flyTo([stockist.lat, stockist.lng], Math.max(map.getZoom(), 12), {
+      duration: 0.9
+    });
+
+    const marker = markerRefs.current[selectedId];
+    if (marker) {
+      window.setTimeout(() => marker.openPopup(), 450);
+    }
+  }, [selectedId, map, markerRefs]);
+
+  return null;
+};
 
 interface StockistMapProps {
   className?: string;
   heightClassName?: string;
+  selectedId?: string;
+  onSelectId?: (id: string) => void;
 }
 
 export const StockistMap: React.FC<StockistMapProps> = ({
   className = '',
-  heightClassName = 'h-[420px] md:h-[560px]'
+  heightClassName = 'h-[420px] md:h-[560px]',
+  selectedId,
+  onSelectId
 }) => {
+  const markerRefs = useRef<Record<string, L.Marker | null>>({});
+
   return (
-    <div className={`${heightClassName} ${className} rounded-lg border border-gray-200 overflow-hidden`}>
+    <div
+      className={`${heightClassName} ${className} rounded-2xl border border-gray-100 overflow-hidden shadow-[0_16px_40px_rgba(255,116,164,0.16)]`}
+    >
       <MapContainer
         bounds={bounds}
-        boundsOptions={{ padding: [40, 40] }}
+        boundsOptions={{ padding: [48, 48] }}
         scrollWheelZoom
-        style={{ width: '100%', height: '100%' }}
+        touchZoom
+        tap
+        zoomSnap={0.5}
+        zoomDelta={0.5}
+        wheelPxPerZoomLevel={90}
+        style={{ width: '100%', height: '100%', background: '#eef2f6' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          subdomains="abcd"
+          maxZoom={19}
         />
-        {stockists.map((stockist) => (
-          <Marker key={stockist.id} position={[stockist.lat, stockist.lng]} icon={redPinIcon}>
-            <Popup>
-              <div className="text-sm">
-                <p className="font-semibold text-gray-900">{stockist.name}</p>
+        <MapFlyTo selectedId={selectedId} markerRefs={markerRefs} />
+        {stockists.map((stockist: Stockist) => (
+          <Marker
+            key={stockist.id}
+            position={[stockist.lat, stockist.lng]}
+            icon={flowerIcon(stockist.kind === 'main')}
+            ref={(el) => {
+              markerRefs.current[stockist.id] = el;
+            }}
+            eventHandlers={{
+              click: () => onSelectId?.(stockist.id)
+            }}
+          >
+            <Popup className="blom-popup">
+              <div className="text-sm min-w-[160px]">
+                <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-primary-pink mb-1">
+                  {stockist.kind === 'main' ? 'Main Store' : 'Distributor'}
+                </span>
+                <p className="font-semibold text-gray-900 leading-snug">{stockist.name}</p>
                 <p className="text-gray-600 mt-1">{stockist.fullAddress}</p>
                 {stockist.phone && <p className="text-gray-600 mt-1">{stockist.phone}</p>}
               </div>

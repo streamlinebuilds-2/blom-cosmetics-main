@@ -16,7 +16,7 @@ export interface Stockist {
 export const stockists: Stockist[] = [
   {
     id: 'main-randfontein',
-    name: 'BLOM Cosmetics — Main Store',
+    name: 'BLOM Cosmetics - Main Store',
     kind: 'main',
     town: 'Randfontein',
     addressLines: ['34 Horingbek Avenue', 'Helikonpark, Randfontein', 'South Africa'],

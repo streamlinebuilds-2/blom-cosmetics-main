@@ -1243,3 +1243,54 @@ html, body {
   .nf__marquee::-webkit-scrollbar { display: none; }
   .nf__track { animation: none; }
 }
+
+/* Stockist / distributor map: branded pins + popups */
+.blom-pin {
+  background: transparent;
+  border: none;
+}
+
+.blom-popup .leaflet-popup-content-wrapper {
+  border-radius: 16px;
+  padding: 2px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 116, 164, 0.16);
+}
+
+.blom-popup .leaflet-popup-content {
+  margin: 12px 14px;
+  line-height: 1.45;
+}
+
+.blom-popup .leaflet-popup-tip {
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: #9ca3af;
+  font-size: 18px;
+  top: 8px;
+  right: 8px;
+}
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: #ff74a4;
+}
+
+.leaflet-control-zoom {
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16) !important;
+  border: none !important;
+}
+.leaflet-control-zoom a {
+  color: #4b5563 !important;
+}
+.leaflet-control-zoom a:hover {
+  background: #fff0f6 !important;
+  color: #ff74a4 !important;
+}
+
+.leaflet-control-attribution {
+  border-radius: 8px 0 0 0 !important;
+  font-size: 10px !important;
+}

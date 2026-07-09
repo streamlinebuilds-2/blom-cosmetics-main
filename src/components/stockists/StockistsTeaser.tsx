@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from '../layout/Container';
 import { Button } from '../ui/Button';
@@ -7,6 +7,7 @@ import { stockists } from '../../data/stockists';
 
 export const StockistsTeaser: React.FC = () => {
   const navigate = useNavigate();
+  const [selectedId, setSelectedId] = useState(stockists.find((s) => s.kind === 'main')?.id ?? stockists[0].id);
 
   return (
     <section className="section-padding">
@@ -18,25 +19,33 @@ export const StockistsTeaser: React.FC = () => {
               From our home base in Randfontein to trusted distributors in the Free State and
               North West, BLOM is growing across South Africa.
             </p>
-            <ul className="space-y-3 mb-6">
+            <ul className="space-y-2 mb-6">
               {stockists.map((stockist) => (
-                <li key={stockist.id} className="flex items-center gap-3">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                      stockist.kind === 'main' ? 'bg-pink-400' : 'bg-blue-400'
+                <li key={stockist.id}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedId(stockist.id)}
+                    className={`w-full flex items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${
+                      selectedId === stockist.id ? 'bg-pink-50' : 'hover:bg-gray-50'
                     }`}
-                  />
-                  <span className="text-gray-700">
-                    <span className="font-medium">{stockist.name}</span>
-                    {' — '}
-                    {stockist.town}
-                  </span>
+                  >
+                    <span
+                      className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                        stockist.kind === 'main' ? 'bg-primary-pink' : 'bg-blue-400'
+                      }`}
+                    />
+                    <span className="text-gray-700">
+                      <span className="font-medium">{stockist.name}</span>
+                      {' - '}
+                      {stockist.town}
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
             <Button onClick={() => navigate('/contact#stockists')}>View All Locations</Button>
           </div>
-          <StockistMap heightClassName="h-72 md:h-96" />
+          <StockistMap heightClassName="h-72 md:h-96" selectedId={selectedId} onSelectId={setSelectedId} />
         </div>
       </Container>
     </section>
