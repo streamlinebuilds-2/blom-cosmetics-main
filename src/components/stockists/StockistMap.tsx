@@ -30,12 +30,13 @@ const flowerIcon = (isMain: boolean) => {
 
 const bounds = L.latLngBounds(stockists.map((s) => [s.lat, s.lng] as [number, number]));
 
-interface MapFlyToProps {
+interface MapControllerProps {
   selectedId?: string;
   markerRefs: React.MutableRefObject<Record<string, L.Marker | null>>;
+  suppressResetRef: React.MutableRefObject<boolean>;
 }
 
-const MapFlyTo: React.FC<MapFlyToProps> = ({ selectedId, markerRefs }) => {
+const MapController: React.FC<MapControllerProps> = ({ selectedId, markerRefs, suppressResetRef }) => {
   const map = useMap();
   const prevIdRef = useRef(selectedId);
 
@@ -47,15 +48,34 @@ const MapFlyTo: React.FC<MapFlyToProps> = ({ selectedId, markerRefs }) => {
     const stockist = stockists.find((s) => s.id === selectedId);
     if (!stockist) return;
 
+    suppressResetRef.current = true;
     map.flyTo([stockist.lat, stockist.lng], Math.max(map.getZoom(), 12), {
       duration: 0.9
     });
 
     const marker = markerRefs.current[selectedId];
     if (marker) {
-      window.setTimeout(() => marker.openPopup(), 450);
+      window.setTimeout(() => {
+        marker.openPopup();
+        window.setTimeout(() => {
+          suppressResetRef.current = false;
+        }, 300);
+      }, 450);
+    } else {
+      suppressResetRef.current = false;
     }
-  }, [selectedId, map, markerRefs]);
+  }, [selectedId, map, markerRefs, suppressResetRef]);
+
+  useEffect(() => {
+    const handlePopupClose = () => {
+      if (suppressResetRef.current) return;
+      map.flyToBounds(bounds, { padding: [48, 48], duration: 0.9 });
+    };
+    map.on('popupclose', handlePopupClose);
+    return () => {
+      map.off('popupclose', handlePopupClose);
+    };
+  }, [map, suppressResetRef]);
 
   return null;
 };
@@ -74,6 +94,7 @@ export const StockistMap: React.FC<StockistMapProps> = ({
   onSelectId
 }) => {
   const markerRefs = useRef<Record<string, L.Marker | null>>({});
+  const suppressResetRef = useRef(false);
 
   return (
     <div
@@ -96,7 +117,7 @@ export const StockistMap: React.FC<StockistMapProps> = ({
           subdomains="abcd"
           maxZoom={19}
         />
-        <MapFlyTo selectedId={selectedId} markerRefs={markerRefs} />
+        <MapController selectedId={selectedId} markerRefs={markerRefs} suppressResetRef={suppressResetRef} />
         {stockists.map((stockist: Stockist) => (
           <Marker
             key={stockist.id}
@@ -106,10 +127,20 @@ export const StockistMap: React.FC<StockistMapProps> = ({
               markerRefs.current[stockist.id] = el;
             }}
             eventHandlers={{
-              click: () => onSelectId?.(stockist.id)
+              click: () => {
+                suppressResetRef.current = true;
+                onSelectId?.(stockist.id);
+                window.setTimeout(() => {
+                  suppressResetRef.current = false;
+                }, 600);
+              }
             }}
           >
-            <Popup className="blom-popup">
+            <Popup
+              className="blom-popup"
+              autoPanPaddingTopLeft={[16, 130]}
+              autoPanPaddingBottomRight={[16, 16]}
+            >
               <div className="text-sm min-w-[160px]">
                 <span className="inline-block text-[10px] font-semibold uppercase tracking-wide text-primary-pink mb-1">
                   {stockist.kind === 'main' ? 'Main Store' : 'Distributor'}

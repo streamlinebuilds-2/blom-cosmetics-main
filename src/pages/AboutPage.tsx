@@ -104,8 +104,6 @@ export const AboutPage: React.FC = () => {
           </Container>
         </section>
 
-        <StockistsTeaser />
-
         {/* The Dream Behind BLOM Section */}
         <section className="section-padding">
           <Container>
@@ -243,6 +241,8 @@ export const AboutPage: React.FC = () => {
         </section>
 
         {/* Founders & Movement Section removed; bios are included in team cards */}
+
+        <StockistsTeaser />
 
       </main>
 

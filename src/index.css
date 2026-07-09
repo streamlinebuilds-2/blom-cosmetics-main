@@ -1258,7 +1258,7 @@ html, body {
 }
 
 .blom-popup .leaflet-popup-content {
-  margin: 12px 14px;
+  margin: 14px 16px;
   line-height: 1.45;
 }
 
@@ -1266,14 +1266,26 @@ html, body {
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
+/* Floating circular close button, positioned outside the popup box so it
+   is never visually lost behind the sticky header or the popup content. */
 .leaflet-container a.leaflet-popup-close-button {
-  color: #9ca3af;
-  font-size: 18px;
-  top: 8px;
-  right: 8px;
+  top: -10px;
+  right: -10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 26px;
+  text-align: center;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
 }
 .leaflet-container a.leaflet-popup-close-button:hover {
   color: #ff74a4;
+  background: #fff0f6;
 }
 
 .leaflet-control-zoom {
