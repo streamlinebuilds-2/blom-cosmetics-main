@@ -11,12 +11,19 @@ export const EXPIRY_ISO = '2026-07-16T00:00:00+02:00';
 export const BIRTHDAY_BUNDLE_SLUG = '30th-birthday-glitter-bundle';
 export const BIRTHDAY_BUNDLE_URL = `/products/${BIRTHDAY_BUNDLE_SLUG}`;
 
-// Cloudinary (new account: hmvetruz). Landscape = desktop hero, portrait = mobile + popup.
-export const BIRTHDAY_HERO_DESKTOP =
+// Cloudinary (new account: hmvetruz).
+export const BIRTHDAY_LANDSCAPE =
   'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto/v1784048473/birthday-launch-hero-desktop.jpg';
-export const BIRTHDAY_HERO_MOBILE =
+export const BIRTHDAY_PORTRAIT =
   'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto/v1784048491/birthday-launch-popup-portrait.png';
-export const BIRTHDAY_POPUP_IMAGE = BIRTHDAY_HERO_MOBILE;
+
+// Hero: landscape poster on desktop, portrait (reel) on mobile.
+export const BIRTHDAY_HERO_DESKTOP = BIRTHDAY_LANDSCAPE;
+export const BIRTHDAY_HERO_MOBILE = BIRTHDAY_PORTRAIT;
+
+// Popup: portrait suits the tall desktop media column; landscape banner on mobile.
+export const BIRTHDAY_POPUP_IMAGE_DESKTOP = BIRTHDAY_PORTRAIT;
+export const BIRTHDAY_POPUP_IMAGE_MOBILE = BIRTHDAY_LANDSCAPE;
 
 /** True while the promo is live: LAUNCH <= now < EXPIRY. */
 export function promoIsLive(now: Date = new Date()): boolean {

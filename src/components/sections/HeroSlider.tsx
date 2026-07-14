@@ -157,14 +157,19 @@ export const HeroSlider: React.FC = () => {
             aria-hidden={index === currentSlide ? false : true}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
+            } ${slideItem.isBirthday ? 'bg-gradient-to-b from-[#f7e9f1] to-[#efe4f6]' : ''}`}
           >
             <picture>
               <source media="(min-width: 768px)" srcSet={slideItem.backgroundImageDesktop} />
               <img
                 src={slideItem.backgroundImageMobile}
                 alt={slideItem.title}
-                className={`w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'}`}
+                className={
+                  slideItem.isBirthday
+                    // Poster: fill the phone on mobile, but show the whole landscape on desktop (no crop, no zoom).
+                    ? 'w-full h-full object-cover md:object-contain object-center'
+                    : `w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'}`
+                }
                 loading={index === 0 ? 'eager' : 'lazy'}
                 decoding={index === 0 ? 'sync' : 'async'}
                 fetchPriority={index === 0 ? 'high' : 'auto'}

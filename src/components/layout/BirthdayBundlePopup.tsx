@@ -5,7 +5,8 @@ import {
   promoIsLive,
   EXPIRY_ISO,
   BIRTHDAY_BUNDLE_URL,
-  BIRTHDAY_POPUP_IMAGE,
+  BIRTHDAY_POPUP_IMAGE_DESKTOP,
+  BIRTHDAY_POPUP_IMAGE_MOBILE,
 } from '../../config/birthdayPromo';
 
 // Avané's 30th Birthday landing popup — promotes the 5-glitter bundle (30% off, one day only).
@@ -118,10 +119,17 @@ export const BirthdayBundlePopup: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-2xl w-[min(820px,95vw)] max-h-[92vh] overflow-hidden flex flex-col md:grid md:grid-cols-2 animate-[bounce-in_0.4s_ease]">
         {/* Visual Panel */}
         <div className="relative shrink-0 overflow-hidden bg-pink-50 h-52 sm:h-60 md:h-auto" aria-hidden="true">
+          {/* Landscape banner on mobile (top strip), portrait poster in the tall desktop column. */}
           <img
-            src={BIRTHDAY_POPUP_IMAGE}
+            src={BIRTHDAY_POPUP_IMAGE_MOBILE}
             alt="Avané's 30th Birthday glitter bundle"
-            className="absolute inset-0 w-full h-full object-cover object-top"
+            className="absolute inset-0 w-full h-full object-cover object-center md:hidden"
+            loading="lazy"
+          />
+          <img
+            src={BIRTHDAY_POPUP_IMAGE_DESKTOP}
+            alt="Avané's 30th Birthday glitter bundle"
+            className="absolute inset-0 w-full h-full object-cover object-top hidden md:block"
             loading="lazy"
           />
           <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-pink-500 text-white text-[11px] md:text-xs font-bold uppercase tracking-wide px-2.5 py-1 md:px-3 md:py-1.5 rounded-full shadow">
