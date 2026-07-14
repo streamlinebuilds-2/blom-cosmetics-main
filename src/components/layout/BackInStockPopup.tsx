@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Sparkles, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { promoIsLive } from '../../config/birthdayPromo';
 
 // "Back in stock" announcement for the 500ml Nail Liquid.
 // Modeled on the Beauty Club signup popup (AnnouncementSignup) so the styling
@@ -47,6 +48,9 @@ export const BackInStockPopup: React.FC = () => {
 
   // Load the product and decide whether to show.
   useEffect(() => {
+    // During the birthday promo, only the birthday popup shows — stay dormant.
+    if (promoIsLive()) return;
+
     // Count this visit once per browser session.
     let visits = readInt(VISITS_KEY, 0);
     const showAt = readInt(SHOW_AT_KEY, 1); // show on the very first visit
@@ -60,6 +64,9 @@ export const BackInStockPopup: React.FC = () => {
 
     // Not due yet — skip the query entirely.
     if (visits < showAt) return;
+
+    // Another auto-popup (e.g. the birthday promo) already claimed this visit — yield to avoid stacking.
+    if (typeof window !== 'undefined' && window.__blomSignup?.hasShown) return;
 
     let cancelled = false;
 

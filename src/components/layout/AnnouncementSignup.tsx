@@ -3,6 +3,7 @@ import { Container } from './Container';
 import { Button } from '../ui/Button';
 import { X, Check } from 'lucide-react';
 import { postJson } from '../../lib/api';
+import { promoIsLive } from '../../config/birthdayPromo';
 
 declare global {
   interface Window {
@@ -40,6 +41,8 @@ export const AnnouncementSignup: React.FC = () => {
 
   // Auto show popup once after 7s on first page load in this tab
   useEffect(() => {
+    // During the birthday promo, only the birthday popup shows — stay dormant.
+    if (promoIsLive()) return;
     // Don't show popup if user has already signed up
     if (hasSignedUp) return;
     

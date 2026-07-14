@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Countdown } from '../ui/Countdown';
+import {
+  promoIsLive,
+  EXPIRY_ISO,
+  BIRTHDAY_BUNDLE_URL,
+  BIRTHDAY_HERO_DESKTOP,
+  BIRTHDAY_HERO_MOBILE,
+} from '../../config/birthdayPromo';
 
 interface Slide {
   id: number;
@@ -13,9 +21,12 @@ interface Slide {
   backgroundImageMobile: string;
   textPosition: 'left' | 'center' | 'right';
   mobileImagePosition?: string; // Added to control cropping (e.g., 'object-top')
+  isBirthday?: boolean; // Birthday-promo slide: image is a full poster, so we overlay only a countdown + CTA
+  fineprint?: string;
+  countdownTo?: string;
 }
 
-const slides: Slide[] = [
+const baseSlides: Slide[] = [
   {
     id: 1,
     title: 'Bloom\nBlossom\nBelieve',
@@ -53,6 +64,27 @@ const slides: Slide[] = [
     mobileImagePosition: 'object-top' // Adjusted to 'top' to prevent cutting off heads/top content
   }
 ];
+
+// The two supplied birthday graphics are finished posters (headline, 30% OFF, glitters all baked in),
+// so this slide overlays ONLY a live countdown + CTA near the bottom rather than the usual hero title.
+const birthdaySlide: Slide = {
+  id: 0,
+  title: '',
+  subtitle: '',
+  description: '',
+  ctaText: 'Shop the Birthday Bundle',
+  ctaHref: BIRTHDAY_BUNDLE_URL,
+  backgroundImageDesktop: BIRTHDAY_HERO_DESKTOP,
+  backgroundImageMobile: BIRTHDAY_HERO_MOBILE,
+  textPosition: 'center',
+  mobileImagePosition: 'object-center',
+  isBirthday: true,
+  fineprint: '30% off, 15 July only, while stocks last',
+  countdownTo: EXPIRY_ISO,
+};
+
+// Prepend the birthday slide only during the promo window; it reverts to the normal 3 automatically.
+const slides: Slide[] = promoIsLive() ? [birthdaySlide, ...baseSlides] : baseSlides;
 
 export const HeroSlider: React.FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -145,43 +177,73 @@ export const HeroSlider: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 h-full flex items-center">
-        <div className="container-custom w-full">
-          <div className={`flex flex-col justify-center items-center text-center h-full max-w-3xl mx-auto`}>
-            <div className="text-white space-y-6 px-4">
-              <div>
-                {slide.subtitle && (
-                  <p className="text-pink-200/90 text-lg font-medium mb-2 animate-fade-in">
-                    {slide.subtitle}
+      {slide.isBirthday ? (
+        // Birthday poster: overlay a live countdown + CTA at the bottom (a scrim keeps them readable).
+        <div className="relative z-10 h-full flex items-end justify-center pointer-events-none">
+          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" />
+          <div className="relative pointer-events-auto flex flex-col items-center text-center gap-4 px-4 pb-10 md:pb-14 max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/30 px-4 py-2 text-white text-sm md:text-base font-semibold shadow-lg">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-300 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-pink-400" />
+              </span>
+              <span>Ends in</span>
+              <Countdown target={slide.countdownTo || EXPIRY_ISO} className="tabular-nums" />
+            </div>
+            <a
+              href={slide.ctaHref}
+              className="btn btn-pink px-10 py-5 text-lg shadow-lg"
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = slide.ctaHref;
+              }}
+            >
+              {slide.ctaText}
+            </a>
+            {slide.fineprint && (
+              <p className="text-white/90 text-sm drop-shadow-sm">{slide.fineprint}</p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="relative z-10 h-full flex items-center">
+          <div className="container-custom w-full">
+            <div className={`flex flex-col justify-center items-center text-center h-full max-w-3xl mx-auto`}>
+              <div className="text-white space-y-6 px-4">
+                <div>
+                  {slide.subtitle && (
+                    <p className="text-pink-200/90 text-lg font-medium mb-2 animate-fade-in">
+                      {slide.subtitle}
+                    </p>
+                  )}
+                  <h1 className="hero-slogan whitespace-pre-line animate-slide-up drop-shadow-md">
+                    {slide.title}
+                  </h1>
+                </div>
+
+                {slide.description && (
+                  <p className="text-xl text-white/95 leading-[1.6] tracking-wide animate-slide-up animation-delay-200 drop-shadow-sm">
+                    {slide.description}
                   </p>
                 )}
-                <h1 className="hero-slogan whitespace-pre-line animate-slide-up drop-shadow-md">
-                  {slide.title}
-                </h1>
-              </div>
 
-              {slide.description && (
-                <p className="text-xl text-white/95 leading-[1.6] tracking-wide animate-slide-up animation-delay-200 drop-shadow-sm">
-                  {slide.description}
-                </p>
-              )}
-
-              <div className="animate-slide-up animation-delay-400 mt-4 flex justify-center">
-                <a
-                  href={slide.ctaHref}
-                  className="btn btn-pink px-10 py-5 text-lg shadow-lg"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.location.href = slide.ctaHref;
-                  }}
-                >
-                  {slide.ctaText}
-                </a>
+                <div className="animate-slide-up animation-delay-400 mt-4 flex justify-center">
+                  <a
+                    href={slide.ctaHref}
+                    className="btn btn-pink px-10 py-5 text-lg shadow-lg"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.location.href = slide.ctaHref;
+                    }}
+                  >
+                    {slide.ctaText}
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Navigation Arrows */}
       <button
