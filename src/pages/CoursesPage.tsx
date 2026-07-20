@@ -27,7 +27,7 @@ const CoursesPage: React.FC = () => {
       image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/q_auto/f_auto/v1778584938/ChatGPT_Image_May_12_2026_01_21_51_PM_w6mltc.png',
       duration: '3–4 Full Days',
       location: 'Randfontein & Orkney',
-      priceLabel: 'From R4,500'
+      priceLabel: 'From R4,819'
     }
   ];
 

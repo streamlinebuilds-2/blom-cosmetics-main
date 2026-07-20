@@ -242,8 +242,8 @@ export const CourseDetailPage: React.FC = () => {
       heroFit: 'contain',
       heroBgColor: '#FBEAF2',
       duration: '3 Full Days (Intensive Training)',
-      price: 'From R4,500',
-      numericPrice: 4500,
+      price: 'From R4,819',
+      numericPrice: 4819,
       depositAmount: 1800,
       isOnline: false,
       location: '34 Horingbek Avenue, Helikonpark, Randfontein, Gauteng',
@@ -307,7 +307,7 @@ export const CourseDetailPage: React.FC = () => {
       packages: [
         {
           name: 'Standard',
-          price: 'R4,500',
+          price: 'R4,819',
           kitValue: 'R3,200',
           features: [
             'Prep & Primer',
@@ -333,7 +333,7 @@ export const CourseDetailPage: React.FC = () => {
         },
         {
           name: 'Deluxe',
-          price: 'R5,800',
+          price: 'R6,119',
           kitValue: 'R4,800',
           features: [
             'Prep & Primer',
