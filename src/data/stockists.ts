@@ -81,5 +81,17 @@ export const stockists: Stockist[] = [
     lng: 27.9290,
     contactName: 'Lesinda Meyer',
     phone: '+27 73 151 1083'
+  },
+  {
+    id: 'the-nail-studio-greenhills',
+    name: 'The Nail Studio',
+    kind: 'distributor',
+    town: 'Randfontein',
+    addressLines: ['29 Clydesdale Crescent', 'Greenhills, Randfontein, 1767'],
+    fullAddress: '29 Clydesdale Crescent, Greenhills, Randfontein, 1767, South Africa',
+    lat: -26.1552,
+    lng: 27.6988,
+    contactName: 'Renaté',
+    phone: '+27 82 491 0078'
   }
 ];
