@@ -400,7 +400,9 @@ export const ShopPage: React.FC = () => {
     if (hashCategory) {
       setSelectedCategory(hashCategory);
       if (hashCategory === 'core-acrylics' || hashCategory === 'coloured-acrylics') {
-        setExpandedCategories((prev) => ({ ...prev, 'acrylic-system': true }));
+        setExpandedCategories((prev) =>
+          prev.includes('acrylic-system') ? prev : [...prev, 'acrylic-system']
+        );
       }
     }
 
