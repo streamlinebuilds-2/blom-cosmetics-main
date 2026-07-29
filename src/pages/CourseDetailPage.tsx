@@ -663,6 +663,89 @@ export const CourseDetailPage: React.FC = () => {
         }
       ]
     },
+    'trendy-ring-nail-art-course': {
+      id: 'trendy-ring-nail-art-course',
+      sku: 'SKU_TRENDY_RING_NAIL_ART',
+      title: 'Trendy Ring Nail Art Course',
+      description: 'Turn simple nails into head-turning masterpieces with modern ring designs, balanced placement, dimensional details, and client-ready finishing techniques.',
+      heroImage: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
+      duration: 'Self-Paced',
+      price: 'R650',
+      numericPrice: 650,
+      depositAmount: 0,
+      isOnline: true,
+      location: 'Online',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané teaches refined, practical techniques that help artists create balanced and confidently finished nail art.'
+      },
+      about: [
+        'Learn Avané’s approach to modern ring nail art in four focused, step-by-step video lessons. You will develop stronger placement, proportion, sculpting, and finishing skills for designs that feel polished rather than overcrowded.',
+        'The course is suitable for beginners and working professionals, includes lifetime Academy access, and follows the same certificate-of-completion process as BLOM’s other online courses.'
+      ],
+      packages: [
+        {
+          name: 'Complete Course',
+          price: 'R650',
+          kitValue: 'Products Not Included',
+          features: [
+            'Lifetime access to all four video lessons',
+            'Modern ring nail trends and design techniques',
+            'Placement, balance, sculpting, and finishing guidance',
+            'Suitable for beginners and professionals',
+            'Certificate after completing your assessment',
+            'Exclusive White + Clear Petal Paste pair for R399'
+          ]
+        }
+      ],
+      availableDates: ['Available Now'],
+      thingsToBring: [
+        'White Petal Paste',
+        'Clear Petal Paste',
+        'Nail art brush and preferred decorative elements'
+      ],
+      trainingSchedule: [],
+      studentDiscount: [
+        'Buy one White and one Clear Petal Paste for R399 together',
+        'The student offer never expires',
+        'One redemption per course purchase'
+      ],
+      accordionData: [
+        {
+          title: 'PART 1: FOUNDATIONS',
+          content: [
+            'Course setup and materials',
+            'Understanding modern ring nail proportions',
+            'Preparing the base design'
+          ]
+        },
+        {
+          title: 'PART 2: PLACEMENT & BALANCE',
+          content: [
+            'Building balanced ring compositions',
+            'Spacing, scale, and visual flow',
+            'Avoiding common placement mistakes'
+          ]
+        },
+        {
+          title: 'PART 3: DIMENSIONAL DETAILS',
+          content: [
+            'Sculpting controlled raised elements',
+            'Adding decorative details',
+            'Keeping the design refined and wearable'
+          ]
+        },
+        {
+          title: 'PART 4: CLIENT-READY FINISH',
+          content: [
+            'Refining the final composition',
+            'Securing and finishing the artwork',
+            'Creating a polished salon-ready result'
+          ]
+        }
+      ]
+    },
     'holiday-watercolor-workshop': {
       id: 'efe16488-1de6-4522-aeb3-b08cfae3a640',
       sku: 'SKU_XMAS_WATERCOLOR',

@@ -15,6 +15,8 @@ export interface EnrollResult {
   success: boolean
   token?: string
   inviteUrl?: string
+  offerUrl?: string
+  offerCouponCode?: string
   error?: string
   fallbackSaved?: boolean
 }
@@ -32,6 +34,10 @@ export interface EnrollResult {
 const N8N_COURSE_INVITE_WEBHOOK = 'https://dockerfile-1n82.onrender.com/webhook/course-invite'
 const ACADEMY_APP_URL = process.env.ACADEMY_URL || 'https://blom-academy.vercel.app'
 const INVITE_EXPIRES_DAYS = 60
+const TRENDY_RING_SLUG = 'trendy-ring-nail-art-course'
+const TRENDY_RING_OFFER_URL = 'https://blom-cosmetics.co.za/offers/trendy-ring-petal-paste'
+const TRENDY_RING_OFFER_IMAGE =
+  'https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/IMG-20260728-WA0023_wssnnp.jpg'
 
 // ---------- Lazy singleton clients ----------
 
@@ -65,6 +71,26 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
   const store = storeClient()
   const email = buyerEmail.toLowerCase().trim()
 
+  let courseBenefit: any = null
+
+  // Grant the paid-course benefit before the invitation idempotency return.
+  // The database function independently verifies that this is a paid Trendy
+  // Ring purchase and enforces one benefit per normalized email.
+  if (courseSlug === TRENDY_RING_SLUG) {
+    try {
+      const { data, error } = await store.rpc('grant_trendy_ring_benefit', {
+        p_order_id: orderId,
+        p_buyer_email: email
+      })
+      if (error) throw error
+      courseBenefit = Array.isArray(data) ? data[0] : data
+    } catch (error: any) {
+      console.error('Trendy Ring benefit grant failed:', error?.message || error)
+      // Do not withhold paid Academy access if the physical-product benefit
+      // needs an operational retry.
+    }
+  }
+
   // In-person courses (e.g. Professional Acrylic Training) have no online Academy
   // course to enrol into. Skip entirely so they don't churn through retries and
   // land as 'failed' — they're handled as bookings and the customer already gets
@@ -86,7 +112,11 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
     const status = String(cpRow?.invitation_status || '').toLowerCase()
     if (status === 'sent' || status === 'redeemed') {
       console.log('Enrolment already handled, skipping:', courseSlug, status)
-      return { success: true }
+      return {
+        success: true,
+        offerUrl: courseBenefit ? TRENDY_RING_OFFER_URL : undefined,
+        offerCouponCode: courseBenefit?.coupon_code
+      }
     }
   } catch { /* non-fatal: fall through to normal enrolment */ }
 
@@ -154,6 +184,11 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
         course_slug: courseTitle, // human-readable; n8n shows this in the email
         invite_url: inviteUrl,
         expires_at: expiresAt,
+        has_course_offer: Boolean(courseBenefit),
+        offer_url: courseBenefit ? TRENDY_RING_OFFER_URL : null,
+        offer_image_url: courseBenefit ? TRENDY_RING_OFFER_IMAGE : null,
+        offer_price: courseBenefit ? 'R399' : null,
+        offer_coupon_code: courseBenefit?.coupon_code || null,
       }),
     })
 
@@ -169,7 +204,13 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
       .eq('course_slug', courseSlug)
 
     console.log('✅ Invite minted + sent to n8n:', email, courseSlug, inviteUrl)
-    return { success: true, token, inviteUrl }
+    return {
+      success: true,
+      token,
+      inviteUrl,
+      offerUrl: courseBenefit ? TRENDY_RING_OFFER_URL : undefined,
+      offerCouponCode: courseBenefit?.coupon_code
+    }
 
   } catch (err: any) {
     const error = err?.message || String(err)

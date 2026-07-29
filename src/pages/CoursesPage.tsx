@@ -31,7 +31,19 @@ const CoursesPage: React.FC = () => {
     }
   ];
 
+  const trendyRingLive = import.meta.env.VITE_TRENDY_RING_COURSE_LIVE === 'true';
   const onlineCourses = [
+    ...(trendyRingLive ? [{
+      id: 6,
+      slug: 'trendy-ring-nail-art-course',
+      title: 'Trendy Ring Nail Art Course',
+      description: 'Master modern ring nail trends, confident placement, dimensional details, and client-ready finishing in four focused video lessons.',
+      image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
+      duration: 'Self-Paced',
+      location: 'Online',
+      price: 650,
+      onSale: false
+    }] : []),
     {
       id: 2,
       slug: 'blom-flower-watercolor-workshop',

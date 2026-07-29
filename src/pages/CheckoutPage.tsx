@@ -423,7 +423,8 @@ export const CheckoutPage: React.FC = () => {
     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
   };
 
-  const handleApplyCoupon = async () => {
+  /* Legacy client-side coupon RPC retained temporarily for migration reference.
+  const handleApplyCouponLegacy = async () => {
     if (!couponCode.trim()) {
       setCouponError('Please enter a coupon code');
       return;
@@ -515,6 +516,69 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
+  */
+  const handleApplyCoupon = async (codeOverride?: string) => {
+    const codeToApply = (codeOverride || couponCode).trim().toUpperCase();
+    if (!codeToApply) {
+      setCouponError('Please enter a coupon code');
+      return;
+    }
+
+    setIsApplyingCoupon(true);
+    setCouponError('');
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      const response = await fetch('/.netlify/functions/apply-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+        },
+        body: JSON.stringify({
+          code: codeToApply,
+          email: shippingInfo.email || '',
+          cart: cartState.items.map(item => ({
+            product_id: item.productId || item.id,
+            name: item.name,
+            quantity: item.quantity,
+            unit_price_cents: Math.round(item.price * 100)
+          }))
+        })
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || (!result.valid && !result.ok)) {
+        setDiscount(0);
+        setAppliedCoupon(null);
+        setCouponDetails(null);
+        clearSimpleCouponData();
+        setCouponError(result.error || result.message || 'Invalid coupon code');
+        return;
+      }
+
+      setDiscount(Number(result.discount_cents || 0) / 100);
+      setAppliedCoupon({
+        id: result.coupon_id || codeToApply,
+        code: codeToApply
+      });
+      setCouponDetails(result);
+      setSimpleCouponData(result);
+      setCouponCode(codeToApply);
+      setCouponError('');
+
+      if (result.offer_type === 'course_benefit') {
+        localStorage.removeItem('blom_pending_course_offer');
+      }
+    } catch (error) {
+      console.error('Coupon application error:', error);
+      setCouponError('Failed to apply coupon. Please try again.');
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
   const handleRemoveCoupon = () => {
     setDiscount(0);
     setAppliedCoupon(null);
@@ -525,7 +589,8 @@ export const CheckoutPage: React.FC = () => {
     console.log('🗑️ Coupon removed and simple data cleared');
   };
 
-  const recalculateCouponDiscount = async () => {
+  /* Legacy recalculation RPC retained temporarily for migration reference.
+  const recalculateCouponDiscountLegacy = async () => {
     if (!appliedCoupon || !couponDetails) {
       console.log('❌ Missing data for recalculation:', { hasAppliedCoupon: !!appliedCoupon, hasCouponDetails: !!couponDetails });
       return;
@@ -632,6 +697,56 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
+  */
+  const recalculateCouponDiscount = async () => {
+    if (!appliedCoupon || !couponDetails) return;
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      const response = await fetch('/.netlify/functions/apply-coupon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+        },
+        body: JSON.stringify({
+          code: appliedCoupon.code,
+          email: shippingInfo.email || '',
+          cart: cartState.items.map(item => ({
+            product_id: item.productId || item.id,
+            name: item.name,
+            quantity: item.quantity,
+            unit_price_cents: Math.round(item.price * 100)
+          }))
+        })
+      });
+
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || (!result.valid && !result.ok)) {
+        handleRemoveCoupon();
+        setCouponError(result.error || result.message || 'Coupon no longer valid');
+        return;
+      }
+
+      setDiscount(Number(result.discount_cents || 0) / 100);
+      setCouponDetails({ ...couponDetails, ...result });
+      setCouponError('');
+    } catch (error) {
+      console.error('Coupon recalculation failed:', error);
+      handleRemoveCoupon();
+      setCouponError('Unable to verify this discount. Please apply it again.');
+    }
+  };
+
+  useEffect(() => {
+    const pendingCode = localStorage.getItem('blom_pending_course_offer');
+    if (!pendingCode || !shippingInfo.email || cartState.items.length === 0 || appliedCoupon || isApplyingCoupon) {
+      return;
+    }
+    void handleApplyCoupon(pendingCode);
+  }, [shippingInfo.email, cartState.items.length, appliedCoupon, isApplyingCoupon]);
+
   const handlePlaceOrder = async () => {
     setIsProcessing(true);
     
@@ -644,9 +759,14 @@ export const CheckoutPage: React.FC = () => {
       const clientPaymentId = `BL-${nowBase36}-${rand}`;
 
       // Step 1: Create order in Supabase (new payload)
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
       const createOrderRes = await fetch('/.netlify/functions/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+        },
         body: JSON.stringify({
           m_payment_id: clientPaymentId,
           buyer: {
@@ -1557,7 +1677,7 @@ export const CheckoutPage: React.FC = () => {
                           />
                           <button
                             type="button"
-                            onClick={handleApplyCoupon}
+                            onClick={() => void handleApplyCoupon()}
                             disabled={isApplyingCoupon || !couponCode.trim()}
                             className="px-4 py-2 bg-pink-400 text-white rounded-lg text-sm font-medium hover:bg-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >

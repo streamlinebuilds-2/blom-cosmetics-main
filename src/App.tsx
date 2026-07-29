@@ -40,6 +40,7 @@ const ProductTemplateExample = lazy(() => import('./pages/ProductTemplateExample
 const MyCoupons = lazy(() => import('./pages/MyCoupons'));
 const ManageAddresses = lazy(() => import('./pages/ManageAddresses'));
 const StockMovementPage = lazy(() => import('./pages/StockMovementPage'));
+const CourseOfferClaimPage = lazy(() => import('./pages/CourseOfferClaimPage').then(m => ({ default: m.CourseOfferClaimPage })));
 
 /**
  * Prefetch next likely routes on idle to improve perceived performance.
@@ -106,6 +107,7 @@ function App() {
           <Route path="/checkout/success" element={<PageWithCart><CheckoutSuccess /></PageWithCart>} />
           <Route path="/checkout/status" element={<PageWithCart><CheckoutSuccess /></PageWithCart>} />
           <Route path="/checkout/cancel" element={<PageWithCart><CheckoutCancel /></PageWithCart>} />
+          <Route path="/offers/trendy-ring-petal-paste" element={<PageWithCart><CourseOfferClaimPage /></PageWithCart>} />
           
           {/* Legal Pages */}
           <Route path="/privacy" element={<PageWithCart><PrivacyPage /></PageWithCart>} />
