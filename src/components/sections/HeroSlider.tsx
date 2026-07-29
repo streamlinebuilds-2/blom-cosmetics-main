@@ -1,271 +1,147 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '../ui/Button';
-import { Countdown } from '../ui/Countdown';
-import {
-  promoIsLive,
-  EXPIRY_ISO,
-  BIRTHDAY_BUNDLE_URL,
-  BIRTHDAY_HERO_DESKTOP,
-  BIRTHDAY_HERO_MOBILE,
-} from '../../config/birthdayPromo';
+import React, { useEffect, useState } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-interface Slide {
-  id: number;
+interface HeroImage { src: string; alt: string }
+interface HeroSlide {
+  id: string;
+  eyebrow: string;
   title: string;
-  subtitle: string;
   description: string;
-  ctaText: string;
-  ctaHref: string;
-  backgroundImageDesktop: string;
-  backgroundImageMobile: string;
-  textPosition: 'left' | 'center' | 'right';
-  mobileImagePosition?: string; // Added to control cropping (e.g., 'object-top')
-  isBirthday?: boolean; // Birthday-promo slide: image is a full poster, so we overlay only a countdown + CTA
-  fineprint?: string;
-  countdownTo?: string;
+  primaryCta: { label: string; href: string };
+  secondaryCta?: { label: string; href: string };
+  kind: 'products' | 'academy';
+  images: HeroImage[];
 }
 
-const baseSlides: Slide[] = [
+const responsiveSrcSet = (src: string) =>
+  [480, 800, 1400]
+    .map((width) => `${src.replace(/w_\d+/, `w_${width}`)} ${width}w`)
+    .join(', ');
+
+const productImages: HeroImage[] = [
   {
-    id: 1,
-    title: 'Bloom\nBlossom\nBelieve',
-    subtitle: '',
-    description: '',
-    ctaText: 'Shop the Collection',
-    ctaHref: '/shop',
-    backgroundImageDesktop: '/hero-desktop-1.webp',
-    backgroundImageMobile: '/hero-mobile-1.webp',
-    textPosition: 'left',
-    mobileImagePosition: 'object-center'
+    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1400,c_limit/v1785259213/products/temp/PetalPasteWhite_hirzoi.jpg',
+    alt: 'BLOM White Petal Paste',
   },
   {
-    id: 2,
-    title: 'The Professional\nAcrylic System',
-    subtitle: '',
-    description: '',
-    ctaText: 'Explore Acrylics',
-    ctaHref: '/shop#acrylic-system',
-    backgroundImageDesktop: '/hero-desktop-2.webp',
-    backgroundImageMobile: '/hero-mobile-2.webp',
-    textPosition: 'right',
-    mobileImagePosition: 'object-center'
+    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_900,c_limit/v1785259046/products/temp/PetalPasteClear_qh62r2.jpg',
+    alt: 'BLOM Clear Petal Paste',
   },
   {
-    id: 3,
-    title: 'Learn\nCreate\nGrow',
-    subtitle: '',
-    description: '',
-    ctaText: 'Explore Courses',
-    ctaHref: '/courses',
-    backgroundImageDesktop: '/hero-desktop-3.webp',
-    backgroundImageMobile: '/hero-mobile-3.webp',
-    textPosition: 'center',
-    mobileImagePosition: 'object-top' // Adjusted to 'top' to prevent cutting off heads/top content
-  }
+    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_900,c_limit/v1785147071/products/temp/RB001_neciyp.jpg',
+    alt: 'BLOM Peony Blush gel polish',
+  },
 ];
 
-// The two supplied birthday graphics are finished posters (headline, 30% OFF, glitters all baked in),
-// so this slide overlays ONLY a live countdown + CTA near the bottom rather than the usual hero title.
-const birthdaySlide: Slide = {
-  id: 0,
-  title: '',
-  subtitle: '',
-  description: '',
-  ctaText: 'Shop the Birthday Bundle',
-  ctaHref: BIRTHDAY_BUNDLE_URL,
-  backgroundImageDesktop: BIRTHDAY_HERO_DESKTOP,
-  backgroundImageMobile: BIRTHDAY_HERO_MOBILE,
-  textPosition: 'center',
-  mobileImagePosition: 'object-center',
-  isBirthday: true,
-  fineprint: '30% off, 15 July only, while stocks last',
-  countdownTo: EXPIRY_ISO,
-};
+const academyImages: HeroImage[] = [
+  {
+    src: 'https://res.cloudinary.com/dnlgohkcc/image/upload/f_auto,q_auto,w_1200,c_limit/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
+    alt: 'Trendy Ring Nail Art Course',
+  },
+  {
+    src: 'https://res.cloudinary.com/dnlgohkcc/image/upload/f_auto,q_auto,w_900,c_limit/v1775453928/WhatsApp_Image_2026-04-03_at_12.34.07_uelxcc.jpg',
+    alt: 'Faded Flowers nail art course',
+  },
+  {
+    src: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/f_auto,q_auto,w_900,c_limit/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+    alt: 'Hands-on BLOM nail training',
+  },
+];
 
-// Prepend the birthday slide only during the promo window; it reverts to the normal 3 automatically.
-const slides: Slide[] = promoIsLive() ? [birthdaySlide, ...baseSlides] : baseSlides;
+const baseSlides: HeroSlide[] = [
+  {
+    id: 'professional-products',
+    eyebrow: 'BLOM Professional',
+    title: 'Professional products. Made to perform.',
+    description: 'Reliable systems, refined finishes and artist-led education for nail professionals who care about every detail.',
+    primaryCta: { label: 'Shop best sellers', href: '/shop' },
+    secondaryCta: { label: 'Discover new arrivals', href: '/shop?q=new' },
+    kind: 'products',
+    images: productImages,
+  },
+  {
+    id: 'academy',
+    eyebrow: 'BLOM Academy',
+    title: 'Learn the technique. Build the confidence.',
+    description: 'Practical training, focused online lessons and techniques you can take straight to your next client.',
+    primaryCta: { label: 'Explore courses', href: '/courses' },
+    secondaryCta: { label: 'View online workshops', href: '/courses#online-workshops' },
+    kind: 'academy',
+    images: academyImages,
+  },
+];
 
 export const HeroSlider: React.FC = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const intervalRef = useRef<number | null>(null);
-
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
+  const [current, setCurrent] = useState(0);
+  const slide = baseSlides[current];
 
   useEffect(() => {
-    // Start auto-scroll immediately
-    const startAutoScroll = () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      intervalRef.current = window.setInterval(() => {
-        nextSlide();
-      }, 6000);
-    };
-
-    // Start immediately
-    startAutoScroll();
-
-    // Also start on any user interaction (in case browser blocks auto-play)
-    const handleUserInteraction = () => {
-      if (!intervalRef.current) {
-        startAutoScroll();
-      }
-    };
-
-    // Add event listeners for user interaction
-    document.addEventListener('click', handleUserInteraction, { once: true });
-    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-    document.addEventListener('keydown', handleUserInteraction, { once: true });
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-      document.removeEventListener('keydown', handleUserInteraction);
-    };
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const interval = window.setInterval(() => {
+      setCurrent((value) => (value + 1) % baseSlides.length);
+    }, 8500);
+    return () => window.clearInterval(interval);
   }, []);
 
-  const slide = slides[currentSlide];
+  const next = () => setCurrent((value) => (value + 1) % baseSlides.length);
+  const previous = () => setCurrent((value) => (value - 1 + baseSlides.length) % baseSlides.length);
 
   return (
-    <section
-      id="heroSlider"
-      // Changed h-screen to h-[100dvh] for better mobile browser support
-      className="relative h-[100dvh] min-h-[600px] max-h-[800px] md:max-h-none overflow-hidden bg-gray-100"
-    >
-      {/* Background Images */}
-      <div className="absolute inset-0">
-        {slides.map((slideItem, index) => (
-          <div
-            key={slideItem.id}
-            id={`slide-${slideItem.id}`}
-            aria-hidden={index === currentSlide ? false : true}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            } ${slideItem.isBirthday ? 'bg-gradient-to-b from-[#f7e9f1] to-[#efe4f6]' : ''}`}
-          >
-            <picture>
-              <source media="(min-width: 768px)" srcSet={slideItem.backgroundImageDesktop} />
-              <img
-                src={slideItem.backgroundImageMobile}
-                alt={slideItem.title}
-                className={
-                  slideItem.isBirthday
-                    // Poster: fill the phone on mobile, but show the whole landscape on desktop (no crop, no zoom).
-                    ? 'w-full h-full object-cover md:object-contain object-center'
-                    : `w-full h-full object-cover ${slideItem.mobileImagePosition || 'object-center'} md:object-center transition-transform duration-[12000ms] ease-out ${index === currentSlide ? 'md:scale-110 scale-105' : 'scale-100'}`
-                }
-                loading={index === 0 ? 'eager' : 'lazy'}
-                decoding={index === 0 ? 'sync' : 'async'}
-                fetchPriority={index === 0 ? 'high' : 'auto'}
-              />
-            </picture>
-            {/* Subtle overlay to improve text readability */}
-            <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-          </div>
-        ))}
-      </div>
-
-      {/* Content */}
-      {slide.isBirthday ? (
-        // Birthday poster: overlay a live countdown + CTA at the bottom (a scrim keeps them readable).
-        <div className="relative z-10 h-full flex items-end justify-center pointer-events-none">
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" />
-          <div className="relative pointer-events-auto flex flex-col items-center text-center gap-4 px-4 pb-10 md:pb-14 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md border border-white/30 px-4 py-2 text-white text-sm md:text-base font-semibold shadow-lg">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-300 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-pink-400" />
-              </span>
-              <span>Ends in</span>
-              <Countdown target={slide.countdownTo || EXPIRY_ISO} className="tabular-nums" />
-            </div>
-            <a
-              href={slide.ctaHref}
-              className="btn btn-pink px-10 py-5 text-lg shadow-lg"
-              onClick={(e) => {
-                e.preventDefault();
-                window.location.href = slide.ctaHref;
-              }}
-            >
-              {slide.ctaText}
+    <section className={`home-hero home-hero--${slide.kind}`} aria-labelledby={`hero-title-${slide.id}`}>
+      <div className="home-hero__wash" aria-hidden="true" />
+      <div className="home-shell home-hero__layout" key={slide.id}>
+        <div className="home-hero__copy">
+          <p className="home-eyebrow">{slide.eyebrow}</p>
+          <h1 id={`hero-title-${slide.id}`}>{slide.title}</h1>
+          <p className="home-hero__description">{slide.description}</p>
+          <div className="home-hero__actions">
+            <a className="home-button home-button--primary" href={slide.primaryCta.href}>
+              {slide.primaryCta.label}
             </a>
-            {slide.fineprint && (
-              <p className="text-white/90 text-sm drop-shadow-sm">{slide.fineprint}</p>
+            {slide.secondaryCta && (
+              <a className="home-button home-button--secondary" href={slide.secondaryCta.href}>
+                {slide.secondaryCta.label}
+              </a>
             )}
           </div>
         </div>
-      ) : (
-        <div className="relative z-10 h-full flex items-center">
-          <div className="container-custom w-full">
-            <div className={`flex flex-col justify-center items-center text-center h-full max-w-3xl mx-auto`}>
-              <div className="text-white space-y-6 px-4">
-                <div>
-                  {slide.subtitle && (
-                    <p className="text-pink-200/90 text-lg font-medium mb-2 animate-fade-in">
-                      {slide.subtitle}
-                    </p>
-                  )}
-                  <h1 className="hero-slogan whitespace-pre-line animate-slide-up drop-shadow-md">
-                    {slide.title}
-                  </h1>
-                </div>
 
-                {slide.description && (
-                  <p className="text-xl text-white/95 leading-[1.6] tracking-wide animate-slide-up animation-delay-200 drop-shadow-sm">
-                    {slide.description}
-                  </p>
-                )}
-
-                <div className="animate-slide-up animation-delay-400 mt-4 flex justify-center">
-                  <a
-                    href={slide.ctaHref}
-                    className="btn btn-pink px-10 py-5 text-lg shadow-lg"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      window.location.href = slide.ctaHref;
-                    }}
-                  >
-                    {slide.ctaText}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="home-hero__visual" aria-label={`${slide.eyebrow} highlights`}>
+          {slide.images.map((image, index) => (
+            <figure
+              className={`home-hero__image home-hero__image--${
+                index === 0 ? 'main' : index === 1 ? 'top' : 'bottom'
+              }`}
+              key={image.src}
+            >
+              <img
+                src={image.src}
+                srcSet={responsiveSrcSet(image.src)}
+                sizes={index === 0
+                  ? '(max-width: 860px) 92vw, 44vw'
+                  : '(max-width: 860px) 42vw, 18vw'}
+                alt={image.alt}
+                loading={current === 0 && index === 0 ? 'eager' : 'lazy'}
+                fetchPriority={current === 0 && index === 0 ? 'high' : 'auto'}
+              />
+            </figure>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-200 text-white hover:scale-110 border border-white/20"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="h-6 w-6" />
-      </button>
-
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 p-2 md:p-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full transition-all duration-200 text-white hover:scale-110 border border-white/20"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="h-6 w-6" />
-      </button>
+      <div className="home-shell home-hero__controls">
+        <div>
+          <button type="button" onClick={previous} aria-label="Previous hero slide">
+            <ArrowLeft aria-hidden="true" />
+          </button>
+          <button type="button" onClick={next} aria-label="Next hero slide">
+            <ArrowRight aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+      <p className="sr-only" aria-live="polite">
+        Showing slide {current + 1}: {slide.title}
+      </p>
     </section>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Container } from './Container';
 import { User, Menu, X, Minus, Plus } from 'lucide-react';
@@ -17,22 +17,10 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
-  const lastScrollY = React.useRef(0);
+  const [logoFailed, setLogoFailed] = useState(false);
   
   // Mobile Accordion State for Shop
   const [isShopExpanded, setIsShopExpanded] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsScrolledDown(currentScrollY > lastScrollY.current && currentScrollY > 100);
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     if (href.startsWith('http')) return;
@@ -78,18 +66,14 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
       <BackInStockPopup />
 
       {/* Main Header */}
-      <header className={`sticky top-0 z-50 border-b transition-all duration-300 ${
-        isScrolledDown 
-          ? 'bg-white/40 backdrop-blur-md shadow-lg' 
-          : 'bg-white shadow-sm'
-      }`}>
+      <header className="sticky top-0 z-50 border-b border-gray-200/70 bg-white/90 backdrop-blur-xl">
         <Container>
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-[72px]">
             {/* Mobile menu button - Left side (mobile only) */}
             {showMobileMenu && (
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 text-gray-400 hover:text-gray-500"
+                className="lg:hidden p-2 text-gray-700 hover:text-pink-600"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
               >
@@ -104,33 +88,38 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             {/* Logo - Left on desktop, center on mobile */}
             <div className="flex-shrink-0 lg:flex-shrink-0 lg:flex-none flex-1 flex justify-center lg:justify-start">
               <a href="/" className="text-2xl font-bold text-gray-900 header-logo" onClick={(e) => handleNavClick(e, '/')}>
-                <img src="/blom_logo.webp" alt="BLOM Cosmetics" className="h-12 md:h-10" />
+                {logoFailed ? (
+                  <span className="tracking-[0.16em] text-[1.05rem] font-extrabold">BLOM</span>
+                ) : (
+                  <img
+                    src="/blom_logo.webp"
+                    alt="BLOM Cosmetics"
+                    className="h-12 md:h-10"
+                    onError={() => setLogoFailed(true)}
+                  />
+                )}
               </a>
             </div>
 
             {/* Desktop Navigation - Center */}
-            <nav className="hidden lg:flex items-center space-x-8 flex-1 justify-center">
+            <nav className="hidden lg:flex items-center gap-8 flex-1 justify-center">
               {navigationItems.map((item) => {
                 const isActive = currentPath === item.href;
                 return (
                   <div key={item.name} className="relative group">
                     <a
                       href={item.href}
-                      className={`px-4 py-2 text-sm font-medium transition-all duration-200 relative ${
+                      className={`px-1 py-2 text-sm font-semibold transition-colors duration-200 relative ${
                         isActive 
-                          ? 'text-gray-900 rounded-md' 
-                          : 'text-gray-700 hover:text-gray-900'
+                          ? 'text-pink-600'
+                          : 'text-gray-700 hover:text-pink-600'
                       }`}
-                      style={{
-                        backgroundColor: isActive ? '#CEE5FF' : 'transparent'
-                      }}
                       onClick={(e) => handleNavClick(e, item.href)}
                     >
                       {item.name}
-                      <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-pink-400 transition-all duration-200 opacity-0 group-hover:opacity-100"></span>
-                      <span className={`absolute inset-0 bg-pink-50 rounded-md transition-all duration-200 -z-10 ${
-                        isActive ? 'opacity-0' : 'opacity-0 group-hover:opacity-100'
-                      }`}></span>
+                      <span className={`absolute bottom-0 left-0 h-px bg-pink-500 transition-all duration-200 ${
+                        isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                      }`} />
                     </a>
                   </div>
                 );
@@ -138,13 +127,10 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
             </nav>
 
             {/* Action Icons - Right side */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-2 md:gap-3">
               <a
                 href="/account"
-                className="p-2 text-gray-700 hover:text-gray-900 transition-colors"
-                onClick={(e) => {
-                  // Standard link behavior for account check
-                }}
+                className="p-2 text-gray-700 hover:text-pink-700 transition-colors"
                 aria-label="Account"
               >
                 <User className="h-5 w-5" />
@@ -196,7 +182,6 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
                             {shopCategories.map((subItem, subIndex) => {
                               // Special handling for Acrylic System with collapsible logic
                               if (subItem.name === 'Acrylic System') {
-                                const isAcrylicExpanded = true; // For now keep it expanded or manage with state if preferred. 
                                 // To make it collapsible, we'd need another state variable.
                                 // Given the user request is just "open up subcategories", showing them inline is the most direct fix.
                                 

@@ -16,10 +16,34 @@ const stagger: Variants = {
 };
 
 const categories = [
-  { name: 'Acrylic System', icon: Sparkles, href: '/shop#acrylic-system', image: '/acrylic-category.webp', description: 'Professional powders & liquids' },
-  { name: 'Prep & Finish', icon: Droplet, href: '/shop#prep-finishing', image: '/cuticle-category.webp', description: 'Nourishing oils & treatments' },
-  { name: 'Tools & Essentials', icon: Palette, href: '/shop#tools-essentials', image: '/nail-essentials-category.webp', description: 'Colors, glitters & finishes' },
-  { name: 'Education', icon: GraduationCap, href: '/courses', image: '/education-category.webp', description: 'Professional training courses' },
+  {
+    name: 'Acrylic System',
+    icon: Sparkles,
+    href: '/shop#acrylic-system',
+    image: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_800,c_fill,g_auto/v1782716390/products/temp/WhatsApp_Image_2026-06-29_at_07.56.58_wocvhi.jpg',
+    description: 'Professional powders and liquids',
+  },
+  {
+    name: 'Prep & Finish',
+    icon: Droplet,
+    href: '/shop#prep-finishing',
+    image: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_800,c_fill,g_auto/v1785147071/products/temp/RB001_neciyp.jpg',
+    description: 'Prep, protection and lasting shine',
+  },
+  {
+    name: 'Tools & Essentials',
+    icon: Palette,
+    href: '/shop#tools-essentials',
+    image: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_800,c_fill,g_auto/v1785259213/products/temp/PetalPasteWhite_hirzoi.jpg',
+    description: 'Everyday artist essentials',
+  },
+  {
+    name: 'Education',
+    icon: GraduationCap,
+    href: '/courses',
+    image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/f_auto,q_auto,w_800,c_fill,g_auto/v1778573976/WhatsApp_Image_2026-05-12_at_09.20.39_kercfw.jpg',
+    description: 'Professional training courses',
+  },
 ];
 
 export const ShopByCategory: React.FC = () => {
@@ -27,50 +51,43 @@ export const ShopByCategory: React.FC = () => {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   return (
-    <section ref={ref} className="section-padding bg-gray-50">
+    <section ref={ref} className="home-categories">
       <Container>
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-12"
+          className="home-section-heading"
         >
-          <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase text-pink-500 mb-3">Explore</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Shop by Category</h2>
-          <p className="text-gray-400 mt-3 text-sm">Find exactly what you need for your nail artistry</p>
+          <p className="home-eyebrow">Explore</p>
+          <h2>Find your system.</h2>
+          <p>Move quickly to the products, tools and training that support your work.</p>
         </motion.div>
 
         <motion.div
           variants={stagger}
           initial="hidden"
           animate={inView ? 'show' : 'hidden'}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6"
+          className="home-categories__grid"
         >
           {categories.map((category) => (
             <motion.a
               key={category.name}
               href={category.href}
               variants={cardVariant}
-              className="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+              className="home-category-card"
             >
-              <div className="aspect-[4/5] overflow-hidden">
+              <div className="home-category-card__image">
                 <img
                   src={category.image}
                   alt={category.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = `https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=800&auto=format&fit=crop`;
-                  }}
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
               </div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <div className="mb-2 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">
-                  <category.icon className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-xl font-extrabold mb-1 text-white drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">{category.name}</h3>
-                <p className="text-sm text-white/95 drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)]">{category.description}</p>
+              <div className="home-category-card__content">
+                <category.icon aria-hidden="true" />
+                <h3>{category.name}</h3>
+                <p>{category.description}</p>
               </div>
             </motion.a>
           ))}

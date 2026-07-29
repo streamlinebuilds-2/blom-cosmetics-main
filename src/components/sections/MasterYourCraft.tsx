@@ -1,136 +1,83 @@
-import React, { useEffect, useRef } from 'react';
-import { Container } from '../layout/Container';
-import { Button } from '../ui/Button';
-import { Award, Computer, User } from 'lucide-react';
+import React from 'react';
+import { ArrowUpRight, Clock, MapPin } from 'lucide-react';
 
-export const MasterYourCraft: React.FC = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const sectionRef = useRef<HTMLElement | null>(null);
+const courses = [
+  {
+    title: 'Rubber Base Perfection',
+    meta: '3-4 days',
+    location: 'Randfontein and Orkney',
+    href: '/courses/rubber-base-perfection-course',
+    image: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/f_auto,q_auto,w_1400,c_limit/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
+    className: 'academy-course--featured',
+  },
+  {
+    title: 'Trendy Ring Nail Art',
+    meta: 'Self-paced',
+    location: 'Online',
+    href: '/courses/trendy-ring-nail-art-course',
+    image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/f_auto,q_auto,w_1000,c_limit/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
+    className: 'academy-course--compact',
+  },
+  {
+    title: 'Faded Flowers Workshop',
+    meta: 'Self-paced',
+    location: 'Online',
+    href: '/courses/faded-flowers-workshop',
+    image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/f_auto,q_auto,w_1000,c_limit/v1775453928/WhatsApp_Image_2026-04-03_at_12.34.07_uelxcc.jpg',
+    className: 'academy-course--compact',
+  },
+];
 
-  const handleNavigation = (e: React.MouseEvent<HTMLElement>, section: string) => {
-    e.preventDefault();
-    try {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      window.location.assign(`/courses${section}`);
-    } catch {
-      window.location.assign(`/courses${section}`);
-    }
-  };
+const responsiveSrcSet = (src: string) =>
+  [480, 800, 1400]
+    .map((width) => `${src.replace(/w_\d+/, `w_${width}`)} ${width}w`)
+    .join(', ');
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    // `loop` attribute handles looping — no need for a manual `ended` listener
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          video.play?.().catch(() => {});
-        } else {
-          video.pause?.();
-        }
-      });
-    }, { threshold: 0.5 });
-    observer.observe(video);
-    return () => observer.disconnect();
-  }, []);
+export const MasterYourCraft: React.FC = () => (
+  <section className="home-academy" aria-labelledby="academy-heading">
+    <div className="home-shell">
+      <header className="home-section-heading">
+        <p className="home-eyebrow">BLOM Academy</p>
+        <h2 id="academy-heading">Techniques that move your work forward.</h2>
+        <p>
+          Learn in person or online with practical guidance, focused demonstrations and
+          skills designed for real client work.
+        </p>
+      </header>
 
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-    // once: true — only add the class, never remove it, so the observer can disconnect
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        el.classList.add('reveal-on-scroll');
-        observer.disconnect();
-      }
-    }, { threshold: 0.15 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section ref={sectionRef} className="master" aria-label="Master Your Craft">
-      <Container>
-        <div className="master__container">
-          {/* Left copy */}
-          <div className="master__copy">
-            <h2 className="heading-with-stripe">MASTER YOUR CRAFT</h2>
-            <p className="master__lead">Professional training designed to give nail technicians the skills and confidence to succeed in their careers.</p>
-
-            <div className="master__types">
-              <article 
-                className="m-type cursor-pointer" 
-                tabIndex={0} 
-                aria-label="In-Class Professional Courses"
-                onClick={(e) => handleNavigation(e, '#in-person-training')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleNavigation(e as any, '#in-person-training');
-                  }
-                }}
-              >
-                <div className="m-type__icon"><User className="h-5 w-5" /></div>
-                <div className="m-type__body">
-                  <h3 className="font-bold text-sm md:text-base">In-Class Professional Courses</h3>
-                  <p className="text-xs md:text-sm text-gray-700">Hands-on training from prep to finishes — kits included, small groups, certificate.</p>
-                </div>
-              </article>
-
-              <article 
-                className="m-type cursor-pointer" 
-                tabIndex={0} 
-                aria-label="Creative Online Workshops"
-                onClick={(e) => handleNavigation(e, '#online-workshops')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleNavigation(e as any, '#online-workshops');
-                  }
-                }}
-              >
-                <div className="m-type__icon"><Computer className="h-5 w-5" /></div>
-                <div className="m-type__body">
-                  <h3 className="font-bold text-sm md:text-base">Creative Online Workshops</h3>
-                  <p className="text-xs md:text-sm text-gray-700">Learn at your own pace with instructor feedback — flexible modules, certificate.</p>
-                </div>
-              </article>
+      <div className="home-academy__grid">
+        {courses.map((course, index) => (
+          <a className={`academy-course ${course.className}`} href={course.href} key={course.title}>
+            <img
+              src={course.image}
+              srcSet={responsiveSrcSet(course.image)}
+              sizes={index === 0
+                ? '(max-width: 860px) 92vw, 58vw'
+                : '(max-width: 860px) 92vw, 28vw'}
+              alt={course.title}
+              loading="lazy"
+            />
+            <div className="academy-course__overlay" />
+            <div className="academy-course__content">
+              <h3>{course.title}</h3>
+              <div className="academy-course__meta">
+                <span><Clock aria-hidden="true" /> {course.meta}</span>
+                <span><MapPin aria-hidden="true" /> {course.location}</span>
+              </div>
             </div>
+            <span className="academy-course__arrow" aria-hidden="true">
+              <ArrowUpRight />
+            </span>
+          </a>
+        ))}
+      </div>
 
-            <ul className="master__chips">
-              <li className="chip">Beginner → Pro</li>
-              <li className="chip">Hands‑on demos</li>
-              <li className="chip">Downloadable guides</li>
-              <li className="chip">Pro tips</li>
-            </ul>
-
-            {/* Stats removed as requested */}
-
-            <div className="master__actions">
-              <a className="btn btn-pink" href="/courses">EXPLORE ALL COURSES</a>
-            </div>
-          </div>
-
-          {/* Right visual */}
-          <div className="master__visual">
-            <figure className="m-visual aspect-[4/3]">
-              <video
-                ref={videoRef}
-                className="myc__image"
-                muted
-                playsInline
-                loop
-                autoPlay
-                preload="metadata"
-              >
-                <source src="/workshop-video.mp4" type="video/mp4" />
-              </video>
-            </figure>
-          </div>
-        </div>
-      </Container>
-    </section>
-  );
-};
+      <div className="home-academy__footer">
+        <p>Choose a focused online workshop or join us for hands-on professional training.</p>
+        <a className="home-button home-button--primary" href="/courses">Explore all courses</a>
+      </div>
+    </div>
+  </section>
+);
 
 export default MasterYourCraft;
