@@ -121,6 +121,31 @@ export async function enrollCourse(input: EnrollInput): Promise<EnrollResult> {
   } catch { /* non-fatal: fall through to normal enrolment */ }
 
   try {
+    // Atomically claim delivery in the Store DB. PayFast's ITN and browser
+    // confirmation can arrive concurrently; only the first caller may continue
+    // to mint/hand off an invite. A processing claim becomes retryable after
+    // ten minutes if the worker stops before marking it sent or failed.
+    const { data: claimed, error: claimError } = await store.rpc(
+      'claim_course_invitation_delivery',
+      {
+        p_order_id: orderId,
+        p_course_slug: courseSlug
+      }
+    )
+
+    if (claimError) {
+      throw new Error(`Could not claim course invitation delivery: ${claimError.message}`)
+    }
+
+    if (!claimed) {
+      console.log('Course invitation delivery already claimed or completed:', courseSlug)
+      return {
+        success: true,
+        offerUrl: courseBenefit ? TRENDY_RING_OFFER_URL : undefined,
+        offerCouponCode: courseBenefit?.coupon_code
+      }
+    }
+
     const academy = academyClient()
 
     // 1. Resolve the course UUID (create_course_invite needs the id, not the slug)

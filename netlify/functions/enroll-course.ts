@@ -3,12 +3,33 @@ import { enrollCourse } from './_lib/enroll-helper'
 
 export const handler: Handler = async (event) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'https://blom-cosmetics.co.za',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
     'Content-Type': 'application/json'
   }
 
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers }
+  }
+
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({ error: 'Method not allowed' })
+    }
+  }
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const authHeader = event.headers.authorization || event.headers.Authorization || ''
+  const token = authHeader.replace(/^Bearer\s+/i, '')
+
+  if (!serviceKey || token !== serviceKey) {
+    return {
+      statusCode: 401,
+      headers,
+      body: JSON.stringify({ error: 'Unauthorized' })
+    }
   }
 
   try {
