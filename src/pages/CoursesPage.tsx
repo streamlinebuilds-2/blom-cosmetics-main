@@ -31,9 +31,8 @@ const CoursesPage: React.FC = () => {
     }
   ];
 
-  const trendyRingLive = import.meta.env.VITE_TRENDY_RING_COURSE_LIVE === 'true';
   const onlineCourses = [
-    ...(trendyRingLive ? [{
+    {
       id: 6,
       slug: 'trendy-ring-nail-art-course',
       title: 'Trendy Ring Nail Art Course',
@@ -43,7 +42,7 @@ const CoursesPage: React.FC = () => {
       location: 'Online',
       price: 650,
       onSale: false
-    }] : []),
+    },
     {
       id: 2,
       slug: 'blom-flower-watercolor-workshop',
