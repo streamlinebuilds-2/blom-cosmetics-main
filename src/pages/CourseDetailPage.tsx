@@ -1317,6 +1317,27 @@ export const CourseDetailPage: React.FC = () => {
           </div>
         </section>
 
+        {courseSlug === 'trendy-ring-nail-art-course' && (
+          <section className="bg-[#fbf8fc] py-10 sm:py-14" aria-label="Exclusive Trendy Ring course offer">
+            <Container>
+              <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#e7dcef] bg-white shadow-lg">
+                <div className="grid items-center lg:grid-cols-[1.2fr_0.8fr]">
+                  <img
+                    src="https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/IMG-20260728-WA0023_wssnnp.jpg"
+                    alt="Exclusive course offer: White and Clear Petal Paste for R399"
+                    className="h-full w-full min-h-[220px] object-cover"
+                  />
+                  <div className="p-7 sm:p-9">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#76548f]">Exclusive course offer</p>
+                    <h2 className="mb-3 text-2xl font-bold text-gray-900">Get both Petal Pastes for R399</h2>
+                    <p className="text-sm leading-relaxed text-gray-600">Buy this course and unlock your permanent White + Clear Petal Paste offer after checkout.</p>
+                  </div>
+                </div>
+              </div>
+            </Container>
+          </section>
+        )}
+
         {/* Meet Your Instructor */}
         <section className="py-20" style={{ background: 'linear-gradient(135deg, #FFE8F0 0%, #FFF0F6 50%, #FFE8F0 100%)' }}>
           <Container>
