@@ -245,6 +245,80 @@ export const handler: Handler = async (event) => {
         }
       })
 
+      // Private, single-use owner test discount for the unlisted Trendy Ring
+      // course. The coupon row is email-locked and marked server-side; the
+      // public code alone is never sufficient to receive this discount.
+      if (couponCode.startsWith('RING-TEST-')) {
+        if (orderKind !== 'course' || body.course_booking?.course_slug !== 'trendy-ring-nail-art-course') {
+          return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This private test discount is only valid for the Trendy Ring course.' })
+          }
+        }
+
+        const authHeader = event.headers.authorization || (event.headers as any).Authorization
+        if (!authHeader) {
+          return {
+            statusCode: 401,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Log in with the BLOM owner account to use the private test discount.' })
+          }
+        }
+
+        const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: { apikey: SERVICE_KEY, Authorization: authHeader }
+        })
+        const user = userRes.ok ? await userRes.json() : null
+        const accountEmail = String(user?.email || '').toLowerCase().trim()
+        const buyerEmail = String(body.shippingInfo?.email || body.buyer?.email || '').toLowerCase().trim()
+
+        const [profileRes, testCouponRes] = await Promise.all([
+          user?.id
+            ? fetch(
+                `${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=app_role&limit=1`,
+                { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+              )
+            : Promise.resolve(null),
+          fetch(
+            `${SUPABASE_URL}/rest/v1/coupons?code=eq.${encodeURIComponent(couponCode)}&select=id,status,is_active,used_count,max_uses,locked_email,notes,valid_until&limit=1`,
+            { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+          )
+        ])
+
+        const profiles = profileRes?.ok ? await profileRes.json() : []
+        const testCoupons = testCouponRes.ok ? await testCouponRes.json() : []
+        const role = String(Array.isArray(profiles) ? profiles[0]?.app_role || '' : '')
+        const testCoupon = Array.isArray(testCoupons) ? testCoupons[0] : null
+        const lockedEmail = String(testCoupon?.locked_email || '').toLowerCase().trim()
+        const isExpired = testCoupon?.valid_until && new Date(testCoupon.valid_until).getTime() <= Date.now()
+
+        if (
+          !accountEmail ||
+          !['owner', 'staff'].includes(role) ||
+          buyerEmail !== accountEmail ||
+          lockedEmail !== accountEmail ||
+          testCoupon?.notes !== 'TRENDY_RING_PRIVATE_R5_TEST' ||
+          testCoupon?.status !== 'active' ||
+          testCoupon?.is_active !== true ||
+          Number(testCoupon?.used_count || 0) >= Number(testCoupon?.max_uses || 1) ||
+          isExpired
+        ) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This private test discount is invalid, expired, used, or belongs to another account.' })
+          }
+        }
+
+        discountCents = Math.max(0, subtotalCents - 500)
+        body.course_booking.amount_paid_cents = subtotalCents - discountCents
+        body.course_booking.details = {
+          ...(body.course_booking.details || {}),
+          list_price_cents: subtotalCents,
+          private_test_discount_cents: discountCents
+        }
+      } else {
       const benefitRes = await fetch(
         `${SUPABASE_URL}/rest/v1/course_benefits?coupon_code=eq.${encodeURIComponent(couponCode)}&select=id,status,buyer_email,coupon_id&limit=1`,
         { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
@@ -342,6 +416,7 @@ export const handler: Handler = async (event) => {
           0,
           Math.min(Math.round(Number(coupon.discount_cents || 0)), subtotalCents + shippingCents)
         )
+      }
       }
     }
 

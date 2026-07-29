@@ -5,6 +5,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
 import { ClickableContact } from '../components/ui/ClickableContact';
+import { supabase } from '../lib/supabase';
 import { 
   Clock, 
   MapPin, 
@@ -30,6 +31,13 @@ export const CourseDetailPage: React.FC = () => {
   const academyCourseSlug = courseSlug === 'online-watercolour-workshop'
     ? 'blom-flower-watercolor-workshop'
     : courseSlug;
+  const privateTestCoupon = new URLSearchParams(window.location.search)
+    .get('test_coupon')
+    ?.trim()
+    .toUpperCase() || '';
+  const hasPrivateTestDiscount =
+    courseSlug === 'trendy-ring-nail-art-course' &&
+    privateTestCoupon.startsWith('RING-TEST-');
   // Course data
   const courses = {
     'professional-acrylic-training': {
@@ -1038,6 +1046,13 @@ export const CourseDetailPage: React.FC = () => {
         ? Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
         : Math.random().toString(16).slice(2, 8).toUpperCase();
       const clientPaymentId = `BL-${nowBase36}-${rand}`;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (hasPrivateTestDiscount && !accessToken) {
+        const returnPath = `${window.location.pathname}${window.location.search}`;
+        window.location.href = `/login?redirect=${encodeURIComponent(returnPath)}`;
+        return;
+      }
 
       // Get the selected package price
       const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
@@ -1063,7 +1078,10 @@ export const CourseDetailPage: React.FC = () => {
       // Create order with course as product
       const orderRes = await fetch('/.netlify/functions/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+        },
         body: JSON.stringify({
           order_kind: 'course',
           m_payment_id: clientPaymentId,
@@ -1100,6 +1118,7 @@ export const CourseDetailPage: React.FC = () => {
             shipping_cents: 0,
             tax_cents: 0
           },
+          coupon: privateTestCoupon ? { code: privateTestCoupon } : null,
           shipping: {
             method: 'collection'
           }
@@ -1113,6 +1132,9 @@ export const CourseDetailPage: React.FC = () => {
       const orderData = await orderRes.json();
       const orderId = orderData.order_id;
       const merchantPaymentId = orderData.m_payment_id || orderData.merchant_payment_id || clientPaymentId;
+      const effectivePaymentAmount = Number.isFinite(Number(orderData.total_cents))
+        ? Number(orderData.total_cents) / 100
+        : paymentAmount;
 
       const itemName = `${course.title} - ${selectedPackage} ${paymentLabel}`;
       const firstName = formData.name.trim().split(' ')[0];
@@ -1126,7 +1148,7 @@ export const CourseDetailPage: React.FC = () => {
           body: JSON.stringify({
             order_id: orderId,
             m_payment_id: merchantPaymentId,
-            amount: paymentAmount,
+            amount: effectivePaymentAmount,
             shipping_amount: 0,
             consumer: {
               givenNames: firstName,
@@ -1138,7 +1160,7 @@ export const CourseDetailPage: React.FC = () => {
               name: itemName,
               sku: (course as any).sku || '',
               quantity: 1,
-              price: paymentAmount
+              price: effectivePaymentAmount
             }]
           })
         });
@@ -1163,7 +1185,7 @@ export const CourseDetailPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           order_id: orderId,
-          amount: paymentAmount,
+          amount: effectivePaymentAmount,
           item_name: itemName,
           m_payment_id: merchantPaymentId,
           email_address: formData.email,
@@ -2275,7 +2297,8 @@ export const CourseDetailPage: React.FC = () => {
                     <p className="text-sm text-gray-600 mb-6">
                       {(() => {
                         const payNow = course.isOnline || paymentOption === 'full';
-                        const amt = payNow ? selectedPackagePrice : depositAmount;
+                        const regularAmount = payNow ? selectedPackagePrice : depositAmount;
+                        const amt = hasPrivateTestDiscount ? 5 : regularAmount;
                         return `${payNow ? 'Total' : 'Deposit'}: R${amt.toLocaleString('en-ZA')}`;
                       })()}
                     </p>
