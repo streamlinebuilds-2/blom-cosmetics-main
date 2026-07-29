@@ -325,6 +325,22 @@
   margin-bottom: 18px;
 }
 
+/* Version A display headings */
+
+.home-page--refresh .home-hero__copy h1,
+.home-page--refresh .home-section-heading h2,
+.home-page--refresh .home-story__copy h2,
+.home-page--refresh .home-reviews__intro h2 {
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0.12em 0.18em 0.16em;
+  border-radius: 16px;
+  background: #b93668;
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(126, 35, 76, 0.14);
+}
+
 /* Products */
 
 .home-products {
