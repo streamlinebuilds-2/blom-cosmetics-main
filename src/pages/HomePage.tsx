@@ -28,6 +28,10 @@ const responsiveSrcSet = (src: string) =>
     .join(', ');
 
 export const HomePage: React.FC = () => {
+  const homepageVersion = new URLSearchParams(window.location.search).get('version') === 'brand'
+    ? 'brand'
+    : 'refresh';
+
   useEffect(() => {
     updateSEO({
       title: 'BLOM Cosmetics - Professional Nail Products and Training South Africa',
@@ -43,7 +47,10 @@ export const HomePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="home-page">
+    <div
+      className={`home-page home-page--${homepageVersion}`}
+      data-home-version={homepageVersion}
+    >
       <Header showMobileMenu={true} />
 
       <main>
