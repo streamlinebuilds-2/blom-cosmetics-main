@@ -1,4 +1,5 @@
 import type { Handler } from '@netlify/functions'
+import { TRENDY_RING_OFFER_PRODUCT_SLUGS } from './_lib/trendy-ring-offer'
 import crypto from 'crypto'
 
 export const handler: Handler = async (event) => {
@@ -374,11 +375,7 @@ export const handler: Handler = async (event) => {
           }
         }
 
-        const requiredSlugs = [
-          'blom-cosmetics-petal-paste-white',
-          'blom-cosmetics-petal-paste-clear'
-        ]
-        const pairItems = requiredSlugs.map((slug) =>
+        const pairItems = TRENDY_RING_OFFER_PRODUCT_SLUGS.map((slug) =>
           validItems.find((it) => it.resolved_product?.slug === slug && Number(it.quantity || 0) >= 1)
         )
         if (pairItems.some((item) => !item)) {

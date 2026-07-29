@@ -1,12 +1,10 @@
 import type { Handler } from '@netlify/functions'
 import { createClient } from '@supabase/supabase-js'
-
-const COURSE_SLUG = 'trendy-ring-nail-art-course'
-const OFFER_PRICE_CENTS = 39900
-const REQUIRED_PRODUCT_SLUGS = [
-  'blom-cosmetics-petal-paste-white',
-  'blom-cosmetics-petal-paste-clear'
-]
+import {
+  TRENDY_RING_COURSE_SLUG,
+  TRENDY_RING_OFFER_PRICE_CENTS,
+  TRENDY_RING_OFFER_PRODUCT_SLUGS
+} from './_lib/trendy-ring-offer'
 
 type CartInput = {
   product_id?: string
@@ -111,7 +109,7 @@ export const handler: Handler = async (event) => {
           body: JSON.stringify({ ok: false, error: 'This offer belongs to a different Store account email.' })
         }
       }
-      if (benefit.course_slug !== COURSE_SLUG || !['eligible', 'claimed'].includes(String(benefit.status))) {
+      if (benefit.course_slug !== TRENDY_RING_COURSE_SLUG || !['eligible', 'claimed'].includes(String(benefit.status))) {
         return {
           statusCode: 409,
           headers,
@@ -127,7 +125,7 @@ export const handler: Handler = async (event) => {
         quantitiesBySlug.set(item.slug, (quantitiesBySlug.get(item.slug) || 0) + item.quantity)
       }
 
-      const missingProduct = REQUIRED_PRODUCT_SLUGS.find((slug) => (quantitiesBySlug.get(slug) || 0) < 1)
+      const missingProduct = TRENDY_RING_OFFER_PRODUCT_SLUGS.find((slug) => (quantitiesBySlug.get(slug) || 0) < 1)
       if (missingProduct) {
         return {
           statusCode: 400,
@@ -139,11 +137,11 @@ export const handler: Handler = async (event) => {
         }
       }
 
-      const pairTotalCents = REQUIRED_PRODUCT_SLUGS.reduce((sum, slug) => {
+      const pairTotalCents = TRENDY_RING_OFFER_PRODUCT_SLUGS.reduce((sum, slug) => {
         const item = canonicalCart.find((cartItem) => cartItem.slug === slug)
         return sum + Number(item?.unit_price_cents || 0)
       }, 0)
-      const discountCents = Math.max(0, pairTotalCents - OFFER_PRICE_CENTS)
+      const discountCents = Math.max(0, pairTotalCents - TRENDY_RING_OFFER_PRICE_CENTS)
 
       await supabase
         .from('course_benefits')

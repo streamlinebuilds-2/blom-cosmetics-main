@@ -1,12 +1,10 @@
 import type { Handler } from '@netlify/functions'
 import { createClient } from '@supabase/supabase-js'
-
-const COURSE_SLUG = 'trendy-ring-nail-art-course'
-const OFFER_PRICE_CENTS = 39900
-const PRODUCT_SLUGS = [
-  'blom-cosmetics-petal-paste-white',
-  'blom-cosmetics-petal-paste-clear'
-]
+import {
+  TRENDY_RING_COURSE_SLUG,
+  TRENDY_RING_OFFER_PRICE_CENTS,
+  TRENDY_RING_OFFER_PRODUCT_SLUGS
+} from './_lib/trendy-ring-offer'
 
 export const handler: Handler = async (event) => {
   const headers = {
@@ -47,7 +45,7 @@ export const handler: Handler = async (event) => {
   const { data: benefit, error: benefitError } = await supabase
     .from('course_benefits')
     .select('id,coupon_code,status,buyer_email')
-    .eq('course_slug', COURSE_SLUG)
+    .eq('course_slug', TRENDY_RING_COURSE_SLUG)
     .ilike('buyer_email', email)
     .maybeSingle()
 
@@ -76,7 +74,7 @@ export const handler: Handler = async (event) => {
   const { data: products, error: productsError } = await supabase
     .from('products')
     .select('id,name,slug,price,price_cents,thumbnail_url,image_url,status,is_active,out_of_stock')
-    .in('slug', PRODUCT_SLUGS)
+    .in('slug', TRENDY_RING_OFFER_PRODUCT_SLUGS)
 
   if (productsError || !products || products.length !== 2) {
     console.error('Course offer products unavailable:', productsError)
@@ -102,7 +100,7 @@ export const handler: Handler = async (event) => {
     .eq('status', 'eligible')
 
   const normalizedProducts = products
-    .sort((a: any, b: any) => PRODUCT_SLUGS.indexOf(a.slug) - PRODUCT_SLUGS.indexOf(b.slug))
+    .sort((a: any, b: any) => TRENDY_RING_OFFER_PRODUCT_SLUGS.indexOf(a.slug) - TRENDY_RING_OFFER_PRODUCT_SLUGS.indexOf(b.slug))
     .map((product: any) => ({
       id: product.id,
       name: product.name,
@@ -116,10 +114,10 @@ export const handler: Handler = async (event) => {
     headers,
     body: JSON.stringify({
       ok: true,
-      course_slug: COURSE_SLUG,
+      course_slug: TRENDY_RING_COURSE_SLUG,
       coupon_code: benefit.coupon_code,
       status: 'claimed',
-      offer_price_cents: OFFER_PRICE_CENTS,
+      offer_price_cents: TRENDY_RING_OFFER_PRICE_CENTS,
       products: normalizedProducts
     })
   }

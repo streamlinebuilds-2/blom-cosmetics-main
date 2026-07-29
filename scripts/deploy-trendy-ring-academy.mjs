@@ -26,7 +26,7 @@ const course = {
     {
       name: 'White Petal Paste',
       image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/IMG-20260728-WA0023_wssnnp.jpg',
-      link: 'https://blom-cosmetics.co.za/products/blom-cosmetics-petal-paste-white'
+      link: 'https://blom-cosmetics.co.za/products/blom-cosmetics-petal-paste-milky-white'
     },
     {
       name: 'Clear Petal Paste',
