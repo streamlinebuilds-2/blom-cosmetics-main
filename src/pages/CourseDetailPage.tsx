@@ -1126,7 +1126,8 @@ export const CourseDetailPage: React.FC = () => {
       });
 
       if (!orderRes.ok) {
-        throw new Error('Failed to create order');
+        const orderError = await orderRes.json().catch(() => null);
+        throw new Error(orderError?.error || 'Failed to create order');
       }
 
       const orderData = await orderRes.json();
@@ -1219,7 +1220,7 @@ export const CourseDetailPage: React.FC = () => {
 
     } catch (error) {
       console.error('Enrollment error:', error);
-      showNotification('Something went wrong. Please try again.', 'error');
+      showNotification(error instanceof Error ? error.message : 'Something went wrong. Please try again.', 'error');
       setIsSubmitting(false);
     }
   };

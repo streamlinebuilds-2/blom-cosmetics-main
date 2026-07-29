@@ -273,31 +273,40 @@ export const handler: Handler = async (event) => {
         const accountEmail = String(user?.email || '').toLowerCase().trim()
         const buyerEmail = String(body.shippingInfo?.email || body.buyer?.email || '').toLowerCase().trim()
 
-        const [profileRes, testCouponRes] = await Promise.all([
-          user?.id
-            ? fetch(
-                `${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(user.id)}&select=app_role&limit=1`,
-                { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
-              )
-            : Promise.resolve(null),
-          fetch(
-            `${SUPABASE_URL}/rest/v1/coupons?code=eq.${encodeURIComponent(couponCode)}&select=id,status,is_active,used_count,max_uses,locked_email,notes,valid_until&limit=1`,
-            { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
-          )
-        ])
-
-        const profiles = profileRes?.ok ? await profileRes.json() : []
+        const testCouponRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/coupons?code=eq.${encodeURIComponent(couponCode)}&select=id,status,is_active,used_count,max_uses,locked_email,notes,valid_until&limit=1`,
+          { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+        )
         const testCoupons = testCouponRes.ok ? await testCouponRes.json() : []
-        const role = String(Array.isArray(profiles) ? profiles[0]?.app_role || '' : '')
         const testCoupon = Array.isArray(testCoupons) ? testCoupons[0] : null
         const lockedEmail = String(testCoupon?.locked_email || '').toLowerCase().trim()
         const isExpired = testCoupon?.valid_until && new Date(testCoupon.valid_until).getTime() <= Date.now()
 
+        if (!accountEmail) {
+          return {
+            statusCode: 401,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Your Store login expired. Please log in again and reopen the R5 test link.' })
+          }
+        }
+
+        if (lockedEmail !== accountEmail) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This R5 test link is locked to a different Store account.' })
+          }
+        }
+
+        if (buyerEmail !== accountEmail) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Use the same email as your logged-in Store account for this R5 test.' })
+          }
+        }
+
         if (
-          !accountEmail ||
-          !['owner', 'staff'].includes(role) ||
-          buyerEmail !== accountEmail ||
-          lockedEmail !== accountEmail ||
           testCoupon?.notes !== 'TRENDY_RING_PRIVATE_R5_TEST' ||
           testCoupon?.status !== 'active' ||
           testCoupon?.is_active !== true ||
@@ -307,7 +316,7 @@ export const handler: Handler = async (event) => {
           return {
             statusCode: 403,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ error: 'This private test discount is invalid, expired, used, or belongs to another account.' })
+            body: JSON.stringify({ error: 'This R5 test discount is invalid, expired, or has already been used.' })
           }
         }
 
