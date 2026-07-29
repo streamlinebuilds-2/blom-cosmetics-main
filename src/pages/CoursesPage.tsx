@@ -3,7 +3,6 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { Clock, MapPin, DollarSign, Star, Activity, Users } from 'lucide-react';
 import { pageSEO, trackPageView, updateSEO } from '../lib/seo';
 
@@ -204,6 +203,27 @@ const CoursesPage: React.FC = () => {
             <div className="text-center mb-12">
               <h2 className="heading-with-stripe">Online Workshops</h2>
             </div>
+
+            <section className="mb-10 overflow-hidden rounded-2xl border border-[#e7dcef] bg-[#fbf8fc] shadow-lg" aria-label="Exclusive Trendy Ring course offer">
+              <div className="grid items-center lg:grid-cols-[1.2fr_0.8fr]">
+                <img
+                  src="https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/IMG-20260728-WA0023_wssnnp.jpg"
+                  alt="Exclusive course offer: White and Clear Petal Paste for R399"
+                  className="h-full w-full min-h-[220px] object-cover"
+                />
+                <div className="p-7 sm:p-9">
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#76548f]">Exclusive course offer</p>
+                  <h3 className="mb-3 text-2xl font-bold text-gray-900">Get both Petal Pastes for R399</h3>
+                  <p className="mb-6 text-sm leading-relaxed text-gray-600">Buy the Trendy Ring Nail Art Course and unlock your permanent White + Clear Petal Paste offer.</p>
+                  <a
+                    href="/courses/trendy-ring-nail-art-course"
+                    className="inline-flex rounded-lg bg-pink-400 px-5 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-pink-500"
+                  >
+                    View the course
+                  </a>
+                </div>
+              </div>
+            </section>
 
             <div className="grid md:grid-cols-2 gap-8">
               {onlineCourses.map((course) => (
