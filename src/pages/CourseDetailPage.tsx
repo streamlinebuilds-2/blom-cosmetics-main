@@ -676,7 +676,7 @@ export const CourseDetailPage: React.FC = () => {
       sku: 'SKU_TRENDY_RING_NAIL_ART',
       title: 'Trendy Ring Nail Art Course',
       description: 'Turn simple nails into head-turning masterpieces with modern ring designs, balanced placement, dimensional details, and client-ready finishing techniques.',
-      heroImage: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
+      heroImage: 'https://res.cloudinary.com/dbhiu7lv0/image/upload/v1785340197/Trendy-Ring-Course-IMG_yltkfx.png',
       duration: 'Self-Paced',
       price: 'R650',
       numericPrice: 650,

@@ -38,7 +38,7 @@ const CoursesPage: React.FC = () => {
       slug: 'trendy-ring-nail-art-course',
       title: 'Trendy Ring Nail Art Course',
       description: 'Master modern ring nail trends, confident placement, dimensional details, and client-ready finishing in four focused video lessons.',
-      image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
+      image: 'https://res.cloudinary.com/dbhiu7lv0/image/upload/v1785340197/Trendy-Ring-Course-IMG_yltkfx.png',
       duration: 'Self-Paced',
       location: 'Online',
       price: 650,
