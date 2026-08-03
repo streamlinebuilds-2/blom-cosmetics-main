@@ -141,10 +141,11 @@ export const FeaturedProducts: React.FC = () => {
       <Container>
         <header className="home-section-heading home-section-heading--products">
           <div>
+            <p className="home-eyebrow">New at BLOM</p>
             <h2 id="new-products-heading">Fresh additions for your kit.</h2>
-            <p>New professional products, selected from the latest BLOM releases.</p>
+            <p>Professional essentials, selected from the latest BLOM releases.</p>
           </div>
-          <a href="/shop?q=new">Shop all new arrivals</a>
+          <a href="/shop?q=new">View new arrivals</a>
         </header>
 
         <ul className="home-products__grid">

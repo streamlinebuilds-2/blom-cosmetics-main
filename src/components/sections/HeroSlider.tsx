@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import fleurCollectionHero from '../../assets/homepage/fleur-collection-hero.webp';
+import peonyBlushGelPolish from '../../assets/homepage/peony-blush-gel-polish.webp';
+import pinkHydrangeaGelPolish from '../../assets/homepage/pink-hydrangea-gel-polish.webp';
 
 interface HeroImage { src: string; alt: string }
 interface HeroSlide {
@@ -13,23 +16,26 @@ interface HeroSlide {
   images: HeroImage[];
 }
 
-const responsiveSrcSet = (src: string) =>
-  [480, 800, 1400]
+const responsiveSrcSet = (src: string) => {
+  if (!src.includes('res.cloudinary.com')) return undefined;
+
+  return [480, 800, 1400]
     .map((width) => `${src.replace(/w_\d+/, `w_${width}`)} ${width}w`)
     .join(', ');
+};
 
 const productImages: HeroImage[] = [
   {
-    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1400,c_limit/v1785259213/products/temp/PetalPasteWhite_hirzoi.jpg',
-    alt: 'BLOM White Petal Paste',
+    src: fleurCollectionHero,
+    alt: 'BLOM Fleur de Berry gel polish collection with fresh flowers',
   },
   {
-    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_900,c_limit/v1785259046/products/temp/PetalPasteClear_qh62r2.jpg',
-    alt: 'BLOM Clear Petal Paste',
+    src: peonyBlushGelPolish,
+    alt: 'BLOM Peony Blush gel polish from the Fleur de Berry collection',
   },
   {
-    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_900,c_limit/v1785147071/products/temp/RB001_neciyp.jpg',
-    alt: 'BLOM Peony Blush gel polish',
+    src: pinkHydrangeaGelPolish,
+    alt: 'BLOM pink gel polish styled with hydrangea flowers',
   },
 ];
 
@@ -122,7 +128,6 @@ export const HeroSlider: React.FC = () => {
                   : '(max-width: 860px) 42vw, 18vw'}
                 alt={image.alt}
                 loading={current === 0 && index === 0 ? 'eager' : 'lazy'}
-                fetchPriority={current === 0 && index === 0 ? 'high' : 'auto'}
               />
             </figure>
           ))}

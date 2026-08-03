@@ -8,24 +8,30 @@ import { TrustBadges } from '../components/sections/TrustBadges';
 import { ShopByCategory } from '../components/sections/ShopByCategory';
 import { MasterYourCraft } from '../components/sections/MasterYourCraft';
 import { Testimonials } from '../components/sections/Testimonials';
+import { SocialGallery } from '../components/sections/SocialGallery';
 import { updateSEO, trackPageView } from '../lib/seo';
+import rosePourGelPolish from '../assets/homepage/rose-pour-gel-polish.webp';
+import gelPolishLineup from '../assets/homepage/gel-polish-lineup.webp';
 import '../styles/homepage-refresh.css';
 
 const storyImages = [
   {
-    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1200,c_limit/v1785147071/products/temp/RB001_neciyp.jpg',
-    alt: 'BLOM Peony Blush gel polish',
+    src: rosePourGelPolish,
+    alt: 'BLOM gel polish styled with a sculptural pink rose',
   },
   {
-    src: 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1000,c_limit/v1785259213/products/temp/PetalPasteWhite_hirzoi.jpg',
-    alt: 'BLOM White Petal Paste',
+    src: gelPolishLineup,
+    alt: 'BLOM gel polish collection in deep floral shades',
   },
 ];
 
-const responsiveSrcSet = (src: string) =>
-  [480, 800, 1200]
+const responsiveSrcSet = (src: string) => {
+  if (!src.includes('res.cloudinary.com')) return undefined;
+
+  return [480, 800, 1200]
     .map((width) => `${src.replace(/w_\d+/, `w_${width}`)} ${width}w`)
     .join(', ');
+};
 
 export const HomePage: React.FC = () => {
   const homepageVersion = new URLSearchParams(window.location.search).get('version') === 'brand'
@@ -99,6 +105,7 @@ export const HomePage: React.FC = () => {
         </section>
 
         <Testimonials />
+        <SocialGallery />
       </main>
 
       <Footer />

@@ -59,9 +59,9 @@ export const ShopByCategory: React.FC = () => {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="home-section-heading"
         >
-          <p className="home-eyebrow">Explore</p>
-          <h2>Find your system.</h2>
-          <p>Move quickly to the products, tools and training that support your work.</p>
+          <p className="home-eyebrow">Shop by system</p>
+          <h2>Everything for your next set.</h2>
+          <p>Find the products, tools and training that support the way you work.</p>
         </motion.div>
 
         <motion.div
