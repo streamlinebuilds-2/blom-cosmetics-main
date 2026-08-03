@@ -42,7 +42,7 @@ export const CourseDetailPage: React.FC = () => {
   const courses = {
     'professional-acrylic-training': {
       id: 'a603be5f-2c56-4e95-9423-8229c8991b40',
-      title: 'Professional Acrylic Training',
+      title: 'Ultimate Acrylic Nail Course',
       description: 'Master the art of acrylic nail application with hands-on training. Choose your kit, book your dates, and secure your spot with a deposit.',
       heroImage: '/professional-acrylic-training-hero.webp',
       duration: '5 Full Days (Intensive Training)',
@@ -165,8 +165,7 @@ export const CourseDetailPage: React.FC = () => {
         }
       ],
       availableDates: [
-        'March 2026 (19-23 Mar)',
-        'May/June 2026 (29 May-2 Jun)'
+        'August/September 2026 (28 Aug-1 Sep)'
       ],
       thingsToBring: [
         'Your own refreshments and lunch (coffee and tea will be provided daily)',
@@ -176,23 +175,13 @@ export const CourseDetailPage: React.FC = () => {
       ],
       trainingSchedule: [
         {
-          title: 'March 2026',
+          title: 'August/September 2026',
           items: [
-            '19 March 2026 (08:30-16:00)',
-            '20 March 2026 (08:30-16:00)',
-            '21 March 2026 (09:00-15:00)',
-            '22 March 2026 (08:30-15:00)',
-            '23 March 2026 (08:30-16:00)'
-          ]
-        },
-        {
-          title: 'May/June 2026',
-          items: [
-            '29 May 2026 (08:30-16:00)',
-            '30 May 2026 (08:30-16:00)',
-            '31 May 2026 (09:00-15:00)',
-            '1 June 2026 (08:30-15:00)',
-            '2 June 2026 (08:30-16:00)'
+            '28 August 2026 (08:30-16:00)',
+            '29 August 2026 (08:30-16:00)',
+            '30 August 2026 (09:00-15:00)',
+            '31 August 2026 (08:30-15:00)',
+            '1 September 2026 (08:30-16:00)'
           ]
         }
       ],
