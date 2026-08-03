@@ -1,11 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { ProductCard } from '../ProductCard';
 import { Container } from '../layout/Container';
-
-// "New & Featured" — an auto-scrolling marquee of the newest in-stock products.
-// We scan the most recently added products and pick 6 with variety (so the row
-// isn't six near-identical acrylic colours), then loop them right-to-left.
 
 interface FeaturedItem {
   id: string;
@@ -18,43 +14,59 @@ interface FeaturedItem {
   inStock: boolean;
 }
 
-// Collapse close variants into one "family" so the picker can enforce variety.
+interface ProductRow {
+  id: string;
+  name: string;
+  slug: string;
+  price: number | string | null;
+  compare_at_price: number | string | null;
+  short_description: string | null;
+  thumbnail_url: string | null;
+  image_url: string | null;
+  product_type: string | null;
+  out_of_stock: boolean | null;
+  stock: number | null;
+  stock_on_hand: number | null;
+  stock_available: number | null;
+  inventory_quantity: number | null;
+}
+
 const familyKey = (name: string): string => {
-  const n = (name || '').toLowerCase();
-  if (n.includes('acrylic')) {
-    if (n.includes('glitter')) return 'glitter-acrylics';
-    if (n.includes('core')) return 'core-acrylics';
+  const normalized = (name || '').toLowerCase();
+  if (normalized.includes('acrylic')) {
+    if (normalized.includes('glitter')) return 'glitter-acrylics';
+    if (normalized.includes('core')) return 'core-acrylics';
     return 'colour-acrylics';
   }
-  // Otherwise the base name before any code/size qualifier.
-  return n.replace(/\(.*?\)/g, '').split(/[-–—]/)[0].trim() || n;
+  return normalized.replace(/\(.*?\)/g, '').split('-')[0].trim() || normalized;
 };
 
-const stockLevel = (p: any): number =>
+const stockLevel = (product: ProductRow): number =>
   Math.max(
-    Number(p.stock_on_hand) || 0,
-    Number(p.stock_available) || 0,
-    Number(p.stock) || 0,
-    Number(p.inventory_quantity) || 0,
+    Number(product.stock_on_hand) || 0,
+    Number(product.stock_available) || 0,
+    Number(product.stock) || 0,
+    Number(product.inventory_quantity) || 0,
   );
 
-// Pick up to `count` items, preferring one per family first, then filling.
-const pickWithVariety = (items: FeaturedItem[], families: string[], count: number): FeaturedItem[] => {
+const pickWithVariety = (items: FeaturedItem[], count: number): FeaturedItem[] => {
   const picked: FeaturedItem[] = [];
-  const used = new Set<number>();
-  const famCount: Record<string, number> = {};
+  const usedFamilies = new Set<string>();
 
-  for (let cap = 1; cap <= 3 && picked.length < count; cap++) {
-    for (let i = 0; i < items.length && picked.length < count; i++) {
-      if (used.has(i)) continue;
-      const k = families[i];
-      if ((famCount[k] || 0) < cap) {
-        picked.push(items[i]);
-        used.add(i);
-        famCount[k] = (famCount[k] || 0) + 1;
-      }
+  items.forEach((item) => {
+    const family = familyKey(item.name);
+    if (picked.length < count && !usedFamilies.has(family)) {
+      picked.push(item);
+      usedFamilies.add(family);
     }
-  }
+  });
+
+  items.forEach((item) => {
+    if (picked.length < count && !picked.some((pickedItem) => pickedItem.id === item.id)) {
+      picked.push(item);
+    }
+  });
+
   return picked;
 };
 
@@ -64,6 +76,7 @@ export const FeaturedProducts: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false;
+
     (async () => {
       try {
         const { data, error } = await supabase
@@ -78,63 +91,65 @@ export const FeaturedProducts: React.FC = () => {
           return;
         }
 
-        const available: FeaturedItem[] = data
-          .filter((p: any) =>
-            (p.product_type || '') !== 'course' &&
-            p.out_of_stock !== true &&
-            stockLevel(p) > 0 &&
-            (p.thumbnail_url || p.image_url),
+        const products = data as ProductRow[];
+        const available: FeaturedItem[] = products
+          .filter((product) =>
+            (product.product_type || '') !== 'course' &&
+            product.out_of_stock !== true &&
+            stockLevel(product) > 0 &&
+            (product.thumbnail_url || product.image_url),
           )
-          .map((p: any) => ({
-            id: p.id,
-            name: p.name,
-            slug: p.slug,
-            price: Number(p.price) || 0,
-            compareAtPrice: p.compare_at_price ? Number(p.compare_at_price) : undefined,
-            shortDescription: p.short_description,
-            image: p.thumbnail_url || p.image_url,
+          .map((product) => ({
+            id: product.id,
+            name: product.name,
+            slug: product.slug,
+            price: Number(product.price) || 0,
+            compareAtPrice: product.compare_at_price ? Number(product.compare_at_price) : undefined,
+            shortDescription: product.short_description || undefined,
+            image: product.thumbnail_url || product.image_url || '',
             inStock: true,
           }));
 
-        const families = available.map((it) => familyKey(it.name));
-        const chosen = pickWithVariety(available, families, 6);
-
         if (!cancelled) {
-          setItems(chosen);
+          setItems(pickWithVariety(available, 4));
           setLoading(false);
         }
       } catch {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => { cancelled = true; };
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Duplicate the list so the marquee loops seamlessly (translateX 0 -> -50%).
-  const loopItems = useMemo(() => (items.length ? [...items, ...items] : []), [items]);
-  // Slow it down as the list grows so speed feels consistent.
-  const durationSec = Math.max(28, items.length * 7);
+  if (loading) {
+    return (
+      <section className="home-products" aria-label="Loading new products">
+        <div className="home-shell home-products__skeleton">
+          {[0, 1, 2, 3].map((item) => <div key={item} aria-hidden="true" />)}
+        </div>
+      </section>
+    );
+  }
 
-  if (loading) return <div className="py-20 text-center text-gray-400">Loading new arrivals…</div>;
   if (items.length === 0) return null;
 
   return (
-    <section className="section-padding bg-white overflow-hidden">
+    <section className="home-products" aria-labelledby="new-products-heading">
       <Container>
-        <div className="text-center mb-10 md:mb-12">
-          <span className="inline-block text-xs font-bold tracking-[0.3em] uppercase text-pink-500 mb-3">Fresh Drops</span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">New &amp; Featured</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            The latest additions to the BLOM range — freshly stocked and ready to shop.
-          </p>
-        </div>
-      </Container>
+        <header className="home-section-heading home-section-heading--products">
+          <div>
+            <h2 id="new-products-heading">Fresh additions for your kit.</h2>
+            <p>New professional products, selected from the latest BLOM releases.</p>
+          </div>
+          <a href="/shop?q=new">Shop all new arrivals</a>
+        </header>
 
-      {/* Full-bleed marquee track */}
-      <div className="nf__marquee" aria-label="New and featured products carousel">
-        <ul className="nf__track" style={{ ['--nf-duration' as any]: `${durationSec}s` }}>
-          {loopItems.map((item, idx) => (
-            <li className="nf__slide" key={`${item.id}-${idx}`} aria-hidden={idx >= items.length}>
+        <ul className="home-products__grid">
+          {items.map((item) => (
+            <li key={item.id}>
               <ProductCard
                 id={item.id}
                 name={item.name}
@@ -145,12 +160,12 @@ export const FeaturedProducts: React.FC = () => {
                 images={[item.image]}
                 inStock={item.inStock}
                 badges={['New']}
-                hoverShine={true}
+                hoverShine={false}
               />
             </li>
           ))}
         </ul>
-      </div>
+      </Container>
     </section>
   );
 };

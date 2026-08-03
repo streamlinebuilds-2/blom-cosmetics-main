@@ -11,7 +11,7 @@ const CoursesPage: React.FC = () => {
     {
       id: 1,
       slug: 'professional-acrylic-training',
-      title: 'Professional Acrylic Training',
+      title: 'Ultimate Acrylic Nail Course',
       description: 'Hands-on, career-start acrylic training in Randfontein. Master prep, application, structure & finishing in 5 days.',
       image: '/professional-acrylic-training-hero.webp',
       duration: '5 Days',
