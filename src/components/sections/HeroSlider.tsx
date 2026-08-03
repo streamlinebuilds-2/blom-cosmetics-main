@@ -1,18 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import fleurCollectionHero from '../../assets/homepage/fleur-collection-hero.webp';
+import React, { useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Droplets, GraduationCap, Sparkles } from 'lucide-react';
 import peonyBlushGelPolish from '../../assets/homepage/peony-blush-gel-polish.webp';
-import pinkHydrangeaGelPolish from '../../assets/homepage/pink-hydrangea-gel-polish.webp';
 
-interface HeroImage { src: string; alt: string }
+interface HeroImage {
+  src: string;
+  alt: string;
+  position?: string;
+}
 interface HeroSlide {
   id: string;
   eyebrow: string;
+  tabLabel: string;
   title: string;
   description: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  kind: 'products' | 'academy';
+  kind: 'gel' | 'prep' | 'academy';
+  stamp: string;
+  layout: 'cascade' | 'split' | 'stack';
   images: HeroImage[];
 }
 
@@ -24,18 +29,38 @@ const responsiveSrcSet = (src: string) => {
     .join(', ');
 };
 
-const productImages: HeroImage[] = [
+const gelImages: HeroImage[] = [
   {
-    src: fleurCollectionHero,
-    alt: 'BLOM Fleur de Berry gel polish collection with fresh flowers',
+    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785756396/homepage/hero/gel-system-collection-mobile.jpg',
+    alt: 'BLOM gel polish collection styled with vivid pink flowers and pearls',
+    position: 'center 54%',
   },
   {
     src: peonyBlushGelPolish,
     alt: 'BLOM Peony Blush gel polish from the Fleur de Berry collection',
   },
   {
-    src: pinkHydrangeaGelPolish,
-    alt: 'BLOM pink gel polish styled with hydrangea flowers',
+    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785756402/homepage/hero/gel-system-manicure.png',
+    alt: 'Finished BLOM gel manicure in pink, lilac, mint and soft nail-art shades',
+    position: 'center 48%',
+  },
+];
+
+const prepImages: HeroImage[] = [
+  {
+    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785757915/homepage/hero/prep-finish-system-mobile.png',
+    alt: 'BLOM Primer, Top Coat, Nail Liquid and Rainbow Sprinkle professional system',
+    position: 'center 52%',
+  },
+  {
+    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785757921/homepage/hero/primer-application.png',
+    alt: 'BLOM acid-free primer being applied precisely to a prepared natural nail',
+    position: 'center',
+  },
+  {
+    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785757926/homepage/hero/top-coat-result.png',
+    alt: 'Finished white shimmer manicure created with BLOM Fairy Dust Top Coat',
+    position: 'center',
   },
 ];
 
@@ -56,45 +81,78 @@ const academyImages: HeroImage[] = [
 
 const baseSlides: HeroSlide[] = [
   {
-    id: 'professional-products',
-    eyebrow: 'BLOM Professional',
-    title: 'Professional products. Made to perform.',
-    description: 'Reliable systems, refined finishes and artist-led education for nail professionals who care about every detail.',
-    primaryCta: { label: 'Shop best sellers', href: '/shop' },
-    secondaryCta: { label: 'Discover new arrivals', href: '/shop?q=new' },
-    kind: 'products',
-    images: productImages,
+    id: 'gel-system',
+    eyebrow: 'New gel system',
+    tabLabel: 'Gel system',
+    title: 'Fresh colour. Serious performance.',
+    description: 'Discover BLOM gel colour, bases and finishes designed to work beautifully from first coat to final shine.',
+    primaryCta: { label: 'Shop the gel system', href: '/shop?category=gel-system' },
+    secondaryCta: { label: 'See new arrivals', href: '/shop?q=new' },
+    kind: 'gel',
+    stamp: 'New colour energy',
+    layout: 'cascade',
+    images: gelImages,
+  },
+  {
+    id: 'prep-and-finish',
+    eyebrow: 'Prep & finish',
+    tabLabel: 'Prep & finish',
+    title: 'The details that make a set last.',
+    description: 'Build a dependable routine with professional prep, primers, bases and finishing products from BLOM.',
+    primaryCta: { label: 'Shop prep & finish', href: '/shop?category=prep-finishing' },
+    secondaryCta: { label: 'Browse all products', href: '/shop' },
+    kind: 'prep',
+    stamp: 'Made for lasting sets',
+    layout: 'split',
+    images: prepImages,
   },
   {
     id: 'academy',
     eyebrow: 'BLOM Academy',
+    tabLabel: 'Academy',
     title: 'Learn the technique. Build the confidence.',
     description: 'Practical training, focused online lessons and techniques you can take straight to your next client.',
     primaryCta: { label: 'Explore courses', href: '/courses' },
     secondaryCta: { label: 'View online workshops', href: '/courses#online-workshops' },
     kind: 'academy',
+    stamp: 'Learn with BLOM',
+    layout: 'stack',
     images: academyImages,
   },
 ];
 
 export const HeroSlider: React.FC = () => {
   const [current, setCurrent] = useState(0);
+  const touchStartX = useRef<number | null>(null);
   const slide = baseSlides[current];
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const interval = window.setInterval(() => {
-      setCurrent((value) => (value + 1) % baseSlides.length);
-    }, 8500);
-    return () => window.clearInterval(interval);
-  }, []);
 
   const next = () => setCurrent((value) => (value + 1) % baseSlides.length);
   const previous = () => setCurrent((value) => (value - 1 + baseSlides.length) % baseSlides.length);
+  const handleTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+  const handleTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
+    if (touchStartX.current === null) return;
+    const distance = (event.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(distance) < 45) return;
+    if (distance < 0) next();
+    else previous();
+  };
+
+  const StampIcon = slide.kind === 'academy'
+    ? GraduationCap
+    : slide.kind === 'prep'
+      ? Droplets
+      : Sparkles;
 
   return (
-    <section className={`home-hero home-hero--${slide.kind}`} aria-labelledby={`hero-title-${slide.id}`}>
-      <div className="home-hero__wash" aria-hidden="true" />
+    <section
+      className={`home-hero home-hero--${slide.kind} home-hero--layout-${slide.layout}`}
+      aria-labelledby={`hero-title-${slide.id}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="home-shell home-hero__layout" key={slide.id}>
         <div className="home-hero__copy">
           <p className="home-eyebrow">{slide.eyebrow}</p>
@@ -128,14 +186,19 @@ export const HeroSlider: React.FC = () => {
                   : '(max-width: 860px) 42vw, 18vw'}
                 alt={image.alt}
                 loading={current === 0 && index === 0 ? 'eager' : 'lazy'}
+                style={image.position ? { objectPosition: image.position } : undefined}
               />
             </figure>
           ))}
+          <span className="home-hero__stamp" aria-hidden="true">
+            <StampIcon />
+            {slide.stamp}
+          </span>
         </div>
       </div>
 
       <div className="home-shell home-hero__controls">
-        <div>
+        <div className="home-hero__arrows">
           <button type="button" onClick={previous} aria-label="Previous hero slide">
             <ArrowLeft aria-hidden="true" />
           </button>
@@ -143,6 +206,23 @@ export const HeroSlider: React.FC = () => {
             <ArrowRight aria-hidden="true" />
           </button>
         </div>
+        <div className="home-hero__tabs" aria-label="Choose a hero story">
+          {baseSlides.map((item, index) => (
+            <button
+              type="button"
+              className={index === current ? 'is-active' : undefined}
+              aria-current={index === current ? 'true' : undefined}
+              onClick={() => setCurrent(index)}
+              key={item.id}
+            >
+              <span aria-hidden="true">0{index + 1}</span>
+              {item.tabLabel}
+            </button>
+          ))}
+        </div>
+        <span className="home-hero__count" aria-hidden="true">
+          0{current + 1} / 0{baseSlides.length}
+        </span>
       </div>
       <p className="sr-only" aria-live="polite">
         Showing slide {current + 1}: {slide.title}

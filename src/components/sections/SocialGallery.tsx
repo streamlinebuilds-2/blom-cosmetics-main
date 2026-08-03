@@ -1,56 +1,54 @@
 import React from 'react';
 import { ArrowUpRight, Facebook, Instagram } from 'lucide-react';
-import fleurCollectionHero from '../../assets/homepage/fleur-collection-hero.webp';
-import gelPolishLineup from '../../assets/homepage/gel-polish-lineup.webp';
-import peonyBlushGelPolish from '../../assets/homepage/peony-blush-gel-polish.webp';
-import pinkHydrangeaGelPolish from '../../assets/homepage/pink-hydrangea-gel-polish.webp';
-import rosePourGelPolish from '../../assets/homepage/rose-pour-gel-polish.webp';
 
 const INSTAGRAM_URL = 'https://www.instagram.com/cosmetics_blom/';
 const FACEBOOK_URL = 'https://www.facebook.com/profile.php?id=61581058185006';
+const CLOUDINARY_BASE = 'https://res.cloudinary.com/drsrbzm2t/image/upload';
+
+const socialImage = (version: string, publicId: string, width: number) =>
+  `${CLOUDINARY_BASE}/f_auto,q_auto,w_${width},h_${width},c_fill,g_auto/${version}/homepage/social/${publicId}`;
 
 const posts = [
   {
-    image: fleurCollectionHero,
-    alt: 'The BLOM Fleur de Berry gel polish collection styled with flowers',
+    href: 'https://www.instagram.com/p/DbbaL53twx-/',
+    image: { version: 'v1785752009', publicId: 'nail-art-statement' },
+    alt: 'Statement nude and white stiletto nail set with crystals and sculpted flowers',
     platform: 'Instagram',
-    href: INSTAGRAM_URL,
   },
   {
-    image: peonyBlushGelPolish,
-    alt: 'BLOM Peony Blush gel polish',
-    platform: 'Facebook',
-    href: FACEBOOK_URL,
-  },
-  {
-    image: pinkHydrangeaGelPolish,
-    alt: 'BLOM pink gel polish with hydrangea flowers',
+    href: 'https://www.instagram.com/p/DbP81PrtFU_/',
+    image: { version: 'v1785752015', publicId: 'pink-hydrangea-gel' },
+    alt: 'BLOM pink gel polish styled with vivid hydrangea flowers',
     platform: 'Instagram',
-    href: INSTAGRAM_URL,
   },
   {
-    image: gelPolishLineup,
-    alt: 'A line-up of BLOM professional gel polish colours',
+    href: 'https://www.facebook.com/photo.php?fbid=122143096635035272&set=pb.61581058185006.-2207520000&type=3',
+    image: { version: 'v1785752017', publicId: 'navy-silver-nail-set' },
+    alt: 'Navy, nude and silver BLOM acrylic nail set',
     platform: 'Facebook',
-    href: FACEBOOK_URL,
   },
   {
-    image: rosePourGelPolish,
-    alt: 'BLOM gel polish styled with a sculptural rose',
-    platform: 'Facebook',
-    href: FACEBOOK_URL,
+    href: 'https://www.instagram.com/p/DbTrsJSNr3y/',
+    image: { version: 'v1785752012', publicId: 'gel-colour-swatches' },
+    alt: 'Hand holding a fan of BLOM pink, nude, berry and glitter gel colour swatches',
+    platform: 'Instagram',
   },
   {
-    image: fleurCollectionHero,
-    alt: 'Close-up of the BLOM Fleur de Berry collection',
+    href: 'https://www.facebook.com/photo.php?fbid=122139722607035272&set=pb.61581058185006.-2207520000&type=3',
+    image: { version: 'v1785752019', publicId: 'berry-pink-nail-set' },
+    alt: 'Berry, pink and peach BLOM nail set with glitter accents',
     platform: 'Facebook',
-    href: FACEBOOK_URL,
-    position: '70% center',
+  },
+  {
+    href: 'https://www.facebook.com/photo.php?fbid=122141126853035272&set=pb.61581058185006.-2207520000&type=3',
+    image: { version: 'v1785752021', publicId: 'prep-primer-results' },
+    alt: 'BLOM Prep and Primer product result feature',
+    platform: 'Facebook',
   },
 ];
 
 export const SocialGallery: React.FC = () => (
-  <section className="home-social" aria-labelledby="social-heading">
+  <section id="social-wall" className="home-social" aria-labelledby="social-heading">
     <div className="home-shell">
       <header className="home-social__heading">
         <div>
@@ -63,8 +61,10 @@ export const SocialGallery: React.FC = () => (
       </header>
 
       <div className="home-social__grid">
-        {posts.map((post, index) => {
+        {posts.map((post) => {
           const PlatformIcon = post.platform === 'Instagram' ? Instagram : Facebook;
+
+          const src = socialImage(post.image.version, post.image.publicId, 800);
 
           return (
             <a
@@ -72,14 +72,21 @@ export const SocialGallery: React.FC = () => (
               href={post.href}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`View BLOM Cosmetics on ${post.platform}`}
-              key={`${post.platform}-${index}`}
+              aria-label={`Open this BLOM ${post.platform} post`}
+              key={post.href}
             >
               <img
-                src={post.image}
+                src={src}
+                srcSet={[
+                  `${socialImage(post.image.version, post.image.publicId, 360)} 360w`,
+                  `${socialImage(post.image.version, post.image.publicId, 600)} 600w`,
+                  `${src} 800w`,
+                ].join(', ')}
+                sizes="(max-width: 700px) 48vw, 33vw"
                 alt={post.alt}
                 loading="lazy"
-                style={post.position ? { objectPosition: post.position } : undefined}
+                width="800"
+                height="800"
               />
               <span className="home-social__platform">
                 <PlatformIcon aria-hidden="true" />

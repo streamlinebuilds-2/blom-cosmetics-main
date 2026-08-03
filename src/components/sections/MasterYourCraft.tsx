@@ -19,7 +19,7 @@ const courses = [
     className: 'academy-course--compact',
   },
   {
-    title: 'Faded Flowers Workshop',
+    title: 'Faded Flowers',
     meta: 'Self-paced',
     location: 'Online',
     href: '/courses/faded-flowers-workshop',
