@@ -6,58 +6,33 @@
    CRITICAL: Must be after design system imports
    ======================================== */
 
-html {
-  color-scheme: light !important;
-  forced-color-adjust: none !important;
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-}
-
-html, body {
-  color-scheme: light !important;
-  forced-color-adjust: none !important;
-  background-color: #ffffff !important;
-  background: #ffffff !important;
-  color: #000000 !important;
-}
-
-/* Override Android/Samsung/Chrome dark mode */
-@media (prefers-color-scheme: dark) {
-  html, body {
-    color-scheme: light !important;
-    forced-color-adjust: none !important;
-    background-color: #ffffff !important;
-    background: #ffffff !important;
-    color: #000000 !important;
-  }
-  
-  * {
-    color-scheme: light !important;
-  }
-}
-
-/* Block system-level dark mode */
-* {
-  color-scheme: light !important;
+:root,
+html,
+body {
+  color-scheme: only light;
+  background-color: #ffffff;
 }
 
 #root {
-  background-color: #ffffff !important;
-  color: #000000 !important;
+  min-height: 100%;
+  background-color: #ffffff;
 }
 
-:root {
-  color-scheme: light only !important;
-  forced-color-adjust: none !important;
-  background-color: #ffffff !important;
+input,
+textarea,
+select,
+button {
+  color-scheme: only light;
 }
 
-/* iOS Safari specific */
-@supports (-webkit-touch-callout: none) {
-  html, body {
-    color-scheme: light !important;
-    forced-color-adjust: none !important;
-    background-color: #ffffff !important;
+/* Keep the BLOM light theme even when the device requests dark mode. */
+@media (prefers-color-scheme: dark) {
+  :root,
+  html,
+  body,
+  #root {
+    color-scheme: only light;
+    background-color: #ffffff;
   }
 }
 

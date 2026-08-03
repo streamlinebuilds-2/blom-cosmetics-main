@@ -1,6 +1,9 @@
-import React, { useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Droplets, GraduationCap, Sparkles } from 'lucide-react';
-import peonyBlushGelPolish from '../../assets/homepage/peony-blush-gel-polish.webp';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight, Droplets, GraduationCap, Palette, Sparkles } from 'lucide-react';
+import academyHero from '../../assets/homepage/hero-academy.webp';
+import acrylicHero from '../../assets/homepage/hero-acrylic-system.webp';
+import gelHero from '../../assets/homepage/hero-gel-system.webp';
+import prepHero from '../../assets/homepage/hero-prep-finish.webp';
 
 interface HeroImage {
   src: string;
@@ -15,69 +18,10 @@ interface HeroSlide {
   description: string;
   primaryCta: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
-  kind: 'gel' | 'prep' | 'academy';
+  kind: 'gel' | 'acrylic' | 'prep' | 'academy';
   stamp: string;
-  layout: 'cascade' | 'split' | 'stack';
-  images: HeroImage[];
+  image: HeroImage;
 }
-
-const responsiveSrcSet = (src: string) => {
-  if (!src.includes('res.cloudinary.com')) return undefined;
-
-  return [480, 800, 1400]
-    .map((width) => `${src.replace(/w_\d+/, `w_${width}`)} ${width}w`)
-    .join(', ');
-};
-
-const gelImages: HeroImage[] = [
-  {
-    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785756396/homepage/hero/gel-system-collection-mobile.jpg',
-    alt: 'BLOM gel polish collection styled with vivid pink flowers and pearls',
-    position: 'center 54%',
-  },
-  {
-    src: peonyBlushGelPolish,
-    alt: 'BLOM Peony Blush gel polish from the Fleur de Berry collection',
-  },
-  {
-    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785756402/homepage/hero/gel-system-manicure.png',
-    alt: 'Finished BLOM gel manicure in pink, lilac, mint and soft nail-art shades',
-    position: 'center 48%',
-  },
-];
-
-const prepImages: HeroImage[] = [
-  {
-    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785757915/homepage/hero/prep-finish-system-mobile.png',
-    alt: 'BLOM Primer, Top Coat, Nail Liquid and Rainbow Sprinkle professional system',
-    position: 'center 52%',
-  },
-  {
-    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785757921/homepage/hero/primer-application.png',
-    alt: 'BLOM acid-free primer being applied precisely to a prepared natural nail',
-    position: 'center',
-  },
-  {
-    src: 'https://res.cloudinary.com/drsrbzm2t/image/upload/f_auto,q_auto,w_1400,c_limit/v1785757926/homepage/hero/top-coat-result.png',
-    alt: 'Finished white shimmer manicure created with BLOM Fairy Dust Top Coat',
-    position: 'center',
-  },
-];
-
-const academyImages: HeroImage[] = [
-  {
-    src: 'https://res.cloudinary.com/dnlgohkcc/image/upload/f_auto,q_auto,w_1200,c_limit/v1785314350/Trendy-Ring-Cover_mdc3dy.jpg',
-    alt: 'Trendy Ring Nail Art Course',
-  },
-  {
-    src: 'https://res.cloudinary.com/dnlgohkcc/image/upload/f_auto,q_auto,w_900,c_limit/v1775453928/WhatsApp_Image_2026-04-03_at_12.34.07_uelxcc.jpg',
-    alt: 'Faded Flowers nail art course',
-  },
-  {
-    src: 'https://res.cloudinary.com/dy1gw7dr2/image/upload/f_auto,q_auto,w_900,c_limit/v1778573976/WhatsApp_Image_2026-05-11_at_14.38.55_ojc1qq.jpg',
-    alt: 'Hands-on BLOM nail training',
-  },
-];
 
 const baseSlides: HeroSlide[] = [
   {
@@ -90,21 +34,43 @@ const baseSlides: HeroSlide[] = [
     secondaryCta: { label: 'See new arrivals', href: '/shop?q=new' },
     kind: 'gel',
     stamp: 'New colour energy',
-    layout: 'cascade',
-    images: gelImages,
+    image: {
+      src: gelHero,
+      alt: 'BLOM gel polish collection styled with vivid pink flowers and pearls',
+      position: 'center',
+    },
+  },
+  {
+    id: 'acrylic-system',
+    eyebrow: 'Acrylic system',
+    tabLabel: 'Acrylic',
+    title: 'Bold colour. Endless creativity.',
+    description: 'Create standout sets with smooth professional acrylic powders, from saturated colour to high-impact glitter.',
+    primaryCta: { label: 'Shop coloured acrylics', href: '/shop?category=coloured-acrylics' },
+    secondaryCta: { label: 'Shop glitter acrylics', href: '/shop?category=glitter-acrylics' },
+    kind: 'acrylic',
+    stamp: 'Made for nail artists',
+    image: {
+      src: acrylicHero,
+      alt: 'Stacked BLOM blue, pink, glitter and red acrylic powders surrounded by flowers',
+      position: 'center',
+    },
   },
   {
     id: 'prep-and-finish',
     eyebrow: 'Prep & finish',
-    tabLabel: 'Prep & finish',
+    tabLabel: 'Prep',
     title: 'The details that make a set last.',
     description: 'Build a dependable routine with professional prep, primers, bases and finishing products from BLOM.',
     primaryCta: { label: 'Shop prep & finish', href: '/shop?category=prep-finishing' },
     secondaryCta: { label: 'Browse all products', href: '/shop' },
     kind: 'prep',
     stamp: 'Made for lasting sets',
-    layout: 'split',
-    images: prepImages,
+    image: {
+      src: prepHero,
+      alt: 'BLOM Prep and Primer bottles styled with white flowers and powder-blue fabric',
+      position: 'center',
+    },
   },
   {
     id: 'academy',
@@ -116,40 +82,70 @@ const baseSlides: HeroSlide[] = [
     secondaryCta: { label: 'View online workshops', href: '/courses#online-workshops' },
     kind: 'academy',
     stamp: 'Learn with BLOM',
-    layout: 'stack',
-    images: academyImages,
+    image: {
+      src: academyHero,
+      alt: 'Professional BLOM Academy acrylic application training',
+      position: 'center',
+    },
   },
 ];
 
 export const HeroSlider: React.FC = () => {
   const [current, setCurrent] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const slide = baseSlides[current];
+
+  useEffect(() => {
+    if (isPaused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const interval = window.setInterval(() => {
+      setCurrent((value) => (value + 1) % baseSlides.length);
+    }, 3000);
+
+    return () => window.clearInterval(interval);
+  }, [isPaused]);
 
   const next = () => setCurrent((value) => (value + 1) % baseSlides.length);
   const previous = () => setCurrent((value) => (value - 1 + baseSlides.length) % baseSlides.length);
   const handleTouchStart = (event: React.TouchEvent<HTMLElement>) => {
+    setIsPaused(true);
     touchStartX.current = event.touches[0]?.clientX ?? null;
   };
   const handleTouchEnd = (event: React.TouchEvent<HTMLElement>) => {
-    if (touchStartX.current === null) return;
+    if (touchStartX.current === null) {
+      setIsPaused(false);
+      return;
+    }
     const distance = (event.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
     touchStartX.current = null;
-    if (Math.abs(distance) < 45) return;
-    if (distance < 0) next();
-    else previous();
+    if (Math.abs(distance) >= 45) {
+      if (distance < 0) next();
+      else previous();
+    }
+    setIsPaused(false);
   };
 
   const StampIcon = slide.kind === 'academy'
     ? GraduationCap
     : slide.kind === 'prep'
       ? Droplets
-      : Sparkles;
+      : slide.kind === 'acrylic'
+        ? Palette
+        : Sparkles;
 
   return (
     <section
-      className={`home-hero home-hero--${slide.kind} home-hero--layout-${slide.layout}`}
+      className={`home-hero home-hero--${slide.kind}`}
       aria-labelledby={`hero-title-${slide.id}`}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocusCapture={() => setIsPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setIsPaused(false);
+        }
+      }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
@@ -170,26 +166,18 @@ export const HeroSlider: React.FC = () => {
           </div>
         </div>
 
-        <div className="home-hero__visual" aria-label={`${slide.eyebrow} highlights`}>
-          {slide.images.map((image, index) => (
-            <figure
-              className={`home-hero__image home-hero__image--${
-                index === 0 ? 'main' : index === 1 ? 'top' : 'bottom'
-              }`}
-              key={image.src}
-            >
-              <img
-                src={image.src}
-                srcSet={responsiveSrcSet(image.src)}
-                sizes={index === 0
-                  ? '(max-width: 860px) 92vw, 44vw'
-                  : '(max-width: 860px) 42vw, 18vw'}
-                alt={image.alt}
-                loading={current === 0 && index === 0 ? 'eager' : 'lazy'}
-                style={image.position ? { objectPosition: image.position } : undefined}
-              />
-            </figure>
-          ))}
+        <div className="home-hero__visual" aria-label={`${slide.eyebrow} feature image`}>
+          <figure className="home-hero__image">
+            <img
+              src={slide.image.src}
+              sizes="(max-width: 700px) calc(100vw - 28px), (max-width: 980px) 70vw, 520px"
+              alt={slide.image.alt}
+              loading={current === 0 ? 'eager' : 'lazy'}
+              fetchPriority={current === 0 ? 'high' : 'auto'}
+              decoding="async"
+              style={slide.image.position ? { objectPosition: slide.image.position } : undefined}
+            />
+          </figure>
           <span className="home-hero__stamp" aria-hidden="true">
             <StampIcon />
             {slide.stamp}
