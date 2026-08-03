@@ -1,4 +1,5 @@
 import type { Handler } from '@netlify/functions'
+import { TRENDY_RING_OFFER_PRODUCT_SLUGS } from './_lib/trendy-ring-offer'
 import crypto from 'crypto'
 
 export const handler: Handler = async (event) => {
@@ -136,9 +137,48 @@ export const handler: Handler = async (event) => {
         base_name: baseName,
         variant_name: variantName, // Store variant separately
         quantity: Number(it.quantity || 1),
-        unit_price: Number(it.unit_price ?? it.price ?? 0),
+        unit_price: resolvedProduct
+          ? Math.round(Number(resolvedProduct.price || 0) * 100)
+          : Number(it.unit_price ?? it.price ?? 0),
         original_sku: it.sku
       });
+    }
+
+    // Lock the Trendy Ring course price and identity to the Store catalog.
+    // The public form may display the price, but cannot choose what is charged.
+    if (orderKind === 'course' && body.course_booking?.course_slug === 'trendy-ring-nail-art-course') {
+      const courseRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/courses?slug=eq.trendy-ring-nail-art-course&select=id,slug,title,price&limit=1`,
+        { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+      )
+      const courseRows = courseRes.ok ? await courseRes.json() : []
+      const catalogCourse = Array.isArray(courseRows) ? courseRows[0] : null
+      if (!catalogCourse || Number(catalogCourse.price) !== 650) {
+        return {
+          statusCode: 503,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ error: 'This course is not available for checkout yet.' })
+        }
+      }
+
+      const canonicalCoursePriceCents = Math.round(Number(catalogCourse.price) * 100)
+      if (validItems[0]) {
+        validItems[0].base_name = `${catalogCourse.title} - Complete Course Purchase`
+        validItems[0].unit_price = canonicalCoursePriceCents
+        validItems[0].quantity = 1
+      }
+      body.course_booking.course_title = catalogCourse.title
+      body.course_booking.course_type = 'online'
+      body.course_booking.selected_package = 'Complete Course'
+      body.course_booking.amount_paid_cents = canonicalCoursePriceCents
+      body.course_booking.amount_owed_cents = 0
+      body.course_booking.payment_kind = 'full'
+      body.course_booking.details = {
+        ...(body.course_booking.details || {}),
+        course_id: catalogCourse.id,
+        course_price_cents: canonicalCoursePriceCents,
+        deposit_cents: 0
+      }
     }
 
     // --- FIX 1 & 2: Normalize Fulfillment Method ---
@@ -187,8 +227,204 @@ export const handler: Handler = async (event) => {
       shippingCents = subtotalCents >= 2500 * 100 ? 0 : 125 * 100
     }
 
-    const rawDiscountCents = Math.round(Number(body.totals?.discount_cents ?? body.discount_cents ?? 0))
-    const discountCents = Math.max(0, Math.min(rawDiscountCents, subtotalCents + shippingCents))
+    // Coupon totals are always recalculated server-side. The frontend may show
+    // an estimate, but it cannot choose the final discount or impersonate the
+    // owner of an account-bound course benefit.
+    const couponCode = String(body.coupon?.code || '').trim().toUpperCase()
+    let discountCents = 0
+
+    if (couponCode) {
+      const canonicalCart = validItems.map((it) => {
+        const canonicalPriceCents = it.resolved_product
+          ? Math.round(Number(it.resolved_product.price || 0) * 100)
+          : Math.max(0, Math.round(Number(it.unit_price || 0)))
+        return {
+          product_id: String(it.resolved_id || ''),
+          name: String(it.resolved_product?.name || it.base_name || ''),
+          quantity: Math.max(1, Math.floor(Number(it.quantity || 1))),
+          unit_price_cents: canonicalPriceCents
+        }
+      })
+
+      // Private, single-use owner test discount for the unlisted Trendy Ring
+      // course. The coupon row is email-locked and marked server-side; the
+      // public code alone is never sufficient to receive this discount.
+      if (couponCode.startsWith('RING-TEST-')) {
+        if (orderKind !== 'course' || body.course_booking?.course_slug !== 'trendy-ring-nail-art-course') {
+          return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This private test discount is only valid for the Trendy Ring course.' })
+          }
+        }
+
+        const authHeader = event.headers.authorization || (event.headers as any).Authorization
+        if (!authHeader) {
+          return {
+            statusCode: 401,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Log in with the BLOM owner account to use the private test discount.' })
+          }
+        }
+
+        const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: { apikey: SERVICE_KEY, Authorization: authHeader }
+        })
+        const user = userRes.ok ? await userRes.json() : null
+        const accountEmail = String(user?.email || '').toLowerCase().trim()
+        const buyerEmail = String(body.shippingInfo?.email || body.buyer?.email || '').toLowerCase().trim()
+
+        const testCouponRes = await fetch(
+          `${SUPABASE_URL}/rest/v1/coupons?code=eq.${encodeURIComponent(couponCode)}&select=id,status,is_active,used_count,max_uses,locked_email,notes,valid_until&limit=1`,
+          { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+        )
+        const testCoupons = testCouponRes.ok ? await testCouponRes.json() : []
+        const testCoupon = Array.isArray(testCoupons) ? testCoupons[0] : null
+        const lockedEmail = String(testCoupon?.locked_email || '').toLowerCase().trim()
+        const isExpired = testCoupon?.valid_until && new Date(testCoupon.valid_until).getTime() <= Date.now()
+
+        if (!accountEmail) {
+          return {
+            statusCode: 401,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Your Store login expired. Please log in again and reopen the R5 test link.' })
+          }
+        }
+
+        if (lockedEmail !== accountEmail) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This R5 test link is locked to a different Store account.' })
+          }
+        }
+
+        if (buyerEmail !== accountEmail) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Use the same email as your logged-in Store account for this R5 test.' })
+          }
+        }
+
+        if (
+          testCoupon?.notes !== 'TRENDY_RING_PRIVATE_R5_TEST' ||
+          testCoupon?.status !== 'active' ||
+          testCoupon?.is_active !== true ||
+          Number(testCoupon?.used_count || 0) >= Number(testCoupon?.max_uses || 1) ||
+          isExpired
+        ) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This R5 test discount is invalid, expired, or has already been used.' })
+          }
+        }
+
+        discountCents = Math.max(0, subtotalCents - 500)
+        body.course_booking.amount_paid_cents = subtotalCents - discountCents
+        body.course_booking.details = {
+          ...(body.course_booking.details || {}),
+          list_price_cents: subtotalCents,
+          private_test_discount_cents: discountCents
+        }
+      } else {
+      const benefitRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/course_benefits?coupon_code=eq.${encodeURIComponent(couponCode)}&select=id,status,buyer_email,coupon_id&limit=1`,
+        { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+      )
+      const benefits = benefitRes.ok ? await benefitRes.json() : []
+      const benefit = Array.isArray(benefits) ? benefits[0] : null
+
+      if (benefit) {
+        const authHeader = event.headers.authorization || (event.headers as any).Authorization
+        if (!authHeader) {
+          return {
+            statusCode: 401,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Log in to use this course offer.' })
+          }
+        }
+
+        const userRes = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: { apikey: SERVICE_KEY, Authorization: authHeader }
+        })
+        const user = userRes.ok ? await userRes.json() : null
+        const accountEmail = String(user?.email || '').toLowerCase().trim()
+        const buyerEmail = String(body.shippingInfo?.email || body.buyer?.email || '').toLowerCase().trim()
+
+        if (!accountEmail || accountEmail !== String(benefit.buyer_email || '').toLowerCase().trim()) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'This course offer belongs to a different Store account.' })
+          }
+        }
+        if (buyerEmail !== accountEmail) {
+          return {
+            statusCode: 403,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Use your Store account email at checkout for this offer.' })
+          }
+        }
+        if (!['eligible', 'claimed'].includes(String(benefit.status))) {
+          return {
+            statusCode: 409,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: benefit.status === 'redeemed' ? 'This offer has already been redeemed.' : 'This offer is no longer active.' })
+          }
+        }
+
+        const pairItems = TRENDY_RING_OFFER_PRODUCT_SLUGS.map((slug) =>
+          validItems.find((it) => it.resolved_product?.slug === slug && Number(it.quantity || 0) >= 1)
+        )
+        if (pairItems.some((item) => !item)) {
+          return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: 'Add one White and one Clear Petal Paste to use your R399 course offer.' })
+          }
+        }
+
+        const pairTotalCents = pairItems.reduce(
+          (sum, item) => sum + Math.round(Number(item!.resolved_product.price || 0) * 100),
+          0
+        )
+        discountCents = Math.max(0, pairTotalCents - 39900)
+      } else {
+        const couponRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
+          method: 'POST',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            p_code: couponCode,
+            p_email: String(body.shippingInfo?.email || body.buyer?.email || '').toLowerCase().trim(),
+            p_order_total_cents: canonicalCart.reduce(
+              (sum, item) => sum + item.quantity * item.unit_price_cents,
+              0
+            ),
+            p_cart_items: canonicalCart
+          })
+        })
+        const couponRows = couponRes.ok ? await couponRes.json() : []
+        const coupon = Array.isArray(couponRows) ? couponRows[0] : couponRows
+        if (!couponRes.ok || !coupon?.valid) {
+          return {
+            statusCode: 400,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ error: coupon?.message || 'Coupon validation failed.' })
+          }
+        }
+        discountCents = Math.max(
+          0,
+          Math.min(Math.round(Number(coupon.discount_cents || 0)), subtotalCents + shippingCents)
+        )
+      }
+      }
+    }
 
     // 3. Create Order via RPC
     const rpcPayload = {
@@ -230,7 +466,7 @@ export const handler: Handler = async (event) => {
       p_fulfillment_method: fulfillmentMethod,
       p_delivery_address: deliveryAddress,
       p_collection_location: collectionLocation,
-      p_coupon_code: body.coupon?.code || null,
+      p_coupon_code: couponCode || null,
       p_order_kind: orderKind
     };
 

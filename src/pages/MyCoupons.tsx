@@ -13,7 +13,7 @@ interface Coupon {
   type: string | null;
   value: number | null;
   percent: number | null;
-  valid_until: string;
+  valid_until: string | null;
   used_count: number;
   max_uses: number;
   min_order_cents: number | null;
@@ -74,6 +74,7 @@ export default function MyCoupons() {
   };
 
   const discountLabel = (coupon: Coupon) => {
+    if (coupon.code.startsWith('RING-')) return 'R399 PAIR';
     if (coupon.type === 'fixed' && coupon.value) return `R${coupon.value} OFF`;
     if (coupon.type === 'percent' && coupon.percent) return `${coupon.percent}% OFF`;
     if (coupon.percent) return `${coupon.percent}% OFF`;
@@ -160,6 +161,7 @@ export default function MyCoupons() {
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {coupons.map((coupon) => {
                 const isCopied = copiedId === coupon.id;
+                const isRingOffer = coupon.code.startsWith('RING-');
                 const remaining = usesRemaining(coupon);
                 const sub = discountSublabel(coupon);
 
@@ -209,12 +211,26 @@ export default function MyCoupons() {
                         )}
                         <div className="flex items-center gap-2">
                           <Calendar className="h-3.5 w-3.5 text-gray-400" />
-                          <span>Expires {formatDate(coupon.valid_until)}</span>
+                          <span>{coupon.valid_until ? `Expires ${formatDate(coupon.valid_until)}` : 'Never expires'}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Ticket className="h-3.5 w-3.5 text-gray-400" />
                           <span>{remaining} use{remaining !== 1 ? 's' : ''} remaining</span>
                         </div>
+                        {isRingOffer && (
+                          <div className="pt-3">
+                            <p className="mb-3 text-xs leading-5 text-gray-500">
+                              One White and one Clear Petal Paste for R399 together.
+                            </p>
+                            <Button
+                              fullWidth
+                              size="sm"
+                              onClick={() => { window.location.href = '/offers/trendy-ring-petal-paste'; }}
+                            >
+                              Shop your course offer
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
