@@ -1,19 +1,6 @@
-import React, { useRef } from 'react';
-import { motion, useInView, type Variants } from 'framer-motion';
+import React from 'react';
 import { Container } from '../layout/Container';
-import { Sparkles, Droplet, Palette, GraduationCap } from 'lucide-react';
-
-const ease = [0.22, 1, 0.36, 1] as [number, number, number, number];
-
-const cardVariant: Variants = {
-  hidden: { opacity: 0, y: 30, scale: 0.97 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.55, ease } }
-};
-
-const stagger: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.09 } }
-};
+import { ArrowUpRight, Sparkles, Droplet, Palette, GraduationCap } from 'lucide-react';
 
 const categories = [
   {
@@ -47,34 +34,20 @@ const categories = [
 ];
 
 export const ShopByCategory: React.FC = () => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
-
   return (
-    <section ref={ref} className="home-categories">
+    <section className="home-categories" aria-labelledby="categories-heading">
       <Container>
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="home-section-heading"
-        >
-          <p className="home-eyebrow">Explore</p>
-          <h2>Find your system.</h2>
-          <p>Move quickly to the products, tools and training that support your work.</p>
-        </motion.div>
+        <div className="home-section-heading">
+          <p className="home-eyebrow">Shop by system</p>
+          <h2 id="categories-heading">Everything for your next set.</h2>
+          <p>Find the products, tools and training that support the way you work.</p>
+        </div>
 
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate={inView ? 'show' : 'hidden'}
-          className="home-categories__grid"
-        >
+        <div className="home-categories__grid">
           {categories.map((category) => (
-            <motion.a
+            <a
               key={category.name}
               href={category.href}
-              variants={cardVariant}
               className="home-category-card"
             >
               <div className="home-category-card__image">
@@ -88,10 +61,13 @@ export const ShopByCategory: React.FC = () => {
                 <category.icon aria-hidden="true" />
                 <h3>{category.name}</h3>
                 <p>{category.description}</p>
+                <span className="home-category-card__arrow" aria-hidden="true">
+                  <ArrowUpRight />
+                </span>
               </div>
-            </motion.a>
+            </a>
           ))}
-        </motion.div>
+        </div>
       </Container>
     </section>
   );
