@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="en" class="light" style="color-scheme: only light; background-color: #ffffff;">
+<html lang="en" style="color-scheme: light dark; background-color: #ffffff;">
   <head>
     <meta charset="UTF-8" />
     
-    <!-- FORCE LIGHT MODE ONLY - Block dark mode completely -->
-    <meta name="color-scheme" content="only light" />
-    <meta name="supported-color-schemes" content="light" />
-    <meta name="theme-color" content="#ffffff" />
+    <!-- BLOM supports an authored light and dark experience; never rely on browser inversion. -->
+    <meta name="color-scheme" content="light dark" />
+    <meta name="supported-color-schemes" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101826" media="(prefers-color-scheme: dark)" />
     
     <!-- SEO Meta Tags -->
     <title>BLOM Cosmetics - Premium Nail Care Products & Professional Training South Africa</title>
@@ -135,23 +136,15 @@
       :root,
       html,
       body {
-        color-scheme: only light;
+        color-scheme: light dark;
         background-color: #ffffff;
-      }
-
-      input,
-      textarea,
-      select,
-      button {
-        color-scheme: only light;
       }
 
       @media (prefers-color-scheme: dark) {
         :root,
         html,
         body {
-          color-scheme: only light;
-          background-color: #ffffff;
+          background-color: #101826;
         }
       }
     </style>

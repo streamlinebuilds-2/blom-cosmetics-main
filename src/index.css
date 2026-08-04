@@ -2,38 +2,21 @@
 @import './styles/design-system.css';
 
 /* ========================================
-   FORCE LIGHT MODE - ANDROID & ALL DEVICES
-   CRITICAL: Must be after design system imports
+   COLOUR-SCHEME BASELINE
+   The homepage provides a deliberate dark treatment below rather than
+   allowing a browser to blindly invert BLOM's brand colours.
    ======================================== */
 
 :root,
 html,
 body {
-  color-scheme: only light;
+  color-scheme: light dark;
   background-color: #ffffff;
 }
 
 #root {
   min-height: 100%;
   background-color: #ffffff;
-}
-
-input,
-textarea,
-select,
-button {
-  color-scheme: only light;
-}
-
-/* Keep the BLOM light theme even when the device requests dark mode. */
-@media (prefers-color-scheme: dark) {
-  :root,
-  html,
-  body,
-  #root {
-    color-scheme: only light;
-    background-color: #ffffff;
-  }
 }
 
 @tailwind base;
