@@ -111,7 +111,7 @@ export const FeaturedProducts: React.FC = () => {
           }));
 
         if (!cancelled) {
-          setItems(pickWithVariety(available, 4));
+          setItems(pickWithVariety(available, 5));
           setLoading(false);
         }
       } catch {
@@ -128,7 +128,7 @@ export const FeaturedProducts: React.FC = () => {
     return (
       <section className="home-products" aria-label="Loading new products">
         <div className="home-shell home-products__skeleton">
-          {[0, 1, 2, 3].map((item) => <div key={item} aria-hidden="true" />)}
+          {[0, 1, 2, 3, 4].map((item) => <div key={item} aria-hidden="true" />)}
         </div>
       </section>
     );

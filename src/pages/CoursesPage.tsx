@@ -3,7 +3,6 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Card, CardContent } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
 import { Clock, MapPin, DollarSign, Star, Activity, Users } from 'lucide-react';
 import { pageSEO, trackPageView, updateSEO } from '../lib/seo';
 
@@ -32,6 +31,17 @@ const CoursesPage: React.FC = () => {
   ];
 
   const onlineCourses = [
+    {
+      id: 6,
+      slug: 'trendy-ring-nail-art-course',
+      title: 'Trendy Ring Nail Art Course',
+      description: 'Master modern ring nail trends, confident placement, dimensional details, and client-ready finishing in four focused video lessons.',
+      image: 'https://res.cloudinary.com/dbhiu7lv0/image/upload/v1785340197/Trendy-Ring-Course-IMG_yltkfx.png',
+      duration: 'Self-Paced',
+      location: 'Online',
+      price: 650,
+      onSale: false
+    },
     {
       id: 2,
       slug: 'blom-flower-watercolor-workshop',

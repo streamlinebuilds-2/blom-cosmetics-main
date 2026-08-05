@@ -5,6 +5,7 @@ import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
 import { Button } from '../components/ui/Button';
 import { ClickableContact } from '../components/ui/ClickableContact';
+import { supabase } from '../lib/supabase';
 import { 
   Clock, 
   MapPin, 
@@ -30,6 +31,13 @@ export const CourseDetailPage: React.FC = () => {
   const academyCourseSlug = courseSlug === 'online-watercolour-workshop'
     ? 'blom-flower-watercolor-workshop'
     : courseSlug;
+  const privateTestCoupon = new URLSearchParams(window.location.search)
+    .get('test_coupon')
+    ?.trim()
+    .toUpperCase() || '';
+  const hasPrivateTestDiscount =
+    courseSlug === 'trendy-ring-nail-art-course' &&
+    privateTestCoupon.startsWith('RING-TEST-');
   // Course data
   const courses = {
     'professional-acrylic-training': {
@@ -652,6 +660,89 @@ export const CourseDetailPage: React.FC = () => {
         }
       ]
     },
+    'trendy-ring-nail-art-course': {
+      id: 'trendy-ring-nail-art-course',
+      sku: 'SKU_TRENDY_RING_NAIL_ART',
+      title: 'Trendy Ring Nail Art Course',
+      description: 'Turn simple nails into head-turning masterpieces with modern ring designs, balanced placement, dimensional details, and client-ready finishing techniques.',
+      heroImage: 'https://res.cloudinary.com/dbhiu7lv0/image/upload/v1785340197/Trendy-Ring-Course-IMG_yltkfx.png',
+      duration: 'Self-Paced',
+      price: 'R650',
+      numericPrice: 650,
+      depositAmount: 0,
+      isOnline: true,
+      location: 'Online',
+      instructor: {
+        name: 'Avané Crous',
+        image: '/avane-crous-headshot.webp',
+        bio: 'Professional nail artist and educator with over 8 years of experience. Avané teaches refined, practical techniques that help artists create balanced and confidently finished nail art.'
+      },
+      about: [
+        'Learn Avané’s approach to modern ring nail art in four focused, step-by-step video lessons. You will develop stronger placement, proportion, sculpting, and finishing skills for designs that feel polished rather than overcrowded.',
+        'The course is suitable for beginners and working professionals, includes lifetime Academy access, and follows the same certificate-of-completion process as BLOM’s other online courses.'
+      ],
+      packages: [
+        {
+          name: 'Complete Course',
+          price: 'R650',
+          kitValue: 'Products Not Included',
+          features: [
+            'Lifetime access to all four video lessons',
+            'Modern ring nail trends and design techniques',
+            'Placement, balance, sculpting, and finishing guidance',
+            'Suitable for beginners and professionals',
+            'Certificate after completing your assessment',
+            'Exclusive White + Clear Petal Paste pair for R399'
+          ]
+        }
+      ],
+      availableDates: ['Available Now'],
+      thingsToBring: [
+        'White Petal Paste',
+        'Clear Petal Paste',
+        'Nail art brush and preferred decorative elements'
+      ],
+      trainingSchedule: [],
+      studentDiscount: [
+        'Buy one White and one Clear Petal Paste for R399 together',
+        'The student offer never expires',
+        'One redemption per course purchase'
+      ],
+      accordionData: [
+        {
+          title: 'PART 1: FOUNDATIONS',
+          content: [
+            'Course setup and materials',
+            'Understanding modern ring nail proportions',
+            'Preparing the base design'
+          ]
+        },
+        {
+          title: 'PART 2: PLACEMENT & BALANCE',
+          content: [
+            'Building balanced ring compositions',
+            'Spacing, scale, and visual flow',
+            'Avoiding common placement mistakes'
+          ]
+        },
+        {
+          title: 'PART 3: DIMENSIONAL DETAILS',
+          content: [
+            'Sculpting controlled raised elements',
+            'Adding decorative details',
+            'Keeping the design refined and wearable'
+          ]
+        },
+        {
+          title: 'PART 4: CLIENT-READY FINISH',
+          content: [
+            'Refining the final composition',
+            'Securing and finishing the artwork',
+            'Creating a polished salon-ready result'
+          ]
+        }
+      ]
+    },
     'holiday-watercolor-workshop': {
       id: 'efe16488-1de6-4522-aeb3-b08cfae3a640',
       sku: 'SKU_XMAS_WATERCOLOR',
@@ -944,6 +1035,13 @@ export const CourseDetailPage: React.FC = () => {
         ? Array.from(bytes).map((b) => b.toString(16).padStart(2, '0')).join('').toUpperCase()
         : Math.random().toString(16).slice(2, 8).toUpperCase();
       const clientPaymentId = `BL-${nowBase36}-${rand}`;
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (hasPrivateTestDiscount && !accessToken) {
+        const returnPath = `${window.location.pathname}${window.location.search}`;
+        window.location.href = `/login?redirect=${encodeURIComponent(returnPath)}`;
+        return;
+      }
 
       // Get the selected package price
       const selectedPkg = course.packages.find(pkg => pkg.name === selectedPackage);
@@ -969,7 +1067,10 @@ export const CourseDetailPage: React.FC = () => {
       // Create order with course as product
       const orderRes = await fetch('/.netlify/functions/create-order', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+        },
         body: JSON.stringify({
           order_kind: 'course',
           m_payment_id: clientPaymentId,
@@ -1006,6 +1107,7 @@ export const CourseDetailPage: React.FC = () => {
             shipping_cents: 0,
             tax_cents: 0
           },
+          coupon: privateTestCoupon ? { code: privateTestCoupon } : null,
           shipping: {
             method: 'collection'
           }
@@ -1013,12 +1115,16 @@ export const CourseDetailPage: React.FC = () => {
       });
 
       if (!orderRes.ok) {
-        throw new Error('Failed to create order');
+        const orderError = await orderRes.json().catch(() => null);
+        throw new Error(orderError?.error || 'Failed to create order');
       }
 
       const orderData = await orderRes.json();
       const orderId = orderData.order_id;
       const merchantPaymentId = orderData.m_payment_id || orderData.merchant_payment_id || clientPaymentId;
+      const effectivePaymentAmount = Number.isFinite(Number(orderData.total_cents))
+        ? Number(orderData.total_cents) / 100
+        : paymentAmount;
 
       const itemName = `${course.title} - ${selectedPackage} ${paymentLabel}`;
       const firstName = formData.name.trim().split(' ')[0];
@@ -1032,7 +1138,7 @@ export const CourseDetailPage: React.FC = () => {
           body: JSON.stringify({
             order_id: orderId,
             m_payment_id: merchantPaymentId,
-            amount: paymentAmount,
+            amount: effectivePaymentAmount,
             shipping_amount: 0,
             consumer: {
               givenNames: firstName,
@@ -1044,7 +1150,7 @@ export const CourseDetailPage: React.FC = () => {
               name: itemName,
               sku: (course as any).sku || '',
               quantity: 1,
-              price: paymentAmount
+              price: effectivePaymentAmount
             }]
           })
         });
@@ -1069,7 +1175,7 @@ export const CourseDetailPage: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           order_id: orderId,
-          amount: paymentAmount,
+          amount: effectivePaymentAmount,
           item_name: itemName,
           m_payment_id: merchantPaymentId,
           email_address: formData.email,
@@ -1103,7 +1209,7 @@ export const CourseDetailPage: React.FC = () => {
 
     } catch (error) {
       console.error('Enrollment error:', error);
-      showNotification('Something went wrong. Please try again.', 'error');
+      showNotification(error instanceof Error ? error.message : 'Something went wrong. Please try again.', 'error');
       setIsSubmitting(false);
     }
   };
@@ -1199,6 +1305,27 @@ export const CourseDetailPage: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {courseSlug === 'trendy-ring-nail-art-course' && (
+          <section className="bg-[#fbf8fc] py-10 sm:py-14" aria-label="Exclusive Trendy Ring course offer">
+            <Container>
+              <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#e7dcef] bg-white shadow-lg">
+                <div className="grid items-center lg:grid-cols-[1.2fr_0.8fr]">
+                  <img
+                    src="https://res.cloudinary.com/dnlgohkcc/image/upload/v1785314350/IMG-20260728-WA0023_wssnnp.jpg"
+                    alt="Exclusive course offer: White and Clear Petal Paste for R399"
+                    className="h-full w-full min-h-[220px] object-cover"
+                  />
+                  <div className="p-7 sm:p-9">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.18em] text-[#76548f]">Exclusive course offer</p>
+                    <h2 className="mb-3 text-2xl font-bold text-gray-900">Get both Petal Pastes for R399</h2>
+                    <p className="text-sm leading-relaxed text-gray-600">Buy this course and unlock your permanent White + Clear Petal Paste offer after checkout.</p>
+                  </div>
+                </div>
+              </div>
+            </Container>
+          </section>
+        )}
 
         {/* Meet Your Instructor */}
         <section className="py-20" style={{ background: 'linear-gradient(135deg, #FFE8F0 0%, #FFF0F6 50%, #FFE8F0 100%)' }}>
@@ -2181,7 +2308,8 @@ export const CourseDetailPage: React.FC = () => {
                     <p className="text-sm text-gray-600 mb-6">
                       {(() => {
                         const payNow = course.isOnline || paymentOption === 'full';
-                        const amt = payNow ? selectedPackagePrice : depositAmount;
+                        const regularAmount = payNow ? selectedPackagePrice : depositAmount;
+                        const amt = hasPrivateTestDiscount ? 5 : regularAmount;
                         return `${payNow ? 'Total' : 'Deposit'}: R${amt.toLocaleString('en-ZA')}`;
                       })()}
                     </p>

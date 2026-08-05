@@ -10,6 +10,11 @@ import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, UserPlus } from 'luc
 
 export const SignupPage: React.FC = () => {
   const navigate = useNavigate();
+  const requestedRedirect = new URLSearchParams(window.location.search).get('redirect');
+  const redirectPath = requestedRedirect?.startsWith('/') && !requestedRedirect.startsWith('//')
+    ? requestedRedirect
+    : '/account';
+  const loginHref = `/login?redirect=${encodeURIComponent(redirectPath)}`;
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -42,12 +47,12 @@ export const SignupPage: React.FC = () => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate('/account');
+        navigate(redirectPath);
       }
     };
 
     checkSession();
-  }, [navigate]);
+  }, [navigate, redirectPath]);
 
   useEffect(() => {
     // Validate form
@@ -110,7 +115,7 @@ export const SignupPage: React.FC = () => {
         password: formData.password,
         options: {
           data: { name: formData.name, phone: formData.phone },
-          emailRedirectTo: `${window.location.origin}/account`
+          emailRedirectTo: `${window.location.origin}${redirectPath}`
         }
       });
 
@@ -123,7 +128,7 @@ export const SignupPage: React.FC = () => {
               <>
                 This email is already registered.{' '}
                 <a
-                  href="/login"
+                  href={loginHref}
                   className="underline font-medium hover:text-red-800 transition-colors"
                 >
                   Click here to log in
@@ -179,7 +184,7 @@ export const SignupPage: React.FC = () => {
       setStatus({ type: 'success', message: 'Account created successfully! Redirecting to your account...' });
       setIsSubmitting(false);
       // Send new users to Log in, then back to account after auth
-      setTimeout(() => { window.location.href = '/login?redirect=/account'; }, 600);
+      setTimeout(() => { window.location.href = loginHref; }, 600);
     } catch (err: any) {
       setStatus({ type: 'error', message: err?.message || 'Something went wrong' });
       setIsSubmitting(false);
@@ -453,7 +458,7 @@ export const SignupPage: React.FC = () => {
                   <p className="text-gray-600">
                     Already have an account?{' '}
                     <a 
-                      href="/login" 
+                      href={loginHref}
                       className="text-pink-400 hover:text-pink-500 font-medium transition-colors"
                     >
                       Log In
@@ -466,7 +471,7 @@ export const SignupPage: React.FC = () => {
                   <div className="mt-6 text-center">
                     <Button 
                       variant="outline" 
-                      onClick={() => window.location.href = '/login'}
+                      onClick={() => { window.location.href = loginHref; }}
                     >
                       Go to Login
                     </Button>
