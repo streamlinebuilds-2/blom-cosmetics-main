@@ -75,36 +75,6 @@
     "shortDescription": "Sweet peach scented cuticle oil with Vitamin E, Jojoba & Soybean Oil."
   },
   {
-    "slug": "vitamin-primer",
-    "title": "Vitamin Primer",
-    "price": 210,
-    "thumbnail": "/vitamin-primer-white.webp",
-    "images": ["/vitamin-primer-white.webp", "/vitamin-primer-colorful.webp"],
-    "badges": ["New"],
-    "status": "active",
-    "rating": 4.8,
-    "reviews": 124,
-    "compareAt": null,
-    "stockStatus": "In Stock",
-    "category": "prep-finishing",
-    "shortDescription": "Acid-free primer for adhesion, vitamin-enriched."
-  },
-  {
-    "slug": "prep-solution",
-    "title": "Prep Solution (Nail Dehydrator)",
-    "price": 200,
-    "thumbnail": "/prep-solution-white.webp",
-    "images": ["/prep-solution-white.webp", "/prep-solution-colorful.webp"],
-    "badges": [],
-    "status": "active",
-    "rating": 4.7,
-    "reviews": 89,
-    "compareAt": null,
-    "stockStatus": "In Stock",
-    "category": "prep-finishing",
-    "shortDescription": "Removes oils & moisture for better adhesion."
-  },
-  {
     "slug": "fairy-dust-top-coat",
     "title": "Fairy Dust Top Coat",
     "price": 195,
