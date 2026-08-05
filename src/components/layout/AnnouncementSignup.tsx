@@ -3,7 +3,6 @@ import { Container } from './Container';
 import { Button } from '../ui/Button';
 import { X, Check } from 'lucide-react';
 import { postJson } from '../../lib/api';
-import { promoIsLive } from '../../config/birthdayPromo';
 
 declare global {
   interface Window {
@@ -37,33 +36,6 @@ export const AnnouncementSignup: React.FC = () => {
     if (hasSignedUp) return false;
     try { return sessionStorage.getItem('signup_banner_closed') === '1' ? false : true; } catch { return !session.bannerClosed; }
   });
-  const timerRef = useRef<number | null>(null);
-
-  // Auto show popup once after 7s on first page load in this tab
-  useEffect(() => {
-    // During the birthday promo, only the birthday popup shows — stay dormant.
-    if (promoIsLive()) return;
-    // Don't show popup if user has already signed up
-    if (hasSignedUp) return;
-    
-    // If this is a reload, allow popup again by clearing the session flag
-    try {
-      const nav = (performance.getEntriesByType('navigation')[0] as any);
-      if (nav && nav.type === 'reload') {
-        sessionStorage.removeItem('signup_popup_closed');
-      }
-    } catch {}
-
-    const closedInThisTab = (() => { try { return sessionStorage.getItem('signup_popup_closed') === '1'; } catch { return false; } })();
-    if (closedInThisTab || session.hasShown || session.popupClosed) return;
-    timerRef.current = window.setTimeout(() => {
-      setIsPopupOpen(true);
-      session.hasShown = true;
-    }, 7000);
-    return () => {
-      if (timerRef.current) window.clearTimeout(timerRef.current);
-    };
-  }, [hasSignedUp]);
 
   // Lock body scroll when popup is open
   useEffect(() => {
@@ -108,10 +80,8 @@ export const AnnouncementSignup: React.FC = () => {
   };
 
   const openPopup = () => {
-    // Mark as shown so auto-timer never retriggers after manual interaction
     session.hasShown = true;
     setIsPopupOpen(true);
-    // User intent overrides previous close. Do not set closed flag here.
   };
 
   // Don't render anything if user has already signed up
@@ -122,14 +92,9 @@ export const AnnouncementSignup: React.FC = () => {
   return (
     <>
       {isBannerVisible && (
-        <div 
-          className="bg-pink-100 text-gray-900 cursor-pointer md:cursor-default"
-          onClick={() => {
-            // On mobile, clicking the banner opens the popup
-            if (window.innerWidth < 768) {
-              openPopup();
-            }
-          }}
+        <div
+          className="bg-pink-100 text-gray-900 cursor-pointer"
+          onClick={openPopup}
         >
           <Container className="py-2 px-4">
             <div className="relative flex items-center justify-center gap-3">
@@ -140,14 +105,14 @@ export const AnnouncementSignup: React.FC = () => {
                 variant="secondary"
                 size="sm"
                 className="hidden md:block !py-1 !px-3 uppercase font-sans bg-pink-100 text-gray-800 border border-gray-800 hover:bg-gray-800 hover:text-pink-100 transition-all duration-200"
-                onClick={openPopup}
+                onClick={(e) => { e.stopPropagation(); openPopup(); }}
               >
                 JOIN NOW
               </Button>
               <button
                 aria-label="Close announcement"
                 className="absolute right-0 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-gray-200"
-                onClick={closeBanner}
+                onClick={(e) => { e.stopPropagation(); closeBanner(); }}
               >
                 <X className="h-4 w-4 md:h-5 md:w-5" />
               </button>
