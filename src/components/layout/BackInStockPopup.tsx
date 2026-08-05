@@ -15,7 +15,7 @@ const SHOW_AT_KEY = 'blom_gel_promo_show_at';
 const SESSION_KEY = 'blom_gel_promo_session';
 const SHOW_DELAY_MS = 3500;
 const GEL_SYSTEM_HREF = '/shop?category=gel-system';
-const PROMO_IMAGE = 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1000/v1785911809/blom/popups/rubber-base-gel-silk-promo.png';
+const PROMO_IMAGE = 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1536/v1785914010/blom/popups/rubber-base-gel-landscape-promo.png';
 
 const readInt = (key: string, fallback: number): number => {
   try {
