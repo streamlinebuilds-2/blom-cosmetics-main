@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight, Droplets, GraduationCap, Palette, Sparkles } from 'lucide-react';
-import academyHero from '../../assets/homepage/hero-academy.webp';
 import acrylicHero from '../../assets/homepage/hero-acrylic-system.webp';
 import gelHero from '../../assets/homepage/hero-gel-system.webp';
 import prepHero from '../../assets/homepage/hero-prep-finish.webp';
 
+const academyHeroDesktop = 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_1200/v1785907284/blom/homepage/hero-academy-desktop.jpg';
+const academyHeroMobile = 'https://res.cloudinary.com/hmvetruz/image/upload/f_auto,q_auto,w_900/v1785907309/blom/homepage/hero-academy-mobile.png';
+
 interface HeroImage {
   src: string;
+  mobileSrc?: string;
   alt: string;
   position?: string;
 }
@@ -83,9 +86,10 @@ const baseSlides: HeroSlide[] = [
     kind: 'academy',
     stamp: 'Learn with BLOM',
     image: {
-      src: academyHero,
-      alt: 'Professional BLOM Academy acrylic application training',
-      position: 'center',
+      src: academyHeroDesktop,
+      mobileSrc: academyHeroMobile,
+      alt: 'BLOM Academy instructor demonstrating acrylic application to a class of nail students',
+      position: 'center 20%',
     },
   },
 ];
@@ -168,15 +172,20 @@ export const HeroSlider: React.FC = () => {
 
         <div className="home-hero__visual" aria-label={`${slide.eyebrow} feature image`}>
           <figure className="home-hero__image">
-            <img
-              src={slide.image.src}
-              sizes="(max-width: 700px) calc(100vw - 28px), (max-width: 980px) 70vw, 520px"
-              alt={slide.image.alt}
-              loading={current === 0 ? 'eager' : 'lazy'}
-              fetchPriority={current === 0 ? 'high' : 'auto'}
-              decoding="async"
-              style={slide.image.position ? { objectPosition: slide.image.position } : undefined}
-            />
+            <picture>
+              {slide.image.mobileSrc && (
+                <source media="(max-width: 700px)" srcSet={slide.image.mobileSrc} />
+              )}
+              <img
+                src={slide.image.src}
+                sizes="(max-width: 700px) calc(100vw - 28px), (max-width: 980px) 70vw, 520px"
+                alt={slide.image.alt}
+                loading={current === 0 ? 'eager' : 'lazy'}
+                fetchPriority={current === 0 ? 'high' : 'auto'}
+                decoding="async"
+                style={slide.image.position ? { objectPosition: slide.image.position } : undefined}
+              />
+            </picture>
           </figure>
           <span className="home-hero__stamp" aria-hidden="true">
             <StampIcon />
