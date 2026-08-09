@@ -260,7 +260,9 @@ export default function CheckoutSuccess() {
                         {(orderDetails.discount_cents || 0) > 0 && (
                           <tr>
                             <td colSpan={2} className="px-4 py-2 text-right text-green-600 font-medium">
-                              Discount
+                              {orderDetails.coupon_code === 'WOMENSDAY2026'
+                                ? 'Women’s Day Promotion'
+                                : 'Discount'}
                             </td>
                             <td className="px-4 py-2 text-right text-green-600 font-medium">
                               -{formatCurrency(orderDetails.discount_cents)}

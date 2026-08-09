@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X, Sparkles, Check } from 'lucide-react';
 import { promoIsLive } from '../../config/birthdayPromo';
+import { womensDayPromotionIsLive } from '../../lib/womensDayPromotion';
 
 // Gel System promo popup. Modeled on the Beauty Club signup popup
 // (AnnouncementSignup) so the styling stays consistent.
@@ -36,7 +37,7 @@ export const BackInStockPopup: React.FC = () => {
   // Decide whether this visit is due to show the promo.
   useEffect(() => {
     // During the birthday promo, only the birthday popup shows — stay dormant.
-    if (promoIsLive()) return;
+    if (womensDayPromotionIsLive() || promoIsLive()) return;
 
     // Count this visit once per browser session.
     let visits = readInt(VISITS_KEY, 0);

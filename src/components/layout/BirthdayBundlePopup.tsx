@@ -8,6 +8,7 @@ import {
   BIRTHDAY_POPUP_IMAGE_DESKTOP,
   BIRTHDAY_POPUP_IMAGE_MOBILE,
 } from '../../config/birthdayPromo';
+import { womensDayPromotionIsLive } from '../../lib/womensDayPromotion';
 
 // Avané's 30th Birthday landing popup — promotes the 5-glitter bundle (30% off, one day only).
 // Modeled on BackInStockPopup so the styling/dismissal stays consistent, but it is gated by the
@@ -46,7 +47,7 @@ export const BirthdayBundlePopup: React.FC = () => {
 
   useEffect(() => {
     // Only ever runs during the promo window; self-disables before/after.
-    if (!promoIsLive()) return;
+    if (womensDayPromotionIsLive() || !promoIsLive()) return;
 
     // Count this visit once per browser session.
     let visits = readInt(VISITS_KEY, 0);

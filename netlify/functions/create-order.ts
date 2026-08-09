@@ -1,5 +1,9 @@
 import type { Handler } from '@netlify/functions'
 import { TRENDY_RING_OFFER_PRODUCT_SLUGS } from './_lib/trendy-ring-offer'
+import {
+  calculateWomensDayPromotion,
+  chooseBestDiscount,
+} from '../../src/lib/womensDayPromotion'
 import crypto from 'crypto'
 
 export const handler: Handler = async (event) => {
@@ -19,6 +23,7 @@ export const handler: Handler = async (event) => {
     }
 
     const numberOrNull = (value: unknown): number | null => {
+      if (value === null || value === undefined || value === '') return null
       const numberValue = Number(value)
       return Number.isFinite(numberValue) ? numberValue : null
     }
@@ -59,8 +64,33 @@ export const handler: Handler = async (event) => {
 
     const normalizeName = (value: unknown) => String(value || '').toLowerCase().trim()
 
+    const findVariant = (product: any, variantName: string): any | null => {
+      if (!variantName || !Array.isArray(product?.variants)) return null
+      const normalizedVariant = normalizeName(variantName)
+      return product.variants.find((variant: any) =>
+        [variant?.id, variant?.name, variant?.label, variant?.title]
+          .some((value) => normalizeName(value) === normalizedVariant)
+      ) || null
+    }
+
+    const getCanonicalPriceCents = (product: any, variantName: string): number => {
+      const variant = findVariant(product, variantName)
+      if (variant) {
+        const variantPriceCents = numberOrNull(variant.price_cents)
+        if (variantPriceCents !== null) return Math.max(0, Math.round(variantPriceCents))
+        const variantPrice = numberOrNull(variant.price)
+        if (variantPrice !== null) return Math.max(0, Math.round(variantPrice * 100))
+      }
+      const productPrice = numberOrNull(product?.price)
+      if (productPrice !== null && productPrice > 0) {
+        return Math.max(0, Math.round(productPrice * 100))
+      }
+      const productPriceCents = numberOrNull(product?.price_cents)
+      return productPriceCents !== null ? Math.max(0, Math.round(productPriceCents)) : 0
+    }
+
     // 1. Load Product Dictionary
-    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price,status,is_active,out_of_stock,stock,stock_qty,stock_on_hand,inventory_quantity,variants`, {
+    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price,price_cents,category,subcategory,status,is_active,out_of_stock,stock,stock_qty,stock_on_hand,inventory_quantity,variants`, {
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
     });
     const dbProducts = productsRes.ok ? await productsRes.json() : [];
@@ -104,6 +134,18 @@ export const handler: Handler = async (event) => {
         }
       }
 
+      if (orderKind === 'product' && !resolvedProduct) {
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: `${baseName} could not be verified against the current Store catalog.`,
+            code: 'INVALID_PRODUCT',
+            product_name: baseName
+          })
+        };
+      }
+
       if (orderKind === 'product' && resolvedProduct && isProductOutOfStock(resolvedProduct)) {
         return {
           statusCode: 409,
@@ -131,14 +173,49 @@ export const handler: Handler = async (event) => {
         };
       }
 
+      if (
+        orderKind === 'product' &&
+        resolvedProduct &&
+        variantName &&
+        Array.isArray(resolvedProduct.variants) &&
+        resolvedProduct.variants.length > 0 &&
+        !findVariant(resolvedProduct, variantName)
+      ) {
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: `${resolvedProduct.name || baseName} has an invalid product option. Please select it again.`,
+            code: 'INVALID_VARIANT',
+            product_id: resolvedProduct.id,
+            product_name: resolvedProduct.name || baseName,
+            variant: variantName
+          })
+        };
+      }
+
+      const requestedQuantity = Number(it.quantity ?? 1)
+      if (!Number.isFinite(requestedQuantity) || requestedQuantity < 1) {
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: `${resolvedProduct?.name || baseName} has an invalid quantity.`,
+            code: 'INVALID_QUANTITY',
+            product_id: resolvedProduct?.id || null,
+            product_name: resolvedProduct?.name || baseName
+          })
+        };
+      }
+
       validItems.push({
         resolved_id: resolvedId,
         resolved_product: resolvedProduct,
         base_name: baseName,
         variant_name: variantName, // Store variant separately
-        quantity: Number(it.quantity || 1),
+        quantity: Math.floor(requestedQuantity),
         unit_price: resolvedProduct
-          ? Math.round(Number(resolvedProduct.price || 0) * 100)
+          ? getCanonicalPriceCents(resolvedProduct, variantName)
           : Number(it.unit_price ?? it.price ?? 0),
         original_sku: it.sku
       });
@@ -231,13 +308,11 @@ export const handler: Handler = async (event) => {
     // an estimate, but it cannot choose the final discount or impersonate the
     // owner of an account-bound course benefit.
     const couponCode = String(body.coupon?.code || '').trim().toUpperCase()
-    let discountCents = 0
+    let couponDiscountCents = 0
 
     if (couponCode) {
       const canonicalCart = validItems.map((it) => {
-        const canonicalPriceCents = it.resolved_product
-          ? Math.round(Number(it.resolved_product.price || 0) * 100)
-          : Math.max(0, Math.round(Number(it.unit_price || 0)))
+        const canonicalPriceCents = Math.max(0, Math.round(Number(it.unit_price || 0)))
         return {
           product_id: String(it.resolved_id || ''),
           name: String(it.resolved_product?.name || it.base_name || ''),
@@ -321,12 +396,12 @@ export const handler: Handler = async (event) => {
           }
         }
 
-        discountCents = Math.max(0, subtotalCents - 500)
-        body.course_booking.amount_paid_cents = subtotalCents - discountCents
+        couponDiscountCents = Math.max(0, subtotalCents - 500)
+        body.course_booking.amount_paid_cents = subtotalCents - couponDiscountCents
         body.course_booking.details = {
           ...(body.course_booking.details || {}),
           list_price_cents: subtotalCents,
-          private_test_discount_cents: discountCents
+          private_test_discount_cents: couponDiscountCents
         }
       } else {
       const benefitRes = await fetch(
@@ -390,7 +465,7 @@ export const handler: Handler = async (event) => {
           (sum, item) => sum + Math.round(Number(item!.resolved_product.price || 0) * 100),
           0
         )
-        discountCents = Math.max(0, pairTotalCents - 39900)
+        couponDiscountCents = Math.max(0, pairTotalCents - 39900)
       } else {
         const couponRes = await fetch(`${SUPABASE_URL}/rest/v1/rpc/redeem_coupon`, {
           method: 'POST',
@@ -418,13 +493,33 @@ export const handler: Handler = async (event) => {
             body: JSON.stringify({ error: coupon?.message || 'Coupon validation failed.' })
           }
         }
-        discountCents = Math.max(
+        couponDiscountCents = Math.max(
           0,
           Math.min(Math.round(Number(coupon.discount_cents || 0)), subtotalCents + shippingCents)
         )
       }
       }
     }
+
+    const womensDayPromotion = calculateWomensDayPromotion(
+      orderKind === 'product'
+        ? validItems.map((item) => ({
+            productId: item.resolved_id,
+            slug: item.resolved_product?.slug,
+            category: item.resolved_product?.category,
+            subcategory: item.resolved_product?.subcategory,
+            unitPriceCents: item.unit_price,
+            quantity: item.quantity,
+          }))
+        : []
+    )
+    const discountChoice = chooseBestDiscount(
+      womensDayPromotion.discountCents,
+      couponDiscountCents,
+      couponCode
+    )
+    const discountCents = discountChoice.discountCents
+    const finalDiscountCode = discountChoice.code
 
     // 3. Create Order via RPC
     const rpcPayload = {
@@ -466,7 +561,7 @@ export const handler: Handler = async (event) => {
       p_fulfillment_method: fulfillmentMethod,
       p_delivery_address: deliveryAddress,
       p_collection_location: collectionLocation,
-      p_coupon_code: couponCode || null,
+      p_coupon_code: finalDiscountCode,
       p_order_kind: orderKind
     };
 
@@ -493,6 +588,24 @@ export const handler: Handler = async (event) => {
 
     const orderData = await rpcRes.json();
     const order = Array.isArray(orderData) ? orderData[0] : orderData;
+
+    if (order?.order_id && finalDiscountCode) {
+      const discountSourceRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(order.order_id)}`,
+        {
+          method: 'PATCH',
+          headers: {
+            apikey: SERVICE_KEY,
+            Authorization: `Bearer ${SERVICE_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ coupon_code: finalDiscountCode })
+        }
+      )
+      if (!discountSourceRes.ok) {
+        console.warn('Could not persist order discount source:', await discountSourceRes.text())
+      }
+    }
 
     if (orderKind === 'course' && body.course_booking?.course_slug) {
       const booking = body.course_booking;
@@ -549,6 +662,11 @@ export const handler: Handler = async (event) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...order,
+        discount_source: discountChoice.source,
+        promotion_discount_cents: womensDayPromotion.discountCents,
+        coupon_discount_cents: couponDiscountCents,
+        discount_cents: discountCents,
+        coupon_code: finalDiscountCode,
         m_payment_id: order?.m_payment_id ?? order?.merchant_payment_id ?? canonicalPaymentId,
         merchant_payment_id: order?.merchant_payment_id ?? order?.m_payment_id ?? canonicalPaymentId
       })

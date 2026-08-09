@@ -9,6 +9,7 @@ import {
   loadCatalog,
   buildRecommendations,
 } from '../../lib/recommendations';
+import { calculateWomensDayPromotionForCart } from '../../lib/womensDayPromotion';
 
 export const CartWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -154,6 +155,10 @@ export const CartWidget: React.FC = () => {
   const recommendedProducts = useMemo<RecommendedProduct[]>(
     () => buildRecommendations(catalog, cartState.items, 3, rotationSeed),
     [catalog, cartState.items, rotationSeed]
+  );
+  const womensDayPromotion = useMemo(
+    () => calculateWomensDayPromotionForCart(cartState.items, catalog),
+    [cartState.items, catalog]
   );
 
   const handleAddRecommendedProduct = (product: RecommendedProduct) => {
@@ -327,7 +332,33 @@ export const CartWidget: React.FC = () => {
                     <span>Subtotal:</span>
                     <span>{formatPrice(cartState.subtotal)}</span>
                   </div>
+                  {womensDayPromotion.applied && (
+                    <>
+                      <div className="flex justify-between font-medium text-rose-600">
+                        <span>Women’s Day Promotion:</span>
+                        <span>-{formatPrice(womensDayPromotion.discountCents / 100)}</span>
+                      </div>
+                      <div className="flex justify-between border-t border-rose-100 pt-2 font-bold">
+                        <span>After discount:</span>
+                        <span>{formatPrice(cartState.subtotal - womensDayPromotion.discountCents / 100)}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
+
+                {womensDayPromotion.isLive && (
+                  <div className={`rounded-xl border px-3 py-2.5 text-center text-sm ${
+                    womensDayPromotion.applied
+                      ? 'border-rose-200 bg-rose-50 text-rose-800'
+                      : 'border-pink-100 bg-pink-50 text-pink-800'
+                  }`}>
+                    {womensDayPromotion.applied
+                      ? 'Women’s Day offer applied — 15% off your 5 lowest-priced eligible products.'
+                      : `Add ${womensDayPromotion.unitsNeeded} more eligible ${
+                          womensDayPromotion.unitsNeeded === 1 ? 'product' : 'products'
+                        } to unlock 15% off 5 products.`}
+                  </div>
+                )}
                 
                 {cartState.subtotal < 2500 && (
                   <p className="text-sm text-gray-600 text-center">

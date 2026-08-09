@@ -1,5 +1,6 @@
 import type { Handler } from '@netlify/functions';
 import { enrollCourse } from './_lib/enroll-helper';
+import { WOMENS_DAY_PROMOTION_CODE } from '../../src/lib/womensDayPromotion';
 
 const PAYFLEX_AUTH_URL = process.env.PAYFLEX_AUTH_URL || 'https://auth-uat.payflex.co.za/auth/merchant';
 const PAYFLEX_API_URL = (process.env.PAYFLEX_API_URL || 'https://api.uat.payflex.co.za').replace(/\/+$/, '');
@@ -29,7 +30,15 @@ async function getPayflexToken(): Promise<string> {
   return data.access_token;
 }
 
-async function verifyPayflexOrder(payflexOrderId: string): Promise<{ orderStatus: string; merchantReference: string } | null> {
+type VerifiedPayflexOrder = {
+  orderStatus: string;
+  merchantReference: string;
+  amount?: number;
+  totalAmount?: number;
+  orderAmount?: number;
+};
+
+async function verifyPayflexOrder(payflexOrderId: string): Promise<VerifiedPayflexOrder | null> {
   try {
     const token = await getPayflexToken();
     const res = await fetch(`${PAYFLEX_API_URL}/order/${encodeURIComponent(payflexOrderId)}`, {
@@ -118,9 +127,11 @@ export const handler: Handler = async (event) => {
 
     // Verify by calling Payflex API directly (no webhook signature)
     let orderStatus = data.orderStatus;
+    let verifiedOrder: VerifiedPayflexOrder | null = null;
     if (payflexOrderId && PAYFLEX_CLIENT_ID) {
       const verified = await verifyPayflexOrder(payflexOrderId);
       if (verified) {
+        verifiedOrder = verified;
         orderStatus = verified.orderStatus;
         console.log('✅ Verified status from Payflex API:', orderStatus);
       } else {
@@ -151,6 +162,16 @@ export const handler: Handler = async (event) => {
     }
 
     // Handle non-approved statuses — only act on definite decline/abandon, never on undefined
+    const verifiedAmount = verifiedOrder?.amount ?? verifiedOrder?.totalAmount ?? verifiedOrder?.orderAmount;
+    if (verifiedAmount !== undefined) {
+      const paidAmountCents = Math.round(Number(verifiedAmount) * 100);
+      const expectedAmountCents = Number(order.total_cents ?? Math.round(Number(order.total || 0) * 100));
+      if (!Number.isFinite(paidAmountCents) || paidAmountCents !== expectedAmountCents) {
+        console.error('Payflex amount mismatch', { orderId: order.id, expectedAmountCents, paidAmountCents });
+        return { statusCode: 409, body: 'Amount mismatch' };
+      }
+    }
+
     const definitelyDeclined = orderStatus && orderStatus !== 'Approved' && orderStatus !== 'Created' && orderStatus !== 'Initiated';
     if (definitelyDeclined) {
       console.log(`Payflex status ${orderStatus} — marking order as cancelled`);
@@ -187,7 +208,7 @@ export const handler: Handler = async (event) => {
     });
 
     // B) Increment coupon usage
-    if (order.coupon_code) {
+    if (order.coupon_code && order.coupon_code !== WOMENS_DAY_PROMOTION_CODE) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_coupon_usage`, {
           method: 'POST',

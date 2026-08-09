@@ -25,6 +25,22 @@ async function getPayflexToken(): Promise<string> {
   return data.access_token;
 }
 
+async function loadOrder(orderId: string, merchantPaymentId: string) {
+  if (!SUPABASE_URL || !SERVICE_KEY) throw new Error('Server order configuration is unavailable');
+  const referenceFilter = encodeURIComponent(
+    `(m_payment_id.eq.${merchantPaymentId},merchant_payment_id.eq.${merchantPaymentId})`
+  );
+  const response = await fetch(
+    `${SUPABASE_URL}/rest/v1/orders?id=eq.${encodeURIComponent(orderId)}&or=${referenceFilter}&select=id,total_cents,total,shipping_cents&limit=1`,
+    { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
+  );
+  if (!response.ok) throw new Error('Unable to verify the order total');
+  const rows = await response.json();
+  const order = Array.isArray(rows) ? rows[0] : null;
+  if (!order) throw new Error('Order and payment reference do not match');
+  return order;
+}
+
 export const handler: Handler = async (event) => {
   console.log('=== PAYFLEX REDIRECT DEBUG ===');
   console.log('Environment:', {
@@ -47,14 +63,21 @@ export const handler: Handler = async (event) => {
 
   try {
     const payload = JSON.parse(event.body || '{}');
-    const { order_id, m_payment_id, amount, shipping_amount, consumer, items } = payload;
+    const { order_id, m_payment_id, consumer, items } = payload;
 
-    if (!order_id || !m_payment_id || !Number.isFinite(Number(amount)) || Number(amount) <= 0) {
+    if (!order_id || !m_payment_id) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing or invalid fields' }) };
     }
 
     if (!PAYFLEX_CLIENT_ID || !PAYFLEX_CLIENT_SECRET) {
       return { statusCode: 500, headers, body: JSON.stringify({ error: 'Payflex credentials not configured' }) };
+    }
+
+    const order = await loadOrder(String(order_id), String(m_payment_id));
+    const totalCents = Number(order.total_cents ?? Math.round(Number(order.total || 0) * 100));
+    const shippingCents = Math.max(0, Math.round(Number(order.shipping_cents || 0)));
+    if (!Number.isFinite(totalCents) || totalCents <= 0) {
+      return { statusCode: 409, headers, body: JSON.stringify({ error: 'The stored order total is invalid' }) };
     }
 
     // 1. Get OAuth token
@@ -63,9 +86,9 @@ export const handler: Handler = async (event) => {
     // 2. Create Payflex order
     const orderBody: Record<string, any> = {
       merchantReference: m_payment_id,
-      amount: Number(Number(amount).toFixed(2)),
+      amount: Number((totalCents / 100).toFixed(2)),
       taxAmount: 0,
-      shippingAmount: Number(Number(shipping_amount || 0).toFixed(2)),
+      shippingAmount: Number((shippingCents / 100).toFixed(2)),
       merchant: {
         redirectConfirmUrl: `${SITE_BASE_URL}/checkout/status?order=${order_id}`,
         redirectCancelUrl: `${SITE_BASE_URL}/checkout/cancel`,

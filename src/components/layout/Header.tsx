@@ -8,6 +8,7 @@ import { AnnouncementSignup } from './AnnouncementSignup';
 import { AnnouncementBar } from './AnnouncementBar';
 import { BackInStockPopup } from './BackInStockPopup';
 import { BirthdayBundlePopup } from './BirthdayBundlePopup';
+import { WomensDayPopup } from './WomensDayPopup';
 
 interface HeaderProps {
   showMobileMenu?: boolean;
@@ -61,6 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     <>
       <AnnouncementBar />
       <AnnouncementSignup />
+      <WomensDayPopup />
       {/* Birthday promo takes priority during its window; it claims the visit before the restock popup. */}
       <BirthdayBundlePopup />
       <BackInStockPopup />

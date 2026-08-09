@@ -65,78 +65,26 @@ function sortKeysForPayFast(keys: string[]) {
   });
 }
 
-async function upsertOrder({ 
-  merchant_payment_id, 
-  amount, 
-  currency, 
-  email,
-  name,
-  items,
-  shippingInfo
-}: {
-  merchant_payment_id: string;
-  amount: number;
-  currency: string;
-  email?: string;
-  name?: string;
-  items?: any[];
-  shippingInfo?: any;
-}) {
+async function loadOrder(orderId: string, merchantPaymentId: string) {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  
+
   if (!supabaseUrl || !serviceKey) {
-    console.warn('Supabase not configured, skipping order upsert');
-    return;
+    throw new Error('Server order configuration is unavailable');
   }
 
-  const baseData = {
-    status: 'pending',
-    total_amount: Number(amount).toFixed(2),
-    currency,
-    customer_email: email ?? null,
-    customer_name: name ?? null,
-    customer_mobile: shippingInfo?.phone ?? null,
-    shipping_method: shippingInfo?.method ?? null,
-    shipping_cost: shippingInfo?.cost ?? 0,
-    delivery_address: shippingInfo?.method === 'door-to-door' ? {
-      street_address: shippingInfo?.ship_to_street ?? null,
-      local_area: shippingInfo?.ship_to_suburb ?? null,
-      city: shippingInfo?.ship_to_city ?? null,
-      zone: shippingInfo?.ship_to_zone ?? null,
-      code: shippingInfo?.ship_to_postal_code ?? null,
-      country: shippingInfo?.ship_to_country ?? null,
-      lat: shippingInfo?.ship_to_lat ?? null,
-      lng: shippingInfo?.ship_to_lng ?? null
-    } : null,
-    updated_at: new Date().toISOString()
-  } as Record<string, any>;
-
-  const tryUpsert = async (idField: 'm_payment_id' | 'merchant_payment_id') => {
-    const r = await fetch(`${supabaseUrl}/rest/v1/orders?on_conflict=${idField}`, {
-      method: 'POST',
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=merge-duplicates'
-      },
-      body: JSON.stringify({ ...baseData, [idField]: merchant_payment_id })
-    });
-    return r;
-  };
-
-  const first = await tryUpsert('m_payment_id');
-  if (first.ok) return;
-  const firstTxt = await first.text();
-
-  const second = await tryUpsert('merchant_payment_id');
-  if (second.ok) return;
-  const secondTxt = await second.text();
-
-  console.error(`Supabase upsert order failed: ${first.status} ${firstTxt}`);
-  console.error(`Supabase upsert order failed: ${second.status} ${secondTxt}`);
-  throw new Error(`Failed to create order: ${second.status}`);
+  const referenceFilter = encodeURIComponent(
+    `(m_payment_id.eq.${merchantPaymentId},merchant_payment_id.eq.${merchantPaymentId})`
+  );
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/orders?id=eq.${encodeURIComponent(orderId)}&or=${referenceFilter}&select=id,m_payment_id,merchant_payment_id,total_cents,total,shipping_cents&limit=1`,
+    { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+  );
+  if (!response.ok) throw new Error('Unable to verify the order total');
+  const rows = await response.json();
+  const order = Array.isArray(rows) ? rows[0] : null;
+  if (!order) throw new Error('Order and payment reference do not match');
+  return order;
 }
 
 export const handler: Handler = async (event) => {
@@ -160,40 +108,30 @@ export const handler: Handler = async (event) => {
 
   try {
     const payload = JSON.parse(event.body || '{}');
-    
-    const amountNum = Number(payload.amount);
-    const amountStr = Number(payload.amount).toFixed(2);
     const item_name = String(payload.item_name || 'BLOM Order');
-    const m_payment_id = String(payload.m_payment_id || `BLOM-${Date.now()}`);
-    
-    if (!Number.isFinite(amountNum) || amountNum <= 0) {
-      return { 
+    const orderId = String(payload.order_id || '');
+    const m_payment_id = String(payload.m_payment_id || '');
+
+    if (!orderId || !m_payment_id) {
+      return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'Invalid amount' }) 
+        body: JSON.stringify({ error: 'A valid order and payment reference are required' })
       };
     }
 
-    // 1) Store order in Supabase
-    try {
-      await upsertOrder({ 
-        merchant_payment_id: m_payment_id, 
-        amount: amountNum, 
-        currency: 'ZAR', 
-        email: payload.email_address,
-        name: payload.name_first || payload.name_last
-          ? `${payload.name_first ?? ''}${payload.name_last ? ' ' + payload.name_last : ''}`.trim()
-          : undefined,
-        items: payload.items,
-        shippingInfo: payload.shippingInfo
-      });
-    } catch (e) {
-      console.error('Order upsert failed:', e);
-      // Continue anyway - we can create order via ITN webhook
+    const order = await loadOrder(orderId, m_payment_id);
+    const totalCents = Number(order.total_cents ?? Math.round(Number(order.total || 0) * 100));
+    if (!Number.isFinite(totalCents) || totalCents <= 0) {
+      return {
+        statusCode: 409,
+        headers,
+        body: JSON.stringify({ error: 'The stored order total is invalid' })
+      };
     }
+    const amountStr = (totalCents / 100).toFixed(2);
 
-    // 2) Build PayFast redirect
-    const orderId = payload.order_id || m_payment_id;
+    // Build PayFast redirect from the server-authoritative order total.
     const RETURN_URL = `${SITE_BASE_URL}/checkout/status?order=${orderId}`;
     
     const merchantId = PF_ENV === 'sandbox' ? process.env.PAYFAST_SANDBOX_MERCHANT_ID : process.env.PAYFAST_MERCHANT_ID;

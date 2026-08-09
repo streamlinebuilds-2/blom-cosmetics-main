@@ -19,6 +19,10 @@ import {
   buildRecommendations,
   loadCatalog,
 } from '../lib/recommendations';
+import {
+  calculateWomensDayPromotionForCart,
+  chooseBestDiscount,
+} from '../lib/womensDayPromotion';
 // Coupon data type (moved inside component as a ref — avoids shared module-level mutable state)
 type SimpleCouponData = {
   couponCode: string;
@@ -197,6 +201,20 @@ export const CheckoutPage: React.FC = () => {
     () => buildRecommendations(catalog, cartState.items, 3, rotationSeed),
     [catalog, cartState.items, rotationSeed]
   );
+
+  const womensDayPromotion = useMemo(
+    () => calculateWomensDayPromotionForCart(cartState.items, catalog),
+    [cartState.items, catalog]
+  );
+  const checkoutDiscountChoice = useMemo(
+    () => chooseBestDiscount(
+      womensDayPromotion.discountCents,
+      Math.round(discount * 100),
+      appliedCoupon?.code
+    ),
+    [womensDayPromotion.discountCents, discount, appliedCoupon?.code]
+  );
+  const effectiveDiscount = checkoutDiscountChoice.discountCents / 100;
 
   // Check wishlist status for recommended products
   useEffect(() => {
@@ -791,7 +809,7 @@ export const CheckoutPage: React.FC = () => {
           totals: {
             subtotal_cents: Math.round(cartState.subtotal * 100),
             shipping_cents: Math.round(shippingCost * 100),
-            discount_cents: Math.round(discount * 100),
+            discount_cents: Math.round(effectiveDiscount * 100),
             tax_cents: 0,
             total_cents: Math.round(orderTotal * 100),
             total: orderTotal
@@ -871,7 +889,12 @@ export const CheckoutPage: React.FC = () => {
         shippingMethod,
         shippingInfo,
         couponCode: appliedCoupon ? appliedCoupon.code : null,
-        couponDiscount: orderData.discount_cents ? orderData.discount_cents / 100 : discount,
+        discountSource: orderData.discount_source || checkoutDiscountChoice.source,
+        couponDiscount: orderData.coupon_discount_cents ? orderData.coupon_discount_cents / 100 : discount,
+        promotionDiscount: orderData.promotion_discount_cents
+          ? orderData.promotion_discount_cents / 100
+          : womensDayPromotion.discountCents / 100,
+        discount: orderData.discount_cents ? orderData.discount_cents / 100 : effectiveDiscount,
         timestamp: new Date().toISOString()
       }));
 
@@ -992,7 +1015,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   const shippingCost = calculateShipping();
-  const orderTotal = cartState.subtotal + shippingCost - discount;
+  const orderTotal = cartState.subtotal + shippingCost - effectiveDiscount;
 
   const paymentMethods = [
     {
@@ -1691,7 +1714,9 @@ export const CheckoutPage: React.FC = () => {
                               Coupon Applied: {appliedCoupon.code}
                             </p>
                             <p className="text-xs text-green-600">
-                              Discount: -{formatPrice(discount)}
+                              {checkoutDiscountChoice.source === 'womens_day'
+                                ? `Women’s Day saves more, so your coupon will not be used.`
+                                : `Coupon saving: -${formatPrice(discount)}`}
                             </p>
                             {/* Debug info */}
                             {process.env.NODE_ENV === 'development' && (
@@ -1719,6 +1744,27 @@ export const CheckoutPage: React.FC = () => {
                     </div>
                   </div>
 
+                  {womensDayPromotion.isLive && (
+                    <div className={`rounded-xl border p-3 ${
+                      womensDayPromotion.applied
+                        ? 'border-rose-200 bg-rose-50 text-rose-800'
+                        : 'border-pink-100 bg-pink-50 text-pink-800'
+                    }`}>
+                      <p className="text-sm font-semibold">
+                        {womensDayPromotion.applied
+                          ? 'Women’s Day offer unlocked'
+                          : `Add ${womensDayPromotion.unitsNeeded} more eligible ${
+                              womensDayPromotion.unitsNeeded === 1 ? 'product' : 'products'
+                            } to unlock 15% off 5 products.`}
+                      </p>
+                      {womensDayPromotion.applied && (
+                        <p className="mt-1 text-xs">
+                          15% off your five lowest-priced eligible products.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Totals */}
                   <div className="border-t pt-4 space-y-2">
                     <div className="flex justify-between text-sm">
@@ -1739,10 +1785,14 @@ export const CheckoutPage: React.FC = () => {
                         <span>-R125</span>
                       </div>
                     )}
-                    {appliedCoupon && discount > 0 && (
+                    {effectiveDiscount > 0 && (
                       <div className="flex justify-between text-sm text-green-600">
-                        <span>Coupon Discount:</span>
-                        <span>-{formatPrice(discount)}</span>
+                        <span>
+                          {checkoutDiscountChoice.source === 'womens_day'
+                            ? 'Women’s Day Promotion:'
+                            : 'Coupon Discount:'}
+                        </span>
+                        <span>-{formatPrice(effectiveDiscount)}</span>
                       </div>
                     )}
                     <div className="flex justify-between font-bold text-lg border-t pt-2">

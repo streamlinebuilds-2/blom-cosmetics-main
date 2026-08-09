@@ -1,6 +1,7 @@
 import type { Handler } from '@netlify/functions';
 import { createClient } from '@supabase/supabase-js';
 import { enrollCourse } from './_lib/enroll-helper';
+import { WOMENS_DAY_PROMOTION_CODE } from '../../src/lib/womensDayPromotion';
 
 // Called from CheckoutSuccess when the user lands back from Payflex.
 // Payflex appends ?orderId=<pf-guid>&token=<token> to the redirectConfirmUrl.
@@ -97,7 +98,7 @@ async function runFulfilment(order: any) {
   console.log('✅ Order marked paid:', orderId);
 
   // B) Coupon
-  if (order.coupon_code) {
+  if (order.coupon_code && order.coupon_code !== WOMENS_DAY_PROMOTION_CODE) {
     try {
       await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_coupon_usage`, {
         method: 'POST',
@@ -209,6 +210,7 @@ export const handler: Handler = async (event) => {
 
     // 1. Verify with Payflex API
     let orderStatus: string | null = null;
+    let verifiedAmount: number | undefined;
     if (PAYFLEX_CLIENT_ID && PAYFLEX_CLIENT_SECRET) {
       try {
         const token = await getPayflexToken();
@@ -218,6 +220,7 @@ export const handler: Handler = async (event) => {
         if (pfRes.ok) {
           const pfData = await pfRes.json();
           orderStatus = pfData.orderStatus || null;
+          verifiedAmount = pfData.amount ?? pfData.totalAmount ?? pfData.orderAmount;
           console.log('✅ Payflex API status:', orderStatus);
         } else {
           console.error('❌ Payflex API error:', pfRes.status, await pfRes.text());
@@ -245,6 +248,15 @@ export const handler: Handler = async (event) => {
     if (orderError || !order) {
       console.error('Order not found:', order_id, orderError);
       return { statusCode: 404, headers, body: JSON.stringify({ error: 'Order not found' }) };
+    }
+
+    if (verifiedAmount !== undefined) {
+      const paidAmountCents = Math.round(Number(verifiedAmount) * 100);
+      const expectedAmountCents = Number(order.total_cents ?? Math.round(Number(order.total || 0) * 100));
+      if (!Number.isFinite(paidAmountCents) || paidAmountCents !== expectedAmountCents) {
+        console.error('Payflex amount mismatch', { orderId: order.id, expectedAmountCents, paidAmountCents });
+        return { statusCode: 409, headers, body: JSON.stringify({ error: 'Payment amount mismatch' }) };
+      }
     }
 
     // 3. Already paid — idempotent

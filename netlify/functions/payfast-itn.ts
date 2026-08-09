@@ -1,4 +1,5 @@
 import type { Handler } from '@netlify/functions'
+import { WOMENS_DAY_PROMOTION_CODE } from '../../src/lib/womensDayPromotion'
 import crypto from 'crypto'
 import { enrollCourse } from './_lib/enroll-helper'
 
@@ -223,6 +224,23 @@ export const handler: Handler = async (event) => {
       return { statusCode: 404, body: 'Order not found' }
     }
 
+    const paidAmountCents = Math.round(Number(data.amount_gross ?? data.amount ?? 0) * 100)
+    const expectedAmountCents = Number(
+      order.total_cents ?? Math.round(Number(order.total || 0) * 100)
+    )
+    if (
+      !Number.isFinite(paidAmountCents) ||
+      !Number.isFinite(expectedAmountCents) ||
+      paidAmountCents !== expectedAmountCents
+    ) {
+      console.error('PayFast amount mismatch', {
+        orderId: order.id,
+        expectedAmountCents,
+        paidAmountCents
+      })
+      return { statusCode: 400, body: 'AMOUNT_MISMATCH' }
+    }
+
     const coursePurchasesRes = await fetch(
       `${SUPABASE_URL}/rest/v1/course_purchases?order_id=eq.${encodeURIComponent(order.id)}&select=course_slug,invitation_status,buyer_email,buyer_name,buyer_phone,instructor,selected_package,selected_date,course_title`,
       { headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` } }
@@ -247,7 +265,7 @@ export const handler: Handler = async (event) => {
       })
 
       // B) INCREMENT COUPON USAGE (New Feature)
-      if (order.coupon_code) {
+      if (order.coupon_code && order.coupon_code !== WOMENS_DAY_PROMOTION_CODE) {
         try {
           console.log(`Incrementing usage for coupon: ${order.coupon_code}`);
           await fetch(`${SUPABASE_URL}/rest/v1/rpc/increment_coupon_usage`, {

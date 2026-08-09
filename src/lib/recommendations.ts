@@ -19,6 +19,7 @@ export interface CatalogProduct {
   thumbnail?: string;
   images?: string[];
   category?: string;
+  subcategory?: string;
   status?: string;
   stockStatus?: string;
   stock?: number;
@@ -67,6 +68,7 @@ type SupabaseProduct = {
   image_url?: string;
   gallery_urls?: string[];
   category?: string | string[];
+  subcategory?: string;
   status?: string;
   is_active?: boolean;
   stock?: number;
@@ -84,6 +86,7 @@ const mapSupabaseProduct = (p: SupabaseProduct): CatalogProduct => ({
   thumbnail: p.thumbnail_url || p.image_url,
   images: [p.thumbnail_url, p.image_url, ...(Array.isArray(p.gallery_urls) ? p.gallery_urls : [])].filter(Boolean),
   category: Array.isArray(p.category) ? p.category[0] : p.category,
+  subcategory: p.subcategory,
   status: p.status || (p.is_active === false ? 'inactive' : 'active'),
   stock: p.stock,
   stock_qty: p.stock_qty,
@@ -104,7 +107,7 @@ export async function loadCatalog(): Promise<CatalogProduct[]> {
       try {
         const { data, error } = await supabase
           .from('products')
-          .select('id,name,slug,price,price_cents,thumbnail_url,image_url,gallery_urls,category,status,is_active,stock,stock_qty,stock_on_hand,inventory_quantity,out_of_stock')
+          .select('id,name,slug,price,price_cents,thumbnail_url,image_url,gallery_urls,category,subcategory,status,is_active,stock,stock_qty,stock_on_hand,inventory_quantity,out_of_stock')
           .in('status', ['active', 'published']);
 
         if (!error && Array.isArray(data) && data.length > 0) {
