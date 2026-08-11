@@ -139,26 +139,48 @@ export const handler: Handler = async (event) => {
       }
     }
 
-    // Find the order by merchantReference (= m_payment_id we set when creating the order)
-    // This avoids depending on the payflex_order_id column existing yet
-    const orParam = merchantReference
-      ? encodeURIComponent(`(m_payment_id.eq.${merchantReference},merchant_payment_id.eq.${merchantReference})`)
-      : null;
-
-    if (!orParam) {
-      console.error('No merchantReference in webhook payload — cannot find order');
-      return { statusCode: 200, body: 'Missing merchantReference — acknowledged' };
+    // Find the order by merchantReference (= m_payment_id we set when creating the order),
+    // falling back to payflex_order_id (= the orderId Payflex sends us in every callback).
+    //
+    // The fallback matters: when a callback arrives without a merchantReference this used to
+    // log and return 200, so Payflex saw success, never retried, and a real payment was
+    // silently dropped. Two orders were lost that way before 2026-08-11.
+    const lookups: string[] = [];
+    if (merchantReference) {
+      lookups.push(`or=${encodeURIComponent(`(m_payment_id.eq.${merchantReference},merchant_payment_id.eq.${merchantReference})`)}`);
+    }
+    if (payflexOrderId) {
+      lookups.push(`payflex_order_id=eq.${encodeURIComponent(payflexOrderId)}`);
     }
 
-    const ordRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?or=${orParam}&select=*`, {
-      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
-    });
-    const orders = await ordRes.json();
-    const order = orders?.[0];
+    if (lookups.length === 0) {
+      // Nothing to match on at all — retrying will never help, so acknowledge.
+      console.error('No merchantReference or orderId in webhook payload — cannot find order');
+      return { statusCode: 200, body: 'No order identifier — acknowledged' };
+    }
+
+    let order: any = null;
+    for (const filter of lookups) {
+      const ordRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?${filter}&select=*`, {
+        headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
+      });
+      if (!ordRes.ok) {
+        console.error('Order lookup failed:', filter, await ordRes.text());
+        continue;
+      }
+      const orders = await ordRes.json();
+      if (orders?.[0]) {
+        order = orders[0];
+        if (!merchantReference) console.log('✅ Matched order via payflex_order_id fallback:', order.id);
+        break;
+      }
+    }
 
     if (!order) {
+      // We had an identifier and still found nothing. Return non-2xx so Payflex
+      // retries instead of treating the payment as delivered.
       console.error('Order not found. payflexOrderId:', payflexOrderId, 'merchantReference:', merchantReference);
-      return { statusCode: 200, body: 'Order not found — acknowledged' };
+      return { statusCode: 404, body: 'Order not found' };
     }
 
     // Handle non-approved statuses — only act on definite decline/abandon, never on undefined
