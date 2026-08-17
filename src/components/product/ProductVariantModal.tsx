@@ -66,7 +66,7 @@ export const ProductVariantModal: React.FC<ProductVariantModalProps> = ({
       
       const cartItem = {
         id: `item_${Date.now()}`,
-        productId: product.slug,
+        productId: product.id || product.slug,
         variantId: selectedVariant,
         name: product.name,
         price: selectedVariantData?.price || product.price,

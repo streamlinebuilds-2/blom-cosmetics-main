@@ -126,11 +126,20 @@ export const handler: Handler = async (event) => {
       idMap.set(String(p.id).toLowerCase(), p.id);
     });
 
-    // Name/slug/sku are only a fallback, and they CAN collide between a product and a
-    // bundle. `dbProducts` lists products before bundles and existing keys are never
-    // overwritten, so a bundle can never shadow a real product — which would misclassify
-    // that product as a bundle and null out its product_id.
-    dbProducts.forEach((p: any) => {
+    // Name/slug/sku are only a fallback, and they CAN collide: between a product and a
+    // bundle, and between a live product and an archived duplicate of it. Existing keys
+    // are never overwritten, so registration order decides the winner:
+    //   1. sellable before archived — otherwise an archived duplicate answers for the
+    //      live product and checkout is blocked by its stale variant list.
+    //   2. products before bundles — otherwise a bundle shadows a real product, which
+    //      would misclassify it and null out its product_id.
+    const isSellableRow = (p: any) => p.status !== 'archived' && p.is_active !== false;
+    const fallbackRows = [
+      ...dbProducts.filter(isSellableRow),
+      ...dbProducts.filter((p: any) => !isSellableRow(p)),
+    ];
+
+    fallbackRows.forEach((p: any) => {
       for (const candidate of [p.name, p.slug, p.sku]) {
         if (!candidate) continue;
         const key = normalizeName(candidate);
@@ -168,6 +177,14 @@ export const handler: Handler = async (event) => {
 
       if (bareId && isUUID(bareId) && idMap.has(String(bareId).toLowerCase())) {
         resolvedId = idMap.get(String(bareId).toLowerCase());
+        resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
+      }
+
+      // Not every add-to-cart path stores a uuid — ProductVariantModal stores the slug.
+      // A non-uuid id is just another fallback key, so resolve it like name/sku rather
+      // than dropping through to name matching, which loses the variant context.
+      if (!resolvedId && bareId && idMap.has(normalizeName(bareId))) {
+        resolvedId = idMap.get(normalizeName(bareId));
         resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
       }
 
