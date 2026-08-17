@@ -119,11 +119,23 @@ export const handler: Handler = async (event) => {
     const dbProducts = [...dbProductRows, ...normalizedBundles];
 
     const idMap = new Map();
+
+    // Ids are authoritative: they are uuids, so they cannot collide with each other or
+    // with a name/slug/sku key.
     dbProducts.forEach((p: any) => {
-      idMap.set(p.id.toLowerCase(), p.id);
-      if (p.name) idMap.set(normalizeName(p.name), p.id);
-      if (p.slug) idMap.set(normalizeName(p.slug), p.id);
-      if (p.sku) idMap.set(normalizeName(p.sku), p.id);
+      idMap.set(String(p.id).toLowerCase(), p.id);
+    });
+
+    // Name/slug/sku are only a fallback, and they CAN collide between a product and a
+    // bundle. `dbProducts` lists products before bundles and existing keys are never
+    // overwritten, so a bundle can never shadow a real product — which would misclassify
+    // that product as a bundle and null out its product_id.
+    dbProducts.forEach((p: any) => {
+      for (const candidate of [p.name, p.slug, p.sku]) {
+        if (!candidate) continue;
+        const key = normalizeName(candidate);
+        if (!idMap.has(key)) idMap.set(key, p.id);
+      }
     });
 
     // 2. Process Items
@@ -144,8 +156,18 @@ export const handler: Handler = async (event) => {
       let resolvedProduct = null;
       let rawId = it.product_id || it.productId || it.id;
 
-      if (rawId && isUUID(rawId) && idMap.has(String(rawId).toLowerCase())) {
-        resolvedId = idMap.get(String(rawId).toLowerCase());
+      // Anything the storefront renders as a bundle carries a `bundle-<uuid>` cart id
+      // (ShopPage.tsx, ProductDetailPage.tsx). The underlying row may be in EITHER table:
+      // legacy bundle-deals are rows in `products`, newer ones are rows in `bundles`.
+      // Strip the prefix so the bare uuid resolves exactly, instead of falling through to
+      // name matching — which is how bundles were being resolved before, and is fragile
+      // (a renamed bundle silently fails to resolve and blocks checkout).
+      const bareId = typeof rawId === 'string' && rawId.startsWith('bundle-')
+        ? rawId.slice('bundle-'.length)
+        : rawId;
+
+      if (bareId && isUUID(bareId) && idMap.has(String(bareId).toLowerCase())) {
+        resolvedId = idMap.get(String(bareId).toLowerCase());
         resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
       }
 
