@@ -570,8 +570,9 @@ export const handler: Handler = async (event) => {
 
         return {
           // Bundles are verified above but live outside `products`, so their id would
-          // violate order_items_product_id_fkey. Persist them by name only, as before.
+          // violate order_items_product_id_fkey. They are linked via bundle_id instead.
           product_id: it.resolved_product?.is_bundle ? null : it.resolved_id,
+          bundle_id: it.resolved_product?.is_bundle ? it.resolved_id : null,
           product_name: finalDisplayName,
           quantity: it.quantity,
           unit_price: unitPriceRands, // Store as Rands (e.g. 590.00)
