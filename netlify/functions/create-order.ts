@@ -126,16 +126,34 @@ export const handler: Handler = async (event) => {
       idMap.set(String(p.id).toLowerCase(), p.id);
     });
 
-    // Name/slug/sku are only a fallback, and they CAN collide between a product and a
-    // bundle. `dbProducts` lists products before bundles and existing keys are never
-    // overwritten, so a bundle can never shadow a real product — which would misclassify
-    // that product as a bundle and null out its product_id.
-    dbProducts.forEach((p: any) => {
-      for (const candidate of [p.name, p.slug, p.sku]) {
+    // Slug/sku and name are fallbacks, and they are kept in SEPARATE maps: one row's
+    // slug can equal a different row's name, and answering a slug lookup with a
+    // name match would charge for the wrong product — or resolve a product to a
+    // bundle, flipping is_bundle and writing the id to the wrong order_items column.
+    const slugSkuMap = new Map();
+    const nameMap = new Map();
+
+    // Within each map the keys CAN still collide — between a product and a bundle, and
+    // between a live product and an archived duplicate of it. Existing keys are never
+    // overwritten, so registration order decides the winner:
+    //   1. sellable before archived — otherwise an archived duplicate answers for the
+    //      live product and checkout is blocked by its stale variant list.
+    //   2. products before bundles — otherwise a bundle shadows a real product, which
+    //      would misclassify it and null out its product_id.
+    const isSellableRow = (p: any) => p.status !== 'archived' && p.is_active !== false;
+    const fallbackRows = [
+      ...dbProducts.filter(isSellableRow),
+      ...dbProducts.filter((p: any) => !isSellableRow(p)),
+    ];
+
+    fallbackRows.forEach((p: any) => {
+      for (const candidate of [p.slug, p.sku]) {
         if (!candidate) continue;
         const key = normalizeName(candidate);
-        if (!idMap.has(key)) idMap.set(key, p.id);
+        if (!slugSkuMap.has(key)) slugSkuMap.set(key, p.id);
       }
+      const nameKey = normalizeName(p.name);
+      if (nameKey && !nameMap.has(nameKey)) nameMap.set(nameKey, p.id);
     });
 
     // 2. Process Items
@@ -171,10 +189,20 @@ export const handler: Handler = async (event) => {
         resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
       }
 
+      // Not every add-to-cart path stores a uuid — ProductVariantModal stores the slug.
+      // Resolve a non-uuid id against slug/sku ONLY, never against names, so a cart id
+      // can't be answered by an unrelated row that happens to be named that.
+      if (!resolvedId && bareId && !isUUID(bareId) && slugSkuMap.has(normalizeName(bareId))) {
+        resolvedId = slugSkuMap.get(normalizeName(bareId));
+        resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
+      }
+
       // If ID not found, try Name matching
       if (!resolvedId) {
-        if (idMap.has(normalizeName(baseName))) {
-          resolvedId = idMap.get(normalizeName(baseName));
+        const nameKey = normalizeName(baseName);
+        const byName = nameMap.has(nameKey) ? nameMap.get(nameKey) : slugSkuMap.get(nameKey);
+        if (byName) {
+          resolvedId = byName;
           resolvedProduct = dbProducts.find((p: any) => p.id === resolvedId);
         }
       }
