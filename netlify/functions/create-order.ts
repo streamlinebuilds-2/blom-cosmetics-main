@@ -90,11 +90,31 @@ export const handler: Handler = async (event) => {
     }
 
     // 1. Load Product Dictionary
-    const productsRes = await fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price,price_cents,category,subcategory,status,is_active,out_of_stock,stock,stock_qty,stock_on_hand,inventory_quantity,variants`, {
-      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
-    });
-    const dbProducts = productsRes.ok ? await productsRes.json() : [];
-    
+    // Bundles live in their own table and are NOT mirrored into `products` (see
+    // ProductDetailPage.tsx / ShopPage.tsx, which read `bundles` directly). They must be
+    // merged in here too, otherwise every bundle-only checkout fails catalog verification.
+    const [productsRes, bundlesRes] = await Promise.all([
+      fetch(`${SUPABASE_URL}/rest/v1/products?select=id,name,slug,sku,price,price_cents,category,subcategory,status,is_active,out_of_stock,stock,stock_qty,stock_on_hand,inventory_quantity,variants`, {
+        headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
+      }),
+      fetch(`${SUPABASE_URL}/rest/v1/bundles?select=id,name,slug,sku,price_cents,status,is_active`, {
+        headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` }
+      })
+    ]);
+    const dbProductRows = productsRes.ok ? await productsRes.json() : [];
+    const dbBundleRows = bundlesRes.ok ? await bundlesRes.json() : [];
+
+    // Normalize bundles into the same shape as products so downstream stock/price/variant
+    // logic (isProductOutOfStock, getCanonicalPriceCents, etc.) works unchanged.
+    const normalizedBundles = dbBundleRows.map((b: any) => ({
+      ...b,
+      category: 'bundle-deals',
+      out_of_stock: b.is_active === false || (b.status && b.status !== 'active' && b.status !== 'published'),
+      variants: [],
+    }));
+
+    const dbProducts = [...dbProductRows, ...normalizedBundles];
+
     const idMap = new Map();
     dbProducts.forEach((p: any) => {
       idMap.set(p.id.toLowerCase(), p.id);
