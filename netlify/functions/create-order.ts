@@ -111,6 +111,9 @@ export const handler: Handler = async (event) => {
       category: 'bundle-deals',
       out_of_stock: b.is_active === false || (b.status && b.status !== 'active' && b.status !== 'published'),
       variants: [],
+      // order_items.product_id has a FK to products(id). Bundle ids only exist in
+      // `bundles`, so they must never be written to that column — see is_bundle use below.
+      is_bundle: true,
     }));
 
     const dbProducts = [...dbProductRows, ...normalizedBundles];
@@ -566,7 +569,9 @@ export const handler: Handler = async (event) => {
         const unitPriceRands = it.unit_price / 100;
 
         return {
-          product_id: it.resolved_id, 
+          // Bundles are verified above but live outside `products`, so their id would
+          // violate order_items_product_id_fkey. Persist them by name only, as before.
+          product_id: it.resolved_product?.is_bundle ? null : it.resolved_id,
           product_name: finalDisplayName,
           quantity: it.quantity,
           unit_price: unitPriceRands, // Store as Rands (e.g. 590.00)
