@@ -4,8 +4,13 @@ import {
   calculateWomensDayPromotion,
   chooseBestDiscount,
   WOMENS_DAY_END_ISO,
+  WOMENS_DAY_PROMOTION_CODE,
   WOMENS_DAY_START_ISO,
 } from './womensDayPromotion';
+
+const womensDay = (discountCents: number) => [
+  { source: 'womens_day', code: WOMENS_DAY_PROMOTION_CODE, discountCents },
+];
 
 const LIVE = new Date('2026-08-10T12:00:00+02:00');
 const line = (price: number, quantity = 1, overrides = {}) => ({
@@ -58,9 +63,23 @@ test('promotion uses a half-open SAST time window', () => {
 });
 
 test('larger discount wins and promotion wins ties', () => {
-  assert.deepEqual(chooseBestDiscount(15000, 20000, 'SAVE20'), {
+  assert.deepEqual(chooseBestDiscount(womensDay(15000), 20000, 'SAVE20'), {
     source: 'coupon', discountCents: 20000, code: 'SAVE20',
   });
-  assert.equal(chooseBestDiscount(20000, 20000, 'SAVE20').source, 'womens_day');
-  assert.equal(chooseBestDiscount(20000, 10000, 'SAVE10').source, 'womens_day');
+  assert.equal(chooseBestDiscount(womensDay(20000), 20000, 'SAVE20').source, 'womens_day');
+  assert.equal(chooseBestDiscount(womensDay(20000), 10000, 'SAVE10').source, 'womens_day');
+});
+
+test('picks the larger of multiple simultaneous promotions', () => {
+  const promotions = [
+    { source: 'womens_day', code: WOMENS_DAY_PROMOTION_CODE, discountCents: 5000 },
+    { source: 'cat_eye', code: 'CATEYE2FOR340', discountCents: 2000 },
+  ];
+  assert.deepEqual(chooseBestDiscount(promotions, 0, null), {
+    source: 'womens_day', discountCents: 5000, code: WOMENS_DAY_PROMOTION_CODE,
+  });
+  assert.deepEqual(chooseBestDiscount(promotions.reverse(), 0, null), {
+    source: 'womens_day', discountCents: 5000, code: WOMENS_DAY_PROMOTION_CODE,
+  });
+  assert.equal(chooseBestDiscount([], 0, null).source, 'none');
 });

@@ -11,6 +11,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "test:promotion": "tsx --test src/lib/womensDayPromotion.test.ts",
+    "test:cateye": "tsx --test src/lib/catEyeTwoForOffer.test.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "seed:products": "tsx scripts/seed-products.ts"

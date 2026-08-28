@@ -3,7 +3,12 @@ import { TRENDY_RING_OFFER_PRODUCT_SLUGS } from './_lib/trendy-ring-offer'
 import {
   calculateWomensDayPromotion,
   chooseBestDiscount,
+  WOMENS_DAY_PROMOTION_CODE,
 } from '../../src/lib/womensDayPromotion'
+import {
+  calculateCatEyeTwoForOffer,
+  CAT_EYE_TWO_FOR_OFFER_CODE,
+} from '../../src/lib/catEyeTwoForOffer'
 import crypto from 'crypto'
 
 export const handler: Handler = async (event) => {
@@ -586,8 +591,21 @@ export const handler: Handler = async (event) => {
           }))
         : []
     )
+    const catEyeOffer = calculateCatEyeTwoForOffer(
+      orderKind === 'product'
+        ? validItems.map((item) => ({
+            productId: item.resolved_id,
+            slug: item.resolved_product?.slug,
+            unitPriceCents: item.unit_price,
+            quantity: item.quantity,
+          }))
+        : []
+    )
     const discountChoice = chooseBestDiscount(
-      womensDayPromotion.discountCents,
+      [
+        { source: 'womens_day', code: WOMENS_DAY_PROMOTION_CODE, discountCents: womensDayPromotion.discountCents },
+        { source: 'cat_eye', code: CAT_EYE_TWO_FOR_OFFER_CODE, discountCents: catEyeOffer.discountCents },
+      ],
       couponDiscountCents,
       couponCode
     )
@@ -740,6 +758,7 @@ export const handler: Handler = async (event) => {
         ...order,
         discount_source: discountChoice.source,
         promotion_discount_cents: womensDayPromotion.discountCents,
+        cat_eye_discount_cents: catEyeOffer.discountCents,
         coupon_discount_cents: couponDiscountCents,
         discount_cents: discountCents,
         coupon_code: finalDiscountCode,

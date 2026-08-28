@@ -22,6 +22,7 @@ import {
 import {
   calculateWomensDayPromotionForCart,
   chooseBestDiscount,
+  WOMENS_DAY_PROMOTION_CODE,
 } from '../lib/womensDayPromotion';
 // Coupon data type (moved inside component as a ref — avoids shared module-level mutable state)
 type SimpleCouponData = {
@@ -208,7 +209,7 @@ export const CheckoutPage: React.FC = () => {
   );
   const checkoutDiscountChoice = useMemo(
     () => chooseBestDiscount(
-      womensDayPromotion.discountCents,
+      [{ source: 'womens_day', code: WOMENS_DAY_PROMOTION_CODE, discountCents: womensDayPromotion.discountCents }],
       Math.round(discount * 100),
       appliedCoupon?.code
     ),

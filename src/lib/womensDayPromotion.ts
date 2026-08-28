@@ -41,9 +41,15 @@ export type WomensDayPromotionResult = {
 };
 
 export type DiscountChoice = {
-  source: 'none' | 'coupon' | 'womens_day';
+  source: 'none' | 'coupon' | string;
   discountCents: number;
   code: string | null;
+};
+
+export type PromotionCandidate = {
+  source: string;
+  code: string | null;
+  discountCents: number;
 };
 
 type PromotionCartItem = {
@@ -119,15 +125,23 @@ export function calculateWomensDayPromotion(
 }
 
 export function chooseBestDiscount(
-  promotionDiscountCents: number,
+  promotions: PromotionCandidate[],
   couponDiscountCents: number,
   couponCode?: string | null,
 ): DiscountChoice {
-  const promotion = Math.max(0, Math.round(promotionDiscountCents || 0));
   const coupon = Math.max(0, Math.round(couponDiscountCents || 0));
 
-  if (promotion > 0 && promotion >= coupon) {
-    return { source: 'womens_day', discountCents: promotion, code: WOMENS_DAY_PROMOTION_CODE };
+  let best: PromotionCandidate | null = null;
+  for (const promo of promotions) {
+    const discountCents = Math.max(0, Math.round(promo.discountCents || 0));
+    if (discountCents <= 0) continue;
+    if (!best || discountCents > best.discountCents) {
+      best = { source: promo.source, code: promo.code, discountCents };
+    }
+  }
+
+  if (best && best.discountCents >= coupon) {
+    return { source: best.source, discountCents: best.discountCents, code: best.code };
   }
   if (coupon > 0) {
     return { source: 'coupon', discountCents: coupon, code: couponCode || null };
