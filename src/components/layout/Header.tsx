@@ -9,6 +9,7 @@ import { AnnouncementBar } from './AnnouncementBar';
 import { BackInStockPopup } from './BackInStockPopup';
 import { BirthdayBundlePopup } from './BirthdayBundlePopup';
 import { WomensDayPopup } from './WomensDayPopup';
+import { CatEyeSpecialsPopup } from './CatEyeSpecialsPopup';
 
 interface HeaderProps {
   showMobileMenu?: boolean;
@@ -62,8 +63,9 @@ export const Header: React.FC<HeaderProps> = ({ showMobileMenu = false }) => {
     <>
       <AnnouncementBar />
       <AnnouncementSignup />
+      {/* Nude Cat Eye launch is the current live promo; it claims the visit ahead of the seasonal/restock popups. */}
+      <CatEyeSpecialsPopup />
       <WomensDayPopup />
-      {/* Birthday promo takes priority during its window; it claims the visit before the restock popup. */}
       <BirthdayBundlePopup />
       <BackInStockPopup />
 
