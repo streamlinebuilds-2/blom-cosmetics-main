@@ -11,6 +11,7 @@ import { AutocompleteSearch } from '../components/search/AutocompleteSearch';
 import { PageLoadingSpinner, ProductGridSkeleton } from '../components/ui/LoadingSpinner';
 import { supabase, supabaseConfigured } from '../lib/supabase';
 import { RangeSlider } from '../components/ui/RangeSlider';
+import { CatEyeShopBanner } from '../components/layout/CatEyeShopBanner';
 
 // Discount system disabled
 
@@ -640,6 +641,8 @@ export const ShopPage: React.FC = () => {
             </div>
           </Container>
         </div>
+
+        <CatEyeShopBanner />
 
         <Container>
           <div className="lg:hidden pt-4 pb-2">

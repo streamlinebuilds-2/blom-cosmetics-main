@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, X } from 'lucide-react';
+import { CAT_EYE_MOBILE_IMAGE, CAT_EYE_DESKTOP_IMAGE } from '../../lib/catEyeAssets';
 
 // Nude Cat Eye Collection launch popup — promotes the 3 specials (fixed 6-item
 // bundle, capped buy-2, fixed 5-item bundle). Unlike WomensDayPopup/
@@ -11,10 +12,8 @@ const SHOW_AT_KEY = 'blom_cateye_specials_show_at';
 const SESSION_KEY = 'blom_cateye_specials_session';
 const SHOW_DELAY_MS = 3000;
 
-const MOBILE_IMAGE =
-  'https://res.cloudinary.com/dbhiu7lv0/image/upload/v1787905639/ChatGPT_Image_Aug_28_2026_10_26_48_AM_jogcwy.png';
-const DESKTOP_IMAGE =
-  'https://res.cloudinary.com/dbhiu7lv0/image/upload/v1787905709/ChatGPT_Image_Aug_28_2026_10_28_10_AM_q6mfjz.png';
+const MOBILE_IMAGE = CAT_EYE_MOBILE_IMAGE;
+const DESKTOP_IMAGE = CAT_EYE_DESKTOP_IMAGE;
 
 const SPECIALS = [
   {
