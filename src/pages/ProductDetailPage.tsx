@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../lib/cart';
+import { FREE_SHIPPING_THRESHOLD_LABEL } from '../lib/shipping';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { Container } from '../components/layout/Container';
@@ -1023,7 +1024,7 @@ export const ProductDetailPage: React.FC = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-sm text-gray-900">Free Shipping</h4>
-                    <p className="text-xs text-gray-500 mt-1">On orders over R2500</p>
+                    <p className="text-xs text-gray-500 mt-1">On orders over {FREE_SHIPPING_THRESHOLD_LABEL}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl">

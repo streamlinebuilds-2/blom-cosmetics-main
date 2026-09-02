@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 import fetch from "node-fetch"
+import { FREE_SHIPPING_THRESHOLD } from "../../src/lib/shipping"
 
 const SB_URL = process.env.SUPABASE_URL!
 const SB_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -128,9 +129,9 @@ export const handler = async (event: any) => {
     // Add shipping as a line item if shipping cost exists
     if (order.shipping_cents && order.shipping_cents > 0) {
       const shippingAmount = order.shipping_cents / 100
-      const freeShippingThreshold = 2500 // R2500 threshold for free shipping
+      const freeShippingThreshold = FREE_SHIPPING_THRESHOLD
 
-      // Check if this qualifies for free shipping (order subtotal >= R2500)
+      // Check if this qualifies for free shipping (subtotal >= the threshold)
       const subtotalAmount = (order.subtotal_cents || 0) / 100
       const isFreeShipping = subtotalAmount >= freeShippingThreshold && shippingAmount === 0
       

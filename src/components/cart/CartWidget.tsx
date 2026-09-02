@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ShoppingCart, X, Plus, Minus, Trash2, Edit } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { cartStore, CartState, formatPrice } from '../../lib/cart';
+import { qualifiesForFreeShipping, amountToFreeShipping } from '../../lib/shipping';
 import { ProductVariantModal } from '../product/ProductVariantModal';
 import {
   CatalogProduct,
@@ -360,9 +361,9 @@ export const CartWidget: React.FC = () => {
                   </div>
                 )}
                 
-                {cartState.subtotal < 2500 && (
+                {!qualifiesForFreeShipping(cartState.subtotal) && (
                   <p className="text-sm text-gray-600 text-center">
-                    Add {formatPrice(2500 - cartState.subtotal)} more for free shipping!
+                    Add {formatPrice(amountToFreeShipping(cartState.subtotal))} more for free shipping!
                   </p>
                 )}
 

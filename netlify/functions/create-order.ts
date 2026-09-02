@@ -9,6 +9,7 @@ import {
   calculateCatEyeTwoForOffer,
   CAT_EYE_TWO_FOR_OFFER_CODE,
 } from '../../src/lib/catEyeTwoForOffer'
+import { standardShippingCentsFor } from '../../src/lib/shipping'
 import crypto from 'crypto'
 
 export const handler: Handler = async (event) => {
@@ -378,8 +379,9 @@ export const handler: Handler = async (event) => {
     } else if (hasFurniture) {
       shippingCents = 0
     } else {
-      // Free shipping over R2500 (must match frontend cart.ts & CheckoutPage.tsx)
-      shippingCents = subtotalCents >= 2500 * 100 ? 0 : 125 * 100
+      // Shared with the storefront via src/lib/shipping.ts, so the quoted
+      // price and the charged price cannot drift apart.
+      shippingCents = standardShippingCentsFor(subtotalCents)
     }
 
     // Coupon totals are always recalculated server-side. The frontend may show

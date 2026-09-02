@@ -12,6 +12,13 @@ import { wishlistStore } from '../lib/wishlist';
 import { AddressAutocomplete } from '../components/checkout/AddressAutocomplete';
 import { validateMobileNumber, validateAddress, formatMobileNumber } from '../lib/validation';
 import { supabase } from '../lib/supabase';
+import {
+  SHIPPING_FLAT_RATE_LABEL,
+  FREE_SHIPPING_THRESHOLD_LABEL,
+  standardShippingFor,
+  qualifiesForFreeShipping,
+  amountToFreeShipping,
+} from '../lib/shipping';
 import { ProductVariantModal } from '../components/product/ProductVariantModal';
 import {
   CatalogProduct,
@@ -1012,7 +1019,7 @@ export const CheckoutPage: React.FC = () => {
     }
 
     // 4. Standard Delivery Rules
-    return cartState.subtotal >= 2500 ? 0 : 125;
+    return standardShippingFor(cartState.subtotal);
   };
 
   const shippingCost = calculateShipping();
@@ -1186,7 +1193,7 @@ export const CheckoutPage: React.FC = () => {
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="font-semibold text-gray-900">Door-to-Door Delivery</span>
                                   <span className="text-lg font-bold text-gray-900">
-                                    {hasFurniture ? 'Calculated Later' : (cartState.subtotal >= 2500 ? 'FREE' : 'R125')}
+                                    {hasFurniture ? 'Calculated Later' : (qualifiesForFreeShipping(cartState.subtotal) ? 'FREE' : SHIPPING_FLAT_RATE_LABEL)}
                                   </span>
                                 </div>
                                 
@@ -1198,11 +1205,11 @@ export const CheckoutPage: React.FC = () => {
                                 ) : (
                                   <>
                                     <p className="text-sm text-gray-600">Delivered to your address. 2–5 business days.</p>
-                                    {cartState.subtotal >= 2500 && (
-                                      <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free over R2500</span>
+                                    {qualifiesForFreeShipping(cartState.subtotal) && (
+                                      <span className="inline-block mt-2 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">Free over {FREE_SHIPPING_THRESHOLD_LABEL}</span>
                                     )}
-                                    {cartState.subtotal < 2500 && (
-                                      <p className="text-xs text-gray-500 mt-1">Add R{(2500 - cartState.subtotal).toFixed(2)} more for free delivery!</p>
+                                    {!qualifiesForFreeShipping(cartState.subtotal) && (
+                                      <p className="text-xs text-gray-500 mt-1">Add R{amountToFreeShipping(cartState.subtotal).toFixed(2)} more for free delivery!</p>
                                     )}
                                   </>
                                 )}
@@ -1780,10 +1787,10 @@ export const CheckoutPage: React.FC = () => {
                           : (shippingCost === 0 ? 'FREE' : formatPrice(shippingCost))}
                       </span>
                     </div>
-                    {shippingMethod === 'door-to-door' && cartState.subtotal >= 2500 && !hasFurniture && (
+                    {shippingMethod === 'door-to-door' && qualifiesForFreeShipping(cartState.subtotal) && !hasFurniture && (
                       <div className="flex justify-between text-xs text-green-600">
                         <span>✨ Free shipping applied!</span>
-                        <span>-R125</span>
+                        <span>-{SHIPPING_FLAT_RATE_LABEL}</span>
                       </div>
                     )}
                     {effectiveDiscount > 0 && (
@@ -1803,10 +1810,10 @@ export const CheckoutPage: React.FC = () => {
                   </div>
 
                   {/* Shipping Notice */}
-                  {!hasFurniture && cartState.subtotal < 2500 && (
+                  {!hasFurniture && !qualifiesForFreeShipping(cartState.subtotal) && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                       <p className="text-sm text-blue-800">
-                        Add {formatPrice(2500 - cartState.subtotal)} more for free shipping!
+                        Add {formatPrice(amountToFreeShipping(cartState.subtotal))} more for free shipping!
                       </p>
                     </div>
                   )}

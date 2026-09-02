@@ -1,6 +1,7 @@
 // Cart state management and utilities
 import { Product, ProductVariant } from './supabase';
 import { analytics } from './analytics';
+import { standardShippingFor } from './shipping';
 
 export interface CartItem {
   id: string;
@@ -139,8 +140,7 @@ class CartStore {
   private updateTotals(): void {
     this.state.subtotal = this.state.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
-    // Free shipping over R2500
-    this.state.shipping = this.state.subtotal >= 2500 ? 0 : 125;
+    this.state.shipping = standardShippingFor(this.state.subtotal);
     
     // 15% VAT
     this.state.tax = Math.round((this.state.subtotal + this.state.shipping) * 0.15);

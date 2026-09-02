@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib"
 import fetch from "node-fetch"
+import { FREE_SHIPPING_THRESHOLD, FREE_SHIPPING_THRESHOLD_LABEL } from "../../src/lib/shipping"
 
 const SUPABASE_URL = process.env.SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -195,14 +196,14 @@ export const handler = async (event: any) => {
     const discountAmount = discountCents / 100
 
     // Shipping
-    const isFreeShipping = subtotalAmount >= 2500 && shippingAmount === 0;
+    const isFreeShipping = subtotalAmount >= FREE_SHIPPING_THRESHOLD && shippingAmount === 0;
     
     if (hasFurniture && shippingAmount === 0) {
       drawText("Shipping (Furniture)", left, y, 10)
       drawRightText("Invoiced Later", right - 20, y, 10)
       y -= 16
     } else if (isFreeShipping) {
-      drawText("FREE SHIPPING - Order over R2500", left, y, 10)
+      drawText("FREE SHIPPING - Order over " + FREE_SHIPPING_THRESHOLD_LABEL, left, y, 10)
       drawRightText("R 0.00", right - 20, y, 10)
       y -= 16
     } else if (shippingAmount > 0) {
