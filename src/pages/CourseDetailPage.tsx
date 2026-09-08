@@ -104,6 +104,20 @@ export const CourseDetailPage: React.FC = () => {
               alt: 'April Course Dates – Yolanda Botha Orkney'
             }
           ]
+        },
+        {
+          name: 'Rochelle Visser',
+          image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1788858144/Codex_Image_Sep_8_2026_09_15_30_AM_ggfdfj.png',
+          bio: 'Professional nail artist with years of experience in nail artistry. Rochelle specialises in teaching proper techniques and helping students build confidence in their nail artistry skills.',
+          location: '21 Selborne Ave, Geduld Ext, Springs',
+          email: 'rochellevisser@hotmail.com',
+          phone: '0760183671',
+          availableDates: [
+            '19–23 October 2026',
+            '16–20 November 2026',
+            '25–29 January 2027',
+            '15–19 February 2027'
+          ]
         }
       ],
       about: [
@@ -294,6 +308,19 @@ export const CourseDetailPage: React.FC = () => {
                 'Day 4: 09:00 – 16:00'
               ]
             }
+          ]
+        },
+        {
+          name: 'Rochelle Visser',
+          image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1788858144/Codex_Image_Sep_8_2026_09_15_30_AM_ggfdfj.png',
+          bio: 'Professional nail artist with years of experience in nail artistry. Rochelle specialises in teaching proper techniques and helping students build confidence in their nail artistry skills.',
+          location: '21 Selborne Ave, Geduld Ext, Springs',
+          email: 'rochellevisser@hotmail.com',
+          phone: '0760183671',
+          availableDates: [
+            '28–30 October 2026',
+            '1–3 December 2026',
+            '16–18 March 2027'
           ]
         }
       ],
