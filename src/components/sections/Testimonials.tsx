@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Facebook, MessageSquarePlus, Quote, Star } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Facebook, MessageSquarePlus, Quote, Star, X } from 'lucide-react';
 import { LeaveReviewModal, type SubmittedReview } from './LeaveReviewModal';
 
 const GOOGLE_REVIEWS_URL =
@@ -58,6 +59,16 @@ export const Testimonials: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const [submitted, setSubmitted] = useState<SubmittedReview[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [lightboxPhoto, setLightboxPhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!lightboxPhoto) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLightboxPhoto(null);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [lightboxPhoto]);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,7 +121,14 @@ export const Testimonials: React.FC = () => {
             <footer>
               <span className="home-review-quote__identity">
                 {review.photo && (
-                  <img className="home-review-quote__avatar" src={review.photo} alt="" aria-hidden="true" />
+                  <button
+                    type="button"
+                    className="home-review-quote__avatar-button"
+                    onClick={() => setLightboxPhoto(review.photo)}
+                    aria-label={`View full photo from ${review.name}`}
+                  >
+                    <img className="home-review-quote__avatar" src={review.photo} alt="" aria-hidden="true" />
+                  </button>
                 )}
                 <span>
                   <strong>{review.name}</strong>
@@ -166,6 +184,27 @@ export const Testimonials: React.FC = () => {
 
       {showForm && (
         <LeaveReviewModal onClose={() => setShowForm(false)} onSubmitted={handleSubmitted} />
+      )}
+
+      {lightboxPhoto && createPortal(
+        <div
+          className="review-lightbox-overlay"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setLightboxPhoto(null);
+          }}
+        >
+          <button
+            type="button"
+            className="review-lightbox__close"
+            onClick={() => setLightboxPhoto(null)}
+            aria-label="Close"
+          >
+            <X aria-hidden="true" />
+          </button>
+          <img className="review-lightbox__image" src={lightboxPhoto} alt="Customer review photo" />
+        </div>,
+        document.body
       )}
     </section>
   );

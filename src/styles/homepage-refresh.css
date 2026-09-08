@@ -1021,14 +1021,76 @@ body[data-blom-route] .home-page main .home-products__grid button.bg-pink-500:ho
   gap: 12px;
 }
 
-.home-review-quote__avatar {
-  width: 44px;
-  height: 44px;
+.home-review-quote__avatar-button {
   flex-shrink: 0;
+  border: none;
+  padding: 0;
+  background: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 160ms ease;
+}
+
+.home-review-quote__avatar-button:hover {
+  transform: scale(1.05);
+}
+
+.home-review-quote__avatar {
+  display: block;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   border: 2px solid #ffffff;
   outline: 1px solid rgba(83, 124, 165, 0.18);
   object-fit: cover;
+}
+
+.review-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(23, 32, 51, 0.82);
+  animation: review-modal-fade 160ms ease;
+}
+
+.review-lightbox__image {
+  max-width: min(90vw, 640px);
+  max-height: 85vh;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  object-fit: contain;
+}
+
+.review-lightbox__close {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+.review-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.review-lightbox__close svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-lightbox-overlay {
+    animation: none;
+  }
 }
 
 /* Leave-a-review modal */
