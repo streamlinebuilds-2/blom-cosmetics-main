@@ -1165,6 +1165,118 @@ body[data-blom-route] .home-page main .home-products__grid button.bg-pink-500:ho
   font-weight: 600;
 }
 
+.review-modal__product-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.review-modal__product-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  background: var(--home-pink-soft);
+  padding: 6px 8px 6px 14px;
+  color: var(--home-pink-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.review-modal__product-chip button {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 116, 164, 0.18);
+  color: var(--home-pink-text);
+  cursor: pointer;
+}
+
+.review-modal__product-chip button:hover {
+  background: var(--home-pink);
+  color: #ffffff;
+}
+
+.review-modal__product-chip button svg {
+  width: 12px;
+  height: 12px;
+}
+
+.review-modal__product-search {
+  position: relative;
+}
+
+.review-modal__product-search-icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  color: var(--home-muted);
+  pointer-events: none;
+}
+
+.review-modal__field .review-modal__product-search input[type='text'] {
+  width: 100%;
+  border: 1px solid rgba(23, 32, 51, 0.16);
+  border-radius: 14px;
+  padding: 12px 14px 12px 40px;
+  color: var(--home-ink);
+  font-size: 0.94rem;
+  font-family: inherit;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.review-modal__field .review-modal__product-search input[type='text']:focus {
+  outline: none;
+  border-color: var(--home-pink);
+  box-shadow: 0 0 0 3px rgba(255, 116, 164, 0.16);
+}
+
+.review-modal__product-suggestions {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid rgba(23, 32, 51, 0.12);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 6px;
+  box-shadow: 0 16px 32px rgba(23, 32, 51, 0.14);
+}
+
+.review-modal__product-suggestion {
+  display: block;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  padding: 10px 12px;
+  color: var(--home-ink);
+  font-size: 0.88rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.review-modal__product-suggestion:hover {
+  background: var(--home-pink-soft);
+  color: var(--home-pink-text);
+}
+
+.review-modal__product-empty {
+  margin: 0;
+  padding: 10px 12px;
+  color: var(--home-muted);
+  font-size: 0.85rem;
+}
+
 .review-modal__photo-input {
   position: absolute;
   width: 1px;

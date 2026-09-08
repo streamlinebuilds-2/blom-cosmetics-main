@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Camera, Loader2, Sparkles, X } from 'lucide-react';
+import { Camera, Loader2, Search, Sparkles, X } from 'lucide-react';
+import { supabase } from '../../lib/supabase';
+
+interface ProductOption {
+  id: string;
+  name: string;
+}
 
 export interface SubmittedReview {
   id: string;
@@ -18,7 +24,7 @@ interface LeaveReviewModalProps {
 const MAX_PHOTO_DIMENSION = 900;
 const NAME_LIMIT = 80;
 const REVIEW_LIMIT = 600;
-const PRODUCTS_LIMIT = 150;
+const MAX_SUGGESTIONS = 8;
 
 function compressImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -49,7 +55,10 @@ function compressImage(file: File): Promise<string> {
 export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({ onClose, onSubmitted }) => {
   const [name, setName] = useState('');
   const [reviewText, setReviewText] = useState('');
-  const [products, setProducts] = useState('');
+  const [productQuery, setProductQuery] = useState('');
+  const [productOptions, setProductOptions] = useState<ProductOption[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<ProductOption[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -58,6 +67,8 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({ onClose, onS
   const [isDone, setIsDone] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const productFieldRef = useRef<HTMLDivElement>(null);
+  const productInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     nameInputRef.current?.focus();
@@ -72,6 +83,48 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({ onClose, onS
       document.body.style.overflow = previousOverflow;
     };
   }, [onClose]);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from('products')
+      .select('id, name')
+      .eq('status', 'active')
+      .order('name')
+      .then(({ data, error }) => {
+        if (!cancelled && !error && data) setProductOptions(data as ProductOption[]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    const onClickOutside = (event: MouseEvent) => {
+      if (productFieldRef.current && !productFieldRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, []);
+
+  const selectedIds = new Set(selectedProducts.map((p) => p.id));
+  const query = productQuery.trim().toLowerCase();
+  const productSuggestions = query
+    ? productOptions.filter((p) => !selectedIds.has(p.id) && p.name.toLowerCase().includes(query)).slice(0, MAX_SUGGESTIONS)
+    : [];
+
+  const addProduct = (product: ProductOption) => {
+    setSelectedProducts((previous) => [...previous, product]);
+    setProductQuery('');
+    setShowSuggestions(false);
+    productInputRef.current?.focus();
+  };
+
+  const removeProduct = (id: string) => {
+    setSelectedProducts((previous) => previous.filter((p) => p.id !== id));
+  };
 
   const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -122,7 +175,7 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({ onClose, onS
         body: JSON.stringify({
           name: name.trim(),
           review_text: reviewText.trim(),
-          products_mentioned: products.trim() || null,
+          products_mentioned: selectedProducts.length ? selectedProducts.map((p) => p.name).join(', ') : null,
           photo: photoPreview,
         }),
       });
@@ -200,16 +253,61 @@ export const LeaveReviewModal: React.FC<LeaveReviewModalProps> = ({ onClose, onS
                 </div>
               </div>
 
-              <div className="review-modal__field">
+              <div className="review-modal__field" ref={productFieldRef}>
                 <label htmlFor="review-products">Products mentioned (optional)</label>
-                <input
-                  id="review-products"
-                  type="text"
-                  value={products}
-                  maxLength={PRODUCTS_LIMIT}
-                  onChange={(event) => setProducts(event.target.value)}
-                  placeholder="e.g. Ultra Bond Nail Glue, Top Coat"
-                />
+
+                {selectedProducts.length > 0 && (
+                  <div className="review-modal__product-chips">
+                    {selectedProducts.map((product) => (
+                      <span className="review-modal__product-chip" key={product.id}>
+                        {product.name}
+                        <button
+                          type="button"
+                          onClick={() => removeProduct(product.id)}
+                          aria-label={`Remove ${product.name}`}
+                        >
+                          <X aria-hidden="true" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="review-modal__product-search">
+                  <Search aria-hidden="true" className="review-modal__product-search-icon" />
+                  <input
+                    id="review-products"
+                    ref={productInputRef}
+                    type="text"
+                    value={productQuery}
+                    onChange={(event) => {
+                      setProductQuery(event.target.value);
+                      setShowSuggestions(true);
+                    }}
+                    onFocus={() => setShowSuggestions(true)}
+                    placeholder="Start typing a product name..."
+                    autoComplete="off"
+                  />
+
+                  {showSuggestions && query && (
+                    <div className="review-modal__product-suggestions">
+                      {productSuggestions.length > 0 ? (
+                        productSuggestions.map((product) => (
+                          <button
+                            type="button"
+                            key={product.id}
+                            className="review-modal__product-suggestion"
+                            onClick={() => addProduct(product)}
+                          >
+                            {product.name}
+                          </button>
+                        ))
+                      ) : (
+                        <p className="review-modal__product-empty">No matching products found.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="review-modal__field">
