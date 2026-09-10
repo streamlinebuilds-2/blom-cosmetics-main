@@ -106,11 +106,11 @@ export const CourseDetailPage: React.FC = () => {
           ]
         },
         {
-          name: 'Rochelle Visser',
+          name: 'Rochelle Ras',
           image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1788858144/Codex_Image_Sep_8_2026_09_15_30_AM_ggfdfj.png',
           bio: 'Professional nail artist with years of experience in nail artistry. Rochelle specialises in teaching proper techniques and helping students build confidence in their nail artistry skills.',
           location: '21 Selborne Ave, Geduld Ext, Springs',
-          email: 'rochellevisser@hotmail.com',
+          email: 'blomcosmetics.springs@gmail.com',
           phone: '0760183671',
           availableDates: [
             '19–23 October 2026',
@@ -311,11 +311,11 @@ export const CourseDetailPage: React.FC = () => {
           ]
         },
         {
-          name: 'Rochelle Visser',
+          name: 'Rochelle Ras',
           image: 'https://res.cloudinary.com/dnlgohkcc/image/upload/v1788858144/Codex_Image_Sep_8_2026_09_15_30_AM_ggfdfj.png',
           bio: 'Professional nail artist with years of experience in nail artistry. Rochelle specialises in teaching proper techniques and helping students build confidence in their nail artistry skills.',
           location: '21 Selborne Ave, Geduld Ext, Springs',
-          email: 'rochellevisser@hotmail.com',
+          email: 'blomcosmetics.springs@gmail.com',
           phone: '0760183671',
           availableDates: [
             '28–30 October 2026',
